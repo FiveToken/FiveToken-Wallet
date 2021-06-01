@@ -1,0 +1,8 @@
+framework module "Wlib" {
+	header "ref.h"
+    header "Wlib.objc.h"
+    header "Universe.objc.h"
+    header "Wlib.h"
+
+    export *
+}
