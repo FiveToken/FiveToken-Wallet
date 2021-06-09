@@ -3,6 +3,7 @@ import 'package:fil/common/navigation.dart';
 import 'package:fil/i10n/localization.dart';
 import 'package:fil/index.dart';
 import 'package:fil/lang/index.dart';
+import 'package:fil/pages/main/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -43,7 +44,7 @@ class AppState extends State<App> {
       void checkAndGo(String link) {
         var l = getValidWCLink(link);
         if (l != '') {
-          Get.offAllNamed(mainPage, arguments: {'url': l});
+          Get.offAll(MainPage(),transition: Transition.fadeIn,arguments: {'url': l});
         }
       }
 

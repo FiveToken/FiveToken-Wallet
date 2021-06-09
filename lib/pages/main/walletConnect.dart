@@ -70,7 +70,7 @@ class ConectedWallet extends StatelessWidget {
                     ],
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  margin: EdgeInsets.only(bottom: 20),
+                  margin: EdgeInsets.only(bottom: 40),
                 )
           ],
         ),

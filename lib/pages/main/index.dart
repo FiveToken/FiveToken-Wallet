@@ -65,6 +65,21 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     reConnect();
   }
 
+  List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
+    return [
+      (WCSession session, JsonRpc rpc) {
+        if (!session.isConnected) {
+          Global.store.remove('wcSession');
+          setState(() {
+            this.connectedSession = null;
+            this.meta = null;
+          });
+        }
+        return rpc;
+      }
+    ];
+  }
+
   List<JsonRpc Function(WCSession, JsonRpc)> get transcationCallback {
     return [
       (WCSession session, JsonRpc rpc) {
@@ -103,7 +118,10 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
             bridgeUrl: m['bridgeUrl'],
             logger: Logger(),
             keyHex: m['keyHex'],
-            eventHandler: {'fil_sendTransaction': transcationCallback});
+            eventHandler: {
+              'fil_sendTransaction': transcationCallback,
+              'wc_sessionUpdate': sessionUpdateCallback,
+            });
         wc.isConnected = wc.isActive = true;
         wc.theirPeerId = m['theirPeerId'];
         var meta = m['theirMeta'];
@@ -222,16 +240,21 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   void handleScan() async {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
-        .then((link) async {
-      if (getValidWCLink(link) != '') {
-        connectWallet(link);
+        .then((value) async {
+      if (value != null && isValidAddress(value)) {
+        Get.toNamed(filTransferPage, arguments: {'to': value});
+      } else if (getValidWCLink(value) != '') {
+        connectWallet(value);
       }
     });
   }
 
   void connectWallet(String uri, {bool newConnect = true}) {
     if (newConnect) {
-      showCustomLoading('connecting');
+      showCustomLoading('Connecting');
+      Future.delayed(Duration(seconds: 20)).then((value) {
+        dismissAllToast();
+      });
     }
     WCSession.connectSession(uri, jsonRpcHandler: {
       'wc_sessionRequest': [
@@ -241,12 +264,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
           return rpc;
         }
       ],
-      'wc_sessionUpdate': [
-        (WCSession session, JsonRpc rpc) {
-          print(session.isConnected);
-          return rpc;
-        }
-      ],
+      'wc_sessionUpdate': sessionUpdateCallback,
       'fil_sendTransaction': [
         (WCSession session, JsonRpc rpc) {
           var params = rpc.params;
@@ -440,8 +458,17 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     var rawMeta = session.theirMeta;
     var handle = (bool approved) {
       session
-          .sendSessionRequestResponse(rpc, 'Filecoin Wallet', rawMeta,
-              ['0xCe855cd625A5C04F93998c80e4388C8c11832Ad7'], approved,
+          .sendSessionRequestResponse(
+              rpc,
+              'Filecoin Wallet',
+              {
+                'description': '',
+                'name': 'Filecoin Wallet',
+                'url': 'https://filecoinwallet.com/',
+                'icons': ['https://filecoinwallet.com/logo.jpg']
+              },
+              [singleStoreController.wal.addrWithNet],
+              approved,
               chainId: 1)
           .then((value) {
         if (approved) {
@@ -499,7 +526,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                             meta: meta,
                             footer: Container(
                               padding: EdgeInsets.symmetric(horizontal: 20),
-                              margin: EdgeInsets.only(bottom: 20),
+                              margin: EdgeInsets.only(bottom: 40),
                               child: FButton(
                                 text: 'DisConnect',
                                 alignment: Alignment.center,
@@ -528,16 +555,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 actions: [
                   Padding(
                     child: GestureDetector(
-                        // onTap: () {
-                        //   Get.toNamed(scanPage,
-                        //           arguments: {'scene': ScanScene.Address})
-                        //       .then((value) {
-                        //     if (value != null && isValidAddress(value)) {
-                        //       Get.toNamed(filTransferPage,
-                        //           arguments: {'to': value});
-                        //     }
-                        //   });
-                        // },
                         onTap: handleScan,
                         child: Image(
                           width: 20,
