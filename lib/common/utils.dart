@@ -351,7 +351,7 @@ String getValidWCLink(String link) {
       return link;
     } else if (link.startsWith('filecoinwallet')) {
       var list = link.split('uri=');
-      if (list.length == 3) {
+      if (list.length == 2) {
         return list[1];
       } else {
         return '';

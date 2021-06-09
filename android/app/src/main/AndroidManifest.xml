@@ -16,7 +16,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="filecoinwallet" android:host="io.filecoinwallet.fil" />
+                <data android:scheme="filecoinwallet"/>
             </intent-filter>
             <intent-filter>
                 <data android:scheme="wc" />
