@@ -1,8 +1,9 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
-Future<int> getNonce(Wallet w) async {
+Future<int> getNonce(ChainWallet w) async {
   var data = JsonRPCRequest(1, "filscan.BalanceNonceByAddress", [
-    {"address": w.address},
+    {"address": w.addr},
   ]);
   var rs = await baseRequest
       .post(
@@ -29,9 +30,9 @@ Future<int> getNonce(Wallet w) async {
   return r == null ? -1 : r;
 }
 
-Future<BalanceNonce> getBalance(Wallet w) async {
+Future<BalanceNonce> getBalance(ChainWallet w) async {
   var rs = await fetch("filscan.BalanceNonceByAddress", [
-    {"address": w.address},
+    {"address": w.addr},
   ]);
   print(rs);
   var balanceNonce = BalanceNonce();

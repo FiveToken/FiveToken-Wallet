@@ -33,7 +33,7 @@ class WalletInitPage extends StatelessWidget {
                     height: 12,
                   ),
                   CommonText(
-                    'Filecoin Wallet',
+                    'FiveToken',
                     color: Colors.white,
                     size: 20,
                     weight: FontWeight.w800,
@@ -79,12 +79,14 @@ class WalletInitPage extends StatelessWidget {
                       CardItem(
                           label: 'pkImport'.tr,
                           onTap: () {
-                            Get.toNamed(importPrivateKeyPage);
+                            Get.toNamed(importIndexPage,
+                                arguments: {'net': $store.net, 'type': 2});
                           }),
                       CardItem(
                           label: 'mneImport'.tr,
                           onTap: () {
-                            Get.toNamed(importMnePage);
+                            Get.toNamed(importIndexPage,
+                                arguments: {'net': $store.net, 'type': 1});
                           })
                     ],
                   ),
@@ -93,7 +95,7 @@ class WalletInitPage extends StatelessWidget {
             ),
             Spacer(),
             CommonText(
-              'v1.0.0',
+              Global.version,
               color: Colors.white,
               size: 14,
             ),

@@ -1,14 +1,21 @@
+import 'dart:developer';
+
 import 'package:fil/index.dart';
 import './fetch.dart';
+
 var messageApi = 'https://api.filwallet.ai:5679/rpc/v0';
+// var messageApi = 'http://192.168.1.189:5678/rpc/v0';
 Future<String> pushSignedMsg(Map<String, dynamic> msg) async {
+  var api = $store.net.prefix == ''
+      ? 'https://api.filwallet.ai:5679/rpc/v0'
+      : 'http://192.168.1.189:5678/rpc/v0';
   if (!Global.online) {
     showCustomError('errorNet'.tr);
   }
   var data = JsonRPCRequest(1, "Filecoin.MessagePush", [msg]);
   try {
     var rs = await Dio().post(
-      messageApi,
+      api,
       data: data,
     );
     print(jsonEncode(data));
@@ -35,7 +42,7 @@ Future<String> pushSignedMsg(Map<String, dynamic> msg) async {
   }
 }
 
-Future<List> getMessageList(
+Future<List<Map<String, dynamic>>> getMessageList(
     {String address = '',
     num time,
     String direction = 'up',
@@ -51,11 +58,9 @@ Future<List> getMessageList(
     }
   ]);
   print(jsonEncode(data));
-  var result =
-      await baseRequest.post('/rpc/v1', data: data).catchError((value) {
+  var result = await Dio().post($store.net.rpc, data: data).catchError((value) {
     print(value);
   });
-
   var response = JsonRPCResponse.fromJson(result.data);
   if (response.error != null) {
     return [];
@@ -63,7 +68,10 @@ Future<List> getMessageList(
   var res = response.result;
   if (res != null) {
     if (res["data"] != null && res['data'] is List) {
-      return res['data'];
+      List list = res['data'];
+      return list.map((mes) {
+        return mes as Map<String, dynamic>;
+      }).toList();
     } else {
       return [];
     }

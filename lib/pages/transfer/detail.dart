@@ -1,6 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
-import 'package:oktoast/oktoast.dart';
+import 'package:web3dart/web3dart.dart';
 
 class FilDetailPage extends StatefulWidget {
   @override
@@ -8,47 +8,31 @@ class FilDetailPage extends StatefulWidget {
 }
 
 class FilDetailPageState extends State<FilDetailPage> {
-  MessageDetail msgDetail =
-      MessageDetail(value: '0', methodName: '', allGasFee: '0');
-  StoreMessage mes = Get.arguments;
-  StoreController controller = Get.find();
-  void getMessageDetailInfo() async {
-    if (mes.pending == 1 || mes.exitCode == -1 || mes.exitCode == -2) {
-      setState(() {
-        msgDetail = MessageDetail(
-            from: mes.from,
-            to: mes.to,
-            value: mes.value,
-            methodName: '',
-            signedCid: mes.signedCid);
-      });
-      return;
-    }
-    showCustomLoading('Loading');
-    var res = await getMessageDetail(mes);
-    dismissAllToast();
-    if (res.height != null) {
-      setState(() {
-        msgDetail = res;
-      });
-    }
-  }
+  CacheMessage mes = Get.arguments;
+  ChainProvider provider;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero).then((value) => getMessageDetailInfo());
   }
 
-  void goFilScan(MessageDetail m) {
-    openInBrowser("$filscanWeb/tipset/message-detail?cid=${m.signedCid}");
+  void goBrowser(CacheMessage m) {
+    openInBrowser($store.net.getDetailLink(m.hash));
+  }
+
+  ChainProvider initProvider() {
+    if ($store.net.addressType == 'eth') {
+      return EthProvider($store.net);
+    } else {
+      return FilecoinProvider($store.net);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       grey: true,
-      title: 'detail'.tr,
+      title: '详情',
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 30, 12, 0),
@@ -61,10 +45,7 @@ class FilDetailPageState extends State<FilDetailPage> {
             SizedBox(
               height: 25,
             ),
-            CommonCard(MessageRow(
-              label: 'amount'.tr,
-              value: atto2Fil(msgDetail.value) + ' FIL',
-            )),
+            CommonCard(MessageRow(label: 'amount'.tr, value: mes.formatValue)),
             SizedBox(
               height: 7,
             ),
@@ -72,22 +53,18 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: atto2Fil(msgDetail.allGasFee) + ' FIL',
+                  value: formatCoin(mes.fee),
                 ))),
             SizedBox(
               height: 7,
             ),
             CommonCard(Column(
               children: [
-                MessageRow(
-                  label: 'from'.tr,
-                  selectable: true,
-                  value: msgDetail.from,
-                ),
+                MessageRow(label: 'from'.tr, selectable: true, value: mes.from),
                 MessageRow(
                   label: 'to'.tr,
                   selectable: true,
-                  value: msgDetail.to,
+                  value: mes.to,
                 )
               ],
             )),
@@ -99,18 +76,18 @@ class FilDetailPageState extends State<FilDetailPage> {
                 MessageRow(
                   label: 'cid'.tr,
                   selectable: true,
-                  value: msgDetail.signedCid,
+                  value: mes.hash,
                 ),
                 Visibility(
                   visible: mes.pending != 1,
                   child: MessageRow(
                     label: 'height'.tr,
-                    value: msgDetail.height.toString(),
+                    value: mes.height.toString(),
                   ),
                 ),
                 GestureDetector(
                   onTap: () {
-                    goFilScan(msgDetail);
+                    goBrowser(mes);
                   },
                   child: Container(
                     width: double.infinity,
@@ -139,7 +116,7 @@ class FilDetailPageState extends State<FilDetailPage> {
 }
 
 class MessageStatusHeader extends StatelessWidget {
-  final StoreMessage mes;
+  final CacheMessage mes;
   MessageStatusHeader(this.mes);
   bool get pending {
     return mes.pending == 1;
@@ -198,13 +175,13 @@ class MessageRow extends StatelessWidget {
             Expanded(
                 child: GestureDetector(
               onTap: () {
-                if (selectable) {
+                if (selectable && value != null) {
                   copyText(value);
                   showCustomToast('copySucc'.tr);
                 }
               },
               child: Text(
-                value,
+                value ?? '',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.end,
               ),

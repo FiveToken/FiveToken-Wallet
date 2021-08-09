@@ -2,56 +2,59 @@ import 'package:day/day.dart';
 import 'package:fil/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:web3dart/web3dart.dart' hide AddressType;
+import 'package:http/http.dart' as http;
 
-class CommonOnlineWallet extends StatefulWidget {
+class MessageListWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return CommonOnlineWidgetState();
   }
 }
 
-class CommonOnlineWidgetState extends State<CommonOnlineWallet>
-    with RouteAware, WidgetsBindingObserver {
+class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
   bool enablePullDown = true;
-  bool enablePullUp = true;
-  StoreController controller = Get.find();
-  Map<String, List<StoreMessage>> mesMap = {};
+  bool enablePullUp;
+  Map<String, List<CacheMessage>> mesMap = {};
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  var box = Hive.box<StoreMessage>(messageBox);
-  List<StoreMessage> messageList = [];
+  var box = OpenedBox.mesInstance;
+  List<CacheMessage> messageList = [];
   Timer timer;
   num currentNonce;
+  StreamSubscription sub;
+  Network net = $store.net;
+  ChainProvider provider;
+  Web3Client client;
+  bool get isFil {
+    return this.net.addressType == AddressType.filecoin.type;
+  }
+
   void _onRefresh() async {
-    await updateBalance();
-    await getMessagesAfterFirstCompletedMessage();
+    if (this.currentNonce == null) {
+      await getNonce();
+    }
+    await loadLatestMessage();
     _refreshController.refreshCompleted();
   }
 
   void _onLoading() async {
-    await getMessagesBeforeLastCompletedMessage();
+    await loadFilecoinOldMessages();
     _refreshController.loadComplete();
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    var list = getWalletSortedMessages();
-    if (list.isEmpty) {
-      getMessages().then((lis) {
-        setState(() {
-          messageList = lis;
-          enablePullUp = lis.length == 80;
-        });
+    enablePullUp = isFil;
+    provider = isFil ? FilecoinProvider(net) : EthProvider(net);
+    sub = Global.eventBus.on<AppStateChangeEvent>().listen((event) {
+      updateBalance().then((value) {
+        loadFilecoinLatestMessages();
       });
-    } else {
-      setState(() {
-        messageList = list;
-      });
-      updateBalance();
-      getMessagesAfterFirstCompletedMessage();
-    }
+    });
+    initList();
+    getNonce();
   }
 
   @override
@@ -64,6 +67,8 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
   void dispose() {
     routeObserver.unsubscribe(this);
     super.dispose();
+    sub.cancel();
+    provider?.dispose();
   }
 
   @override
@@ -72,34 +77,102 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
     setList();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState appLifecycleState) {
-    super.didChangeAppLifecycleState(appLifecycleState);
-    if (appLifecycleState == AppLifecycleState.resumed) {
-      if (timer == null) {
-        timer = Timer(Duration(milliseconds: 100), () async {
-          updateBalance().then((value) {
-            timer = null;
-            getMessagesAfterFirstCompletedMessage();
+  void initList() {
+    var list = getWalletSortedMessages();
+    if (list.isEmpty) {
+      if (isFil) {
+        getMessages().then((lis) {
+          setState(() {
+            messageList = lis;
+            enablePullUp = lis.length == 80;
           });
         });
       } else {
-        timer.cancel();
+        client = Web3Client(net.rpc, http.Client());
+      }
+    } else {
+      setState(() {
+        messageList = list;
+      });
+      // updateBalance();
+      if (isFil) {
+        loadFilecoinLatestMessages();
+      } else {
+        client = Web3Client(net.rpc, http.Client());
+      }
+    }
+  }
+
+  Future loadLatestMessage() async {
+    if (isFil) {
+      await loadFilecoinLatestMessages();
+    } else {
+      await loadEthLatestMessage();
+    }
+  }
+
+  Future getNonce() async {
+    var res = await provider.getNonce();
+    if (res != -1) {
+      this.currentNonce = res;
+    }
+  }
+
+  Future loadEthLatestMessage() async {
+    var pendingList = box.values
+        .where((mes) => mes.pending == 1 && mes.rpc == net.rpc)
+        .toList();
+    if (pendingList.isNotEmpty) {
+      try {
+        var list = await Future.wait<TransactionReceipt>(
+            pendingList.map((mes) => client.getTransactionReceipt(mes.hash)));
+        Map<String, TransactionReceipt> map = {};
+        for (var i = 0; i < list.length; i++) {
+          var t = list[i];
+          var mes = pendingList[i];
+          if (t != null && t.gasUsed != null) {
+            var limit = BigInt.tryParse(mes.gas.gasPrice) ?? BigInt.one;
+            mes.fee = (limit * t.gasUsed).toString();
+            map[mes.hash] = t;
+          }
+        }
+        if (map.isNotEmpty) {
+          var futures = map.values
+              .map((t) => client.getBlockByNumber(t.blockNumber.blockNum))
+              .toList();
+          var mesList = map.keys.toList();
+          var blocks = await Future.wait(futures);
+          for (var i = 0; i < mesList.length; i++) {
+            var block = blocks[i];
+            var key = mesList[i];
+            var mes = box.get(key);
+            if (block.timestamp != null && block.timestamp is int) {
+              mes.pending = 0;
+              mes.blockTime = block.timestamp;
+              mes.height = block.number;
+              mes.exitCode = map[key].status ? 0 : 1;
+              box.put(key, mes);
+            }
+          }
+          setList();
+        }
+      } catch (e) {
+        print(e);
       }
     }
   }
 
   Future<void> updateBalance() async {
-    var wal = singleStoreController.wal;
-    var res = await getBalance(singleStoreController.wal);
+    var wal = $store.wal;
+    var res = await getBalance($store.wal);
     if (res.nonce != -1) {}
     wal.balance = res.balance;
-    singleStoreController.changeWalletBalance(res.balance);
+    $store.changeWalletBalance(res.balance);
     this.currentNonce = res.nonce;
-    OpenedBox.addressInsance.put(wal.address, wal);
+    OpenedBox.walletInstance.put(wal.address, wal);
   }
 
-  Future getMessagesAfterFirstCompletedMessage() async {
+  Future loadFilecoinLatestMessages() async {
     var list = messageList;
     num time;
     if (list.isNotEmpty) {
@@ -122,7 +195,7 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
     }
   }
 
-  Future getMessagesBeforeLastCompletedMessage() async {
+  Future loadFilecoinOldMessages() async {
     var list = messageList;
     num time;
     if (list.isNotEmpty) {
@@ -147,12 +220,13 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
     }
   }
 
-  List<StoreMessage> getWalletSortedMessages() {
-    var list = <StoreMessage>[];
-    var address = controller.wal.address;
+  List<CacheMessage> getWalletSortedMessages() {
+    var list = <CacheMessage>[];
+    var address = $store.wal.addr;
     box.values.forEach((element) {
       var message = element;
-      if (message.from == address || message.to == address) {
+      if ((message.from == address || message.to == address) &&
+          message.rpc == $store.net.rpc) {
         list.add(message);
       }
     });
@@ -166,34 +240,46 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
     return list;
   }
 
-  Future<List<StoreMessage>> getMessages(
+  Future<List<CacheMessage>> getMessages(
       {num time, String direction = 'up', num count = 80}) async {
     try {
       var res = await getMessageList(
-          address: controller.wal.address,
+          address: $store.wal.addr,
           direction: direction,
           time: time,
           count: count);
       if (res.isNotEmpty) {
-        var messages = res.map((e) {
-          var mes = StoreMessage.fromJson(e);
-          mes.pending = 0;
-          mes.owner = controller.wal.address;
-          return mes;
-        }).toList();
+        List<CacheMessage> messages = [];
+        res.forEach((map) {
+          var mes = CacheMessage(
+              hash: map['signed_cid'],
+              to: map['to'],
+              from: map['from'],
+              value: map['value'],
+              blockTime: map['block_time'],
+              exitCode: map['exit_code'],
+              owner: $store.wal.addr,
+              pending: 0,
+              height: map['height'],
+              nonce: map['nonce']);
+          if (map['method_name'] == 'transfer' ||
+              map['method_name'] == 'send') {
+            messages.add(mes);
+          }
+        });
         var nonce = this.currentNonce;
         var pendingList = box.values.where((mes) => mes.pending == 1).toList();
         if (pendingList.isNotEmpty) {
           for (var k = 0; k < pendingList.length; k++) {
             var mes = pendingList[k];
             if (mes.nonce < nonce) {
-              await box.delete(mes.signedCid);
+              await box.delete(mes.hash);
             }
           }
         }
         for (var i = 0; i < messages.length; i++) {
           var m = messages[i];
-          await box.put(m.signedCid, m);
+          await box.put(m.hash, m);
         }
         return messages.toList();
       } else {
@@ -275,16 +361,17 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
                         ),
                         Column(
                           children: List.generate(l.length, (i) {
+                            //TODO
                             var message = l[i];
-                            var args = message.args;
-                            if (args != null && args != 'null') {
-                              var decodeArgs = jsonDecode(args);
-                              if (decodeArgs != null &&
-                                  (decodeArgs is Map) &&
-                                  decodeArgs['AmountRequested'] != null) {
-                                message.value = decodeArgs['AmountRequested'];
-                              }
-                            }
+                            var args = message.owner;
+                            // if (args != null && args != 'null') {
+                            //   var decodeArgs = jsonDecode(args);
+                            //   if (decodeArgs != null &&
+                            //       (decodeArgs is Map) &&
+                            //       decodeArgs['AmountRequested'] != null) {
+                            //     message.value = decodeArgs['AmountRequested'];
+                            //   }
+                            // }
                             return MessageItem(message);
                           }),
                         )
@@ -300,10 +387,10 @@ class CommonOnlineWidgetState extends State<CommonOnlineWallet>
 }
 
 class MessageItem extends StatelessWidget {
-  final StoreMessage mes;
+  final CacheMessage mes;
   MessageItem(this.mes);
   bool get isSend {
-    return mes.from == singleStoreController.wal.address;
+    return mes.from == $store.wal.address;
   }
 
   bool get fail {
@@ -320,12 +407,15 @@ class MessageItem extends StatelessWidget {
     return '$pre ${dotString(str: address)}';
   }
 
+  bool get isToken => mes.token != null;
   String get value {
-    var v = atto2Fil(mes.value);
+    var v =
+        isToken ? mes.token.getFormatBalance(mes.value) : formatCoin(mes.value);
+    var unit = isToken ? $store.net.coin : mes.token?.symbol;
     if (v == '0') {
-      return '0 FIL';
+      return '0 $unit';
     } else {
-      return '${pending || fail ? '' : (isSend ? '-' : '+')}${atto2Fil(mes.value)} FIL';
+      return '${pending || fail ? '' : (isSend ? '-' : '+')} $v';
     }
   }
 

@@ -2,73 +2,6 @@ import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'message.g.dart';
 
-class Receipt {
-  String ret;
-  num exitCode, gasUsed;
-
-  Receipt(this.exitCode, this.gasUsed, this.ret);
-
-  Receipt.fromJson(Map<String, dynamic> json)
-      : this.ret = json['return'],
-        this.exitCode = json['exit_code'],
-        this.gasUsed = json['gas_used'];
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      "return": this.ret,
-      "gas_used": this.gasUsed,
-      "exit_code": this.exitCode,
-    };
-  }
-}
-
-class Message {
-  String to, from, value, gasPrice, params, gasFeeCap, gasPremium;
-  num version, nonce, gasLimit, method;
-
-  Message(
-      {this.version,
-      this.to,
-      this.from,
-      this.value,
-      this.gasPrice,
-      this.gasLimit,
-      this.params,
-      this.nonce,
-      this.method,
-      this.gasFeeCap,
-      this.gasPremium});
-
-  Message.fromJson(Map<String, dynamic> json)
-      : this.version = json['version'],
-        this.to = json['to'],
-        this.from = json['from'],
-        this.value = json['value'],
-        this.gasPrice = json['gas_price'],
-        this.gasLimit = json['gas_limit'],
-        this.params = json['params'],
-        this.nonce = json['nonce'],
-        this.method = json['method'],
-        this.gasFeeCap = json['gas_fee_cap'],
-        this.gasPremium = json['gas_premium'];
-
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      "version": this.version,
-      "to": this.to,
-      "from": this.from,
-      "value": this.value,
-      "gas_price": this.gasPrice,
-      "gas_limit": this.gasLimit,
-      "gas_premium": this.gasPremium,
-      "gas_fee_cap": this.gasFeeCap,
-      "params": this.params,
-      "nonce": this.nonce,
-      "method": this.method,
-    };
-  }
-}
-
 class MessageDetail {
   String to,
       from,
@@ -197,40 +130,84 @@ class StoreMessage {
   }
 }
 
-class WrappedMessage {
-  dynamic message, receipt, signature;
-  String cid, blockCid, requiredFunds;
-  num blockHeight, size, timestamp, pushTime, status;
+@HiveType(typeId: 11)
+class CacheMessage {
+  @HiveField(0)
+  String from;
+  @HiveField(1)
+  String to;
+  @HiveField(2)
+  String owner;
+  @HiveField(3)
+  String hash;
+  @HiveField(4)
+  String value;
+  @HiveField(5)
+  num blockTime;
+  @HiveField(6)
+  num exitCode;
+  @HiveField(7)
+  num pending;
+  @HiveField(8)
+  num nonce;
+  @HiveField(9)
+  String rpc;
+  @HiveField(10)
+  ChainGas gas;
+  @HiveField(11)
+  Token token;
+  @HiveField(12)
+  String fee;
+  @HiveField(13)
+  int height;
+  CacheMessage(
+      {this.from = '',
+      this.to = '',
+      this.hash = '',
+      this.value = '0',
+      this.blockTime = 0,
+      this.owner = '',
+      this.pending = 1,
+      this.nonce = 0,
+      this.rpc = '',
+      this.gas,
+      this.token,
+      this.fee = '',
+      this.height = 0,
+      this.exitCode});
+  String get formatValue {
+    if (token != null) {
+      return token.getFormatBalance(value);
+    } else {
+      return formatCoin(value);
+    }
+  }
 
-  WrappedMessage(this.message, this.cid, this.blockCid, this.requiredFunds,
-      this.blockHeight, this.size, this.timestamp, this.pushTime, this.status);
-
-  WrappedMessage.fromJson(Map<String, dynamic> json)
-      : this.message = json['message'],
-        this.cid = json['cid'],
-        this.blockCid = json['block_cid'],
-        this.requiredFunds = json['required_funds'],
-        this.blockHeight = json['block_height'],
-        this.size = json['size'],
-        this.timestamp = json['timestamp'],
-        this.pushTime = json['push_time'],
-        this.status = json['status'],
-        this.receipt = json['receipt'],
-        this.signature = json['signature'];
-
+  // CacheMessage.fromJson(Map<dynamic, dynamic> json)
+  //     : this.hash = json['signed_cid'],
+  //       this.to = json['to'],
+  //       this.from = json['from'] ?? 0,
+  //       this.value = json['value'],
+  //       this.blockTime = json['block_time'],
+  //       this.exitCode = json['exit_code'],
+  //       this.owner = json['owner'],
+  //       this.pending = json['pending'],
+  //       this.nonce = json['nonce'];
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      "message": this.message,
-      "cid": this.cid,
-      "block_cid": this.blockCid,
-      "required_funds": this.requiredFunds,
-      "block_height": this.blockHeight,
-      "size": this.size,
-      "timestamp": this.timestamp,
-      "push_time": this.pushTime,
-      "status": this.status,
-      "receipt": this.receipt,
-      "signature": this.signature,
+      'signed_cid': hash,
+      'to': to,
+      'from': from,
+      'value': value,
+      'block_time': blockTime,
+      'exit_code': exitCode,
+      'pending': pending,
+      'owner': owner,
+      'nonce': nonce,
+      'gas': gas,
+      'token': token,
+      'fee': fee,
+      'height': height
     };
   }
 }

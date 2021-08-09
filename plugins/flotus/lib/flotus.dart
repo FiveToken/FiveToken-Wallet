@@ -67,6 +67,13 @@ class Flotus {
     return addr;
   }
 
+  static Future<String> genProposalForChangeWorkerAddress(
+      String miner, String params) async {
+    final String addr = await _channel.invokeMethod(
+        'genProposalForChangeWorkerAddress', {'miner': miner, 'value': params});
+    return addr;
+  }
+
   static Future<String> genApprovalV3(String tx) async {
     final String addr = await _channel.invokeMethod('genApprovalV3', {
       'tx': tx,

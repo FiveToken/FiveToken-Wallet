@@ -16,7 +16,7 @@ class FilGasPage extends StatefulWidget {
 }
 
 class FilGasPageState extends State<FilGasPage> {
-  StoreController controller = singleStoreController;
+  StoreController controller = $store;
   TextEditingController baseFeeCtrl = TextEditingController();
   int index = 0;
   void onChange(String v) {
@@ -29,7 +29,8 @@ class FilGasPageState extends State<FilGasPage> {
 
   int get baseFee {
     try {
-      var base = int.parse(singleStoreController.gas.value.baseFee);
+      //TODO
+      var base = int.parse($store.gas.gasPremium);
       return base;
     } catch (e) {
       return 0;
@@ -38,7 +39,7 @@ class FilGasPageState extends State<FilGasPage> {
 
   int get premium {
     try {
-      var p = int.parse(singleStoreController.gas.value.premium);
+      var p = int.parse($store.gas.gasPremium);
       return p;
     } catch (e) {
       return 0;
@@ -58,13 +59,13 @@ class FilGasPageState extends State<FilGasPage> {
 
   String get feePrice {
     return getMarketPrice(
-        singleStoreController.maxFee.replaceAll('Fil', ''), Global.price.rate);
+        $store.gas.maxFee.replaceAll('Fil', ''), Global.price.rate);
   }
 
   @override
   void initState() {
     super.initState();
-    index = singleStoreController.gas.value.level;
+    index = $store.gas.level;
     baseFeeCtrl.addListener(() {
       var baseFeeStr = baseFeeCtrl.text.trim();
       if (baseFeeStr == '') {
@@ -72,10 +73,10 @@ class FilGasPageState extends State<FilGasPage> {
       }
       try {
         var baseFeeNum = int.parse(baseFeeStr) * pow(10, 9);
-        var gas = singleStoreController.gas.value;
-        gas.feeCap = (premium + baseFeeNum).toString();
+        var gas = $store.gas;
+        gas.gasPrice = (premium + baseFeeNum).toString();
         gas.level = 2;
-        singleStoreController.setGas(gas);
+        $store.setGas(gas);
         setState(() {});
       } catch (e) {
         print(e);
@@ -106,8 +107,7 @@ class FilGasPageState extends State<FilGasPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CommonText.white('fee'.tr),
-                      Obx(() => CommonText.white(singleStoreController.maxFee,
-                          size: 18))
+                      Obx(() => CommonText.white($store.gas.maxFee, size: 18))
                     ],
                   ),
                   SizedBox(
@@ -168,10 +168,10 @@ class FilGasPageState extends State<FilGasPage> {
                 setState(() {
                   index = 0;
                 });
-                var gas = singleStoreController.gas.value;
-                gas.feeCap = fastFeeCap;
+                var gas = $store.gas;
+                gas.gasPrice = fastFeeCap;
                 gas.level = 0;
-                singleStoreController.setGas(gas);
+                $store.setGas(gas);
               },
             ),
             SizedBox(
@@ -212,10 +212,10 @@ class FilGasPageState extends State<FilGasPage> {
                 setState(() {
                   index = 1;
                 });
-                var gas = singleStoreController.gas.value;
+                var gas = $store.gas;
                 gas.level = 1;
-                gas.feeCap = slowFeeCap;
-                singleStoreController.setGas(gas);
+                gas.gasPrice = slowFeeCap;
+                $store.setGas(gas);
               },
             ),
             SizedBox(
@@ -255,9 +255,7 @@ class FilGasPageState extends State<FilGasPage> {
                           label: '',
                           controller: baseFeeCtrl,
                           type: TextInputType.number,
-                          inputFormatters: [
-                            PrecisionLimitFormatter(8)
-                          ],
+                          inputFormatters: [PrecisionLimitFormatter(8)],
                           extra: Padding(
                             padding: EdgeInsets.only(right: 12),
                             child: CommonText.grey('NanoFIL', size: 10),

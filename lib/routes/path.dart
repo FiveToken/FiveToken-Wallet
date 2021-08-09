@@ -25,6 +25,7 @@ const String mneCheckPage = "/mneCheck";
 const String importPrivateKeyPage = "/importPrivateKey";
 const String importMnePage = "/importMne";
 const String createWarnPage = '/createWarn';
+const String importIndexPage='/import';
 
 //main
 const String mainPage = '/main';
@@ -36,8 +37,17 @@ const String walletMnePage = '/wallet/mne';
 const String walletPrivatekey = '/wallet/privatekey';
 const String walletMainPage='/wallet/main';
 const String walletCodePage ='/wallet/code';
+const String walletIdPage='/wallet/id';
 
 //address
 const String addressIndexPage = '/addressBook/index';
 const String addressAddPage = '/addressBook/add';
 const String addressSelectPage='/addressBook/select';
+const String addressNetPage='/addressBook/net';
+const String addressWalletPage='/addressBook/wallet';
+
+//net
+const String netIndexPage='/net/index';
+const String netAddPage='/net/add';
+const String netTokenAddPage='/net/token';
+

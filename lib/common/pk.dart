@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
+import 'package:fil/index.dart' hide Nonce;
 
 Future<List<int>> genSalt(String addr, String pass) async {
   var str = '${addr}filwalllet$pass';
@@ -37,7 +38,7 @@ Uint8List decodePrivate(String pk) {
   return base64Decode(pk);
 }
 
-String xor(Uint8List first, Uint8List second, {int size = 32}) {
+String xor(List<int> first, List<int> second, {int size = 32}) {
   var list = <int>[];
   for (var i = 0; i < first.length; i++) {
     var ele = first[i];
@@ -51,7 +52,8 @@ String xor(Uint8List first, Uint8List second, {int size = 32}) {
 Future<bool> validatePrivateKey(
     String addr, String pass, String skKek, String dig) async {
   var sk = await getPrivateKey(addr, pass, skKek);
-  var digest = await genPrivateKeyDigest(sk);
+  var s=hex.encode(base64Decode(sk));
+  var digest = await genPrivateKeyDigest(s);
   if (dig != digest) {
     return false;
   } else {

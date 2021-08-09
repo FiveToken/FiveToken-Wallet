@@ -1,3 +1,5 @@
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
 class ImportPrivateKeyPage extends StatefulWidget {
@@ -8,6 +10,7 @@ class ImportPrivateKeyPage extends StatefulWidget {
 class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
   TextEditingController inputControl = TextEditingController();
   TextEditingController nameControl = TextEditingController();
+  Network net = Get.arguments['net'];
   void _genWalletByPkAndType(String inputStr, String type, String name) async {
     String pk = '';
     String signType = SignSecp;
@@ -42,7 +45,7 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
     }
   }
 
-  void _handleImport(BuildContext context) {
+  void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;
     if (inputStr == "") {
@@ -53,22 +56,44 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       showCustomError('enterName'.tr);
       return;
     }
-    try {
-      PrivateKey privateKey = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
-      var type = privateKey.type;
-      var key = privateKey.privateKey;
-      if (type == 'secp256k1') {
-        _genWalletByPkAndType(key, '1', name);
-      } else if (type == 'bls') {
-        _genWalletByPkAndType(key, '3', name);
-      } else {
+    if (net.chain == 'filecoin') {
+      try {
+        PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+      } catch (e) {
         showCustomError('wrongPk'.tr);
+        return;
       }
-    } catch (e) {
-      showCustomError('wrongPk'.tr);
+    } else {
+      try {
+        await EthWallet.genAddrByPrivateKey(inputStr);
+      } catch (e) {
+        showCustomError('wrongPk'.tr);
+        return;
+      }
     }
+    Get.toNamed(passwordSetPage, arguments: {
+      'type': 2,
+      'privateKey': inputStr,
+      'net': net,
+      'label': name
+    });
+    // try {
+    //   PrivateKey privateKey = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+    //   var type = privateKey.type;
+    //   var key = privateKey.privateKey;
+    //   if (type == 'secp256k1') {
+    //     _genWalletByPkAndType(key, '1', name);
+    //   } else if (type == 'bls') {
+    //     _genWalletByPkAndType(key, '3', name);
+    //   } else {
+    //     showCustomError('wrongPk'.tr);
+    //   }
+    // } catch (e) {
+    //   showCustomError('wrongPk'.tr);
+    // }
   }
 
+  void getChainTypeByPaivateKey(String private) {}
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.PrivateKey})
         .then((value) {

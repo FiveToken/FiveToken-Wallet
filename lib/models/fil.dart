@@ -30,6 +30,12 @@ class Fil {
   String toString() {
     double v = _fil();
     return v.toString();
+    // if(v == 0){
+    //   return "0";
+    // }
+    // var r = v.toString().replaceFirst(RegExp(r"0+$"), "");
+    // r = r.replaceFirst(RegExp(r"\.$"), "");
+    // return parseE(r);
   }
 
   String toFixed({int len = 12}) {

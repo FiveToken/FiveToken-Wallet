@@ -87,6 +87,12 @@ public class FlotusPlugin: FlutterPlugin, MethodCallHandler {
         var res = Wlib.genProposalForChangeOwnerV3(self,miner,value)
         result.success(res)
       }
+      call.method == "genProposalForChangeWorkerAddress" -> {
+        var miner = call.argument<String>("miner")
+        var value = call.argument<String>("value")
+        var res = Wlib.genProposalForChangeWorkerAddress(miner,value)
+        result.success(res)
+      }
       call.method == "genApprovalV3" -> {
         var tx = call.argument<String>("tx")
         var res = Wlib.genApprovalV3(tx)

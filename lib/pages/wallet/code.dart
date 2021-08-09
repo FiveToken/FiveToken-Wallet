@@ -5,7 +5,7 @@ import 'package:share/share.dart';
 class WalletCodePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var addr = singleStoreController.wal.addr;
+    var addr = $store.wal.addr;
     return CommonScaffold(
       title: 'rec'.tr,
       hasFooter: false,
@@ -34,9 +34,7 @@ class WalletCodePage extends StatelessWidget {
                   Container(
                     child: Text(
                       'scan'.tr,
-                      style: TextStyle(
-                        color: CustomColor.grey
-                      ),
+                      style: TextStyle(color: CustomColor.grey),
                       textAlign: TextAlign.center,
                     ),
                     padding: EdgeInsets.symmetric(vertical: 25),
@@ -79,6 +77,9 @@ class WalletCodePage extends StatelessWidget {
                                 Image(
                                     width: 20,
                                     image: AssetImage('icons/copy.png')),
+                                SizedBox(
+                                  width: 5,
+                                ),
                                 CommonText(
                                   'copy'.tr,
                                 )
@@ -103,6 +104,9 @@ class WalletCodePage extends StatelessWidget {
                                 Image(
                                     width: 20,
                                     image: AssetImage('icons/share-d.png')),
+                                SizedBox(
+                                  width: 5,
+                                ),
                                 CommonText(
                                   'share'.tr,
                                 )
@@ -124,12 +128,12 @@ class WalletCodePage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image(width: 25, image: AssetImage('icons/fil2.png')),
+                  Image(width: 30, image: AssetImage('icons/fivetoken.png')),
                   SizedBox(
                     width: 10,
                   ),
                   CommonText(
-                    'Filecoin Wallet',
+                    'FiveToken',
                     color: Colors.white,
                   )
                 ],

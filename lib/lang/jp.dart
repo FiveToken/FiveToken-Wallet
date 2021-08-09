@@ -96,7 +96,6 @@ const Map<String, String> JP_LANG = {
   "cid": "トランザクションID",
   "height": "ブロック高さ",
   "more": "詳細をもっとみる",
-  "detail":"詳細",
   "pending": "待機中",
   "tradeSucc": "トランザクションに成功しました",
   "tradeFail": "トランザクションに失敗しました",
@@ -146,6 +145,11 @@ const Map<String, String> JP_LANG = {
   'hasPending': '未確認の取引がございますが、新規送金を続きますか？',
   'speedup': '未確認の取引を速めます',
   'continueNew': '新規取引を続きます',
+  'connecting':'接続中',
+  'connect':'接続',
+  'approve':'承認する',
+  'disConnect':'接続を切断',
+  'reject':'拒否',
   "errorExist": "当該ウォレットアドレスはすでに存在しています",
   "errorNet": "現在のネットワークに変動があります。正しく接続しているかチェックしてください",
   "errorSetGas": "手数料取得に失敗しました。ネットワーク状況をチェックしてください",
@@ -153,5 +157,6 @@ const Map<String, String> JP_LANG = {
   "errorLowBalance": "残高不足",
   "errorAddr": "アドレスフォーマットは間違っています。受信アドレスが正しいかをチェックしてください",
   "errorFromAsTo": "送信アドレスは受信アドレスと同じものであってはなりません",
+  'errorParams':'パラメータエラー',
   "next": "次へ"
 };

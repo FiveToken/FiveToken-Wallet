@@ -1,4 +1,5 @@
 import 'package:fil/index.dart';
+import 'package:fil/pages/wallet/id.dart';
 
 List<GetPage> getWalletRoutes() {
   var list = <GetPage>[];
@@ -9,6 +10,14 @@ List<GetPage> getWalletRoutes() {
       GetPage(name: walletPrivatekey, page: () => WalletPrivatekeyPage());
   var main = GetPage(name: walletMainPage, page: () => WalletMainPage());
   var code = GetPage(name: walletCodePage, page: () => WalletCodePage());
-  list..add(select)..add(manage)..add(mne)..add(private)..add(main)..add(code);
+  var id = GetPage(name: walletIdPage, page: () => IdWalletPage());
+  list
+    ..add(select)
+    ..add(manage)
+    ..add(mne)
+    ..add(private)
+    ..add(main)
+    ..add(code)
+    ..add(id);
   return list;
 }

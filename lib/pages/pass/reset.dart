@@ -1,4 +1,7 @@
+import 'package:fil/chain/key.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
+import 'package:oktoast/oktoast.dart';
 
 class PassResetPage extends StatefulWidget {
   @override
@@ -11,7 +14,9 @@ class PassResetPageState extends State<PassResetPage> {
   final TextEditingController oldCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
   final TextEditingController newConfirmCtrl = TextEditingController();
-  var box = Hive.box<Wallet>(addressBox);
+  var box = OpenedBox.walletInstance;
+  bool loading = false;
+  ChainWallet wallet = Get.arguments['wallet'];
   Future<bool> checkValid() async {
     var old = oldCtrl.text.trim();
     var newP = newCtrl.text.trim();
@@ -20,9 +25,7 @@ class PassResetPageState extends State<PassResetPage> {
       showCustomError('enterOldPass'.tr);
       return false;
     }
-    var wal = singleStoreController.wal;
-    var valid =
-        await validatePrivateKey(wal.addrWithNet, old, wal.skKek, wal.digest);
+    var valid = await wallet.validatePrivateKey(old);
     if (!valid) {
       showCustomError('wrongOldPass'.tr);
       return false;
@@ -39,30 +42,62 @@ class PassResetPageState extends State<PassResetPage> {
   }
 
   void handleConfrim() async {
-    var valid = await checkValid();
-    if (!valid) {
+    if (loading) {
       return;
-    } else {
-      var pass = newCtrl.text.trim();
-      var oldPass = oldCtrl.text.trim();
-      var wal = singleStoreController.wal;
-      var addr = wal.addrWithNet;
-      var sk = await getPrivateKey(addr, oldPass, wal.skKek);
-      var mne = aesDecrypt(wal.mne, sk);
-      var newKek = await genKek(addr, pass);
-      var skKek = xor(newKek, base64Decode(sk));
-      var digest = await genPrivateKeyDigest(sk);
-      if (wal.mne != '') {
-        var m = aesEncrypt(mne, sk);
-        wal.mne = m;
+    }
+    this.loading = true;
+    showCustomLoading('Loading');
+    try {
+      var valid = await checkValid();
+      var old = oldCtrl.text.trim();
+      var newP = newCtrl.text.trim();
+      var private = await wallet.getPrivateKey(old);
+      if (!valid) {
+        return;
+      } else {
+        var isId = wallet.type == 0;
+        if (isId) {
+          var list = OpenedBox.walletInstance.values
+              .where((wal) => wal.groupHash == wallet.groupHash)
+              .toList();
+          for (var i = 0; i < list.length; i++) {
+            var wal = list[i];
+            var p = private;
+            var same = wal.addressType == wallet.addressType;
+            if (!same) {
+              p = await wal.getPrivateKey(old);
+            }
+            EncryptKey key;
+            if (wal.addressType == 'eth') {
+              key = await EthWallet.genEncryptKeyByPrivateKey(p, newP);
+            } else {
+              key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP);
+            }
+            wal.skKek = key.kek;
+            box.put(wal.address, wal);
+            if (same) {
+              $store.setWallet(wal);
+            }
+          }
+        } else {
+          EncryptKey key;
+          if (wallet.addressType == 'eth') {
+            key = await EthWallet.genEncryptKeyByPrivateKey(private, newP);
+          } else {
+            key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, newP);
+          }
+          box.put(wallet.address, wallet);
+          wallet.skKek = key.kek;
+          $store.setWallet(wallet);
+        }
+        dismissAllToast();
+        this.loading = false;
+        Get.back();
+        showCustomToast('changePassSucc'.tr);
       }
-      wal.skKek = skKek;
-      wal.digest = digest;
-      OpenedBox.addressInsance.put(addr, wal);
-      Global.cacheWallet = wal;
-      singleStoreController.setWallet(wal);
-      Get.back();
-      showCustomToast('changePassSucc'.tr);
+    } catch (e) {
+      this.loading = false;
+      dismissAllToast();
     }
   }
 

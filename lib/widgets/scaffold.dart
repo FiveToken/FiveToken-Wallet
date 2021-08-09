@@ -16,6 +16,7 @@ class CommonScaffold extends StatelessWidget {
   final bool grey;
   final bool resizeToAvoidBottomInset;
   final Widget leading;
+  final Widget footer;
   CommonScaffold(
       {this.title = '',
       this.body,
@@ -28,6 +29,7 @@ class CommonScaffold extends StatelessWidget {
       this.hasLeading = true,
       this.grey = false,
       this.leading,
+      this.footer,
       this.resizeToAvoidBottomInset = false,
       this.hasFooter = true});
   @override
@@ -47,16 +49,17 @@ class CommonScaffold extends StatelessWidget {
               weight: FontWeight.w500,
               size: 18,
             ),
-            leading: leading??Visibility(
-              child: IconButton(
-                onPressed: () {
-                  Get.back();
-                },
-                icon: IconNavBack,
-                alignment: NavLeadingAlign,
-              ),
-              visible: hasLeading,
-            ),
+            leading: leading ??
+                Visibility(
+                  child: IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: IconNavBack,
+                    alignment: NavLeadingAlign,
+                  ),
+                  visible: hasLeading,
+                ),
             centerTitle: true,
             actions: actions,
           ),
@@ -65,25 +68,26 @@ class CommonScaffold extends StatelessWidget {
         body: body,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: hasFooter
-            ? Container(
-                width: double.infinity,
-                height: 45,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(const Radius.circular(8)),
-                  color: CustomColor.primary,
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                child: FlatButton(
-                  child: Text(
-                    footerText,
-                    style: TextStyle(color: Colors.white),
+            ? footer ??
+                Container(
+                  width: double.infinity,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(const Radius.circular(8)),
+                    color: CustomColor.primary,
                   ),
-                  onPressed: () {
-                    onPressed();
-                  },
-                  //color: Colors.blue,
-                ),
-              )
+                  margin: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+                  child: FlatButton(
+                    child: Text(
+                      footerText,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      onPressed();
+                    },
+                    //color: Colors.blue,
+                  ),
+                )
             : Container());
   }
 }

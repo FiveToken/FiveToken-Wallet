@@ -10,6 +10,8 @@ class Field extends StatelessWidget {
   final bool enabled;
   final bool autofocus;
   final Widget append;
+  final String placeholder;
+  final FocusNode focusNode;
   Field(
       {this.label = '',
       this.controller,
@@ -17,8 +19,10 @@ class Field extends StatelessWidget {
       this.extra,
       this.inputAction,
       this.enabled = true,
+      this.focusNode,
       this.autofocus = false,
       this.append,
+      this.placeholder = '',
       this.inputFormatters = const []});
   @override
   Widget build(BuildContext context) {
@@ -59,9 +63,12 @@ class Field extends StatelessWidget {
                         controller: controller,
                         keyboardType: type ?? TextInputType.multiline,
                         maxLines: null,
+                        focusNode: focusNode,
                         inputFormatters: inputFormatters,
                         textInputAction: inputAction ?? TextInputAction.done,
-                        decoration: InputDecoration.collapsed(hintText: ''),
+                        decoration: InputDecoration.collapsed(
+                            hintText: placeholder,
+                            hintStyle: TextStyle(fontSize: 13)),
                       )),
                       extra ??
                           Container(

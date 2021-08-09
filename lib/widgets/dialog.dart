@@ -1,3 +1,4 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
 typedef SingleStringParamFn = void Function(String pass);
@@ -73,7 +74,8 @@ class CommonTitle extends StatelessWidget {
 
 class PassDialog extends StatefulWidget {
   final SingleStringParamFn callback;
-  PassDialog(this.callback);
+  final ChainWallet wallet;
+  PassDialog(this.callback, {this.wallet});
   @override
   State<StatefulWidget> createState() {
     return PassDialogState();
@@ -88,10 +90,9 @@ class PassDialogState extends State<PassDialog> {
       showCustomError('enterPass'.tr);
       return;
     }
-    var wal = singleStoreController.wal;
+    var wal = widget.wallet ?? $store.wal;
     try {
-      var valid = await validatePrivateKey(
-          wal.addrWithNet, pass, wal.skKek, wal.digest);
+      var valid = await wal.validatePrivateKey(pass);
       var instance = Global.store;
       var pre = instance.getInt('passWrongCount') ?? 0;
       if (!valid) {
@@ -182,8 +183,16 @@ class PassDialogState extends State<PassDialog> {
   }
 }
 
-void showPassDialog(BuildContext context, SingleStringParamFn callback) {
-  showCustomDialog(context, PassDialog(callback), color: CustomColor.bgGrey);
+void showPassDialog(BuildContext context, SingleStringParamFn callback,
+    {ChainWallet wallet}) {
+  showCustomDialog(
+    context,
+    PassDialog(
+      callback,
+      wallet: wallet,
+    ),
+    color: CustomColor.bgGrey,
+  );
 }
 
 void showDeleteDialog(BuildContext context,

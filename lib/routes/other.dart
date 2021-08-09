@@ -1,4 +1,5 @@
 import 'package:fil/index.dart';
+import 'package:fil/pages/other/clause.dart';
 import 'package:fil/pages/other/lang.dart';
 
 List<GetPage> getOtherRoutes() {
@@ -7,6 +8,7 @@ List<GetPage> getOtherRoutes() {
   var scan = GetPage(name: scanPage, page: () => ScanPage());
   var setting = GetPage(name: setPage, page: () => SetPage());
   var lang = GetPage(name: langPage, page: () => LangPage());
-  list..add(web)..add(scan)..add(setting)..add(lang);
+  var service = GetPage(name: servicePage, page: () => ServicePage());
+  list..add(web)..add(scan)..add(setting)..add(lang)..add(service);
   return list;
 }

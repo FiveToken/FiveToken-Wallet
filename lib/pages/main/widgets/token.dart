@@ -1,0 +1,225 @@
+import 'package:fil/chain/token.dart';
+import 'package:fil/index.dart';
+import 'package:fil/widgets/icons.dart';
+import 'package:fil/widgets/random.dart';
+import 'package:web3dart/web3dart.dart';
+import 'package:http/http.dart' as http;
+
+class TokenWidget extends StatefulWidget {
+  final Token token;
+  final Web3Client client;
+  final Key key;
+  TokenWidget({this.token, this.client, this.key});
+  @override
+  State<StatefulWidget> createState() {
+    return TokenWidgetState();
+  }
+}
+
+class TokenWidgetState extends State<TokenWidget> {
+  String balance;
+  StreamSubscription sub;
+  @override
+  void initState() {
+    super.initState();
+    balance = widget.token.balance ?? "0";
+    getBalance();
+    nextTick(() {
+      sub = Global.eventBus.on<RefreshEvent>().listen((event) {
+        getBalance();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    sub?.cancel();
+  }
+
+  void getBalance() async {
+    var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
+    var con =
+        DeployedContract(abi, EthereumAddress.fromHex(widget.token.address));
+
+    try {
+      var list = await widget.client.call(
+          contract: con,
+          function: con.function('balanceOf'),
+          params: [EthereumAddress.fromHex($store.wal.addr)]);
+      if (list.isNotEmpty) {
+        var numStr = list[0];
+        var t = widget.token;
+        if (numStr is BigInt && numStr.toString() != t.balance) {
+          t.balance = numStr.toString();
+          OpenedBox.tokenInstance.put(t.address, t);
+        }
+        setState(() {});
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var token = widget.token;
+    return GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+            border:
+                Border(bottom: BorderSide(color: Colors.grey[200], width: .5))),
+        padding: EdgeInsets.all(12),
+        child: Row(
+          children: [
+            RandomIcon(token.address),
+            SizedBox(
+              width: 10,
+            ),
+            CommonText(
+              token.symbol,
+              color: CustomColor.primary,
+            ),
+            Spacer(),
+            CommonText(
+              widget.token.formatBalance,
+              color: CustomColor.primary,
+            ),
+          ],
+        ),
+      ),
+      onTap: () {
+        Global.cacheToken = token;
+        Get.toNamed(
+          walletMainPage,
+        );
+      },
+    );
+  }
+}
+
+class TokenList extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return TokenListState();
+  }
+}
+
+class TokenListState extends State<TokenList> {
+  Worker worker;
+  Web3Client client;
+  @override
+  void initState() {
+    super.initState();
+    worker = ever($store.network, (net) {
+      setState(() {});
+    });
+    client = Web3Client($store.net.rpc, http.Client());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    worker.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var list = OpenedBox.tokenInstance.values
+        .where((token) => token.rpc == $store.net.rpc)
+        .toList();
+    return Column(
+      children: [
+        Column(
+          children: List.generate(list.length, (index) {
+            return TokenWidget(
+              token: list[index],
+              client: client,
+              key: ValueKey(list[index].address),
+            );
+          }),
+        ),
+        SizedBox(
+          height: 30,
+        ),
+        Visibility(
+            visible: $store.net.chain != 'filecoin',
+            child: GestureDetector(
+              onTap: () {
+                Get.toNamed(netTokenAddPage).then((value) {
+                  setState(() {});
+                });
+              },
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Icon(Icons.add), CommonText('添加代币')],
+                ),
+              ),
+            ))
+      ],
+    );
+  }
+}
+
+class MainTokenWidget extends StatelessWidget {
+  CoinIcon get coinIcon {
+    var key = $store.net.coin;
+    if (CoinIcon.icons.containsKey(key)) {
+      return CoinIcon.icons[key];
+    } else {
+      return CoinIcon(
+          bg: CustomColor.primary, border: false, icon: Container());
+    }
+  }
+
+  String get label =>
+      $store.net.chain == '' ? $store.net.coin : $store.net.chain;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+            border:
+                Border(bottom: BorderSide(color: Colors.grey[200], width: .5))),
+        padding: EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Obx(() => Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: coinIcon.border ? .5 : 0,
+                              color: Colors.grey[400]),
+                          color: coinIcon.bg,
+                          borderRadius: BorderRadius.circular(15)),
+                      child: coinIcon.icon,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    CommonText(
+                      label,
+                      color: CustomColor.primary,
+                    ),
+                  ],
+                )),
+            Spacer(),
+            Obx(() => CommonText(
+                  $store.wal.formatBalance,
+                  color: CustomColor.primary,
+                )),
+          ],
+        ),
+      ),
+      onTap: () {
+        Get.toNamed(walletMainPage);
+      },
+    );
+  }
+}

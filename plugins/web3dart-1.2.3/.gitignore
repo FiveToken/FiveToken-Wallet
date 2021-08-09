@@ -1,0 +1,39 @@
+# Files and directories created by pub
+.packages
+.pub/
+build/
+# Remove the following pattern if you wish to check in your lock file
+pubspec.lock
+
+.dart_tool/
+
+# Directory created by dartdoc
+doc/api/
+
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff:
+.idea/
+
+## File-based project format:
+*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+out/
+**.iml
+
+.vscode/**
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+.idea/markdown-navigator.xml
+.idea/*
+
+# Generated test coverage
+coverage.json
+lcov.info
+test_coverage

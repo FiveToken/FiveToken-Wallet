@@ -1,3 +1,4 @@
+import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
@@ -9,7 +10,6 @@ import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 const psalt = "vFIzIawYOU";
-var _box = Hive.box<Wallet>(addressBox);
 Future<bool> checkNetStatus() async {
   var connectivityResult = await Connectivity().checkConnectivity();
   bool isOn = connectivityResult != ConnectivityResult.none;
@@ -150,6 +150,43 @@ bool isValidAddress(String input) {
   return true;
 }
 
+bool isValidChainAddress(String addr, Network net) {
+  return net.addressType == 'eth'
+      ? isValidEthAddress(addr)
+      : isValidFilecoinAddress(addr, net);
+}
+
+bool isValidEthAddress(String addr) {
+  return addr.length == 42 && addr.substring(0, 2) == '0x';
+}
+
+bool isValidFilecoinAddress(String address, Network net) {
+  var prefix = net.prefix;
+  if (address[0] != prefix) {
+    return false;
+  }
+  var addr = address.trim().toLowerCase();
+  if (addr == '') {
+    return false;
+  }
+  var protocol = addr[1];
+  if (!RegExp(r"^0|1|3$").hasMatch(protocol)) {
+    return false;
+  }
+  var raw = addr.substring(2);
+  if (protocol == "0") {
+    if (raw.length > 20) {
+      return false;
+    }
+  }
+  if (protocol == "3") {
+    if (raw.length < 30 || raw.length > 120) {
+      return false;
+    }
+  }
+  return true;
+}
+
 List<String> parseFee(double fee) {
   if (fee == 0) {
     return ['0', '1000'];
@@ -205,6 +242,33 @@ String formatTime(num timestamp) {
   return "${t.year.toString().substring(2)}/${t.month.toString().padLeft(2, '0')}/${t.day.toString().padLeft(2, '0')} ${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
 }
 
+String formatFilNum({double attoFil, num size = 5}) {
+  var fil = attoFil / pow(10, 18);
+  print(fil.toString());
+  var filStr = parseE(fil.toString());
+  print(filStr);
+  var dot = filStr.split('.')[1];
+  print(dot);
+  var zero = 0;
+  if (dot != null) {
+    for (var i = 0; i < dot.length; i++) {
+      if (dot[i] != '0') {
+        break;
+      } else {
+        zero++;
+      }
+    }
+    if (zero <= 5) {
+      return '${fixedFloat(number: filStr, size: 5)} Fil';
+    } else if (zero > 5 && zero <= 13) {
+      return '${fixedFloat(number: (double.parse(filStr) * pow(10, 9)).toString(), size: size)} nanoFil';
+    } else {
+      return '${fixedFloat(number: (double.parse(filStr) * pow(10, 18)).toString(), size: size)} attoFil';
+    }
+  } else {
+    return '$filStr Fil';
+  }
+}
 
 String fixedFloat({String number, num size = 2}) {
   var arr = number.split('.');
@@ -226,11 +290,88 @@ String formatFil({double attoFil, num size = 5}) {
   } else if (length >= 5 && length <= 13) {
     return '${(attoFil / pow(10, 9)).toPrecision(size)} nanoFil';
   } else {
-    return '${(attoFil / pow(10, 18)).toPrecision(size)}Fil';
+    return '${(attoFil / pow(10, 18)).toPrecision(size)} Fil';
+  }
+}
+
+String truncate(double value, {int size = 4}) {
+  return ((value * pow(10, size)).floor() / pow(10, size)).toString();
+}
+
+String formatFIL(String attoFil, {num size = 4, bool fixed = false}) {
+  if (attoFil == '0') {
+    return '0 FIL';
+  }
+  try {
+    var str = attoFil;
+    var v = BigInt.parse(attoFil);
+    num length = str.length;
+    if (length < 5) {
+      return '$str attoFIL';
+    } else if (length >= 5 && length <= 13) {
+      var unit = BigInt.from(pow(10, 9));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} nanoFIL'
+          : '${truncate(res)} nanoFIL';
+    } else {
+      var unit = BigInt.from(pow(10, 18));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} FIL'
+          : '${truncate(res, size: size)} FIL';
+    }
+  } catch (e) {
+    return attoFil;
+  }
+}
+
+String formatCoin(String amount,
+    {num size = 4, bool fixed = false, Network net}) {
+      net = net ?? $store.net;
+  if (amount == '0') {
+    return '0 ${net.coin}';
+  }
+  
+  var isFil = net.addressType == AddressType.filecoin.type;
+  try {
+    var str = amount;
+    var v = BigInt.parse(amount);
+    num length = str.length;
+    if (length < 5) {
+      var u = isFil ? 'attoFIL' : 'wei';
+      return '$str $u';
+    } else if (length >= 5 && length <= 13) {
+      var u = isFil ? 'nanoFIL' : 'gwei';
+      var unit = BigInt.from(pow(10, 9));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} $u'
+          : '${truncate(res)} $u';
+    } else {
+      var u = isFil ? 'FIL' : net.coin;
+      var unit = BigInt.from(pow(10, 18));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} $u'
+          : '${truncate(res, size: size)} $u';
+    }
+  } catch (e) {
+    return amount;
   }
 }
 
 String fil2Atto(String fil) {
+  //return parseE((double.parse(fil) * pow(10, 18)).toString()).split('.')[0];
+  return (BigInt.from((double.parse(fil) * pow(10, 9))) *
+          BigInt.from(pow(10, 9)))
+      .toString();
+}
+
+String getChainValue(String fil, {int precision = 18}) {
+  if (precision < 10) {
+    return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
+  }
   return (BigInt.from((double.parse(fil) * pow(10, 9))) *
           BigInt.from(pow(10, 9)))
       .toString();
@@ -238,42 +379,6 @@ String fil2Atto(String fil) {
 
 String atto2Fil(String value, {num len = 6}) {
   return Fil(attofil: value).toFixed(len: len);
-}
-
-String unitConversion(String byteStr, num length) {
-  int byte = int.parse(byteStr);
-  String res = '';
-  var positive = true;
-  if (byte == 0) {
-    return "0 bytes";
-  }
-  if (byte < 0) {
-    positive = false;
-    res = byte.abs().toString();
-  }
-  var k = 1024;
-  var sizes = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-  var c = (log(byte) / log(k)).truncate();
-  if (c < 0) {
-    res = '';
-  } else {
-    res = (byte / pow(k, c)).toStringAsFixed(length) + " " + sizes[c];
-  }
-
-  return positive ? res : '-$res';
-}
-
-
-String walletLabel(String addr, {bool dot = true}) {
-  return _box.containsKey(addr)
-      ? _box.get(addr).label
-      : dot
-          ? dotString(str: addr)
-          : addr;
-}
-
-bool isExistWallet(String addr) {
-  return _box.containsKey(addr);
 }
 
 String encodeString(String str, [int times = 1]) {
@@ -362,8 +467,8 @@ String getValidWCLink(String link) {
   }
 }
 
-String getMaxFee(Gas gas) {
-  var feeCap = gas.feeCap;
+String getMaxFee(ChainGas gas) {
+  var feeCap = gas.gasPrice;
   var gasLimit = gas.gasLimit;
   return formatFil(attoFil: (double.parse(feeCap) * gasLimit));
 }

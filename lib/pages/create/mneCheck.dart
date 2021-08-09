@@ -1,6 +1,6 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
-import 'package:bip39/bip39.dart' as bip39;
 
 class MneCheckPage extends StatefulWidget {
   @override
@@ -37,38 +37,43 @@ class MneCheckPageState extends State<MneCheckPage> {
   }
 
   void createWallet(BuildContext context, String type) async {
-    try {
-      String signType = SignSecp;
-      String pk = '';
-      String ck = '';
-      if (type == '1') {
-        ck = genCKBase64(mne);
-        pk = await Flotus.secpPrivateToPublic(ck: ck);
-      } else {
-        var key = bip39.mnemonicToSeed(mne);
-        signType = SignBls;
-        ck = await Bls.ckgen(num: key.join(""));
-        pk = await Bls.pkgen(num: ck);
-      }
-      String address = await Flotus.genAddress(pk: pk, t: signType);
-      address = Global.netPrefix + address.substring(1);
-      var exist = OpenedBox.addressInsance.containsKey(address);
-      if (exist) {
-        showCustomError('errorExist'.tr);
-        return;
-      }
-      Wallet wallet = Wallet(
-          ck: ck,
-          address: address,
-          label: 'FIL',
-          walletType: 0,
-          mne: mne,
-          type: type);
-      Get.toNamed(passwordSetPage,
-          arguments: {'wallet': wallet, 'create': true});
-    } catch (e) {
-      showCustomError('checkMneFail'.tr);
-    }
+    var pk = EthWallet.genPrivateKeyByMne(mne);
+    var addr = await EthWallet.genAddrByPrivateKey(pk);
+    print(pk);
+    print(addr);
+
+    // try {
+    //   String signType = SignSecp;
+    //   String pk = '';
+    //   String ck = '';
+    //   if (type == '1') {
+    //     ck = genCKBase64(mne);
+    //     pk = await Flotus.secpPrivateToPublic(ck: ck);
+    //   } else {
+    //     var key = bip39.mnemonicToSeed(mne);
+    //     signType = SignBls;
+    //     ck = await Bls.ckgen(num: key.join(""));
+    //     pk = await Bls.pkgen(num: ck);
+    //   }
+    //   String address = await Flotus.genAddress(pk: pk, t: signType);
+    //   address = Global.netPrefix + address.substring(1);
+    //   var exist = OpenedBox.addressInsance.containsKey(address);
+    //   if (exist) {
+    //     showCustomError('errorExist'.tr);
+    //     return;
+    //   }
+    //   Wallet wallet = Wallet(
+    //       ck: ck,
+    //       address: address,
+    //       label: 'FIL',
+    //       walletType: 0,
+    //       mne: mne,
+    //       type: type);
+    //   Get.toNamed(passwordSetPage,
+    //       arguments: {'wallet': wallet, 'create': true});
+    // } catch (e) {
+    //   showCustomError('checkMneFail'.tr);
+    // }
   }
 
   @override
@@ -76,15 +81,12 @@ class MneCheckPageState extends State<MneCheckPage> {
     return CommonScaffold(
       grey: true,
       onPressed: () {
-        var str = selectedList.join(' ');
-        if (str != mne || selectedList.length < 12) {
-          showCustomError('wrongMne'.tr);
-          return;
-        }
-        showWalletSelector(context, (String type) {
-          //print(type);
-          createWallet(context, type);
-        });
+        // var str = selectedList.join(' ');
+        // if (str != mne || selectedList.length < 12) {
+        //   showCustomError('wrongMne'.tr);
+        //   return;
+        // }
+        Get.toNamed(passwordSetPage, arguments: {'type': 0, 'mne': mne});
       },
       footerText: 'next'.tr,
       body: SingleChildScrollView(

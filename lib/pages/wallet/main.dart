@@ -1,6 +1,8 @@
 import 'package:fil/index.dart';
 import 'package:fil/pages/main/index.dart';
 import 'package:fil/pages/wallet/widgets/messageList.dart';
+import 'package:fil/widgets/icons.dart';
+import 'package:fil/widgets/random.dart';
 
 class WalletMainPage extends StatefulWidget {
   @override
@@ -11,64 +13,93 @@ class WalletMainPage extends StatefulWidget {
 
 class WalletMainPageState extends State<WalletMainPage> {
   String price;
+  Token token = Global.cacheToken;
   @override
   void initState() {
     super.initState();
     // if (Get.arguments != null && Get.arguments['marketPrice'] != null) {
     //   price = Get.arguments['marketPrice'] as String;
     // }else{
-    //   price=singleStoreController.wal.address;
+    //   price=$store.wal.address;
     // }
-    price =
-        getMarketPrice(singleStoreController.wal.balance, Global.price.rate);
+    price = getMarketPrice($store.wal.balance, Global.price.rate);
   }
 
+  bool get showToken => token != null;
+
+  CoinIcon get coinIcon {
+    var key = $store.net.coin;
+    if (CoinIcon.icons.containsKey(key)) {
+      return CoinIcon.icons[key];
+    } else {
+      return CoinIcon(
+          bg: CustomColor.primary, border: false, icon: Container());
+    }
+  }
+
+  String get title => showToken ? token.symbol : $store.net.coin;
+  Future onRefresh() async {}
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: 'Filecoin',
+      title: title,
       hasFooter: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(0, 25, 0, 17),
-            child: Container(
-              width: 70,
-              height: 70,
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  color: CustomColor.primary,
-                  borderRadius: BorderRadius.circular(35)),
-              child: Image(
-                image: AssetImage('icons/fil-w.png'),
+      body: CustomRefreshWidget(
+        enablePullUp: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 25, 0, 17),
+                child: showToken
+                    ? RandomIcon(
+                        token.address,
+                        size: 70,
+                      )
+                    : Container(
+                        width: 70,
+                        height: 70,
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: coinIcon.border ? .5 : 0,
+                                color: Colors.grey[400]),
+                            color: coinIcon.bg,
+                            borderRadius: BorderRadius.circular(35)),
+                        child: coinIcon.icon,
+                      ),
+                alignment: Alignment.center,
+                width: double.infinity,
               ),
-            ),
-            alignment: Alignment.center,
-            width: double.infinity,
+              !showToken
+                  ? Obx(() => CommonText(
+                        formatCoin($store.wal.balance),
+                        size: 30,
+                        weight: FontWeight.w800,
+                      ))
+                  : CommonText(
+                      token.formatBalance,
+                      size: 30,
+                      weight: FontWeight.w800,
+                    ),
+              Visibility(
+                  visible: !showToken,
+                  child: CommonText(
+                    price,
+                    size: 14,
+                    color: CustomColor.grey,
+                  )),
+              SizedBox(
+                height: 17,
+              ),
+              WalletService(),
+              SizedBox(
+                height: 25,
+              ),
+              Expanded(child: MessageListWidget())
+            ],
           ),
-          Obx(() => CommonText(
-                formatDouble(singleStoreController.wal.balance,
-                        truncate: true, size: 8) +
-                    ' FIL',
-                size: 30,
-                weight: FontWeight.w800,
-              )),
-          CommonText(
-            price,
-            size: 14,
-            color: CustomColor.grey,
-          ),
-          SizedBox(
-            height: 17,
-          ),
-          WalletService(),
-          SizedBox(
-            height: 25,
-          ),
-          Expanded(child: CommonOnlineWallet())
-        ],
-      ),
+          onRefresh: onRefresh),
     );
   }
 }

@@ -1,25 +1,45 @@
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 import 'package:get/get.dart';
 
 class StoreController extends GetxController {
-  var wallet = Wallet().obs;
-  var gas = Gas().obs;
+  var wallet = ChainWallet().obs;
+  var g = ChainGas().obs;
   var message = StoreMessage().obs;
   var scanResult = ''.obs;
-  Wallet get wal {
+  var network = Network().obs;
+  var tok = Token().obs;
+  ChainWallet get wal {
     return wallet.value;
+  }
+
+  Network get net {
+    return network.value;
   }
 
   StoreMessage get mes {
     return message.value;
   }
 
-  String get maxFee {
-    return getMaxFee(gas.value);
+  ChainGas get gas {
+    return g.value;
   }
 
-  void setWallet(Wallet wal) async {
-    wallet.value = Wallet.fromJson(wal.toJson());
+  Token get token {
+    return tok.value;
+  }
+
+  void setWallet(ChainWallet wal) async {
+    wallet.value = ChainWallet.fromJson(wal.toJson());
+  }
+
+  void setNet(Network net) {
+    network.value = net;
+  }
+
+  void setToken(Token t) {
+    tok.value = t;
   }
 
   void changeWalletName(String label) {
@@ -40,8 +60,8 @@ class StoreController extends GetxController {
     });
   }
 
-  void setGas(Gas g) {
-    gas.value = g;
+  void setGas(ChainGas gas) {
+    g.value = gas;
   }
 
   void setMessage(StoreMessage mes) {
@@ -53,4 +73,4 @@ class StoreController extends GetxController {
   }
 }
 
-StoreController singleStoreController = Get.find();
+StoreController $store = Get.find();

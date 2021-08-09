@@ -42,6 +42,12 @@ class SetPageState extends State<SetPage> {
                     Get.toNamed(langPage);
                   },
                 ),
+                CardItem(
+                  label: '网络',
+                  onTap: () {
+                    Get.toNamed(netIndexPage);
+                  },
+                ),
               ],
             ),
             SizedBox(

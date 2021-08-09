@@ -25,7 +25,7 @@ class SelectLangPage extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(0, 40, 0, 12),
                   ),
                   CommonText(
-                    'Filecoin Wallet',
+                    'FiveToken',
                     color: Colors.white,
                     size: 20,
                     weight: FontWeight.w800,

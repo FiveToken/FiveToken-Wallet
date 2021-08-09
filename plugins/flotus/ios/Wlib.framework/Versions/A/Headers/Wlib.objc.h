@@ -12,9 +12,11 @@
 
 
 @class WlibBigInt;
+@class WlibChangeWorkerAddressParams;
 @class WlibConstructorParams;
 @class WlibExecParams;
 @class WlibFIL;
+@class WlibGenChangeWorkerParamInput;
 @class WlibGenConstructorParamInput;
 @class WlibMessage;
 @class WlibMsg;
@@ -65,7 +67,6 @@
 
 // skipped method BigInt.Exp with unsupported parameter or return types
 
-- (NSData* _Nullable)fillBytes:(NSData* _Nullable)buf;
 // skipped method BigInt.Format with unsupported parameter or return types
 
 // skipped method BigInt.GCD with unsupported parameter or return types
@@ -156,6 +157,22 @@
 
 @end
 
+@interface WlibChangeWorkerAddressParams : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+// skipped field ChangeWorkerAddressParams.NewWorker with unsupported type: github.com/filecoin-project/go-address.Address
+
+// skipped field ChangeWorkerAddressParams.NewControlAddrs with unsupported type: []github.com/filecoin-project/go-address.Address
+
+// skipped method ChangeWorkerAddressParams.MarshalCBOR with unsupported parameter or return types
+
+// skipped method ChangeWorkerAddressParams.UnmarshalCBOR with unsupported parameter or return types
+
+@end
+
 /**
  * type ConstructorParams struct {
 	Signers               []addr.Address
@@ -234,7 +251,6 @@
 
 // skipped method FIL.Exp with unsupported parameter or return types
 
-- (NSData* _Nullable)fillBytes:(NSData* _Nullable)buf;
 // skipped method FIL.Format with unsupported parameter or return types
 
 // skipped method FIL.GCD with unsupported parameter or return types
@@ -308,6 +324,18 @@
 - (BOOL)unmarshalText:(NSData* _Nullable)text error:(NSError* _Nullable* _Nullable)error;
 // skipped method FIL.Xor with unsupported parameter or return types
 
+@end
+
+@interface WlibGenChangeWorkerParamInput : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+@property (nonatomic) NSString* _Nonnull newWorker;
+// skipped field GenChangeWorkerParamInput.NewControlAddrs with unsupported type: []string
+
+- (NSString* _Nonnull)transferToSpec:(NSString* _Nullable)miner;
 @end
 
 @interface WlibGenConstructorParamInput : NSObject <goSeqRefInterface> {
@@ -553,10 +581,26 @@ FOUNDATION_EXPORT NSString* _Nonnull WlibGenAddress(NSString* _Nullable pk, NSSt
 
 FOUNDATION_EXPORT NSString* _Nonnull WlibGenApprovalV3(NSString* _Nullable tx);
 
+/**
+ * GenConstructorParamV3 创建多签钱包，Spec Actor V3版本,从SpecActorV2版本开始延续
+传入的参数 json格式
+{
+ "signers": ["f3xaczqsnxryrhirf4ptfsjb72nv3ogr5uhzsl6qd7l2zahkiaqqkw4fyeim2msfsjdi4sirimpitkc27wgv6q"],
+ "threshold": 2,
+ "unlock_duration": 120
+}
 
+输出的结果 json格式
+{"param":"gtgqUwABVQAOZmlsLzMvbXVsdGlzaWdGhIACGHgA"}
+param 做base64编码
+如果有错误，则返回
+{"err": "some error here"}
+ */
 FOUNDATION_EXPORT NSString* _Nonnull WlibGenConstructorParamV3(NSString* _Nullable input);
 
 FOUNDATION_EXPORT NSString* _Nonnull WlibGenProposalForChangeOwnerV3(NSString* _Nullable self_, NSString* _Nullable miner, NSString* _Nullable value);
+
+FOUNDATION_EXPORT NSString* _Nonnull WlibGenProposalForChangeWorkerAddress(NSString* _Nullable miner, NSString* _Nullable params);
 
 FOUNDATION_EXPORT NSString* _Nonnull WlibGenProposalForWithdrawBalanceV3(NSString* _Nullable miner, NSString* _Nullable value);
 

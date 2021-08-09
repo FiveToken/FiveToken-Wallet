@@ -83,6 +83,25 @@ class TMessage {
       "Method": this.method,
     };
   }
+
+  bool get valid {
+    try {
+      var feeCapNum = int.parse(gasFeeCap);
+      var premium = int.parse(gasPremium);
+      var valueNum = int.parse(value);
+      return version is int &&
+          to is String &&
+          from is String &&
+          feeCapNum is int &&
+          valueNum is int &&
+          premium is int &&
+          gasLimit is int &&
+          nonce is int &&
+          method is int;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 @HiveType(typeId: 2)
@@ -125,6 +144,7 @@ class SignedMessage {
       "Signature": this.signature,
     };
   }
+
   Map<String, dynamic> toLotusSignedMessage() {
     return <String, dynamic>{
       "Message": this.message.toLotusMessage(),
@@ -132,4 +152,3 @@ class SignedMessage {
     };
   }
 }
-

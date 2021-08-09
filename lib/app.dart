@@ -22,11 +22,12 @@ class App extends StatefulWidget {
   }
 }
 
-class AppState extends State<App> {
+class AppState extends State<App> with WidgetsBindingObserver  {
   StreamSubscription _sub;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     initDevice();
     initRequest();
     nextTick(() => initUniLinks());
@@ -78,7 +79,13 @@ class AppState extends State<App> {
       }
     });
   }
-
+@override
+  void didChangeAppLifecycleState(AppLifecycleState appLifecycleState) {
+    super.didChangeAppLifecycleState(appLifecycleState);
+    if (appLifecycleState == AppLifecycleState.resumed) {
+      Global.eventBus.fire(AppStateChangeEvent());
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return OKToast(
@@ -87,7 +94,7 @@ class AppState extends State<App> {
         child: GetMaterialApp(
             locale: Locale(Global.langCode),
             translations: Messages(),
-            title: "Filecoin Wallet",
+            title: "FiveToken",
             getPages: initRoutes(),
             debugShowCheckedModeBanner: false,
             initialRoute: widget.initialRoute,

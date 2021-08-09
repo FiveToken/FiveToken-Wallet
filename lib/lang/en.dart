@@ -72,7 +72,7 @@ const Map<String, String> EN_LANG = {
   "createSucc": "Create successfully",
   "lang": "Language",
   "service": "Privacy Policy",
-  'clause': 'Terms of Service',
+  'clause':'Terms of Service',
   "version": "Version No.",
   "pass": "Payment password",
   "setPass": "Set payment password",
@@ -101,7 +101,6 @@ const Map<String, String> EN_LANG = {
   "cid": "Transaction ID",
   "height": "Block height",
   "more": "See more",
-  "detail": "Detail",
   "pending": "Waiting",
   "tradeSucc": "Transaction success",
   "tradeFail": "Transaction failed",
@@ -154,6 +153,11 @@ const Map<String, String> EN_LANG = {
       'There is unconfirmed transaction. Do you want to continue to transfer?',
   'speedup': 'Speed up unconfirmed transactions',
   'continueNew': 'Continue to send the new transaction',
+  'connecting':'Connecting',
+  'connect':'Connect',
+  'disConnect':'DisConnect',
+  'approve':'Approve',
+  'reject':'Reject',
   "errorExist": "Wallet address already exists",
   "errorNet":
       "The current network is unstable, please check that the connection is coorect",
@@ -163,5 +167,6 @@ const Map<String, String> EN_LANG = {
   "errorAddr":
       "Address format error, please check that receiving address is correct",
   "errorFromAsTo": "Sending address cannot be the same as receiving address",
+  'errorParams':'Wrong Parameter',
   "next": "Next"
 };

@@ -1,3 +1,4 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
 class AddressBookSelectPage extends StatefulWidget {
@@ -8,11 +9,11 @@ class AddressBookSelectPage extends StatefulWidget {
 }
 
 class AddressBookSelectPageState extends State<AddressBookSelectPage> {
-  var box = Hive.box<Wallet>(addressBookBox);
-  List<Wallet> list = [];
+  var box = OpenedBox.addressBookInsance;
+  List<ContactAddress> list = [];
   void setList() {
     setState(() {
-      list = box.values.toList();
+      list = box.values.where((addr) => addr.rpc == $store.net.rpc).toList();
     });
   }
 
@@ -27,6 +28,7 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
     return CommonScaffold(
         title: 'selectAddr'.tr,
         hasFooter: false,
+        grey: true,
         actions: [
           GestureDetector(
             child: Padding(
@@ -42,48 +44,70 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
         ],
         body: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(12, 20, 12, 20),
-          child: Column(
-            children: List.generate(
-              list.length,
-              (index) {
-                var wallet = list[index];
-                return Column(
-                  children: [
-                    GestureDetector(
-                      child: Container(
-                        width: double.infinity,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CommonText.white(wallet.label, size: 15),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            CommonText.white(
-                              dotString(str: wallet.address),
-                              size: 10,
-                            ),
-                          ],
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: CustomRadius.b8,
-                          color: CustomColor.primary,
-                        ),
-                      ),
-                      onTap: () {
-                        Get.back(result: wallet);
-                      },
-                    ),
-                    SizedBox(
-                      height: 8,
-                    )
-                  ],
-                );
+          child: Layout.colStart([
+            CommonText($store.net.label),
+            SizedBox(
+              height: 12,
+            ),
+            TapCardWidget(
+              Layout.rowBetween([
+                CommonText.white('选择钱包内地址'),
+                Image(width: 18, image: AssetImage('icons/right-w.png'))
+              ]),
+              onTap: () {
+                Get.toNamed(addressWalletPage).then((value){
+                  if(value is ChainWallet){
+                    Get.back(result: value);
+                  }
+                });
               },
             ),
-          ),
+            SizedBox(
+              height: 12,
+            ),
+            Column(
+              children: List.generate(
+                list.length,
+                (index) {
+                  var wallet = list[index];
+                  return Column(
+                    children: [
+                      GestureDetector(
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CommonText.white(wallet.label, size: 15),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              CommonText.white(
+                                dotString(str: wallet.address),
+                                size: 10,
+                              ),
+                            ],
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: CustomRadius.b8,
+                            color: CustomColor.primary,
+                          ),
+                        ),
+                        onTap: () {
+                          Get.back(result: wallet);
+                        },
+                      ),
+                      SizedBox(
+                        height: 8,
+                      )
+                    ],
+                  );
+                },
+              ),
+            )
+          ]),
         ));
   }
 }
