@@ -49,8 +49,6 @@ dependencies:
   image_picker: ^0.6.7+21
   fbutton: ^2.0.1
   package_info: ^0.4.3+2
-  flutter_update_dialog: ^1.0.0
-  install_plugin: ^2.0.1
   webview_flutter: ^1.0.7
   device_info: ^1.0.0
   url_launcher: ^5.7.10
@@ -65,6 +63,11 @@ dependencies:
   tuple: 1.0.3
   uuid: 2.2.2
   web_socket_channel: 1.2.0
+  web3dart: 
+     path: ./plugins/web3dart-1.2.3
+  random_color: ^1.0.5
+  event_bus: ^1.1.1
+  #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
