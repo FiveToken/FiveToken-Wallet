@@ -50,6 +50,7 @@ class NetSelect extends StatelessWidget {
                                       if (l.isNotEmpty) {
                                         $store.setNet(net);
                                         $store.setWallet(l[0]);
+                                        Global.eventBus.fire(WalletChangeEvent());
                                         Global.store.setString(
                                             'currentWalletAddress',
                                             l[0].address);

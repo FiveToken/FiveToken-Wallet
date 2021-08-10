@@ -40,6 +40,8 @@ class Network {
     }
   }
 
+  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain);
+
   Network(
       {this.name = '',
       this.chain = '',

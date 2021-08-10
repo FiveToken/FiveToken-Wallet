@@ -29,7 +29,6 @@ class FilGasPageState extends State<FilGasPage> {
 
   int get baseFee {
     try {
-      //TODO
       var base = int.parse($store.gas.gasPremium);
       return base;
     } catch (e) {

@@ -53,8 +53,9 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
         loadFilecoinLatestMessages();
       });
     });
+    deleteExtraList();
     initList();
-    getNonce();
+    // getNonce();
   }
 
   @override
@@ -223,10 +224,8 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
   List<CacheMessage> getWalletSortedMessages() {
     var list = <CacheMessage>[];
     var address = $store.wal.addr;
-    box.values.forEach((element) {
-      var message = element;
-      if ((message.from == address || message.to == address) &&
-          message.rpc == $store.net.rpc) {
+    box.values.forEach((message) {
+      if ((message.owner == address) && message.rpc == $store.net.rpc) {
         list.add(message);
       }
     });
@@ -260,6 +259,7 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
               exitCode: map['exit_code'],
               owner: $store.wal.addr,
               pending: 0,
+              rpc: net.rpc,
               height: map['height'],
               nonce: map['nonce']);
           if (map['method_name'] == 'transfer' ||
@@ -267,16 +267,16 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
             messages.add(mes);
           }
         });
-        var nonce = this.currentNonce;
-        var pendingList = box.values.where((mes) => mes.pending == 1).toList();
-        if (pendingList.isNotEmpty) {
-          for (var k = 0; k < pendingList.length; k++) {
-            var mes = pendingList[k];
-            if (mes.nonce < nonce) {
-              await box.delete(mes.hash);
-            }
-          }
-        }
+        // var nonce = this.currentNonce;
+        // var pendingList = box.values.where((mes) => mes.pending == 1).toList();
+        // if (pendingList.isNotEmpty) {
+        //   for (var k = 0; k < pendingList.length; k++) {
+        //     var mes = pendingList[k];
+        //     if (mes.nonce < nonce) {
+        //       await box.delete(mes.hash);
+        //     }
+        //   }
+        // }
         for (var i = 0; i < messages.length; i++) {
           var m = messages[i];
           await box.put(m.hash, m);
@@ -296,6 +296,35 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
     setState(() {
       messageList = list;
     });
+  }
+
+  void deleteExtraList() async {
+    var allList = OpenedBox.mesInstance.values
+        .where((mes) => mes.from == $store.wal.addr && mes.rpc == net.rpc);
+    List<CacheMessage> pendingList = [];
+    List<CacheMessage> resolvedList = [];
+    allList.forEach((mes) {
+      if (mes.pending == 1) {
+        pendingList.add(mes);
+      } else {
+        resolvedList.add(mes);
+      }
+    });
+    if (resolvedList.isNotEmpty && pendingList.isNotEmpty) {
+      List<num> shouldDeleteNonce = [];
+      var pendingNonce = pendingList.map((mes) => mes.nonce);
+      resolvedList.forEach((mes) {
+        if (pendingNonce.contains(mes.nonce)) {
+          shouldDeleteNonce.add(mes.nonce);
+        }
+      });
+      if (shouldDeleteNonce.isNotEmpty) {
+        var deleteKeys = pendingList
+            .where((mes) => shouldDeleteNonce.contains(mes.nonce))
+            .map((mes) => mes.hash);
+        box.deleteAll(deleteKeys);
+      }
+    }
   }
 
   @override
@@ -361,9 +390,8 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
                         ),
                         Column(
                           children: List.generate(l.length, (i) {
-                            //TODO
                             var message = l[i];
-                            var args = message.owner;
+                            // var args = message.owner;
                             // if (args != null && args != 'null') {
                             //   var decodeArgs = jsonDecode(args);
                             //   if (decodeArgs != null &&

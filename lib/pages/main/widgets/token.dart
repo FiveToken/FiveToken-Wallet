@@ -41,7 +41,6 @@ class TokenWidgetState extends State<TokenWidget> {
     var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
     var con =
         DeployedContract(abi, EthereumAddress.fromHex(widget.token.address));
-
     try {
       var list = await widget.client.call(
           contract: con,
@@ -111,16 +110,21 @@ class TokenListState extends State<TokenList> {
   @override
   void initState() {
     super.initState();
+    initClient($store.net);
     worker = ever($store.network, (net) {
+      initClient(net);
       setState(() {});
     });
-    client = Web3Client($store.net.rpc, http.Client());
   }
 
   @override
   void dispose() {
     super.dispose();
     worker.dispose();
+  }
+
+  void initClient(Network net) {
+    client = Web3Client(net.rpc, http.Client());
   }
 
   @override

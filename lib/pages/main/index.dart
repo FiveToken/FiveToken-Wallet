@@ -1,8 +1,10 @@
+
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:fil/pages/main/drawer.dart';
 import 'package:fil/pages/main/widgets/net.dart';
+import 'package:fil/pages/main/widgets/price.dart';
 import 'package:fil/pages/main/widgets/token.dart';
 import 'package:fil/pages/transfer/transfer.dart';
 import 'package:logger/logger.dart';
@@ -22,37 +24,19 @@ class MainPageState extends State<MainPage> {
   String balance = $store.wal.balance;
   var box = OpenedBox.walletInstance;
   Timer timer;
-  FilPrice price = FilPrice();
   WCSession connectedSession;
   WCMeta meta;
   Box<Nonce> nonceBoxInstance = OpenedBox.nonceInsance;
   final Web3Client client = Web3Client($store.net.rpc, Client());
   ChainProvider provider;
   Worker worker;
-  void getPrice() async {
-    var res = await getFilPrice();
-    Global.price = res;
-    if (res.cny != 0) {
-      setState(() {
-        price = res;
-      });
-    }
-  }
 
-  double get rate {
-    var lang = Global.langCode;
-    lang = 'en';
-    return lang == 'en' ? price.usd : price.cny;
-  }
 
-  String get marketPrice {
-    return getMarketPrice(balance, rate);
-  }
 
   @override
   void initState() {
     super.initState();
-    getPrice();
+
     var isCreate = false;
     if (Get.arguments != null && Get.arguments['create'] != null) {
       isCreate = Get.arguments['create'] as bool;
@@ -72,6 +56,12 @@ class MainPageState extends State<MainPage> {
       print('wallet change');
       getBalance();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    worker?.dispose();
   }
 
   List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
@@ -295,7 +285,8 @@ class MainPageState extends State<MainPage> {
         }
       ],
       'wc_sessionUpdate': sessionUpdateCallback,
-      'fil_sendTransaction': transcationCallback
+      'fil_sendTransaction': transcationCallback,
+      'eth_sendTransaction': transcationCallback,
     });
   }
 
@@ -308,7 +299,7 @@ class MainPageState extends State<MainPage> {
     String sign = '';
     num signType;
     var cid = await Flotus.messageCid(msg: jsonEncode(message));
-    if ($store.wal.type == '1') {
+    if ($store.wal.addr[1] == '1') {
       signType = SignTypeSecp;
       sign = await Flotus.secpSign(ck: ck, msg: cid);
     } else {
@@ -345,7 +336,7 @@ class MainPageState extends State<MainPage> {
     String sign = '';
     num signType;
     var cid = await Flotus.messageCid(msg: jsonEncode(msg));
-    if (wallet.type == '1') {
+    if (wallet.addr[1] == '1') {
       signType = SignTypeSecp;
       sign = await Flotus.secpSign(ck: ck, msg: cid);
     } else {
@@ -389,7 +380,7 @@ class MainPageState extends State<MainPage> {
       {WCSession session, JsonRpc rpc, String to, String value}) {
     var controller = $store;
     var wallet = controller.wal;
-    var address = wallet.address;
+    var address = wallet.addr;
     var now = DateTime.now().millisecondsSinceEpoch;
     Future.wait([getGasDetail(to: to), getNonce(wallet)]).then((res) {
       var gas = res[0] as ChainGas;
@@ -493,7 +484,7 @@ class MainPageState extends State<MainPage> {
                 'url': 'https://filecoinwallet.com/',
                 'icons': ['https://filecoinwallet.com/logo.jpg']
               },
-              [$store.wal.address],
+              [$store.wal.addr],
               approved,
               chainId: 1)
           .then((value) {
@@ -642,14 +633,7 @@ class MainPageState extends State<MainPage> {
                 SizedBox(
                   height: 25,
                 ),
-                CommonText(
-                  marketPrice,
-                  size: 30,
-                  weight: FontWeight.w800,
-                ),
-                SizedBox(
-                  height: 12,
-                ),
+                CoinPriceWidget(),
                 Obx(
                   () => CommonText(
                     $store.wal.label,

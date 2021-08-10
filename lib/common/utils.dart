@@ -206,16 +206,6 @@ String genCKBase64(String mne) {
   return ck;
 }
 
-Future<AndroidDeviceInfo> getAndroidDeviceInfo() async {
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-  print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
-  print("android device id is:");
-  print(androidInfo.androidId);
-
-  return androidInfo;
-}
-
 String genRandStr(int size) {
   String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   String result = "";
@@ -235,39 +225,6 @@ String hex2str(String hexString) {
   String ascii = List.generate(split.length,
       (i) => String.fromCharCode(int.parse(split[i], radix: 16))).join();
   return ascii;
-}
-
-String formatTime(num timestamp) {
-  var t = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-  return "${t.year.toString().substring(2)}/${t.month.toString().padLeft(2, '0')}/${t.day.toString().padLeft(2, '0')} ${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
-}
-
-String formatFilNum({double attoFil, num size = 5}) {
-  var fil = attoFil / pow(10, 18);
-  print(fil.toString());
-  var filStr = parseE(fil.toString());
-  print(filStr);
-  var dot = filStr.split('.')[1];
-  print(dot);
-  var zero = 0;
-  if (dot != null) {
-    for (var i = 0; i < dot.length; i++) {
-      if (dot[i] != '0') {
-        break;
-      } else {
-        zero++;
-      }
-    }
-    if (zero <= 5) {
-      return '${fixedFloat(number: filStr, size: 5)} Fil';
-    } else if (zero > 5 && zero <= 13) {
-      return '${fixedFloat(number: (double.parse(filStr) * pow(10, 9)).toString(), size: size)} nanoFil';
-    } else {
-      return '${fixedFloat(number: (double.parse(filStr) * pow(10, 18)).toString(), size: size)} attoFil';
-    }
-  } else {
-    return '$filStr Fil';
-  }
 }
 
 String fixedFloat({String number, num size = 2}) {

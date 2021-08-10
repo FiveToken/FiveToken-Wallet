@@ -37,10 +37,8 @@ class MneCheckPageState extends State<MneCheckPage> {
   }
 
   void createWallet(BuildContext context, String type) async {
-    var pk = EthWallet.genPrivateKeyByMne(mne);
-    var addr = await EthWallet.genAddrByPrivateKey(pk);
-    print(pk);
-    print(addr);
+    // var pk = EthWallet.genPrivateKeyByMne(mne);
+    // var addr = await EthWallet.genAddrByPrivateKey(pk);
 
     // try {
     //   String signType = SignSecp;
@@ -81,12 +79,13 @@ class MneCheckPageState extends State<MneCheckPage> {
     return CommonScaffold(
       grey: true,
       onPressed: () {
-        // var str = selectedList.join(' ');
-        // if (str != mne || selectedList.length < 12) {
-        //   showCustomError('wrongMne'.tr);
-        //   return;
-        // }
-        Get.toNamed(passwordSetPage, arguments: {'type': 0, 'mne': mne});
+        var str = selectedList.join(' ');
+        if (str != mne || selectedList.length < 12) {
+          showCustomError('wrongMne'.tr);
+          return;
+        }
+        Get.toNamed(passwordSetPage,
+            arguments: {'type': 0, 'mne': mne, 'label': 'FIL'});
       },
       footerText: 'next'.tr,
       body: SingleChildScrollView(

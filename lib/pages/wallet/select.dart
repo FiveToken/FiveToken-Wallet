@@ -192,7 +192,12 @@ class WalletSelectPageState extends State<WalletSelectPage> {
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(0, 20, 0, 40),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              child: CommonText('身份钱包(多币种)'),
+              padding: EdgeInsets.only(left: 12),
+            ),
             Column(
               children: List.generate(entry.length, (index) {
                 var hash = entry[index].key;
@@ -222,6 +227,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                         $store.setWallet(wallets[0]);
                       }
                     }
+                    Global.eventBus.fire(WalletChangeEvent());
                     Navigator.of(context)
                         .popUntil((route) => route.settings.name == mainPage);
                   },
@@ -234,60 +240,77 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                 );
               }),
             ),
-            Column(
-              children: List.generate(importWallets.length, (index) {
-                var wal = importWallets[index];
-                var net = Network.getNetByRpc(wal.rpc);
-                return SwiperWidget(
-                  active: $store.wal.key == wal.key,
-                  onDelete: () {
-                    showDeleteDialog(context,
-                        title: 'deleteAddr'.tr,
-                        content: 'confirmDelete'.tr, onDelete: () {
-                      deleteImprotWallet(wal, net);
-                    });
-                  },
-                  onSet: () {
-                    Get.toNamed(walletMangePage,
-                        arguments: {'net': net, 'wallet': wal}).then((value) {
-                      setState(() {});
-                    });
-                  },
-                  onTap: () {
-                    $store.setWallet(wal);
-                    $store.setNet(net);
-                    Global.eventBus.fire(WalletChangeEvent());
-                    Global.store.setString('currentWalletAddress', wal.address);
-                    Global.store.setString('activeNetwork', net.rpc);
-                    Navigator.of(context)
-                        .popUntil((route) => route.settings.name == mainPage);
-                  },
-                  id: wal.address,
-                  child: Container(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CommonText.white(wal.label, size: 15),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            CommonText.white(
-                                dotString(str: net.prefix + wal.address),
-                                size: 12)
-                          ],
-                        ),
-                        CommonText.white(net.label),
-                      ],
-                    ),
+            SizedBox(
+              height: 12,
+            ),
+            Visibility(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    child: CommonText('导入'),
+                    padding: EdgeInsets.only(left: 12),
                   ),
-                );
-              }),
-            )
+                  Column(
+                    children: List.generate(importWallets.length, (index) {
+                      var wal = importWallets[index];
+                      var net = Network.getNetByRpc(wal.rpc);
+                      return SwiperWidget(
+                        active: $store.wal.key == wal.key,
+                        onDelete: () {
+                          showDeleteDialog(context,
+                              title: 'deleteAddr'.tr,
+                              content: 'confirmDelete'.tr, onDelete: () {
+                            deleteImprotWallet(wal, net);
+                          });
+                        },
+                        onSet: () {
+                          Get.toNamed(walletMangePage,
+                                  arguments: {'net': net, 'wallet': wal})
+                              .then((value) {
+                            setState(() {});
+                          });
+                        },
+                        onTap: () {
+                          $store.setWallet(wal);
+                          $store.setNet(net);
+                          Global.eventBus.fire(WalletChangeEvent());
+                          Global.store
+                              .setString('currentWalletAddress', wal.address);
+                          Global.store.setString('activeNetwork', net.rpc);
+                          Navigator.of(context).popUntil(
+                              (route) => route.settings.name == mainPage);
+                        },
+                        id: wal.address,
+                        child: Container(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CommonText.white(wal.label, size: 15),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  CommonText.white(
+                                      dotString(str: net.prefix + wal.address),
+                                      size: 12)
+                                ],
+                              ),
+                              CommonText.white(net.label),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  )
+                ],
+              ),
+              visible: importWallets.isNotEmpty,
+            ),
           ],
         ),
       ),

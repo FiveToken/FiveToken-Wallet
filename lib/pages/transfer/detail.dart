@@ -1,7 +1,5 @@
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
-import 'package:web3dart/web3dart.dart';
-
 class FilDetailPage extends StatefulWidget {
   @override
   State createState() => FilDetailPageState();

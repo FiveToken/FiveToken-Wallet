@@ -62,6 +62,8 @@ class TokenAddPageState extends State<TokenAddPage> {
         if (symbol.isNotEmpty && decimals.isNotEmpty) {
           symbolCtrl.text = symbol[0].toString();
           preCtrl.text = decimals[0].toString();
+        } else {
+          showCustomError('无效的代币地址');
         }
       }
     } catch (e) {
@@ -119,10 +121,12 @@ class TokenAddPageState extends State<TokenAddPage> {
             ),
             Field(
               label: '代币符号',
+              enabled: false,
               controller: symbolCtrl,
             ),
             Field(
               label: '代币精度',
+              enabled: false,
               type: TextInputType.number,
               inputFormatters: [PrecisionLimitFormatter(8)],
               controller: preCtrl,

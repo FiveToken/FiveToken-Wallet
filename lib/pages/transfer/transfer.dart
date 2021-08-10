@@ -73,6 +73,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     return pendingList.isNotEmpty;
   }
 
+  bool get isToken => token != null;
+
   List<CacheMessage> get pendingList {
     return OpenedBox.mesInstance.values
         .where((mes) =>
@@ -80,7 +82,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         .toList();
   }
 
-  void getNonce() async {
+  Future<bool> getNonce() async {
     var nonce = await provider.getNonce();
     var address = wallet.addr;
     var now = getSecondSinceEpoch();
@@ -96,19 +98,24 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
           nonceBoxInstance.put(key, Nonce(time: now, value: nonce));
         }
       }
+      return true;
+    } else {
+      return false;
     }
   }
 
-  void getGas(String to) async {
-    // var addr = token?.address ?? to;
-    var g = await provider.getGas(to: to, isToken: token != null);
+  Future<bool> getGas(String to) async {
+    var g = await provider.getGas(to: to, isToken: isToken);
     if (g.gasPrice != '0') {
       controller.setGas(g);
       this.gas = g;
+      return true;
+    } else {
+      return false;
     }
   }
 
-  void speedup(String ck) async {
+  void speedup(String private) async {
     if (loading) {
       return;
     }
@@ -131,8 +138,25 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         var g = provider.replaceGas(cacheGas, chainPremium: chainPremium);
         this.loading = true;
         showCustomLoading('Loading');
-        var res = await provider.sendTransaction(
-            to: last.to, amount: last.value, gas: g);
+        var res = '';
+        if (last.token != null) {
+          EthProvider p = provider;
+          res = await p.sendToken(
+              to: last.to,
+              nonce: n,
+              gas: g,
+              amount: last.value,
+              private: private,
+              addr: token.address);
+        } else {
+          res = await provider.sendTransaction(
+              nonce: n,
+              to: last.to,
+              amount: last.value,
+              gas: g,
+              private: private);
+        }
+
         this.loading = false;
         dismissAllToast();
         if (res != '') {
@@ -184,21 +208,35 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var from = wallet.addr;
     var to = addressCtrl.text.trim();
     var amount = amountCtrl.text.trim();
-    if (controller.gas.gasPrice == '0') {
-      showCustomError('errorSetGas'.tr);
-      return;
-    }
-    if (nonce == null || nonce == -1) {
-      showCustomError("errorGetNonce".tr);
-      return;
-    }
+    // if (controller.gas.gasPrice == '0') {
+    //   showCustomError('errorSetGas'.tr);
+    //   return;
+    // }
+    // if (nonce == null || nonce == -1) {
+    //   showCustomError("errorGetNonce".tr);
+    //   return;
+    // }
     try {
       var nonceKey = '$from\_${net.rpc}';
-      var realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
+      // var realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
       var value = getChainValue(amount, precision: token?.precision ?? 18);
       this.loading = true;
       showCustomLoading('Loading');
-      bool isToken = token != null;
+      if (controller.gas.gasPrice == '0') {
+        var valid = await getGas(to);
+        if (!valid) {
+          showCustomError('errorSetGas'.tr);
+          return;
+        }
+      }
+      if (nonce == null || nonce == -1) {
+        var valid = await getNonce();
+        if (!valid) {
+          showCustomError("errorGetNonce".tr);
+          return;
+        }
+      }
+      var realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
       var res = '';
       if (isToken) {
         EthProvider p = provider;
@@ -253,13 +291,14 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       } else {
         showCustomError('sendFail'.tr);
       }
+      if (mounted) {
+        goBack();
+      }
     } catch (e) {
       this.loading = false;
       dismissAllToast();
+      showCustomError('sendFail'.tr);
       print(e);
-    }
-    if (mounted) {
-      goBack();
     }
   }
 
@@ -277,8 +316,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var amount = amountCtrl.text;
     var toAddress = addressCtrl.text;
     var trimAmount = amount.trim();
-    var feeCap = controller.gas.gasPrice;
-    var gasLimit = controller.gas.gasLimit;
     var trimAddress = toAddress.trim();
     if (trimAddress == "") {
       showCustomError('enterAddr'.tr);
@@ -301,12 +338,22 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       showCustomError('enterValidAmount'.tr);
       return false;
     }
-    var balance = double.parse(fil2Atto(controller.wal.balance));
-    var amountAtto = double.parse(fil2Atto(trimAmount));
-    var maxFee = double.parse(feeCap) * gasLimit;
-    if (balance < amountAtto + maxFee) {
-      showCustomError('errorLowBalance'.tr);
-      return false;
+    var balanceNum =
+        BigInt.tryParse(isToken ? token.balance : controller.wal.balance);
+    var fee = controller.gas.feeNum;
+    var amountNum = BigInt.from(
+        (double.tryParse(trimAmount) * pow(10, isToken ? token.precision : 18))
+            .truncate());
+    if (isToken) {
+      if (amountNum > balanceNum) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
+    } else {
+      if (balanceNum < fee + amountNum) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
     }
     return true;
   }
@@ -355,9 +402,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         )
       ],
       onPressed: () async {
-        // if (!checkInputValid()) {
-        //   return;
-        // }
+        if (!checkInputValid()) {
+          return;
+        }
         var pushNew = () {
           showCustomModalBottomSheet(
               shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
@@ -424,7 +471,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                 ),
                 onTap: () {
                   Get.toNamed(addressSelectPage).then((value) {
-                    if (value is ContactAddress || value is ChainWallet) {
+                    if (value is ContactAddress) {
+                      addressCtrl.text = value.address;
+                    } else if (value is ChainWallet) {
                       addressCtrl.text = value.addr;
                     }
                   });
@@ -556,7 +605,7 @@ class ConfirmSheet extends StatelessWidget {
       this.onConfirm,
       this.footer,
       this.token});
-  String get symbol=>token!=null?token.symbol:$store.net.coin;
+  String get symbol => token != null ? token.symbol : $store.net.coin;
   @override
   Widget build(BuildContext context) {
     return Column(

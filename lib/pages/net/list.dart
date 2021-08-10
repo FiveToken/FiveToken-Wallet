@@ -71,6 +71,7 @@ class NetIndexStatePage extends State<NetIndexPage> {
                               });
                             },
                             child: Container(
+                              height: 70,
                               margin: EdgeInsets.only(bottom: 12),
                               padding: EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -83,7 +84,7 @@ class NetIndexStatePage extends State<NetIndexPage> {
                                   CommonText.white(custom ? n.name : n.label),
                                   custom
                                       ? Transform.translate(
-                                          offset: Offset(0, 10),
+                                          offset: Offset(0, 25),
                                           child: Icon(
                                             Icons.more_horiz_sharp,
                                             color: Colors.white,

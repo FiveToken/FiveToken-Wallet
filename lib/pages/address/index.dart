@@ -82,7 +82,7 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
                     showDeleteDialog(context,
                         title: 'deleteAddr'.tr,
                         content: 'confirmDelete'.tr, onDelete: () {
-                      box.delete(addr.address);
+                      box.delete(addr.key);
                       list.removeAt(index);
                       setList();
                       showCustomToast('deleteSucc'.tr);

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fil/index.dart';
 
 class PushObserver extends NavigatorObserver {

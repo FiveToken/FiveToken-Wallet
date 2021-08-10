@@ -13,10 +13,17 @@ class ChainGas {
   int level;
   String get maxFee {
     try {
-      return formatCoin(
-          (BigInt.from(gasLimit) * BigInt.parse(gasPrice)).toString());
+      return formatCoin(feeNum.toString());
     } catch (e) {
       return '';
+    }
+  }
+
+  BigInt get feeNum {
+    try {
+      return BigInt.from(gasLimit) * BigInt.parse(gasPrice);
+    } catch (e) {
+      return BigInt.zero;
     }
   }
 

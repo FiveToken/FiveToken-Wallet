@@ -19,7 +19,6 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
-  // Wallet wallet = Get.arguments['wallet'];
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();

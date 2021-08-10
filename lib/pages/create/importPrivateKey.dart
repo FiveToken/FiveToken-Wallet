@@ -11,40 +11,6 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
   TextEditingController inputControl = TextEditingController();
   TextEditingController nameControl = TextEditingController();
   Network net = Get.arguments['net'];
-  void _genWalletByPkAndType(String inputStr, String type, String name) async {
-    String pk = '';
-    String signType = SignSecp;
-    try {
-      if (type == '1') {
-        pk = await Flotus.secpPrivateToPublic(ck: inputStr);
-      } else {
-        signType = SignBls;
-        pk = await Bls.pkgen(num: inputStr);
-      }
-      if (pk == "") {
-        showCustomError('wrongPk'.tr);
-        return;
-      }
-      String address = await Flotus.genAddress(pk: pk, t: signType);
-      address = Global.netPrefix + address.substring(1);
-      var exist = OpenedBox.addressInsance.containsKey(address);
-      if (exist) {
-        showCustomError('errorExist'.tr);
-        return;
-      }
-      Wallet wallet = Wallet(
-          ck: inputStr,
-          address: address,
-          label: name,
-          mne: '',
-          walletType: 0,
-          type: type);
-      Get.toNamed(passwordSetPage, arguments: {'wallet': wallet});
-    } catch (e) {
-      showCustomError('wrongPk'.tr);
-    }
-  }
-
   void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;

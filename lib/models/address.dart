@@ -9,4 +9,5 @@ class ContactAddress {
   @HiveField(2)
   String rpc;
   ContactAddress({this.label = '', this.address = '', this.rpc = ''});
+  String get key=>'$address\_$rpc';
 }

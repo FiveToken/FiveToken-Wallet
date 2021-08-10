@@ -12,7 +12,7 @@ class WalletMainPage extends StatefulWidget {
 }
 
 class WalletMainPageState extends State<WalletMainPage> {
-  String price;
+  // String price;
   Token token = Global.cacheToken;
   @override
   void initState() {
@@ -22,7 +22,7 @@ class WalletMainPageState extends State<WalletMainPage> {
     // }else{
     //   price=$store.wal.address;
     // }
-    price = getMarketPrice($store.wal.balance, Global.price.rate);
+    // price = getMarketPrice($store.wal.balance, Global.price.rate);
   }
 
   bool get showToken => token != null;
@@ -82,13 +82,13 @@ class WalletMainPageState extends State<WalletMainPage> {
                       size: 30,
                       weight: FontWeight.w800,
                     ),
-              Visibility(
-                  visible: !showToken,
-                  child: CommonText(
-                    price,
-                    size: 14,
-                    color: CustomColor.grey,
-                  )),
+              // Visibility(
+              //     visible: !showToken,
+              //     child: CommonText(
+              //       price,
+              //       size: 14,
+              //       color: CustomColor.grey,
+              //     )),
               SizedBox(
                 height: 17,
               ),

@@ -14,13 +14,8 @@ const String NetPrefix = 'f';
 
 class Global {
   static String version = "v1.0.0";
-  // kv store
-
-  // 是否为release版
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
-
   static SharedPreferences store;
-
   static Wallet activeWallet;
   static ChainWallet cacheWallet;
   static Map<String, dynamic> info = {};
@@ -30,7 +25,7 @@ class Global {
   static String platform;
   static String os;
   static String currentWalletAddress;
-  static FilPrice price;
+  static CoinPrice price;
   static String langCode;
   static EventBus eventBus = EventBus();
   static String get netPrefix => NetPrefix;

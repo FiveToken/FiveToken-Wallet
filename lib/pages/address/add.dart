@@ -11,7 +11,7 @@ class AddressBookAddPage extends StatefulWidget {
 class AddressBookAddPageState extends State<AddressBookAddPage> {
   TextEditingController addrCtrl = TextEditingController();
   TextEditingController nameCtrl = TextEditingController();
-  Wallet wallet;
+  ContactAddress addr;
   var box = OpenedBox.addressBookInsance;
   int mode = 0;
   Network net = $store.net;
@@ -19,10 +19,11 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   void initState() {
     super.initState();
     if (Get.arguments != null && Get.arguments['mode'] != null) {
-      wallet = Get.arguments['wallet'] as Wallet;
+      addr = Get.arguments['addr'] as ContactAddress;
       mode = 1;
-      addrCtrl.text = wallet.addr;
-      nameCtrl.text = wallet.label;
+      addrCtrl.text = addr.address;
+      nameCtrl.text = addr.label;
+      net=Network.getNetByRpc(addr.rpc);
     }
   }
 
@@ -59,16 +60,16 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     var address = addrCtrl.text.trim();
     var label = nameCtrl.text.trim();
     if (edit) {
-      box.delete(wallet.address);
+      box.delete(addr.key);
     }
-    box.put('${address}_${net.rpc}',
-        ContactAddress(label: label, address: address, rpc: net.rpc));
+    var v = ContactAddress(label: label, address: address, rpc: net.rpc);
+    box.put(v.key, v);
     showCustomToast(!edit ? 'addAddrSucc'.tr : 'changeAddrSucc'.tr);
     Get.back();
   }
 
   bool get edit {
-    return wallet != null;
+    return addr != null;
   }
 
   void showDialog() {
