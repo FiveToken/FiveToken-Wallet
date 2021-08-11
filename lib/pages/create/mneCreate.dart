@@ -55,7 +55,7 @@ class MneCreatePageState extends State<MneCreatePage> {
 
   void genMne() {
     setState(() {
-      mne = bip39.generateMnemonic(lang: 'en');
+      mne = bip39.generateMnemonic();
     });
   }
 
