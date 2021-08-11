@@ -4,7 +4,6 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
-import 'package:device_info/device_info.dart';
 import 'package:connectivity/connectivity.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';

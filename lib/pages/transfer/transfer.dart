@@ -105,7 +105,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   }
 
   Future<bool> getGas(String to) async {
-    var g = await provider.getGas(to: to, isToken: isToken);
+    var g = await provider.getGas(to: to, isToken: isToken,token: token);
     if (g.gasPrice != '0') {
       controller.setGas(g);
       this.gas = g;
@@ -242,7 +242,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         EthProvider p = provider;
         res = await p.sendToken(
             to: to,
-            nonce: nonce,
+            nonce: realNonce,
             gas: gas,
             amount: value,
             private: private,

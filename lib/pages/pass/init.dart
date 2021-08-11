@@ -2,6 +2,7 @@ import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
+import 'package:oktoast/oktoast.dart';
 
 class PassInitPage extends StatefulWidget {
   @override
@@ -53,6 +54,7 @@ class PassInitPageState extends State<PassInitPage> {
       return;
     }
     this.loading = true;
+    showCustomLoading('Loading');
     if (type == 0 || (type == 1 && net == null)) {
       Map<String, EncryptKey> keyMap = {};
       keyMap['eth'] = await EthWallet.genEncryptKey(mne, pass);
@@ -140,6 +142,7 @@ class PassInitPageState extends State<PassInitPage> {
       }
     }
     this.loading = false;
+    dismissAllToast();
     Get.offAllNamed(mainPage);
   }
 

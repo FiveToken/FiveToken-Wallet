@@ -1,4 +1,3 @@
-
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
@@ -21,7 +20,6 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   final TextEditingController controller = TextEditingController();
-  String balance = $store.wal.balance;
   var box = OpenedBox.walletInstance;
   Timer timer;
   WCSession connectedSession;
@@ -31,17 +29,15 @@ class MainPageState extends State<MainPage> {
   ChainProvider provider;
   Worker worker;
 
-
-
   @override
   void initState() {
     super.initState();
 
-    var isCreate = false;
-    if (Get.arguments != null && Get.arguments['create'] != null) {
-      isCreate = Get.arguments['create'] as bool;
-    }
-    var show = Get.arguments != null && isCreate == true;
+    // var isCreate = false;
+    // if (Get.arguments != null && Get.arguments['create'] != null) {
+    //   isCreate = Get.arguments['create'] as bool;
+    // }
+    var show = $store.wal.label == 'FIL';
     if (show) {
       showChangeNameDialog();
     }
@@ -236,8 +232,12 @@ class MainPageState extends State<MainPage> {
                             return;
                           }
                           var wallet = $store.wal;
-                          wallet.label = v;
-                          box.put(wallet.address, wallet);
+                          var list = box.values.where(
+                              (wal) => wal.groupHash == wallet.groupHash);
+                          list.forEach((wal) {
+                            wal.label = v;
+                            box.put(wal.key, wal);
+                          });
                           $store.changeWalletName(v);
                           Get.back();
                           showCustomToast('createSucc'.tr);
@@ -634,6 +634,9 @@ class MainPageState extends State<MainPage> {
                   height: 25,
                 ),
                 CoinPriceWidget(),
+                SizedBox(
+                  height: 8,
+                ),
                 Obx(
                   () => CommonText(
                     $store.wal.label,

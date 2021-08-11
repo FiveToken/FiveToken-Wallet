@@ -20,7 +20,6 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
       RefreshController(initialRefresh: false);
   var box = OpenedBox.mesInstance;
   List<CacheMessage> messageList = [];
-  Timer timer;
   num currentNonce;
   StreamSubscription sub;
   Network net = $store.net;
@@ -391,15 +390,6 @@ class CommonOnlineWidgetState extends State<MessageListWidget> with RouteAware {
                         Column(
                           children: List.generate(l.length, (i) {
                             var message = l[i];
-                            // var args = message.owner;
-                            // if (args != null && args != 'null') {
-                            //   var decodeArgs = jsonDecode(args);
-                            //   if (decodeArgs != null &&
-                            //       (decodeArgs is Map) &&
-                            //       decodeArgs['AmountRequested'] != null) {
-                            //     message.value = decodeArgs['AmountRequested'];
-                            //   }
-                            // }
                             return MessageItem(message);
                           }),
                         )

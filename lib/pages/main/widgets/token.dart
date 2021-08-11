@@ -19,6 +19,7 @@ class TokenWidget extends StatefulWidget {
 class TokenWidgetState extends State<TokenWidget> {
   String balance;
   StreamSubscription sub;
+  StreamSubscription sub2;
   @override
   void initState() {
     super.initState();
@@ -26,6 +27,12 @@ class TokenWidgetState extends State<TokenWidget> {
     getBalance();
     nextTick(() {
       sub = Global.eventBus.on<RefreshEvent>().listen((event) {
+        if (event.token == null ||
+            event.token.address == widget.token.address) {
+          getBalance();
+        }
+      });
+      sub2 = Global.eventBus.on<WalletChangeEvent>().listen((event) {
         getBalance();
       });
     });
@@ -35,6 +42,7 @@ class TokenWidgetState extends State<TokenWidget> {
   void dispose() {
     super.dispose();
     sub?.cancel();
+    sub2?.cancel();
   }
 
   void getBalance() async {

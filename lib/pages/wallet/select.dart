@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
@@ -225,6 +227,8 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                           .toList();
                       if (wallets.isNotEmpty) {
                         $store.setWallet(wallets[0]);
+                        Global.store.setString(
+                            'currentWalletAddress', wallets[0].address);
                       }
                     }
                     Global.eventBus.fire(WalletChangeEvent());

@@ -1,4 +1,9 @@
+import 'package:fil/index.dart';
+
 class AppStateChangeEvent {}
-class RefreshEvent{}
+class RefreshEvent{
+  Token token;
+  RefreshEvent({this.token});
+}
 class WalletChangeEvent{}
 class NetChangeEvent{}

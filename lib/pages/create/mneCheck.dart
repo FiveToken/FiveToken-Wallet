@@ -1,4 +1,3 @@
-import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 

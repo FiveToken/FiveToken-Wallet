@@ -16,7 +16,7 @@ abstract class ChainProvider {
     ChainGas gas,
     int nonce,
   });
-  Future<ChainGas> getGas({String to, bool isToken = false});
+  Future<ChainGas> getGas({String to, bool isToken = false, Token token});
   Future<int> getNonce();
   ChainGas replaceGas(ChainGas gas, {String chainPremium});
   Future<ChainMessageDetail> getMessageDetail(String hash);
@@ -131,7 +131,8 @@ class FilecoinProvider extends ChainProvider {
   }
 
   @override
-  Future<ChainGas> getGas({String to, bool isToken = false}) async {
+  Future<ChainGas> getGas(
+      {String to, bool isToken = false, Token token}) async {
     if (to == null || to == '') {
       to = $store.net.prefix + '099';
     }
@@ -298,24 +299,44 @@ class EthProvider extends ChainProvider {
   }
 
   @override
-  Future<ChainGas> getGas({String to, bool isToken = false}) async {
+  Future<ChainGas> getGas(
+      {String to, bool isToken = false, Token token}) async {
     var empty = ChainGas();
     if (to == null || to == '') {
       to = $store.wal.addr;
     }
     var toAddr = EthereumAddress.fromHex(to);
     try {
-      var res = await Future.wait([
-        client.getGasPrice(),
-        client.estimateGas(
-            to: toAddr, value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
-      ]);
+      List<dynamic> res = [];
+      if (token != null) {
+        var abi = ContractAbi.fromJson(Contract.abi, '');
+        var con = DeployedContract(abi, EthereumAddress.fromHex(token.address));
+        var data = con.function('transfer').encodeCall([
+          EthereumAddress.fromHex(to),
+          BigInt.from(100*pow(10, token.precision))
+        ]);
+        res = await Future.wait([
+          client.getGasPrice(),
+          client.estimateGas(
+              to: EthereumAddress.fromHex(token.address),
+              sender: toAddr,
+              data: data,
+              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
+        ]);
+      } else {
+        res = await Future.wait([
+          client.getGasPrice(),
+          client.estimateGas(
+              to: toAddr,
+              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
+        ]);
+      }
       if (res.length == 2) {
         EtherAmount gasPrice = res[0];
         BigInt gasLimit = res[1];
         int realLimit = gasLimit.toInt();
         if (isToken) {
-          realLimit = (gasLimit.toInt() * 2.5).truncate();
+          realLimit = (gasLimit.toInt() * 2).truncate();
         }
         return ChainGas(
             gasLimit: realLimit, gasPrice: gasPrice.getInWei.toString());
@@ -331,20 +352,13 @@ class EthProvider extends ChainProvider {
   @override
   Future<ChainMessageDetail> getMessageDetail(String hash) async {
     try {
-      var info = await client.getTransactionByHash(hash);
       var res = await client.getTransactionReceipt(hash);
-      var str = String.fromCharCodes(info.input);
       return ChainMessageDetail(
           from: res.from.toString(),
           to: res.to.toString(),
           height: res.blockNumber.blockNum,
-          // fee: (res.gasUsed *
-          //         res.gasPrice.getValueInUnitBI(EtherUnit.wei))
-          //     .toString(),
           hash: hash);
     } catch (e) {
-      debugger();
-      debugger();
       return ChainMessageDetail();
     }
   }

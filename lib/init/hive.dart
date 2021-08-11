@@ -37,7 +37,6 @@ Future initHive() async {
   await Hive.openBox<CacheMessage>(cacheMessageBox);
   // await OpenedBox.walletInstance.deleteFromDisk();
   // await OpenedBox.mesInstance.deleteFromDisk();
-  // await OpenedBox.mesInstance.deleteFromDisk();
   // await OpenedBox.tokenInstance.deleteFromDisk();
 }
 
