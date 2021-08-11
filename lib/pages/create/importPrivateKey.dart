@@ -1,5 +1,5 @@
 import 'package:fil/index.dart';
-
+/// import wallet by private key
 class ImportPrivateKeyPage extends StatefulWidget {
   @override
   State createState() => ImportPrivateKeyPageState();

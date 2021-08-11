@@ -1,15 +1,7 @@
 import 'dart:io';
 import 'package:fil/index.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// ignore: prefer_collection_literals
-// final Set<JavascriptChannel> jsChannels = [
-//   JavascriptChannel(
-//       name: 'Print',
-//       onMessageReceived: (JavascriptMessage message) {
-//         print(message.message);
-//       }),
-// ].toSet();
-
+/// webview
 class WebviewPage extends StatefulWidget {
   @override
   State createState() => WebviewPageState();

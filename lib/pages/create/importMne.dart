@@ -1,7 +1,7 @@
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
-
+/// import wallet by mne
 class ImportMnePage extends StatefulWidget {
   @override
   State createState() => ImportMnePageState();

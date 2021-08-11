@@ -1,5 +1,5 @@
 import 'package:fil/index.dart';
-
+/// create or import different wallet 
 class WalletInitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

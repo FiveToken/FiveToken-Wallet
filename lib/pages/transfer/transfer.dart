@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:oktoast/oktoast.dart';
-
+/// transfer page
 class FilTransferNewPage extends StatefulWidget {
   @override
   State createState() => FilTransferNewPageState();
@@ -66,7 +66,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
         OpenedBox.messageInsance.values.where((mes) => mes.pending == 1);
     return pendingList.isNotEmpty;
   }
-
+  /// get suggest gas 
   Future getGas() async {
     var to = _addressCtl.text.trim();
     var res = await getGasDetail(to: to);
@@ -75,7 +75,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
       setState(() {});
     }
   }
-
+  /// increase gas and resend a blocked message
   void speedup(String ck) async {
     var pendingList = OpenedBox.messageInsance.values
         .where((mes) => mes.pending == 1)
@@ -93,6 +93,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
     var key = '$from\_$n';
     var cacheGas = OpenedBox.gasInsance.get(key);
     if (cacheGas != null) {
+      /// increase GasPremium to replace the message in mpool
       var chainPremium = int.parse(controller.gas.value.premium);
       var caculatePremium = (int.parse(cacheGas.premium) * 1.3).truncate();
       var realPremium = max(chainPremium, caculatePremium);
@@ -150,7 +151,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
       }
     }
   }
-
+  /// push message 
   void _pushMsg(String ck) async {
     if (!Global.online) {
       showCustomError('errorNet'.tr);
@@ -166,6 +167,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
       showCustomError("errorGetNonce".tr);
       return;
     }
+    /// use bigger nonce when send multiple messages in a short time
     var realNonce = max(nonce, nonceBoxInstance.get(from).value);
     var value = fil2Atto(_amountCtl.text.trim());
     var msg = TMessage(
@@ -265,7 +267,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage>
 
     return true;
   }
-
+  /// get the nonce of the wallet
   void _getNonce() async {
     var wal = singleStoreController.wal;
     var nonce = await getNonce(wal);

@@ -1,7 +1,7 @@
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:oktoast/oktoast.dart';
-
+/// display detail of a transaction
 class FilDetailPage extends StatefulWidget {
   @override
   State createState() => FilDetailPageState();

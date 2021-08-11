@@ -1,6 +1,8 @@
 import 'package:fil/index.dart';
 import './fetch.dart';
 var messageApi = 'https://api.filwallet.ai:5679/rpc/v0';
+
+/// push signed message to lotus 
 Future<String> pushSignedMsg(Map<String, dynamic> msg) async {
   if (!Global.online) {
     showCustomError('errorNet'.tr);
@@ -35,6 +37,12 @@ Future<String> pushSignedMsg(Map<String, dynamic> msg) async {
   }
 }
 
+/// get messages related to the specified address
+///  [address]  address use to search
+///  [timePoint]  tipset timestamp
+///  [direction]  'up': find messages before [timePoint] 'down': find messages after [timePoint]
+///  [count] num of the messages 
+///  [method] message's method
 Future<List> getMessageList(
     {String address = '',
     num time,
@@ -72,6 +80,7 @@ Future<List> getMessageList(
   }
 }
 
+/// get the message detail infomation by signed cid
 Future<MessageDetail> getMessageDetail(StoreMessage mes) async {
   if (!Global.online) {
     showCustomError('errorNet'.tr);
@@ -99,6 +108,9 @@ Future<MessageDetail> getMessageDetail(StoreMessage mes) async {
   }
 }
 
+/// get gas_limit,gas_premium and base_fee to predict gas 
+///  [method]  'method' filed in message
+///  [to] 'to' field in message
 Future<Gas> getGasDetail({num method = 0, String to}) async {
   if (!Global.online) {
     showCustomError('errorNet'.tr);

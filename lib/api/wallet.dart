@@ -1,5 +1,7 @@
 import 'package:fil/index.dart';
 
+
+/// get nonce of an address
 Future<int> getNonce(Wallet w) async {
   var data = JsonRPCRequest(1, "filscan.BalanceNonceByAddress", [
     {"address": w.address},
@@ -53,6 +55,7 @@ Future<BalanceNonce> getBalance(Wallet w) async {
   return balanceNonce;
 }
 
+/// get balance and nonce of an address
 Future<WalletMeta> getWalletMeta(String address) async {
   var rs = await fetch("filscan.BalanceNonceByAddress", [
     {"address": address},

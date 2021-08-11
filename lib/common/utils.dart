@@ -4,18 +4,13 @@ import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:device_info/device_info.dart';
-import 'package:connectivity/connectivity.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 const psalt = "vFIzIawYOU";
 var _box = Hive.box<Wallet>(addressBox);
-Future<bool> checkNetStatus() async {
-  var connectivityResult = await Connectivity().checkConnectivity();
-  bool isOn = connectivityResult != ConnectivityResult.none;
-  return isOn;
-}
 
+/// decrypt the string that was encrypted
 String aesDecrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -28,7 +23,7 @@ String aesDecrypt(String raw, String mix) {
   var decoded = encrypter.decrypt(encrypted, iv: encrypt.IV.fromLength(16));
   return decoded;
 }
-
+/// use aes algorithm to encrypt a string
 String aesEncrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -40,7 +35,7 @@ String aesEncrypt(String raw, String mix) {
   var encoded = encrypter.encrypt(raw, iv: encrypt.IV.fromLength(16));
   return encoded.base64;
 }
-
+/// generate the digest of the given string
 String tokenify(String str, {String salt = psalt}) {
   var key = utf8.encode(salt);
   var bytes = utf8.encode(str.trim());
@@ -49,11 +44,11 @@ String tokenify(String str, {String salt = psalt}) {
   var digest = hmacSha.convert(bytes);
   return digest.toString();
 }
-
+/// hide keyboard
 void unFocusOf(BuildContext context) {
   FocusScope.of(context).requestFocus(FocusNode());
 }
-
+/// set  data of clipboard to the given [text] then call the [callback]
 void copyText(String text, {Function callback}) {
   var data = ClipboardData(text: text);
   Clipboard.setData(data).then((_) {
@@ -62,7 +57,7 @@ void copyText(String text, {Function callback}) {
     }
   });
 }
-
+/// convert a long string to short
 String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
   int strLen = str.length;
   if (strLen < headLen + tailLen) {
@@ -77,7 +72,7 @@ String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
 
   return "$headStr...$tailStr";
 }
-
+/// convert a big float number in exponential form to int string
 String parseE(String str) {
   final isE = RegExp(r"[eE][+-]\d+$");
   if (!isE.hasMatch(str)) {
@@ -115,6 +110,7 @@ String toFixed(double input, int len) {
   return parseE(r);
 }
 
+/// verify if [input] is a valid double number
 bool isDecimal(String input) {
   var r = RegExp(r"(^\d+(?:\.\d+)?([eE]-?\d+)?$|^\.\d+([eE]-?\d+)?$)");
   if (r.hasMatch(input.trim())) {
@@ -123,6 +119,8 @@ bool isDecimal(String input) {
   return false;
 }
 
+
+/// verify if [input] is a valid filecoin address
 bool isValidAddress(String input) {
   var addr = input.trim().toLowerCase();
   if (addr == '') {
@@ -150,16 +148,7 @@ bool isValidAddress(String input) {
   return true;
 }
 
-List<String> parseFee(double fee) {
-  if (fee == 0) {
-    return ['0', '1000'];
-  } else if (fee < 0.0000001) {
-    return ['1000', (fee * pow(10, 15)).toStringAsFixed(0)];
-  } else {
-    return [(fee * pow(10, 10)).toStringAsFixed(0), '99999999'];
-  }
-}
-
+/// generate private key by [mne]
 String genCKBase64(String mne) {
   var seed = bip39.mnemonicToSeed(mne);
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
@@ -169,26 +158,7 @@ String genCKBase64(String mne) {
   return ck;
 }
 
-Future<AndroidDeviceInfo> getAndroidDeviceInfo() async {
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-  print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
-  print("android device id is:");
-  print(androidInfo.androidId);
-
-  return androidInfo;
-}
-
-String genRandStr(int size) {
-  String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  String result = "";
-  var strLen = str.length;
-  for (int i = 0; i < size; i++) {
-    result += str[Random().nextInt(strLen)];
-  }
-  return result;
-}
-
+/// convert hex encode string
 String hex2str(String hexString) {
   hexString = hexString.trim();
   List<String> split = [];
@@ -200,10 +170,6 @@ String hex2str(String hexString) {
   return ascii;
 }
 
-String formatTime(num timestamp) {
-  var t = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-  return "${t.year.toString().substring(2)}/${t.month.toString().padLeft(2, '0')}/${t.day.toString().padLeft(2, '0')} ${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
-}
 
 
 String fixedFloat({String number, num size = 2}) {
@@ -217,7 +183,7 @@ String fixedFloat({String number, num size = 2}) {
     return number;
   }
 }
-
+/// convert attoFil to different units
 String formatFil({double attoFil, num size = 5}) {
   var str = attoFil.toString().split('.')[0];
   num length = str.length;
@@ -230,16 +196,18 @@ String formatFil({double attoFil, num size = 5}) {
   }
 }
 
+/// convert fil to attofil
 String fil2Atto(String fil) {
   return (BigInt.from((double.parse(fil) * pow(10, 9))) *
           BigInt.from(pow(10, 9)))
       .toString();
 }
 
+/// convert attofil to fil
 String atto2Fil(String value, {num len = 6}) {
   return Fil(attofil: value).toFixed(len: len);
 }
-
+/// convert bytes to different units
 String unitConversion(String byteStr, num length) {
   int byte = int.parse(byteStr);
   String res = '';
@@ -263,18 +231,6 @@ String unitConversion(String byteStr, num length) {
   return positive ? res : '-$res';
 }
 
-
-String walletLabel(String addr, {bool dot = true}) {
-  return _box.containsKey(addr)
-      ? _box.get(addr).label
-      : dot
-          ? dotString(str: addr)
-          : addr;
-}
-
-bool isExistWallet(String addr) {
-  return _box.containsKey(addr);
-}
 
 String encodeString(String str, [int times = 1]) {
   List<int> s = utf8.encode(str);
@@ -305,7 +261,7 @@ String formatDouble(String str, {bool truncate = false, int size = 4}) {
     return '0';
   }
 }
-
+/// convert a base64 encode private key to hex encode private key. [type] represent different algorithm
 String base64ToHex(String pk, String type) {
   String t = type == '1' ? 'secp256k1' : 'bls';
   PrivateKey privateKey = PrivateKey(t, pk);
@@ -317,6 +273,7 @@ String base64ToHex(String pk, String type) {
   return result;
 }
 
+/// launch a [url] to open other app or open in browser
 Future openInBrowser(String url) async {
   if (await canLaunch(url)) {
     await launch(
@@ -329,12 +286,14 @@ Future openInBrowser(String url) async {
   }
 }
 
+/// verify if the [pass] is valid
 bool isValidPassword(String pass) {
   pass = pass.trim();
   var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
   return reg.hasMatch(pass);
 }
 
+/// call a function in next tick
 void nextTick(Noop callback) {
   Future.delayed(Duration.zero).then((value) {
     callback();

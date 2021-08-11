@@ -2,7 +2,7 @@ import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:fil/pages/create/warn.dart';
-
+/// generate mne 
 class MneCreatePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {

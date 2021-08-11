@@ -1,5 +1,5 @@
 import 'package:fil/index.dart';
-
+/// reset password of the wallet
 class PassResetPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
