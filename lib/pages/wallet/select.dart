@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
@@ -197,7 +195,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              child: CommonText('身份钱包(多币种)'),
+              child: CommonText('idMulti'.tr),
               padding: EdgeInsets.only(left: 12),
             ),
             Column(
@@ -252,7 +250,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    child: CommonText('导入'),
+                    child: CommonText('import'.tr),
                     padding: EdgeInsets.only(left: 12),
                   ),
                   Column(

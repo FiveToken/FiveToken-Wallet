@@ -245,7 +245,7 @@ class NetEntranceWidget extends StatelessWidget {
             Layout.colStart([
               CommonText(net.label),
               CommonText.grey(
-                '显示当前网络下地址簿',
+                'showCurrentAddr'.tr,
                 size: 12,
               )
             ]),

@@ -1,99 +1,93 @@
 import 'package:fil/index.dart';
-import 'package:fil/pages/main/index.dart';
 import 'package:fil/store/store.dart';
 
-var _lableStyle =
-    TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(FTips1));
-var _decoration = BoxDecoration(
-    border: Border(
-        bottom: BorderSide(
-  color: Colors.grey[200],
-)));
-
+/// customize gas fee
 class FilGasPage extends StatefulWidget {
   @override
   State createState() => FilGasPageState();
 }
 
 class FilGasPageState extends State<FilGasPage> {
-  StoreController controller = $store;
-  TextEditingController baseFeeCtrl = TextEditingController();
+  TextEditingController feeCapCtrl = TextEditingController();
+  TextEditingController gasLimitCtrl = TextEditingController();
   int index = 0;
-  void onChange(String v) {
-    setState(() {});
-  }
-
+  ChainGas chainGas = ChainGas();
   Color getTextColor(bool filter) {
     return filter ? Colors.white : CustomColor.grey;
   }
 
-  int get baseFee {
-    try {
-      var base = int.parse($store.gas.gasPremium);
-      return base;
-    } catch (e) {
-      return 0;
-    }
-  }
+  bool get isEth => $store.net.addressType == 'eth';
 
-  int get premium {
-    try {
-      var p = int.parse($store.gas.gasPremium);
-      return p;
-    } catch (e) {
-      return 0;
-    }
+  ChainGas get gas {
+    return $store.g.value;
   }
 
   String get fastFeeCap {
-    var feeCap = max(3 * baseFee, 5 * pow(10, 9));
-    return feeCap.toString();
+    return chainGas.gasPrice;
   }
 
   String get slowFeeCap {
-    var base = (2.9 * baseFee).truncate();
-    var feeCap = max(base, 4.9 * pow(10, 9)).truncate();
-    return feeCap.toString();
+    try {
+      var feeCapNum = int.parse(chainGas.gasPrice);
+      var feeCap = (0.9 * feeCapNum).truncate().toString();
+      return feeCap.toString();
+    } catch (e) {
+      return chainGas.gasPrice;
+    }
   }
 
-  String get feePrice {
-    return getMarketPrice(
-        $store.gas.maxFee.replaceAll('Fil', ''), Global.price.rate);
+  void handleSubmit(BuildContext context) {
+    final feeCap = feeCapCtrl.text.trim();
+    final gasLimit = gasLimitCtrl.text.trim();
+    var feeCapNum = double.parse(feeCap);
+    if (feeCap == '' || gasLimit == '') {
+      showCustomError('errorSetGas'.tr);
+      return;
+    }
+    if (index == 2) {
+      $store.setGas(ChainGas(
+          level: 2,
+          gasLimit: double.tryParse(gasLimit).truncate(),
+          gasPrice: isEth
+              ? (BigInt.from(pow(10, 9)) * BigInt.from(feeCapNum)).toString()
+              : feeCapNum.truncate().toString(),
+          gasPremium:
+              isEth ? chainGas.gasPremium : (feeCapNum - 100).toString()));
+    }
+    unFocusOf(context);
+    Get.back();
   }
 
   @override
   void initState() {
     super.initState();
     index = $store.gas.level;
-    baseFeeCtrl.addListener(() {
-      var baseFeeStr = baseFeeCtrl.text.trim();
-      if (baseFeeStr == '') {
-        return;
-      }
-      try {
-        var baseFeeNum = int.parse(baseFeeStr) * pow(10, 9);
-        var gas = $store.gas;
-        gas.gasPrice = (premium + baseFeeNum).toString();
-        gas.level = 2;
-        $store.setGas(gas);
-        setState(() {});
-      } catch (e) {
-        print(e);
-      }
-    });
+    if (Get.arguments != null && Get.arguments['gas'] != null) {
+      chainGas = Get.arguments['gas'] as ChainGas;
+      syncGas(chainGas);
+    }
+    if (index == 2) {
+      syncGas($store.gas);
+    }
+  }
+
+  void syncGas(ChainGas g) {
+    feeCapCtrl.text = g.gasPrice;
+    gasLimitCtrl.text = g.gasLimit.toString();
   }
 
   @override
   Widget build(BuildContext context) {
+    var h = MediaQuery.of(context).viewInsets.bottom;
     return CommonScaffold(
       title: 'advanced'.tr,
       footerText: 'sure'.tr,
-      onPressed: () {
-        Get.back();
-      },
       grey: true,
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(12, 20, 12, 0),
+      onPressed: () {
+        handleSubmit(context);
+      },
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(12, 20, 12, h + 100),
         child: Column(
           children: [
             Container(
@@ -112,10 +106,10 @@ class FilGasPageState extends State<FilGasPage> {
                   SizedBox(
                     height: 8,
                   ),
-                  Container(
-                    alignment: Alignment.bottomRight,
-                    child: CommonText.white(feePrice, size: 10),
-                  )
+                  // Container(
+                  //   alignment: Alignment.bottomRight,
+                  //   child: CommonText.white(feePrice, size: 10),
+                  // )
                 ],
               ),
             ),
@@ -127,7 +121,7 @@ class FilGasPageState extends State<FilGasPage> {
                   CommonText.main('feeRate'.tr),
                   // Image(
                   //   width: 20,
-                  //   image: AssetImage('icons/que.png'),
+                  //   image: AssetImage('images/que.png'),
                   // )
                 ],
               ),
@@ -150,7 +144,7 @@ class FilGasPageState extends State<FilGasPage> {
                           color: getTextColor(index == 0),
                         ),
                         CommonText(
-                          fastFeeCap,
+                          formatCoin(chainGas.fast.gasPrice, size: 5),
                           size: 10,
                           color: getTextColor(index == 0),
                         )
@@ -166,11 +160,8 @@ class FilGasPageState extends State<FilGasPage> {
               onTap: () {
                 setState(() {
                   index = 0;
+                  $store.setGas(chainGas.fast);
                 });
-                var gas = $store.gas;
-                gas.gasPrice = fastFeeCap;
-                gas.level = 0;
-                $store.setGas(gas);
               },
             ),
             SizedBox(
@@ -194,7 +185,7 @@ class FilGasPageState extends State<FilGasPage> {
                           color: getTextColor(index == 1),
                         ),
                         CommonText(
-                          slowFeeCap,
+                          formatCoin(chainGas.slow.gasPrice, size: 5),
                           size: 10,
                           color: getTextColor(index == 1),
                         ),
@@ -210,11 +201,8 @@ class FilGasPageState extends State<FilGasPage> {
               onTap: () {
                 setState(() {
                   index = 1;
+                  $store.setGas(chainGas.slow);
                 });
-                var gas = $store.gas;
-                gas.level = 1;
-                gas.gasPrice = slowFeeCap;
-                $store.setGas(gas);
               },
             ),
             SizedBox(
@@ -223,6 +211,16 @@ class FilGasPageState extends State<FilGasPage> {
             index != 2
                 ? GestureDetector(
                     onTap: () {
+                      var n = double.parse(chainGas.gasPrice) / pow(10, 9);
+                      if ($store.net.addressType == 'eth') {
+                        if (n > 1) {
+                          feeCapCtrl.text = n.truncate().toString();
+                        } else {
+                          feeCapCtrl.text = n.toStringAsFixed(1);
+                        }
+                      } else {
+                        feeCapCtrl.text = chainGas.gasPrice;
+                      }
                       setState(() {
                         index = 2;
                       });
@@ -249,16 +247,25 @@ class FilGasPageState extends State<FilGasPage> {
                         Divider(
                           color: Colors.white,
                         ),
-                        CommonText.white('feeRate'.tr, size: 10),
+                        CommonText.white('GasFeeCap', size: 10),
                         Field(
                           label: '',
-                          controller: baseFeeCtrl,
+                          controller: feeCapCtrl,
                           type: TextInputType.number,
-                          inputFormatters: [PrecisionLimitFormatter(8)],
                           extra: Padding(
                             padding: EdgeInsets.only(right: 12),
-                            child: CommonText.grey('NanoFIL', size: 10),
+                            child: CommonText($store.net.addressType == 'eth'
+                                ? 'gwei'
+                                : 'attoFIL'),
                           ),
+                          inputFormatters: [PrecisionLimitFormatter(8)],
+                        ),
+                        CommonText.white('GasLimit', size: 10),
+                        Field(
+                          label: '',
+                          controller: gasLimitCtrl,
+                          type: TextInputType.number,
+                          inputFormatters: [PrecisionLimitFormatter(8)],
                         )
                       ],
                     ),
@@ -266,54 +273,6 @@ class FilGasPageState extends State<FilGasPage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class MaxFee extends StatelessWidget {
-  final String feeCap;
-  final String gas;
-  MaxFee({this.feeCap = '0', this.gas = '0'});
-  @override
-  Widget build(BuildContext context) {
-    var _feeCap = feeCap;
-    var _gas = gas;
-    if (_feeCap?.trim() == '') {
-      _feeCap = '0';
-    }
-    if (_gas?.trim() == '') {
-      _gas = '0';
-    }
-    return Column(
-      children: [
-        Container(
-          child: Row(
-            children: [
-              Text(
-                'maxFee'.tr,
-                style: _lableStyle,
-              ),
-              Text(formatFil(
-                  attoFil: double.parse(_feeCap) * double.parse(_gas)))
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          ),
-          decoration: _decoration,
-          padding: EdgeInsets.only(bottom: 10),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Row(
-          children: [
-            CommonText(
-              'GasFeeCap($_feeCap attoFil)*Gas($_gas)',
-              size: 14,
-            )
-          ],
-          mainAxisAlignment: MainAxisAlignment.end,
-        )
-      ],
     );
   }
 }

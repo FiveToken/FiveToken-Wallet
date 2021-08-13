@@ -12,7 +12,7 @@ class ImportIndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: isMne ? '导入助记词' : '导入私钥',
+      title: isMne ? 'importMne'.tr : 'importPk'.tr,
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 20, 12, 40),
@@ -22,7 +22,7 @@ class ImportIndexPage extends StatelessWidget {
             Visibility(
               child: TapCardWidget(
                 Layout.rowBetween([
-                  CommonText.white('身份钱包'),
+                  CommonText.white('idWallet'.tr),
                   Image(width: 18, image: AssetImage('icons/right-w.png'))
                 ]),
                 onTap: () {
@@ -39,7 +39,7 @@ class ImportIndexPage extends StatelessWidget {
               return Visibility(
                   visible: nets.isNotEmpty,
                   child: Layout.colStart([
-                    CommonText(['主网', '测试网', '自定义网络'][index]),
+                    CommonText(Network.labels[index]),
                     SizedBox(
                       height: 12,
                     ),

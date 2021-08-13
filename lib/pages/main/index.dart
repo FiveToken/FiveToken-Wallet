@@ -8,8 +8,12 @@ import 'package:fil/pages/main/widgets/token.dart';
 import 'package:fil/pages/transfer/transfer.dart';
 import 'package:logger/logger.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import './walletConnect.dart';
+
+typedef WCCallback = List<JsonRpc Function(WCSession, JsonRpc)> Function(
+    String type);
 
 class MainPage extends StatefulWidget {
   @override
@@ -52,12 +56,55 @@ class MainPageState extends State<MainPage> {
       print('wallet change');
       getBalance();
     });
+    
   }
 
   @override
   void dispose() {
     super.dispose();
     worker?.dispose();
+  }
+
+  List<JsonRpc Function(WCSession, JsonRpc)> genCallback(String type) {
+    var callback = (WCSession session, JsonRpc rpc) {
+      if ($store.net.addressType != type) {
+        showCustomError('网络类型错误');
+        session.sendResponse(rpc.id, '$type\_sendTransaction',
+            error: {'message': 'Reject'});
+      }
+      var params = rpc.params;
+      if (params != null && params is List && params.isNotEmpty) {
+        try {
+          var p = params[0] as Map<String, dynamic>;
+          var to = p['to'] as String;
+          var value = p['value'] as String;
+          BigInt valueNum;
+          if (value.startsWith('0x')) {
+            valueNum = hexToInt(value);
+          } else {
+            valueNum = BigInt.tryParse(value);
+          }
+          if (to != null && value != null) {
+            handleTransaction(
+                session: session,
+                rpc: rpc,
+                to: to,
+                value: valueNum,
+                type: type);
+          } else {
+            showCustomError('errorParams'.tr);
+          }
+        } catch (e) {
+          showCustomError(e.toString());
+          session.sendResponse(rpc.id, '$type\_sendTransaction',
+              error: {'message': 'Reject'});
+        }
+      } else {
+        showCustomError('errorParams'.tr);
+      }
+      return rpc;
+    };
+    return [callback];
   }
 
   List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
@@ -69,34 +116,6 @@ class MainPageState extends State<MainPage> {
             this.connectedSession = null;
             this.meta = null;
           });
-        }
-        return rpc;
-      }
-    ];
-  }
-
-  List<JsonRpc Function(WCSession, JsonRpc)> get transcationCallback {
-    return [
-      (WCSession session, JsonRpc rpc) {
-        var params = rpc.params;
-        if (params != null && params is List && params.isNotEmpty) {
-          try {
-            var p = params[0] as Map<String, dynamic>;
-            var to = p['to'] as String;
-            var value = p['value'] as String;
-            // ignore: unused_local_variable
-            var valueNum = double.parse(value);
-            if (to != null && value != null) {
-              handleTransaction(
-                  session: session, rpc: rpc, to: to, value: value);
-            } else {
-              showCustomError('errorParams'.tr);
-            }
-          } catch (e) {
-            showCustomError(e.toString());
-          }
-        } else {
-          showCustomError('errorParams'.tr);
         }
         return rpc;
       }
@@ -163,7 +182,8 @@ class MainPageState extends State<MainPage> {
             logger: Logger(),
             keyHex: m['keyHex'],
             eventHandler: {
-              'fil_sendTransaction': transcationCallback,
+              'fil_sendTransaction': genCallback('filecoin'),
+              'eth_sendTransaction': genCallback('eth'),
               'wc_sessionUpdate': sessionUpdateCallback,
             });
         wc.isConnected = wc.isActive = true;
@@ -285,8 +305,8 @@ class MainPageState extends State<MainPage> {
         }
       ],
       'wc_sessionUpdate': sessionUpdateCallback,
-      'fil_sendTransaction': transcationCallback,
-      'eth_sendTransaction': transcationCallback,
+      'fil_sendTransaction': genCallback('filecoin'),
+      'eth_sendTransaction': genCallback('eth'),
     });
   }
 
@@ -312,84 +332,75 @@ class MainPageState extends State<MainPage> {
   }
 
   void pushMsg(
-      {String ck,
-      Gas gas,
+      {String private,
+      ChainGas gas,
       int nonce,
       WCSession session,
       JsonRpc rpc,
-      String value,
+      BigInt value,
       String to,
+      String type,
       ChainWallet wallet}) async {
-    var from = wallet.address;
+    var from = wallet.addr;
+    var net = $store.net;
+    var nonceKey = '$from\_${net.rpc}';
     var realNonce = max(nonce, nonceBoxInstance.get(from).value);
-    var msg = TMessage(
-        version: 0,
-        method: 0,
-        nonce: realNonce,
-        from: from,
+    var res = await provider.sendTransaction(
         to: to,
-        params: "",
-        value: fil2Atto(value),
-        gasFeeCap: gas.feeCap,
-        gasLimit: gas.gasLimit,
-        gasPremium: gas.premium);
-    String sign = '';
-    num signType;
-    var cid = await Flotus.messageCid(msg: jsonEncode(msg));
-    if (wallet.addr[1] == '1') {
-      signType = SignTypeSecp;
-      sign = await Flotus.secpSign(ck: ck, msg: cid);
-    } else {
-      signType = SignTypeBls;
-      sign = await Bls.cksign(num: "$ck $cid");
-    }
-    var sm = SignedMessage(msg, Signature(signType, sign));
-    showCustomLoading('sending'.tr);
-    String res = await pushSignedMsg(sm.toLotusSignedMessage());
-    dismissAllToast();
+        amount: value.toString(),
+        private: private,
+        gas: gas,
+        nonce: realNonce);
     if (res != '') {
       showCustomToast('sended'.tr);
+      session.sendResponse(rpc.id, '$type\_sendTransaction', result: res);
       var cacheGas = ChainGas(
-          gasPrice: gas.feeCap,
-          gasLimit: gas.gasLimit,
-          gasPremium: gas.premium);
-      OpenedBox.gasInsance.put('$from\_$realNonce', cacheGas);
-      OpenedBox.messageInsance.put(
+          gasPrice: $store.gas.gasPrice,
+          gasLimit: $store.gas.gasLimit,
+          gasPremium: $store.gas.gasPremium);
+      OpenedBox.gasInsance
+          .put('$from\_$realNonce\_${$store.net.rpc}', cacheGas);
+      $store.setGas(ChainGas());
+      OpenedBox.mesInstance.put(
           res,
-          StoreMessage(
+          CacheMessage(
               pending: 1,
               from: from,
               to: to,
-              value: fil2Atto(value),
+              value: value.toString(),
               owner: from,
               nonce: realNonce,
-              signedCid: res,
+              hash: res,
+              rpc: net.rpc,
+              gas: cacheGas,
+              fee: (BigInt.from(cacheGas.gasLimit) *
+                          BigInt.tryParse(cacheGas.gasPrice) ??
+                      0)
+                  .toString(),
               blockTime:
                   (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
-      var oldNonce = nonceBoxInstance.get(from);
+      var oldNonce = nonceBoxInstance.get(nonceKey);
       nonceBoxInstance.put(
-          from, Nonce(value: realNonce + 1, time: oldNonce.time));
-      session.sendResponse(rpc.id, 'fil_sendTransaction',
-          result: {'signed_cid': res});
+          nonceKey, Nonce(value: realNonce + 1, time: oldNonce.time));
     } else {
       showCustomError('sendFail'.tr);
     }
   }
 
   void handleTransaction(
-      {WCSession session, JsonRpc rpc, String to, String value}) {
+      {WCSession session, JsonRpc rpc, String to, BigInt value, String type}) {
     var controller = $store;
     var wallet = controller.wal;
     var address = wallet.addr;
     var now = DateTime.now().millisecondsSinceEpoch;
-    Future.wait([getGasDetail(to: to), getNonce(wallet)]).then((res) {
+    Future.wait([provider.getGas(to: to), provider.getNonce()]).then((res) {
       var gas = res[0] as ChainGas;
       var nonce = res[1] as int;
       if (gas.gasPrice == '0') {
         showCustomError('errorSetGas'.tr);
         return;
       }
-      if (nonce == null || nonce == -1) {
+      if (nonce == -1) {
         showCustomError("errorGetNonce".tr);
         return;
       }
@@ -402,7 +413,6 @@ class MainPageState extends State<MainPage> {
           nonceBoxInstance.put(address, Nonce(time: now, value: nonce));
         }
       }
-      var maxFee = getMaxFee(gas);
       showCustomModalBottomSheet(
           shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
           context: context,
@@ -413,8 +423,8 @@ class MainPageState extends State<MainPage> {
                 child: ConfirmSheet(
                   from: address,
                   to: to,
-                  gas: maxFee,
-                  value: value,
+                  gas: gas.maxFee,
+                  value: getChainValue(value.toString()),
                   footer: Row(
                     children: [
                       Expanded(
@@ -423,7 +433,7 @@ class MainPageState extends State<MainPage> {
                         height: 40,
                         onPressed: () {
                           Get.back();
-                          session.sendResponse(rpc.id, 'fil_sendTransaction',
+                          session.sendResponse(rpc.id, '$type\_sendTransaction',
                               error: {'message': 'Reject'});
                         },
                         strokeWidth: .5,
@@ -442,18 +452,18 @@ class MainPageState extends State<MainPage> {
                           Get.back();
                           showPassDialog(context, (String pass) async {
                             var wal = controller.wal;
-                            var ck = await getPrivateKey(
-                                wal.address, pass, wal.skKek);
-                            // pushMsg(
-                            //     ck: ck,
-                            //     value: value,
-                            //     gas: gas,
-                            //     wallet: wallet,
-                            //     rpc: rpc,
-                            //     to: to,
-                            //     session: session,
-                            //     nonce: nonce);
-                            //onConfirm(ck);
+                            var private = await wal.getPrivateKey(pass);
+                            pushMsg(
+                                private: private,
+                                value: value,
+                                gas: gas,
+                                wallet: wallet,
+                                rpc: rpc,
+                                to: to,
+                                type: type,
+                                session: session,
+                                nonce: nonce);
+                            // onConfirm(ck);
                           });
                         },
                         height: 40,
@@ -481,12 +491,12 @@ class MainPageState extends State<MainPage> {
               {
                 'description': '',
                 'name': 'FiveToken',
-                'url': 'https://filecoinwallet.com/',
-                'icons': ['https://filecoinwallet.com/logo.jpg']
+                'url': 'https://fivetoken.io/',
+                'icons': ['https://fivetoken.io/image/ft-logo.png']
               },
               [$store.wal.addr],
               approved,
-              chainId: 1)
+              chainId: int.tryParse($store.net.chainId))
           .then((value) {
         if (approved) {
           var s = session.toString();
@@ -687,7 +697,7 @@ class MainPageState extends State<MainPage> {
                 SizedBox(
                   height: 18,
                 ),
-                WalletService(),
+                WalletService(mainPage),
                 SizedBox(
                   height: 40,
                 ),

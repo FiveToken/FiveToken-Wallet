@@ -17,7 +17,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   String balance = '0';
   TextEditingController amountCtrl = TextEditingController();
   TextEditingController addressCtrl = TextEditingController();
-  StoreController controller = $store;
   int nonce;
   FocusNode focusNode = FocusNode();
   ChainProvider provider;
@@ -26,18 +25,22 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   ChainWallet wallet = $store.wal;
   Token token = Global.cacheToken;
   bool loading = false;
-
+  String prePage;
   var nonceBoxInstance = OpenedBox.nonceInsance;
   @override
   void initState() {
     super.initState();
+
     if (Get.arguments != null) {
       if (Get.arguments['to'] != null) {
         addressCtrl.text = Get.arguments['to'];
       }
-      if (Get.arguments['token'] != null) {
-        this.token = Get.arguments['token'];
+      if (Get.arguments['page'] != null) {
+        prePage = Get.arguments['page'];
       }
+      // if (Get.arguments['token'] != null) {
+      //   this.token = Get.arguments['token'];
+      // }
     }
     focusNode.addListener(() {
       if (!focusNode.hasFocus) {
@@ -105,9 +108,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   }
 
   Future<bool> getGas(String to) async {
-    var g = await provider.getGas(to: to, isToken: isToken,token: token);
+    var g = await provider.getGas(to: to, isToken: isToken, token: token);
     if (g.gasPrice != '0') {
-      controller.setGas(g);
+      $store.setGas(g);
       this.gas = g;
       return true;
     } else {
@@ -134,7 +137,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var cacheGas = OpenedBox.gasInsance.get(key);
     if (cacheGas != null) {
       try {
-        var chainPremium = controller.gas.gasPremium;
+        var chainPremium = $store.gas.gasPremium;
         var g = provider.replaceGas(cacheGas, chainPremium: chainPremium);
         this.loading = true;
         showCustomLoading('Loading');
@@ -161,7 +164,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         dismissAllToast();
         if (res != '') {
           showCustomToast('sended'.tr);
-          controller.setGas(ChainGas());
+          $store.setGas(ChainGas());
           OpenedBox.gasInsance.put(key, g);
           OpenedBox.mesInstance.put(
               res,
@@ -208,21 +211,12 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var from = wallet.addr;
     var to = addressCtrl.text.trim();
     var amount = amountCtrl.text.trim();
-    // if (controller.gas.gasPrice == '0') {
-    //   showCustomError('errorSetGas'.tr);
-    //   return;
-    // }
-    // if (nonce == null || nonce == -1) {
-    //   showCustomError("errorGetNonce".tr);
-    //   return;
-    // }
     try {
       var nonceKey = '$from\_${net.rpc}';
-      // var realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
       var value = getChainValue(amount, precision: token?.precision ?? 18);
       this.loading = true;
       showCustomLoading('Loading');
-      if (controller.gas.gasPrice == '0') {
+      if ($store.gas.gasPrice == '0') {
         var valid = await getGas(to);
         if (!valid) {
           showCustomError('errorSetGas'.tr);
@@ -243,7 +237,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         res = await p.sendToken(
             to: to,
             nonce: realNonce,
-            gas: gas,
+            gas: $store.gas,
             amount: value,
             private: private,
             addr: token.address);
@@ -253,7 +247,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
           amount: value,
           private: private,
           nonce: realNonce,
-          gas: gas,
+          gas: $store.gas,
         );
       }
       this.loading = false;
@@ -261,11 +255,11 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       if (res != '') {
         showCustomToast('sended'.tr);
         var cacheGas = ChainGas(
-            gasPrice: controller.gas.gasPrice,
-            gasLimit: controller.gas.gasLimit,
-            gasPremium: controller.gas.gasPremium);
+            gasPrice: $store.gas.gasPrice,
+            gasLimit: $store.gas.gasLimit,
+            gasPremium: $store.gas.gasPremium);
         OpenedBox.gasInsance.put('$from\_$realNonce\_${net.rpc}', cacheGas);
-        controller.setGas(ChainGas());
+        $store.setGas(ChainGas());
         OpenedBox.mesInstance.put(
             res,
             CacheMessage(
@@ -303,12 +297,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   }
 
   void goBack() {
-    if (Get.previousRoute != null && Get.previousRoute != '') {
-      if (Get.previousRoute == mainPage) {
-        Get.offAndToNamed(walletMainPage);
-      } else {
-        Get.back();
-      }
+    if (prePage != walletMainPage) {
+      Get.offAndToNamed(walletMainPage);
+    } else {
+      Get.back();
     }
   }
 
@@ -339,8 +331,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       return false;
     }
     var balanceNum =
-        BigInt.tryParse(isToken ? token.balance : controller.wal.balance);
-    var fee = controller.gas.feeNum;
+        BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+    var fee = $store.gas.feeNum;
     var amountNum = BigInt.from(
         (double.tryParse(trimAmount) * pow(10, isToken ? token.precision : 18))
             .truncate());
@@ -414,9 +406,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                   child: SingleChildScrollView(
                     padding: EdgeInsets.only(bottom: 30),
                     child: ConfirmSheet(
-                      from: controller.wal.address,
+                      from: $store.wal.address,
                       to: addressCtrl.text,
-                      gas: controller.gas.maxFee,
+                      gas: $store.gas.maxFee,
                       value: amountCtrl.text,
                       token: token,
                       onConfirm: (String ck) {
@@ -492,42 +484,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                 color: CustomColor.grey,
               ),
             ),
-            GestureDetector(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    child: CommonText.main('fee'.tr),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-                    decoration: BoxDecoration(
-                        color: Color(0xff5C8BCB),
-                        borderRadius: CustomRadius.b8),
-                    child: Row(
-                      children: [
-                        Obx(() => CommonText(
-                              $store.gas.maxFee,
-                              size: 14,
-                              color: Colors.white,
-                            )),
-                        Spacer(),
-                        CommonText(
-                          'advanced'.tr,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                        Image(width: 18, image: AssetImage('icons/right-w.png'))
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              onTap: () {
-                Get.toNamed(filGasPage);
-              },
-            ),
+            Obx(() => SetGas(
+                  maxFee: $store.gas.maxFee,
+                  gas: gas,
+                )),
           ],
         ),
       ),
@@ -722,6 +682,50 @@ class ConfirmSheet extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(12, 15, 12, 20),
         )
       ],
+    );
+  }
+}
+
+class SetGas extends StatelessWidget {
+  final String maxFee;
+  final ChainGas gas;
+  SetGas({@required this.maxFee, this.gas});
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            child: CommonText.main('fee'.tr),
+            padding: EdgeInsets.symmetric(vertical: 12),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+            decoration: BoxDecoration(
+                color: Color(0xff5C8BCB), borderRadius: CustomRadius.b8),
+            child: Row(
+              children: [
+                CommonText(
+                  maxFee,
+                  size: 14,
+                  color: Colors.white,
+                ),
+                Spacer(),
+                CommonText(
+                  'advanced'.tr,
+                  color: Colors.white,
+                  size: 14,
+                ),
+                Image(width: 18, image: AssetImage('icons/right-w.png'))
+              ],
+            ),
+          )
+        ],
+      ),
+      onTap: () {
+        Get.toNamed(filGasPage, arguments: {'gas': gas});
+      },
     );
   }
 }

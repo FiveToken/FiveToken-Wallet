@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:day/day.dart';
 import 'package:fil/index.dart';
 import 'package:fil/pages/wallet/widgets/messageList.dart';
@@ -25,7 +23,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   var box = OpenedBox.mesInstance;
   List<CacheMessage> messageList = [];
   num currentNonce;
-  StreamSubscription sub;
   Network net = $store.net;
   ChainProvider provider;
   Web3Client client;
@@ -38,14 +35,28 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     super.initState();
     enablePullUp = isFil;
     provider = isFil ? FilecoinProvider(net) : EthProvider(net);
-    sub = Global.eventBus.on<AppStateChangeEvent>().listen((event) {
-      updateBalance().then((value) {
-        loadFilecoinLatestMessages();
-      });
-    });
     deleteExtraList();
     initList();
     // getNonce();
+  }
+
+  ChainProvider initProvider() {
+    if ($store.net.addressType == 'eth') {
+      return EthProvider($store.net);
+    } else {
+      return FilecoinProvider($store.net);
+    }
+  }
+
+  Future getBalance() async {
+    var wal = $store.wal;
+    provider = initProvider();
+    var res = await provider.getBalance(wal.addr);
+    if (res != wal.balance) {
+      $store.changeWalletBalance(res);
+      wal.balance = res;
+      OpenedBox.walletInstance.put(wal.key, wal);
+    }
   }
 
   @override
@@ -58,7 +69,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   void dispose() {
     routeObserver.unsubscribe(this);
     super.dispose();
-    sub.cancel();
     provider?.dispose();
   }
 
@@ -85,7 +95,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       setState(() {
         messageList = list;
       });
-      // updateBalance();
       if (isFil) {
         loadFilecoinLatestMessages();
       } else {
@@ -152,16 +161,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
         print(e);
       }
     }
-  }
-
-  Future updateBalance() async {
-    var wal = $store.wal;
-    var res = await getBalance($store.wal);
-    if (res.nonce != -1) {}
-    wal.balance = res.balance;
-    $store.changeWalletBalance(res.balance);
-    this.currentNonce = res.nonce;
-    OpenedBox.walletInstance.put(wal.address, wal);
   }
 
   Future loadFilecoinLatestMessages() async {
@@ -330,9 +329,10 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   String get title => showToken ? token.symbol : $store.net.coin;
   Future onRefresh() async {
-    if (this.currentNonce == null) {
-      await getNonce();
-    }
+    // if (this.currentNonce == null) {
+    //   await getNonce();
+    // }
+    getBalance();
     Global.eventBus.fire(RefreshEvent(token: token));
     await loadLatestMessage();
   }
@@ -414,7 +414,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                             SizedBox(
                               height: 17,
                             ),
-                            WalletService(),
+                            WalletService(walletMainPage),
                             SizedBox(
                               height: 25,
                             ),
@@ -483,6 +483,8 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 }
 
 class WalletService extends StatelessWidget {
+  final String page;
+  WalletService(this.page);
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -512,7 +514,7 @@ class WalletService extends StatelessWidget {
           children: [
             IconBtn(
               onTap: () {
-                Get.toNamed(filTransferPage);
+                Get.toNamed(filTransferPage, arguments: {'page': page});
               },
               path: 'rec.png',
               color: Color(0xff5C8BCB),

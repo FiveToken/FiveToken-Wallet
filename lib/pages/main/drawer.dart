@@ -56,20 +56,23 @@ class DrawerBody extends StatelessWidget {
           Divider(thickness: .2),
           DrawerItem(
             onTap: () {
-              // Get.back();
-              //Get.toNamed(initWalletPage);
-              Get.toNamed(passwordSetPage);
+              Get.back();
             },
             label: 'wallet'.tr,
             iconPath: 'wal.png',
           ),
-          DrawerItem(
-            onTap: () {
-              openInBrowser(
-                  'https://filscan.io/tipset/address-detail?address=$addr');
-            },
-            label: 'filscan'.tr,
-            iconPath: 'broswer.png',
+          Obx(
+            () => Visibility(
+              child: DrawerItem(
+                onTap: () {
+                  var url = $store.net.getAddrDetailLink(addr);
+                  openInBrowser(url);
+                },
+                label: 'filscan'.tr,
+                iconPath: 'broswer.png',
+              ),
+              visible: $store.net.browser != '',
+            ),
           ),
           Divider(thickness: .2),
           DrawerItem(

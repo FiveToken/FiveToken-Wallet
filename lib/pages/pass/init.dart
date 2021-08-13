@@ -111,7 +111,7 @@ class PassInitPageState extends State<PassInitPage> {
         EncryptKey key;
         if (net.addressType == 'eth') {
           if (privateKey.length > 32) {
-            showCustomError('私钥格式错误');
+            showCustomError('wrongPk'.tr);
             return;
           }
           key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
@@ -138,7 +138,7 @@ class PassInitPageState extends State<PassInitPage> {
           Global.store.setString('currentWalletAddress', wal.address);
         }
       } catch (e) {
-        showCustomError('导入失败');
+        showCustomError('importFail'.tr);
       }
     }
     this.loading = false;

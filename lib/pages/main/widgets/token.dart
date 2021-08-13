@@ -61,7 +61,9 @@ class TokenWidgetState extends State<TokenWidget> {
           t.balance = numStr.toString();
           OpenedBox.tokenInstance.put(t.address, t);
         }
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     } catch (e) {
       print(e);
@@ -121,7 +123,9 @@ class TokenListState extends State<TokenList> {
     initClient($store.net);
     worker = ever($store.network, (net) {
       initClient(net);
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -165,7 +169,7 @@ class TokenListState extends State<TokenList> {
               child: Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Icon(Icons.add), CommonText('添加代币')],
+                  children: [Icon(Icons.add), CommonText('addToken'.tr)],
                 ),
               ),
             ))

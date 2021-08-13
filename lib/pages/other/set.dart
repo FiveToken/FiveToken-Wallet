@@ -43,7 +43,7 @@ class SetPageState extends State<SetPage> {
                   },
                 ),
                 CardItem(
-                  label: '网络',
+                  label: 'net'.tr,
                   onTap: () {
                     Get.toNamed(netIndexPage);
                   },

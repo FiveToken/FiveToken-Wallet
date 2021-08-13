@@ -32,7 +32,7 @@ class Network {
     return netType == 2 ? name : '$chain$net'.tr;
   }
 
-  String getDetailLink(cid) {
+  String getDetailLink(String cid) {
     if (addressType == 'eth') {
       return '$browser/tx/$cid';
     } else {
@@ -40,8 +40,17 @@ class Network {
     }
   }
 
-  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain);
+  String getAddrDetailLink(String addr) {
+    if (addressType == 'eth') {
+      return '$browser/address/$addr';
+    } else {
+      return '$browser/tipset/address-detail?address=$addr';
+    }
+  }
 
+  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain);
+  static List<String> get labels =>
+      ['mainNet'.tr, 'testNet'.tr, 'customNet'.tr];
   Network(
       {this.name = '',
       this.chain = '',
@@ -105,7 +114,7 @@ class Network {
       coin: 'ETH',
       chainId: '42',
       color: '0xff9064FF',
-      browser: 'https://kovan.etherscan.io/',
+      browser: 'https://kovan.etherscan.io',
       addressType: 'eth');
   static Network get ethRopstenNet => Network(
       chain: 'eth',
@@ -116,7 +125,7 @@ class Network {
       coin: 'ETH',
       chainId: '3',
       color: '0xffFF4A8D',
-      browser: 'https://ropsten.etherscan.io/',
+      browser: 'https://ropsten.etherscan.io',
       addressType: 'eth');
   static Network get ethRinkebyNet => Network(
       chain: 'eth',
@@ -127,7 +136,7 @@ class Network {
       color: '0xffF6C343',
       rpc: 'https://rinkeby.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
       coin: 'ETH',
-      browser: 'https://rinkeby.etherscan.io/',
+      browser: 'https://rinkeby.etherscan.io',
       addressType: 'eth');
   static Network get ethGoerliNet => Network(
       chain: 'eth',
@@ -138,7 +147,7 @@ class Network {
       rpc: 'https://goerli.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
       coin: 'ETH',
       chainId: '5',
-      browser: 'https://goerli.etherscan.io/',
+      browser: 'https://goerli.etherscan.io',
       addressType: 'eth');
   static Network get binanceTestnet => Network(
       chain: 'binance',

@@ -21,7 +21,7 @@ class Global {
   static Map<String, dynamic> info = {};
   static String selectWalletType = '1';
   static String uuid;
-  static bool online = false;
+  static bool online = true;
   static String platform;
   static String os;
   static String currentWalletAddress;

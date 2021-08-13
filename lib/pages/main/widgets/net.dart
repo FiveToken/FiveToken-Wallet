@@ -17,7 +17,7 @@ class NetSelect extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CommonTitle(
-                        '网络',
+                        'net'.tr,
                         showDelete: true,
                       ),
                       Expanded(
@@ -26,7 +26,7 @@ class NetSelect extends StatelessWidget {
                             EdgeInsets.symmetric(horizontal: 12, vertical: 20),
                         child: Layout.colStart(
                             List.generate(Network.netList.length, (index) {
-                          var labels = ['主网', '测试网', '自定义'];
+                          var labels = Network.labels;
                           var nets = Network.netList[index];
                           return Visibility(
                             child: Column(

@@ -7,12 +7,14 @@ class CustomRefreshWidget extends StatefulWidget {
   final Widget child;
   final bool enablePullDown;
   final bool enablePullUp;
+  final bool listenAppState;
   final FreshCallback onRefresh;
   final FreshCallback onLoading;
   CustomRefreshWidget(
       {@required this.child,
       this.enablePullUp = true,
       this.enablePullDown = true,
+      this.listenAppState = true,
       this.onLoading,
       @required this.onRefresh});
   @override
@@ -39,9 +41,14 @@ class CustomRefreshWidgetState extends State<CustomRefreshWidget> {
   @override
   void initState() {
     super.initState();
-    nextTick((){
+    nextTick(() {
       controller.requestRefresh();
     });
+    if (widget.listenAppState) {
+      Global.eventBus.on<AppStateChangeEvent>().listen((event) {
+        controller.requestRefresh();
+      });
+    }
   }
 
   void _onLoading() async {
@@ -68,7 +75,7 @@ class CustomRefreshWidgetState extends State<CustomRefreshWidget> {
       header: WaterDropHeader(
         waterDropColor: CustomColor.primary,
         complete: Text('finish'.tr),
-        failed: Text('加载失败'),
+        failed: Text('loadFail'.tr),
       ),
       child: widget.child,
     );

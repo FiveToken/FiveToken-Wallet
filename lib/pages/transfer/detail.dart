@@ -1,5 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
+
 class FilDetailPage extends StatefulWidget {
   @override
   State createState() => FilDetailPageState();
@@ -30,7 +31,7 @@ class FilDetailPageState extends State<FilDetailPage> {
   Widget build(BuildContext context) {
     return CommonScaffold(
       grey: true,
-      title: '详情',
+      title: 'detail'.tr,
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 30, 12, 0),
@@ -83,7 +84,9 @@ class FilDetailPageState extends State<FilDetailPage> {
                     value: mes.height.toString(),
                   ),
                 ),
-                GestureDetector(
+                Visibility(
+                  visible: $store.net.browser!='',
+                    child: GestureDetector(
                   onTap: () {
                     goBrowser(mes);
                   },
@@ -103,7 +106,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                             bottomLeft: Radius.circular(8),
                             bottomRight: Radius.circular(8))),
                   ),
-                )
+                ))
               ],
             )),
           ],

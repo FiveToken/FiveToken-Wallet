@@ -23,7 +23,7 @@ class WalletManagePageState extends State<WalletManagePage> {
 
   CardItem get nameItem {
     return CardItem(
-      label: isId ? '身份钱包名称' : 'walletName'.tr,
+      label: isId ? 'idName'.tr : 'walletName'.tr,
       onTap: () {
         controller.text = wallet.label;
         var hash = wallet.groupHash;
@@ -171,7 +171,7 @@ class WalletManagePageState extends State<WalletManagePage> {
 
   CardItem get passItem {
     return CardItem(
-      label: isId ? '修改身份钱包密码' : '修改支付密码',
+      label: isId ? 'changeIdPass'.tr : 'changePass'.tr,
       onTap: () {
         Get.toNamed(passwordResetPage, arguments: {'wallet': wallet});
       },

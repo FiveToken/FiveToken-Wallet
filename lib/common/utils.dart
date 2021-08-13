@@ -284,11 +284,11 @@ String formatFIL(String attoFil, {num size = 4, bool fixed = false}) {
 
 String formatCoin(String amount,
     {num size = 4, bool fixed = false, Network net}) {
-      net = net ?? $store.net;
+  net = net ?? $store.net;
   if (amount == '0') {
     return '0 ${net.coin}';
   }
-  
+
   var isFil = net.addressType == AddressType.filecoin.type;
   try {
     var str = amount;
@@ -303,7 +303,7 @@ String formatCoin(String amount,
       var res = v / unit;
       return fixed
           ? '${res.toStringAsFixed(size)} $u'
-          : '${truncate(res)} $u';
+          : '${truncate(res, size: size)} $u';
     } else {
       var u = isFil ? 'FIL' : net.coin;
       var unit = BigInt.from(pow(10, 18));
@@ -427,4 +427,14 @@ String getMaxFee(ChainGas gas) {
   var feeCap = gas.gasPrice;
   var gasLimit = gas.gasLimit;
   return formatFil(attoFil: (double.parse(feeCap) * gasLimit));
+}
+
+String trParams(String tr, [Map<String, String> params = const {}]) {
+  var trans = tr;
+  if (params.isNotEmpty) {
+    params.forEach((key, value) {
+      trans = trans.replaceAll('@$key', value);
+    });
+  }
+  return trans;
 }

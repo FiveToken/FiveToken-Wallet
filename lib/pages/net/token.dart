@@ -63,13 +63,13 @@ class TokenAddPageState extends State<TokenAddPage> {
           symbolCtrl.text = symbol[0].toString();
           preCtrl.text = decimals[0].toString();
         } else {
-          showCustomError('无效的代币地址');
+          showCustomError('invalidTokenAddr'.tr);
         }
       }
     } catch (e) {
       this.loading = false;
       dismissAllToast();
-      showCustomError('查询代币信息失败');
+      showCustomError('searchTokenFail'.tr);
     }
   }
 
@@ -78,15 +78,15 @@ class TokenAddPageState extends State<TokenAddPage> {
     var symbol = symbolCtrl.text.trim();
     var pre = preCtrl.text.trim();
     if (addr == '') {
-      showCustomError('请输入合约地址');
+      showCustomError('enterTokenAddr'.tr);
       return;
     }
     if (symbol == '') {
-      showCustomError('请输入代币符号');
+      showCustomError('enterTokenSymbol'.tr);
       return;
     }
     if (pre == '') {
-      showCustomError('请输入代币精度');
+      showCustomError('enterTokenPre'.tr);
       return;
     }
     OpenedBox.tokenInstance.put(
@@ -103,7 +103,7 @@ class TokenAddPageState extends State<TokenAddPage> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: '添加代币',
+      title: 'addToken'.tr,
       footerText: 'add'.tr,
       onPressed: () {
         submit();
@@ -114,18 +114,18 @@ class TokenAddPageState extends State<TokenAddPage> {
         child: Column(
           children: [
             Field(
-              label: '合约地址',
+              label: 'tokenAddr'.tr,
               controller: addrCtrl,
               placeholder: '0x...',
               focusNode: node,
             ),
             Field(
-              label: '代币符号',
+              label: 'tokenSymbol'.tr,
               enabled: false,
               controller: symbolCtrl,
             ),
             Field(
-              label: '代币精度',
+              label: 'tokenPre'.tr,
               enabled: false,
               type: TextInputType.number,
               inputFormatters: [PrecisionLimitFormatter(8)],

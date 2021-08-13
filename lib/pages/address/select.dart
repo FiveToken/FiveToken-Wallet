@@ -51,7 +51,7 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
             ),
             TapCardWidget(
               Layout.rowBetween([
-                CommonText.white('选择钱包内地址'),
+                CommonText.white('selectWalletAddr'.tr),
                 Image(width: 18, image: AssetImage('icons/right-w.png'))
               ]),
               onTap: () {

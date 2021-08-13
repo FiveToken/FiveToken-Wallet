@@ -24,7 +24,7 @@ class AddressBookWalletSelect extends StatelessWidget {
         body: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(12, 20, 12, 40),
           child: Layout.colStart([
-            CommonText('身份钱包'),
+            CommonText('idWallet'.tr),
             SizedBox(
               height: 12,
             ),
@@ -57,7 +57,7 @@ class AddressBookWalletSelect extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CommonText('导入'),
+                    CommonText('import'.tr),
                     SizedBox(
                       height: 12,
                     ),

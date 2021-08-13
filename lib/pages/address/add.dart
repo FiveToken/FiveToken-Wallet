@@ -23,7 +23,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
-      net=Network.getNetByRpc(addr.rpc);
+      net = Network.getNetByRpc(addr.rpc);
     }
   }
 
@@ -78,12 +78,12 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
         Column(
           children: [
             CommonTitle(
-              '添加地址簿',
+              'addAddrBook'.tr,
               showDelete: true,
             ),
             Container(
-                child: CommonText.center(
-                    '您当前在${$store.net.label}下，添加的该地址为${net.label}下，添加后需切换至${net.label}才可查看，是否继续添加'),
+                child: CommonText.center(trParams('netNotMatch'.tr,
+                    {'currentNet': $store.net.label, 'newNet': net.label})),
                 padding: EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 30,

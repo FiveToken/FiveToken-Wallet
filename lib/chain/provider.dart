@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
 import 'package:web3dart/web3dart.dart';
@@ -334,6 +332,7 @@ class EthProvider extends ChainProvider {
       if (res.length == 2) {
         EtherAmount gasPrice = res[0];
         BigInt gasLimit = res[1];
+        print(gasPrice);
         int realLimit = gasLimit.toInt();
         if (isToken) {
           realLimit = (gasLimit.toInt() * 2).truncate();

@@ -35,7 +35,7 @@ class NetIndexStatePage extends State<NetIndexPage> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: '网络',
+      title: 'net'.tr,
       footerText: 'add'.tr,
       onPressed: () {
         Get.toNamed(netAddPage).then((value) {
@@ -49,7 +49,7 @@ class NetIndexStatePage extends State<NetIndexPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(Network.netList.length, (index) {
             var net = Network.netList[index];
-            var labels = ['主网', '测试网', '自定义'];
+            var labels = Network.labels;
             return net.length > 0
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

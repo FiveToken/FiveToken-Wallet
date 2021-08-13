@@ -12,7 +12,7 @@ class AddressBookNetState extends State<AddressBookNetPage> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: '选择地址簿网络',
+      title: 'selectAddrNet'.tr,
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 20, 12, 20),
@@ -20,7 +20,7 @@ class AddressBookNetState extends State<AddressBookNetPage> {
           children: List.generate(Network.netList.length, (index) {
             var nets = Network.netList[index];
             return Layout.colStart([
-              CommonText(['主网', '测试网', '自定义网络'][index]),
+              CommonText(Network.labels[index]),
               SizedBox(
                 height: 12,
               ),

@@ -11,19 +11,21 @@ class CoinPriceState extends State<CoinPriceWidget> {
   CoinPrice price = CoinPrice();
   Worker worker;
   String marketPrice = '';
+  StreamSubscription sub;
   @override
   void initState() {
     super.initState();
-    if ($store.net.chain != '') {
-      getPrice();
-    }
-    worker = ever($store.network, (Network net) {
+    worker = ever($store.wallet, (ChainWallet wal) {
+      var net = Network.getNetByRpc(wal.rpc);
       if (net.hasPrice) {
         setState(() {
           marketPrice = '';
         });
-        getPrice();
+        getPrice(net);
       }
+    });
+    sub = Global.eventBus.on<RefreshEvent>().listen((event) {
+      getPrice($store.net);
     });
   }
 
@@ -31,6 +33,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
   void dispose() {
     super.dispose();
     worker.dispose();
+    sub.cancel();
   }
 
   double get rate {
@@ -39,17 +42,13 @@ class CoinPriceState extends State<CoinPriceWidget> {
     return lang == 'en' ? price.usd : price.cny;
   }
 
-  // String get marketPrice {
-  //   return getMarketPrice($store.wal.balance, rate);
-  // }
-
-  void getPrice() async {
-    var res = await getFilPrice($store.net.chain);
+  void getPrice(Network net) async {
+    var res = await getFilPrice(net.chain);
     Global.price = res;
     if (res.cny != 0) {
       setState(() {
         price = res;
-        marketPrice = getMarketPrice($store.wal.balance, rate);
+        marketPrice = getMarketPrice($store.wal.balance, res.usd);
       });
     }
   }

@@ -24,7 +24,7 @@ class ImportMnePageState extends State<ImportMnePage> {
       showCustomError('enterName'.tr);
       return false;
     }
-    if (!bip39.validateMnemonic(inputStr)) {
+    if (!bip39.validateMnemonic(inputStr, lang: 'en')) {
       showCustomError('wrongMne'.tr);
       return false;
     }

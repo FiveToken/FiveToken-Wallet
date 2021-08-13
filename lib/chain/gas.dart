@@ -27,11 +27,55 @@ class ChainGas {
     }
   }
 
+  ChainGas get fast {
+    var res = ChainGas();
+    try {
+      var net = $store.net;
+      var price = double.parse(gasPrice);
+      if (net.addressType == 'eth' && price > 10 * pow(10, 9)) {
+        price += 2 * pow(10, 9);
+      } else {
+        price = 1.1 * price;
+      }
+      res
+        ..gasLimit = gasLimit
+        ..gasPremium = gasPremium
+        ..gasPrice = price.truncate().toString()
+        ..level = 0;
+      return res;
+    } catch (e) {
+      return res;
+    }
+  }
+
+  ChainGas get slow {
+    var res = ChainGas();
+    try {
+      var net = $store.net;
+      var price = double.parse(gasPrice);
+      var premium = double.parse(gasPremium);
+      if (net.addressType == 'eth' && price > 10 * pow(10, 9)) {
+        price -= 2 * pow(10, 9);
+      } else {
+        price = 0.9 * price;
+        premium = price - 100;
+      }
+      res
+        ..gasLimit = gasLimit
+        ..gasPremium = premium.truncate().toString()
+        ..gasPrice = price.truncate().toString()
+        ..level = 1;
+      return res;
+    } catch (e) {
+      return res;
+    }
+  }
+
   ChainGas(
       {this.gasLimit = 0,
       this.gasPremium = '0',
       this.gasPrice = '0',
-      this.level = 0});
+      this.level = -1});
   ChainGas.fromJson(Map<String, dynamic> json) {
     gasPrice = json['feeCap'];
     gasLimit = json['gasLimit'];

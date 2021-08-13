@@ -31,7 +31,7 @@ class IdWalletPageState extends State<IdWalletPage> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: '身份钱包',
+      title: 'idWallet'.tr,
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 20, 12, 40),
@@ -42,7 +42,7 @@ class IdWalletPageState extends State<IdWalletPage> {
                 var nets = Network.netList[index];
                 return Visibility(
                   child: Layout.colStart([
-                    CommonText(['主网', '测试网', '自定义网络'][index]),
+                    CommonText(Network.labels[index]),
                     SizedBox(
                       height: 12,
                     ),
@@ -103,7 +103,8 @@ class IdWalletPageState extends State<IdWalletPage> {
                 });
               },
               child: Container(
-                child: CommonText.grey(!hideTest ? '隐藏测试网' : '显示测试网'),
+                child:
+                    CommonText.grey(!hideTest ? 'hideTest'.tr : 'showTest'.tr),
               ),
             )
           ],
