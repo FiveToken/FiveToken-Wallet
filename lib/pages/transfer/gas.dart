@@ -52,7 +52,7 @@ class FilGasPageState extends State<FilGasPage> {
               ? (BigInt.from(pow(10, 9)) * BigInt.from(feeCapNum)).toString()
               : feeCapNum.truncate().toString(),
           gasPremium:
-              isEth ? chainGas.gasPremium : (feeCapNum - 100).toString()));
+              isEth ? chainGas.gasPremium : (feeCapNum - 100).truncate().toString()));
     }
     unFocusOf(context);
     Get.back();
@@ -144,7 +144,7 @@ class FilGasPageState extends State<FilGasPage> {
                           color: getTextColor(index == 0),
                         ),
                         CommonText(
-                          formatCoin(chainGas.fast.gasPrice, size: 5),
+                          formatCoin(chainGas.gasPrice, size: 5),
                           size: 10,
                           color: getTextColor(index == 0),
                         )
@@ -160,7 +160,7 @@ class FilGasPageState extends State<FilGasPage> {
               onTap: () {
                 setState(() {
                   index = 0;
-                  $store.setGas(chainGas.fast);
+                  $store.setGas(chainGas);
                 });
               },
             ),

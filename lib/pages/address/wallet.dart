@@ -64,21 +64,24 @@ class AddressBookWalletSelect extends StatelessWidget {
                     Column(
                       children: List.generate(importWallets.length, (index) {
                         var wallet = importWallets[index];
-                        return TapCardWidget(
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CommonText.white(wallet.label),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                CommonText.white(dotString(str: wallet.addr),
-                                    size: 12),
-                              ],
-                            ), onTap: () {
-                          Get.back(result: wallet);
-                        });
+                        return Container(
+                          child: TapCardWidget(
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CommonText.white(wallet.label),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  CommonText.white(dotString(str: wallet.addr),
+                                      size: 12),
+                                ],
+                              ), onTap: () {
+                            Get.back(result: wallet);
+                          }),
+                          margin: EdgeInsets.only(bottom: 12),
+                        );
                       }),
                     )
                   ],

@@ -88,6 +88,8 @@ class FilecoinProvider extends ChainProvider {
         sign = await Bls.cksign(num: "$private $cid");
       }
       var sm = SignedMessage(msg, Signature(signType, sign));
+      print(sm.toLotusSignedMessage());
+      
       String res = await pushSignedMsg(sm.toLotusSignedMessage());
       return res;
     } catch (e) {

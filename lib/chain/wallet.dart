@@ -248,6 +248,7 @@ class EthWallet extends ChainWallet {
       var ethDigest = await genPrivateKeyDigest(privateKey);
       return EncryptKey(kek: ethSkKek, digest: ethDigest, address: ethAddr);
     } catch (e) {
+      print(e);
       throw (e);
     }
   }

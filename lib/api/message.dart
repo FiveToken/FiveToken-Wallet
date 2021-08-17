@@ -2,7 +2,7 @@ import 'package:fil/index.dart';
 
 var messageApi = 'https://api.filwallet.ai:5679/rpc/v0';
 Future<String> pushSignedMsg(Map<String, dynamic> msg) async {
-  var api = $store.net.prefix == ''
+  var api = $store.net.prefix == 'f'
       ? 'https://api.filwallet.ai:5679/rpc/v0'
       : 'http://192.168.1.189:5678/rpc/v0';
   if (!Global.online) {

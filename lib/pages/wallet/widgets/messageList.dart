@@ -420,8 +420,8 @@ class MessageItem extends StatelessWidget {
   }
 
   String get addr {
-    var pre = isSend ? 'to'.tr : 'from'.tr;
-    var address = isSend ? mes.to : mes.from;
+    var pre = !isSend ? 'to'.tr : 'from'.tr;
+    var address = !isSend ? mes.to : mes.from;
     return '$pre ${dotString(str: address)}';
   }
 
@@ -433,7 +433,7 @@ class MessageItem extends StatelessWidget {
     if (v == '0') {
       return '0 $unit';
     } else {
-      return '${pending || fail ? '' : (isSend ? '-' : '+')} $v';
+      return '${pending || fail ? '' : (!isSend ? '-' : '+')} $v';
     }
   }
 
@@ -454,12 +454,12 @@ class MessageItem extends StatelessWidget {
                   ? 0xffE8CC5C
                   : (fail
                       ? 0xffB4B5B7
-                      : isSend
+                      : !isSend
                           ? 0xff5C8BCB
                           : 0xff5CC1CB)),
               path: (pending
                   ? 'pending.png'
-                  : (fail ? 'fail.png' : (isSend ? 'rec.png' : 'send.png'))),
+                  : (fail ? 'fail.png' : (!isSend ? 'rec.png' : 'send.png'))),
             ),
             SizedBox(
               width: 10,
@@ -471,7 +471,7 @@ class MessageItem extends StatelessWidget {
                       ? 'pending'.tr
                       : (fail
                           ? 'fail'.tr
-                          : isSend
+                          : !isSend
                               ? 'sended'.tr
                               : 'reced'.tr),
                   size: 15,

@@ -20,6 +20,7 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
+  var box = OpenedBox.walletInstance;
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
@@ -53,13 +54,18 @@ class PassInitPageState extends State<PassInitPage> {
     if (loading) {
       return;
     }
+
     this.loading = true;
     showCustomLoading('Loading');
     if (type == 0 || (type == 1 && net == null)) {
-      Map<String, EncryptKey> keyMap = {};
-      keyMap['eth'] = await EthWallet.genEncryptKey(mne, pass);
-      keyMap['filecoin'] = await FilecoinWallet.genEncryptKey(mne, pass);
       try {
+        Map<String, EncryptKey> keyMap = {};
+        keyMap['eth'] = await EthWallet.genEncryptKey(mne, pass);
+        keyMap['filecoin'] = await FilecoinWallet.genEncryptKey(mne, pass);
+        if (box.containsKey(keyMap['eth'].address)) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
         for (var nets in Network.netList) {
           for (var net in nets) {
             var type = net.addressType;
@@ -74,7 +80,7 @@ class PassInitPageState extends State<PassInitPage> {
             wal.digest = key.digest;
             wal.address = key.address;
             wal.skKek = key.kek;
-            OpenedBox.walletInstance.put(wal.key, wal);
+            box.put(wal.key, wal);
             var currentNet = $store.net;
             if (currentNet.addressType == type) {
               $store.setWallet(wal);
@@ -84,33 +90,45 @@ class PassInitPageState extends State<PassInitPage> {
         }
       } catch (e) {
         print(e);
+        this.loading = false;
+        dismissAllToast();
       }
     } else if (type == 1 && net != null) {
-      EncryptKey key;
-      if (net.addressType == 'eth') {
-        key = await EthWallet.genEncryptKey(mne, pass);
-      } else {
-        key = await FilecoinWallet.genEncryptKey(mne, pass);
+      try {
+        EncryptKey key;
+        if (net.addressType == 'eth') {
+          key = await EthWallet.genEncryptKey(mne, pass);
+        } else {
+          key = await FilecoinWallet.genEncryptKey(mne, pass);
+        }
+        var wal = ChainWallet(
+            label: label,
+            mne: aesEncrypt(mne, key.private),
+            groupHash: tokenify(mne),
+            type: 1,
+            rpc: net.rpc,
+            addressType: net.addressType);
+        wal.digest = key.digest;
+        wal.address = key.address;
+        wal.skKek = key.kek;
+        if (box.containsKey(wal.key)) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
+        box.put(wal.key, wal);
+        $store.setWallet(wal);
+        $store.setNet(net);
+        Global.store.setString('currentWalletAddress', wal.address);
+      } catch (e) {
+        print(e);
+        dismissAllToast();
+        this.loading = false;
       }
-      var wal = ChainWallet(
-          label: label,
-          mne: aesEncrypt(mne, key.private),
-          groupHash: tokenify(mne),
-          type: 1,
-          rpc: net.rpc,
-          addressType: net.addressType);
-      wal.digest = key.digest;
-      wal.address = key.address;
-      wal.skKek = key.kek;
-      OpenedBox.walletInstance.put(wal.key, wal);
-      $store.setWallet(wal);
-      $store.setNet(net);
-      Global.store.setString('currentWalletAddress', wal.address);
     } else {
       try {
         EncryptKey key;
         if (net.addressType == 'eth') {
-          if (privateKey.length > 32) {
+          if (privateKey.length > 64) {
             showCustomError('wrongPk'.tr);
             return;
           }
@@ -122,25 +140,33 @@ class PassInitPageState extends State<PassInitPage> {
           var pk = filPk.privateKey;
           key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass,
               type: type);
-          var wal = ChainWallet(
-              label: label,
-              mne: '',
-              groupHash: '',
-              type: 2,
-              rpc: net.rpc,
-              addressType: net.addressType);
-          wal.digest = key.digest;
-          wal.address = key.address;
-          wal.skKek = key.kek;
-          OpenedBox.walletInstance.put(wal.key, wal);
-          $store.setWallet(wal);
-          $store.setNet(net);
-          Global.store.setString('currentWalletAddress', wal.address);
         }
+
+        var wal = ChainWallet(
+            label: label,
+            mne: '',
+            groupHash: '',
+            type: 2,
+            rpc: net.rpc,
+            addressType: net.addressType);
+        wal.digest = key.digest;
+        wal.address = key.address;
+        wal.skKek = key.kek;
+        if (box.containsKey(wal.key)) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
+        box.put(wal.key, wal);
+        $store.setWallet(wal);
+        $store.setNet(net);
+        Global.store.setString('currentWalletAddress', wal.address);
       } catch (e) {
+        print(e);
+        this.loading = false;
         showCustomError('importFail'.tr);
       }
     }
+
     this.loading = false;
     dismissAllToast();
     Get.offAllNamed(mainPage);

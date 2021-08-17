@@ -16,34 +16,31 @@ class AddressBookNetState extends State<AddressBookNetPage> {
       hasFooter: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(12, 20, 12, 20),
-        child: Column(
-          children: List.generate(Network.netList.length, (index) {
-            var nets = Network.netList[index];
-            return Layout.colStart([
-              CommonText(Network.labels[index]),
-              SizedBox(
-                height: 12,
-              ),
-              Column(
-                children: List.generate(nets.length, (index) {
-                  var net = nets[index];
-                  return Container(
-                    child: TapCardWidget(
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: CommonText.white(net.label),
-                      ),
-                      onTap: () {
-                        Get.back(result: net);
-                      },
-                    ),
-                    margin: EdgeInsets.only(bottom: 12),
-                  );
-                }),
-              )
-            ]);
-          }),
-        ),
+        child: Layout.colStart(List.generate(Network.netList.length, (index) {
+          var nets = Network.netList[index];
+          return Visibility(
+              child: Layout.colStart([
+            CommonText(Network.labels[index]),
+            SizedBox(
+              height: 12,
+            ),
+            Layout.colStart(List.generate(nets.length, (index) {
+              var net = nets[index];
+              return Container(
+                child: TapCardWidget(
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: CommonText.white(net.label),
+                  ),
+                  onTap: () {
+                    Get.back(result: net);
+                  },
+                ),
+                margin: EdgeInsets.only(bottom: 12),
+              );
+            }))
+          ]),visible: nets.isNotEmpty,);
+        })),
       ),
     );
   }

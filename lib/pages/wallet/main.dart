@@ -365,7 +365,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       title: title,
       hasFooter: false,
       body: CustomRefreshWidget(
-          enablePullUp: false,
+          enablePullUp: isFil,
           onLoading: onLoading,
           child: CustomScrollView(
             slivers: [

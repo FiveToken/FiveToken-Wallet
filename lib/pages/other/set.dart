@@ -58,14 +58,14 @@ class SetPageState extends State<SetPage> {
                 CardItem(
                   label: 'service'.tr,
                   onTap: () {
-                    var url = 'https://filecoinwallet.com/private?lang=$lang';
+                    var url = 'https://fivetoken.io/private?lang=$lang';
                     openInBrowser(url);
                   },
                 ),
                 CardItem(
                   label: 'clause'.tr,
                   onTap: () {
-                    var url = 'https://filecoinwallet.com/service?lang=$lang';
+                    var url = 'https://fivetoken.io/service?lang=$lang';
                     openInBrowser(url);
                   },
                 ),

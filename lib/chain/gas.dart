@@ -13,7 +13,7 @@ class ChainGas {
   int level;
   String get maxFee {
     try {
-      return formatCoin(feeNum.toString());
+      return formatCoin(feeNum.toString(),size: 5);
     } catch (e) {
       return '';
     }
@@ -75,7 +75,7 @@ class ChainGas {
       {this.gasLimit = 0,
       this.gasPremium = '0',
       this.gasPrice = '0',
-      this.level = -1});
+      this.level = 0});
   ChainGas.fromJson(Map<String, dynamic> json) {
     gasPrice = json['feeCap'];
     gasLimit = json['gasLimit'];

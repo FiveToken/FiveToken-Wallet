@@ -103,7 +103,7 @@ class Network {
       rpc: 'https://calibration.filscan.io:8800/rpc/v1',
       coin: 'FIL',
       prefix: 't',
-      browser: 'https://calibration.filscan.io/#',
+      browser: 'https://calibration.filscan.io',
       addressType: 'filecoin');
   static Network get ethKovanNet => Network(
       chain: 'eth',
