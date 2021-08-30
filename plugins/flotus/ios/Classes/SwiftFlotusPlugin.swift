@@ -58,6 +58,11 @@ public class SwiftFlotusPlugin: NSObject, FlutterPlugin {
       let value = args["value"] as! String
       let res = WlibGenProposalForChangeOwnerV3(sel,miner,value)
       result(res)
+    case "genProposalForChangeWorkerAddress":
+      let miner = args["miner"] as! String
+      let value = args["value"] as! String
+      let res = WlibGenProposalForChangeWorkerAddress(miner,value)
+      result(res)
     case "genApprovalV3":
       let tx = args["tx"] as! String
       let res = WlibGenApprovalV3(tx)

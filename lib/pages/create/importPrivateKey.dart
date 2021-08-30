@@ -1,3 +1,5 @@
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 /// import wallet by private key
 class ImportPrivateKeyPage extends StatefulWidget {
@@ -8,67 +10,45 @@ class ImportPrivateKeyPage extends StatefulWidget {
 class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
   TextEditingController inputControl = TextEditingController();
   TextEditingController nameControl = TextEditingController();
-  void _genWalletByPkAndType(String inputStr, String type, String name) async {
-    String pk = '';
-    String signType = SignSecp;
-    try {
-      if (type == '1') {
-        pk = await Flotus.secpPrivateToPublic(ck: inputStr);
-      } else {
-        signType = SignBls;
-        pk = await Bls.pkgen(num: inputStr);
-      }
-      if (pk == "") {
-        showCustomError('wrongPk'.tr);
-        return;
-      }
-      String address = await Flotus.genAddress(pk: pk, t: signType);
-      address = Global.netPrefix + address.substring(1);
-      var exist = OpenedBox.addressInsance.containsKey(address);
-      if (exist) {
-        showCustomError('errorExist'.tr);
-        return;
-      }
-      Wallet wallet = Wallet(
-          ck: inputStr,
-          address: address,
-          label: name,
-          mne: '',
-          walletType: 0,
-          type: type);
-      Get.toNamed(passwordSetPage, arguments: {'wallet': wallet});
-    } catch (e) {
-      showCustomError('wrongPk'.tr);
-    }
-  }
-
-  void _handleImport(BuildContext context) {
+  Network net = Get.arguments['net'];
+  void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;
     if (inputStr == "") {
       showCustomError('enterPk'.tr);
       return;
     }
+    if(inputStr.startsWith('0x')){
+      inputStr=inputStr.substring(2);
+    }
     if (name == '') {
       showCustomError('enterName'.tr);
       return;
     }
-    try {
-      PrivateKey privateKey = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
-      var type = privateKey.type;
-      var key = privateKey.privateKey;
-      if (type == 'secp256k1') {
-        _genWalletByPkAndType(key, '1', name);
-      } else if (type == 'bls') {
-        _genWalletByPkAndType(key, '3', name);
-      } else {
+    if (net.chain == 'filecoin') {
+      try {
+        PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+      } catch (e) {
         showCustomError('wrongPk'.tr);
+        return;
       }
-    } catch (e) {
-      showCustomError('wrongPk'.tr);
+    } else {
+      try {
+        await EthWallet.genAddrByPrivateKey(inputStr);
+      } catch (e) {
+        showCustomError('wrongPk'.tr);
+        return;
+      }
     }
+    Get.toNamed(passwordSetPage, arguments: {
+      'type': 2,
+      'privateKey': inputStr,
+      'net': net,
+      'label': name
+    });
   }
 
+  void getChainTypeByPaivateKey(String private) {}
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.PrivateKey})
         .then((value) {

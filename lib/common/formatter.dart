@@ -5,7 +5,7 @@ class PrecisionLimitFormatter extends TextInputFormatter {
 
   PrecisionLimitFormatter(this._scale);
 
-  RegExp exp = new RegExp("[0-9.]");
+  RegExp exp = new RegExp(r"[0-9.]");
   static const String POINTER = ".";
   static const String DOUBLE_ZERO = "00";
 
@@ -15,7 +15,6 @@ class PrecisionLimitFormatter extends TextInputFormatter {
     if (newValue.text.isEmpty) {
       return TextEditingValue();
     }
-
     if (!exp.hasMatch(newValue.text)) {
       return oldValue;
     }

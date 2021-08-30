@@ -93,13 +93,13 @@ class WalletMeta {
   }
 }
 
-class FilPrice {
+class CoinPrice {
   double usd;
   double cny;
-  FilPrice({this.usd = 0.0, this.cny = 0.0});
-  FilPrice.fromJson(Map<String, dynamic> json) {
+  CoinPrice({this.usd = 0.0, this.cny = 0.0});
+  CoinPrice.fromJson(Map<String, dynamic> json) {
     usd = json['usd'] + 0.0 as double;
-    cny = json['cny'] as double;
+    cny = json['cny'] + 0.0 as double;
   }
   double get rate {
     //var lang = Global.langCode;

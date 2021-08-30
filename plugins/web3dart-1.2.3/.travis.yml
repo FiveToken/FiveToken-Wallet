@@ -1,0 +1,6 @@
+language: dart
+dart:
+  - stable
+
+script: tool/build.sh
+after_success: 'bash <(curl -s https://codecov.io/bash) -f lcov.info'

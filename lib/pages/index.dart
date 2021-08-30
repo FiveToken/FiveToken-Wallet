@@ -22,3 +22,4 @@ export './wallet/index.dart';
 
 export './address/add.dart';
 export './address/index.dart';
+export './net/index.dart';

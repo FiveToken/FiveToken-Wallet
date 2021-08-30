@@ -5,12 +5,14 @@ class CommonText extends StatelessWidget {
   final double size;
   final FontWeight weight;
   final Color color;
+  final TextAlign align;
   const CommonText(this.text,
-      {this.size = 14, this.weight, this.color = Colors.black});
+      {this.size = 14, this.weight, this.color = Colors.black, this.align});
   @override
   Widget build(BuildContext context) {
     return Text(
-      text,
+      text ?? "",
+      textAlign: align ?? TextAlign.start,
       style: TextStyle(fontWeight: weight, color: color, fontSize: size),
     );
   }

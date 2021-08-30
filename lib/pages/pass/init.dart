@@ -1,5 +1,9 @@
+import 'package:fil/chain/key.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
-/// set password of a wallet
+import 'package:oktoast/oktoast.dart';
+
 class PassInitPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -10,8 +14,13 @@ class PassInitPage extends StatefulWidget {
 class PassInitPageState extends State<PassInitPage> {
   TextEditingController passCtrl = TextEditingController();
   TextEditingController passConfirmCtrl = TextEditingController();
-  bool mneCreate;
-  Wallet wallet = Get.arguments['wallet'] as Wallet;
+  int type; //0 id 1 mne 2 privatekey
+  String mne;
+  String privateKey;
+  Network net;
+  String label;
+  bool loading = false;
+  var box = OpenedBox.walletInstance;
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
@@ -29,32 +38,157 @@ class PassInitPageState extends State<PassInitPage> {
   @override
   void initState() {
     super.initState();
-    mneCreate = Get.arguments != null && Get.arguments['create'] == true;
+    var arg = Get.arguments ?? {'type': 0};
+    type = arg['type'];
+    mne = arg['mne'];
+    label = arg['label'];
+    privateKey = arg['privateKey'];
+    net = arg['net'];
   }
 
   void handleSubmit() async {
+    String pass = passCtrl.text.trim();
     if (!checkPass()) {
       return;
     }
-    unFocusOf(context);
-    String pass = passCtrl.text.trim();
-    var addr = wallet.addrWithNet;
-    var ck = wallet.ck;
-    var kek = await genKek(addr, pass);
-    var pkList = base64Decode(ck);
-    var skKek = xor(kek, pkList);
-    if (wallet.mne != '') {
-      var m = aesEncrypt(wallet.mne, ck);
-      wallet.mne = m;
+    if (loading) {
+      return;
     }
-    var digest = await genPrivateKeyDigest(ck);
-    wallet.skKek = skKek;
-    wallet.digest = digest;
-    wallet.ck = '';
-    Global.store.setString('currentWalletAddress', addr);
-    OpenedBox.addressInsance.put(addr, wallet);
-    singleStoreController.setWallet(wallet);
-    Get.offAllNamed(mainPage, arguments: {'create': mneCreate});
+
+    this.loading = true;
+    showCustomLoading('Loading');
+    if (type == 0 || (type == 1 && net == null)) {
+      try {
+        Map<String, EncryptKey> keyMap = {};
+        var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
+        var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+        keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
+        keyMap['filecoin'] =
+            await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
+        keyMap['calibration'] = await FilecoinWallet.genEncryptKeyByPrivateKey(
+            filPk, pass,
+            prefix: 't');
+        var key = keyMap['eth'].address + '_' + Network.ethMainNet.rpc + '_0';
+        if (box.containsKey(key)) {
+          showCustomError('errorExist'.tr);
+          this.loading = false;
+          return;
+        }
+        for (var nets in Network.netList) {
+          for (var net in nets) {
+            var type = net.addressType;
+            EncryptKey key = keyMap[type];
+            if (net.rpc == Network.filecoinTestNet.rpc) {
+              key = keyMap[net.net];
+            }
+            var wal = ChainWallet(
+                label: label,
+                mne: aesEncrypt(mne, key.private),
+                groupHash: tokenify(mne),
+                type: 0,
+                rpc: net.rpc,
+                addressType: type);
+            wal.digest = key.digest;
+            wal.address =  key.address;
+            wal.skKek = key.kek;
+            box.put(wal.key, wal);
+            var currentNet = $store.net;
+            if (currentNet.rpc == net.rpc) {
+              $store.setWallet(wal);
+              Global.store.setString('currentWalletAddress', wal.key);
+            }
+          }
+        }
+      } catch (e) {
+        print(e);
+        this.loading = false;
+        dismissAllToast();
+      }
+    } else if (type == 1 && net != null) {
+      try {
+        EncryptKey key;
+        if (net.addressType == 'eth') {
+          var private = await compute(EthWallet.genPrivateKeyByMne, mne);
+          key = await EthWallet.genEncryptKeyByPrivateKey(private, pass);
+        } else {
+          var private = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+          key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass,
+              prefix: net.prefix);
+        }
+        var wal = ChainWallet(
+            label: label,
+            mne: aesEncrypt(mne, key.private),
+            groupHash: tokenify(mne),
+            type: 1,
+            rpc: net.rpc,
+            addressType: net.addressType);
+        wal.digest = key.digest;
+        wal.address =  key.address;
+        wal.skKek = key.kek;
+        if (box.containsKey(wal.key)) {
+          showCustomError('errorExist'.tr);
+          this.loading = false;
+          return;
+        }
+        box.put(wal.key, wal);
+        $store.setWallet(wal);
+        $store.setNet(net);
+        Global.store.setString('currentWalletAddress', wal.key);
+        Global.store.setString('activeNetwork', net.rpc);
+      } catch (e) {
+        print(e);
+        dismissAllToast();
+        this.loading = false;
+      }
+    } else {
+      try {
+        EncryptKey key;
+        if (net.addressType == 'eth') {
+          if (privateKey.length > 64) {
+            showCustomError('wrongPk'.tr);
+            this.loading = false;
+            return;
+          }
+          key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
+        } else {
+          PrivateKey filPk =
+              PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
+          var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
+          var pk = filPk.privateKey;
+          key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass,
+              type: type, prefix: net.prefix);
+        }
+
+        var wal = ChainWallet(
+            label: label,
+            mne: '',
+            groupHash: '',
+            type: 2,
+            rpc: net.rpc,
+            addressType: net.addressType);
+        wal.digest = key.digest;
+        wal.address =  key.address;
+        wal.skKek = key.kek;
+        if (box.containsKey(wal.key)) {
+          showCustomError('errorExist'.tr);
+          this.loading = false;
+          return;
+        }
+        box.put(wal.key, wal);
+        $store.setWallet(wal);
+        $store.setNet(net);
+        Global.store.setString('currentWalletAddress', wal.key);
+        Global.store.setString('activeNetwork', net.rpc);
+      } catch (e) {
+        print(e);
+        this.loading = false;
+        showCustomError('importFail'.tr);
+      }
+    }
+
+    this.loading = false;
+    dismissAllToast();
+    Get.offAllNamed(mainPage);
   }
 
   @override
@@ -169,18 +303,6 @@ class PassFieldState extends State<PassField> {
                   });
                 },
               ),
-              // IconButton(
-              //   icon: Image(
-              //       width: 22,
-              //       image: AssetImage(!passShow
-              //           ? 'icons/close-eye-d.png'
-              //           : 'icons/open-d.png')),
-              //   onPressed: () {
-              //     setState(() {
-              //       passShow = !passShow;
-              //     });
-              //   },
-              // )
             ],
           ),
         )

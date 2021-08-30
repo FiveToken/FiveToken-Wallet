@@ -1,18 +1,23 @@
 import 'package:fil/index.dart';
 
-/// get fil price
-Future<FilPrice> getFilPrice() async {
+Future<CoinPrice> getFilPrice(String chain) async {
   try {
-    var url='http://8.209.219.115:8090';
-    var response = await Dio().get('$url/third/price');
+    Map<String, String> coinMap = {
+      'filecoin': 'filecoin',
+      'eth': 'ethereum',
+      'binance': 'binancecoin'
+    };
+    var url = "http://8.209.219.115:8090";
+    var coin=coinMap[chain];
+    var response = await Dio().get('$url/third/priceByType?coin=$coin');
     print(response);
     if (response.data['code'] == 0) {
-      return FilPrice.fromJson(response.data['data']);
+      return CoinPrice.fromJson(response.data['data']);
     } else {
-      return FilPrice();
+      return CoinPrice();
     }
   } catch (e) {
     print(e);
-    return FilPrice();
+    return CoinPrice();
   }
 }

@@ -31,8 +31,3 @@ class CacheGas {
   CacheGas({this.feeCap, this.premium, this.cid, this.gasLimit});
 }
 
-class BalanceNonce {
-  num nonce;
-  String balance;
-  BalanceNonce({this.balance = '0', this.nonce = -1});
-}

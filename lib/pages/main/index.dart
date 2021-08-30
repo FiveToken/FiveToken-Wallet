@@ -1,10 +1,19 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:fil/pages/main/drawer.dart';
+import 'package:fil/pages/main/widgets/net.dart';
+import 'package:fil/pages/main/widgets/price.dart';
+import 'package:fil/pages/main/widgets/token.dart';
 import 'package:fil/pages/transfer/transfer.dart';
 import 'package:logger/logger.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 import './walletConnect.dart';
+
+typedef WCCallback = List<JsonRpc Function(WCSession, JsonRpc)> Function(
+    String type);
 
 class MainPage extends StatefulWidget {
   @override
@@ -13,46 +22,26 @@ class MainPage extends StatefulWidget {
   }
 }
 
-class MainPageState extends State<MainPage> with WidgetsBindingObserver {
+class MainPageState extends State<MainPage> {
   final TextEditingController controller = TextEditingController();
-  String balance = singleStoreController.wal.balance;
-  var box = Hive.box<Wallet>(addressBox);
+  var box = OpenedBox.walletInstance;
   Timer timer;
-  FilPrice price = FilPrice();
   WCSession connectedSession;
   WCMeta meta;
   Box<Nonce> nonceBoxInstance = OpenedBox.nonceInsance;
-  void getPrice() async {
-    var res = await getFilPrice();
-    Global.price = res;
-    if (res.cny != 0) {
-      setState(() {
-        price = res;
-      });
-    }
-  }
-
-  double get rate {
-    var lang = Global.langCode;
-    lang = 'en';
-    return lang == 'en' ? price.usd : price.cny;
-  }
-
-  String get marketPrice {
-    return getMarketPrice(balance, rate);
-  }
+  final Web3Client client = Web3Client($store.net.url, Client());
+  ChainProvider provider;
+  Worker worker;
 
   @override
   void initState() {
     super.initState();
-    getPrice();
-    updateBalance();
-    var isCreate = false;
-    if (Get.arguments != null && Get.arguments['create'] != null) {
-      isCreate = Get.arguments['create'] as bool;
-    }
-    WidgetsBinding.instance.addObserver(this);
-    var show = Get.arguments != null && isCreate == true;
+
+    // var isCreate = false;
+    // if (Get.arguments != null && Get.arguments['create'] != null) {
+    //   isCreate = Get.arguments['create'] as bool;
+    // }
+    var show = $store.wal.label == DefaultWalletName;
     if (show) {
       showChangeNameDialog();
     }
@@ -63,6 +52,58 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       });
     }
     reConnect();
+    Global.eventBus.on<WalletChangeEvent>().listen((event) {
+      print('wallet change');
+      getBalance();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    worker?.dispose();
+  }
+
+  List<JsonRpc Function(WCSession, JsonRpc)> genCallback(String type) {
+    var callback = (WCSession session, JsonRpc rpc) {
+      if ($store.net.addressType != type) {
+        showCustomError('wrongNet'.tr);
+        session.sendResponse(rpc.id, '$type\_sendTransaction',
+            error: {'message': 'Reject'});
+      }
+      var params = rpc.params;
+      if (params != null && params is List && params.isNotEmpty) {
+        try {
+          var p = params[0] as Map<String, dynamic>;
+          var to = p['to'] as String;
+          var value = p['value'] as String;
+          BigInt valueNum;
+          if (value.startsWith('0x')) {
+            valueNum = hexToInt(value);
+          } else {
+            valueNum = BigInt.tryParse(value);
+          }
+          if (to != null && value != null) {
+            handleTransaction(
+                session: session,
+                rpc: rpc,
+                to: to,
+                value: valueNum,
+                type: type);
+          } else {
+            showCustomError('errorParams'.tr);
+          }
+        } catch (e) {
+          showCustomError(e.toString());
+          session.sendResponse(rpc.id, '$type\_sendTransaction',
+              error: {'message': 'Reject'});
+        }
+      } else {
+        showCustomError('errorParams'.tr);
+      }
+      return rpc;
+    };
+    return [callback];
   }
 
   List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
@@ -80,34 +121,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     ];
   }
 
-  List<JsonRpc Function(WCSession, JsonRpc)> get transcationCallback {
-    return [
-      (WCSession session, JsonRpc rpc) {
-        var params = rpc.params;
-        if (params != null && params is List && params.isNotEmpty) {
-          try {
-            var p = params[0] as Map<String, dynamic>;
-            var to = p['to'] as String;
-            var value = p['value'] as String;
-            // ignore: unused_local_variable
-            var valueNum = double.parse(value);
-            if (to != null && value != null) {
-              handleTransaction(
-                  session: session, rpc: rpc, to: to, value: value);
-            } else {
-              showCustomError('wrong params');
-            }
-          } catch (e) {
-            showCustomError(e.toString());
-          }
-        } else {
-          showCustomError('wrong params');
-        }
-        return rpc;
-      }
-    ];
-  }
-
   void reConnect() {
     var wcSession = Global.store.getString('wcSession');
     if (wcSession != null) {
@@ -119,7 +132,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
             logger: Logger(),
             keyHex: m['keyHex'],
             eventHandler: {
-              'fil_sendTransaction': transcationCallback,
+              'fil_sendTransaction': genCallback('filecoin'),
+              'eth_sendTransaction': genCallback('eth'),
               'wc_sessionUpdate': sessionUpdateCallback,
             });
         wc.isConnected = wc.isActive = true;
@@ -140,7 +154,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   void showChangeNameDialog() {
     Future.delayed(Duration.zero).then((value) {
-      controller.text = singleStoreController.wal.label;
+      controller.text = $store.wal.label;
       showCustomDialog(
           context,
           Container(
@@ -187,10 +201,14 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                             showCustomError('nameTooLong'.tr);
                             return;
                           }
-                          var wallet = singleStoreController.wal;
-                          wallet.label = v;
-                          box.put(wallet.address, wallet);
-                          singleStoreController.changeWalletName(v);
+                          var wallet = $store.wal;
+                          var list = box.values.where(
+                              (wal) => wal.groupHash == wallet.groupHash);
+                          list.forEach((wal) {
+                            wal.label = v;
+                            box.put(wal.key, wal);
+                          });
+                          $store.changeWalletName(v);
                           Get.back();
                           showCustomToast('createSucc'.tr);
                         },
@@ -210,38 +228,10 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     });
   }
 
-  void updateBalance() async {
-    var wal = singleStoreController.wal;
-    var res = await getBalance(wal);
-    wal.balance = res.balance;
-    timer = null;
-    singleStoreController.changeWalletBalance(res.balance);
-    OpenedBox.addressInsance.put(wal.address, wal);
-    if (mounted) {
-      setState(() {
-        this.balance = res.balance;
-      });
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState appLifecycleState) {
-    super.didChangeAppLifecycleState(appLifecycleState);
-    if (appLifecycleState == AppLifecycleState.resumed) {
-      if (timer == null) {
-        timer = Timer(Duration(milliseconds: 100), () async {
-          updateBalance();
-        });
-      } else {
-        timer.cancel();
-      }
-    }
-  }
-
   void handleScan() async {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((value) async {
-      if (value != null && isValidAddress(value)) {
+      if (value != null && isValidChainAddress(value, $store.net)) {
         Get.toNamed(filTransferPage, arguments: {'to': value});
       } else if (getValidWCLink(value) != '') {
         connectWallet(value);
@@ -251,7 +241,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   void connectWallet(String uri, {bool newConnect = true}) {
     if (newConnect) {
-      showCustomLoading('Connecting');
+      showCustomLoading('connecting'.tr);
       Future.delayed(Duration(seconds: 20)).then((value) {
         dismissAllToast();
       });
@@ -265,114 +255,102 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         }
       ],
       'wc_sessionUpdate': sessionUpdateCallback,
-      'fil_sendTransaction': [
-        (WCSession session, JsonRpc rpc) {
-          var params = rpc.params;
-          if (params != null && params is List && params.isNotEmpty) {
-            try {
-              var p = params[0] as Map<String, dynamic>;
-              var to = p['to'] as String;
-              var value = p['value'] as String;
-              // ignore: unused_local_variable
-              var valueNum = double.parse(value);
-              if (to != null && value != null) {
-                handleTransaction(
-                    session: session, rpc: rpc, to: to, value: value);
-              } else {
-                showCustomError('wrong params');
-              }
-            } catch (e) {
-              showCustomError(e.toString());
-            }
-          } else {
-            showCustomError('wrong params');
-          }
-          return rpc;
-        }
-      ]
+      'fil_sendTransaction': genCallback('filecoin'),
+      'eth_sendTransaction': genCallback('eth'),
     });
   }
 
-  void pushMsg(
-      {String ck,
-      Gas gas,
-      int nonce,
-      WCSession session,
-      JsonRpc rpc,
-      String value,
-      String to,
-      Wallet wallet}) async {
-    var from = wallet.addrWithNet;
-    var realNonce = max(nonce, nonceBoxInstance.get(from).value);
-    var msg = TMessage(
-        version: 0,
-        method: 0,
-        nonce: realNonce,
-        from: from,
-        to: to,
-        params: "",
-        value: fil2Atto(value),
-        gasFeeCap: gas.feeCap,
-        gasLimit: gas.gasLimit,
-        gasPremium: gas.premium);
+  void signMessage(
+    TMessage message, {
+    String ck,
+    WCSession session,
+    JsonRpc rpc,
+  }) async {
     String sign = '';
     num signType;
-    var cid = await Flotus.messageCid(msg: jsonEncode(msg));
-    if (wallet.type == '1') {
+    var cid = await Flotus.messageCid(msg: jsonEncode(message));
+    if ($store.wal.addr[1] == '1') {
       signType = SignTypeSecp;
       sign = await Flotus.secpSign(ck: ck, msg: cid);
     } else {
       signType = SignTypeBls;
       sign = await Bls.cksign(num: "$ck $cid");
     }
-    var sm = SignedMessage(msg, Signature(signType, sign));
-    showCustomLoading('sending'.tr);
-    String res = await pushSignedMsg(sm.toLotusSignedMessage());
-    dismissAllToast();
+    var sm = SignedMessage(message, Signature(signType, sign));
+    session.sendResponse(rpc.id, 'fil_signMessage',
+        result: sm.toLotusSignedMessage());
+  }
+
+  void pushMsg(
+      {String private,
+      ChainGas gas,
+      int nonce,
+      WCSession session,
+      JsonRpc rpc,
+      BigInt value,
+      String to,
+      String type,
+      ChainWallet wallet}) async {
+    var from = wallet.addr;
+    var net = $store.net;
+    var nonceKey = '$from\_${net.rpc}';
+    var realNonce = max(nonce, nonceBoxInstance.get(from).value);
+    var res = await provider.sendTransaction(
+        to: to,
+        amount: value.toString(),
+        private: private,
+        gas: gas,
+        nonce: realNonce);
     if (res != '') {
       showCustomToast('sended'.tr);
-      var cacheGas = CacheGas(
-          cid: res,
-          feeCap: gas.feeCap,
-          gasLimit: gas.gasLimit,
-          premium: gas.premium);
-      OpenedBox.gasInsance.put('$from\_$realNonce', cacheGas);
-      OpenedBox.messageInsance.put(
+      session.sendResponse(rpc.id, '$type\_sendTransaction', result: res);
+      var cacheGas = ChainGas(
+          gasPrice: $store.gas.gasPrice,
+          gasLimit: $store.gas.gasLimit,
+          gasPremium: $store.gas.gasPremium);
+      OpenedBox.gasInsance
+          .put('$from\_$realNonce\_${$store.net.rpc}', cacheGas);
+      $store.setGas(ChainGas());
+      OpenedBox.mesInstance.put(
           res,
-          StoreMessage(
+          CacheMessage(
               pending: 1,
               from: from,
               to: to,
-              value: fil2Atto(value),
+              value: value.toString(),
               owner: from,
               nonce: realNonce,
-              signedCid: res,
+              hash: res,
+              rpc: net.rpc,
+              gas: cacheGas,
+              fee: (BigInt.from(cacheGas.gasLimit) *
+                          BigInt.tryParse(cacheGas.gasPrice) ??
+                      0)
+                  .toString(),
               blockTime:
                   (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
-      var oldNonce = nonceBoxInstance.get(from);
+      var oldNonce = nonceBoxInstance.get(nonceKey);
       nonceBoxInstance.put(
-          from, Nonce(value: realNonce + 1, time: oldNonce.time));
-      session.sendResponse(rpc.id, 'fil_sendTransaction',
-          result: {'signed_cid': res});
+          nonceKey, Nonce(value: realNonce + 1, time: oldNonce.time));
     } else {
       showCustomError('sendFail'.tr);
     }
   }
 
   void handleTransaction(
-      {WCSession session, JsonRpc rpc, String to, String value}) {
-    var controller = singleStoreController;
+      {WCSession session, JsonRpc rpc, String to, BigInt value, String type}) {
+    var controller = $store;
     var wallet = controller.wal;
-    var address = wallet.addrWithNet;
+    var address = wallet.addr;
     var now = DateTime.now().millisecondsSinceEpoch;
-    Future.wait([getGasDetail(to: to), getNonce(wallet)]).then((res) {
-      var gas = res[0] as Gas;
+    Future.wait([provider.getGas(to: to), provider.getNonce()]).then((res) {
+      var gas = res[0] as ChainGas;
       var nonce = res[1] as int;
-      if (gas.feeCap == '0') {
+      if (gas.gasPrice == '0') {
         showCustomError('errorSetGas'.tr);
         return;
       }
-      if (nonce == null || nonce == -1) {
+      if (nonce == -1) {
         showCustomError("errorGetNonce".tr);
         return;
       }
@@ -385,7 +363,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
           nonceBoxInstance.put(address, Nonce(time: now, value: nonce));
         }
       }
-      var maxFee = getMaxFee(gas);
       showCustomModalBottomSheet(
           shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
           context: context,
@@ -396,30 +373,47 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 child: ConfirmSheet(
                   from: address,
                   to: to,
-                  gas: maxFee,
-                  value: value,
+                  gas: gas.maxFee,
+                  value: getChainValue(value.toString()),
                   footer: Row(
                     children: [
                       Expanded(
                           child: FButton(
-                        text: 'Approve',
+                        alignment: Alignment.center,
+                        height: 40,
+                        onPressed: () {
+                          Get.back();
+                          session.sendResponse(rpc.id, '$type\_sendTransaction',
+                              error: {'message': 'Reject'});
+                        },
+                        strokeWidth: .5,
+                        strokeColor: Color(0xffcccccc),
+                        corner: FCorner.all(6),
+                        text: 'reject'.tr,
+                      )),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                          child: FButton(
+                        text: 'approve'.tr,
                         alignment: Alignment.center,
                         onPressed: () {
                           Get.back();
                           showPassDialog(context, (String pass) async {
                             var wal = controller.wal;
-                            var ck = await getPrivateKey(
-                                wal.addrWithNet, pass, wal.skKek);
+                            var private = await wal.getPrivateKey(pass);
                             pushMsg(
-                                ck: ck,
+                                private: private,
                                 value: value,
                                 gas: gas,
                                 wallet: wallet,
                                 rpc: rpc,
                                 to: to,
+                                type: type,
                                 session: session,
                                 nonce: nonce);
-                            //onConfirm(ck);
+                            // onConfirm(ck);
                           });
                         },
                         height: 40,
@@ -427,23 +421,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                         color: CustomColor.primary,
                         corner: FCorner.all(6),
                       )),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                          child: FButton(
-                        alignment: Alignment.center,
-                        height: 40,
-                        onPressed: () {
-                          Get.back();
-                          session.sendResponse(rpc.id, 'fil_transfer',
-                              error: {'message': 'Reject'});
-                        },
-                        style: TextStyle(color: Colors.white),
-                        corner: FCorner.all(6),
-                        color: Colors.red,
-                        text: 'Reject',
-                      ))
                     ],
                   ),
                 ),
@@ -460,16 +437,16 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       session
           .sendSessionRequestResponse(
               rpc,
-              'Filecoin Wallet',
+              'FiveToken',
               {
                 'description': '',
-                'name': 'Filecoin Wallet',
-                'url': 'https://filecoinwallet.com/',
-                'icons': ['https://filecoinwallet.com/logo.jpg']
+                'name': 'FiveToken',
+                'url': 'https://fivetoken.io/',
+                'icons': ['https://fivetoken.io/image/ft-logo.png']
               },
-              [singleStoreController.wal.addrWithNet],
+              [$store.wal.addr],
               approved,
-              chainId: 1)
+              chainId: int.tryParse($store.net.chainId))
           .then((value) {
         if (approved) {
           var s = session.toString();
@@ -497,6 +474,30 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
               },
             );
           });
+    }
+  }
+
+  Future onRefresh() async {
+    Global.eventBus.fire(RefreshEvent());
+    await getBalance();
+  }
+
+  ChainProvider initProvider() {
+    if ($store.net.addressType == 'eth') {
+      return EthProvider($store.net);
+    } else {
+      return FilecoinProvider($store.net);
+    }
+  }
+
+  Future getBalance() async {
+    var wal = $store.wal;
+    provider = initProvider();
+    var res = await provider.getBalance(wal.addr);
+    if (res != wal.balance && res != '0') {
+      $store.changeWalletBalance(res);
+      wal.balance = res;
+      OpenedBox.walletInstance.put(wal.key, wal);
     }
   }
 
@@ -528,7 +529,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                               padding: EdgeInsets.symmetric(horizontal: 20),
                               margin: EdgeInsets.only(bottom: 40),
                               child: FButton(
-                                text: 'DisConnect',
+                                text: 'disConnect'.tr,
                                 alignment: Alignment.center,
                                 onPressed: () {
                                   Get.back();
@@ -563,8 +564,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     padding: EdgeInsets.only(right: 10),
                   )
                 ],
-                backgroundColor: Color(FColorWhite),
-                elevation: NavElevation,
+                backgroundColor: Colors.white,
+                elevation: .5,
                 leading: Builder(
                   builder: (BuildContext context) {
                     return IconButton(
@@ -576,11 +577,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     );
                   },
                 ),
-                title: CommonText(
-                  'wallet'.tr,
-                  size: 18,
-                  weight: FontWeight.w500,
-                ),
+                title: NetSelect(),
                 centerTitle: true,
               ),
               preferredSize: Size.fromHeight(NavHeight)),
@@ -588,139 +585,82 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
             child: DrawerBody(),
           ),
           backgroundColor: Colors.white,
-          body: Column(
-            children: [
-              SizedBox(
-                height: 25,
-              ),
-              CommonText(
-                marketPrice,
-                size: 30,
-                weight: FontWeight.w800,
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              Obx(
-                () => CommonText(
-                  singleStoreController.wal.label,
-                  size: 14,
-                  color: Color(0xffB4B5B7),
+          body: CustomRefreshWidget(
+            onRefresh: onRefresh,
+            enablePullUp: false,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 25,
                 ),
-              ),
-              SizedBox(
-                height: 18,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 25,
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                    child: Obx(() => CommonText(
-                          dotString(str: singleStoreController.wal.addr),
-                          size: 14,
-                          color: Color(0xffB4B5B7),
-                        )),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: Color(0xfff8f8f8)),
+                CoinPriceWidget(),
+                SizedBox(
+                  height: 8,
+                ),
+                Obx(
+                  () => CommonText(
+                    $store.wal.label,
+                    size: 14,
+                    color: Color(0xffB4B5B7),
                   ),
-                  SizedBox(
-                    width: 14,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      copyText(singleStoreController.wal.addr);
-                      showCustomToast('copyAddr'.tr);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(4),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 25,
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      child: Obx(() => CommonText(
+                            dotString(str: $store.wal.addr),
+                            size: 14,
+                            color: Color(0xffB4B5B7),
+                          )),
                       decoration: BoxDecoration(
-                          color: CustomColor.primary,
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Image(
-                          fit: BoxFit.fitWidth,
-                          width: 17,
-                          height: 17,
-                          image: AssetImage('icons/copy-w.png')),
+                          borderRadius: BorderRadius.circular(5),
+                          color: Color(0xfff8f8f8)),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 18,
-              ),
-              WalletService(),
-              SizedBox(
-                height: 40,
-              ),
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        padding: EdgeInsets.all(2),
+                    SizedBox(
+                      width: 14,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        copyText($store.wal.addr);
+                        showCustomToast('copyAddr'.tr);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(4),
                         decoration: BoxDecoration(
                             color: CustomColor.primary,
-                            borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Image(
-                          image: AssetImage('icons/fil-w.png'),
-                        ),
+                            fit: BoxFit.fitWidth,
+                            width: 17,
+                            height: 17,
+                            image: AssetImage('icons/copy-w.png')),
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CommonText(
-                                'Filecoin',
-                                size: 15,
-                                weight: FontWeight.w500,
-                              ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              CommonText(
-                                marketPrice,
-                                color: CustomColor.grey,
-                                size: 12,
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 4,
-                          ),
-                          CommonText(
-                            formatDouble(balance, truncate: true, size: 4) +
-                                ' FIL',
-                            color: CustomColor.primary,
-                          )
-                        ],
-                      ))
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  Get.toNamed(walletMainPage,
-                      arguments: {'marketPrice': marketPrice}).then((value) {
-                    setState(() {
-                      balance = singleStoreController.wal.balance;
-                    });
-                  });
-                },
-              )
-            ],
+                SizedBox(
+                  height: 18,
+                ),
+                WalletService(mainPage),
+                SizedBox(
+                  height: 40,
+                ),
+                MainTokenWidget(),
+                Expanded(
+                    child: SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: 40),
+                  child: Column(
+                    children: [TokenList()],
+                  ),
+                )),
+              ],
+            ),
           ),
         ),
         onWillPop: () async {
@@ -732,7 +672,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
 String getMarketPrice(String balance, double rate) {
   try {
-    var b = double.parse(balance);
+    var b = double.parse(balance) / pow(10, 18);
     //var code=Global.langCode;
     var code = 'en';
     var unit = code == 'en' ? '\$' : '¥';

@@ -1,14 +1,19 @@
+import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
-import 'package:device_info/device_info.dart';
+import 'package:connectivity/connectivity.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 const psalt = "vFIzIawYOU";
-var _box = Hive.box<Wallet>(addressBox);
+Future<bool> checkNetStatus() async {
+  var connectivityResult = await Connectivity().checkConnectivity();
+  bool isOn = connectivityResult != ConnectivityResult.none;
+  return isOn;
+}
 
 /// decrypt the string that was encrypted
 String aesDecrypt(String raw, String mix) {
@@ -119,15 +124,23 @@ bool isDecimal(String input) {
   return false;
 }
 
+bool isValidChainAddress(String addr, Network net) {
+  return net.addressType == 'eth'
+      ? isValidEthAddress(addr)
+      : isValidFilecoinAddress(addr, net);
+}
 
-/// verify if [input] is a valid filecoin address
-bool isValidAddress(String input) {
-  var addr = input.trim().toLowerCase();
-  if (addr == '') {
+bool isValidEthAddress(String addr) {
+  return addr.length == 42 && addr.substring(0, 2) == '0x';
+}
+
+bool isValidFilecoinAddress(String address, Network net) {
+  var prefix = net.prefix;
+  if (address[0] != prefix) {
     return false;
   }
-  var mainNet = addr[0];
-  if (mainNet != 't' && mainNet != 'f') {
+  var addr = address.trim().toLowerCase();
+  if (addr == '') {
     return false;
   }
   var protocol = addr[1];
@@ -148,7 +161,6 @@ bool isValidAddress(String input) {
   return true;
 }
 
-/// generate private key by [mne]
 String genCKBase64(String mne) {
   var seed = bip39.mnemonicToSeed(mne);
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
@@ -158,7 +170,6 @@ String genCKBase64(String mne) {
   return ck;
 }
 
-/// convert hex encode string
 String hex2str(String hexString) {
   hexString = hexString.trim();
   List<String> split = [];
@@ -170,76 +181,53 @@ String hex2str(String hexString) {
   return ascii;
 }
 
+String truncate(double value, {int size = 4}) {
+  return ((value * pow(10, size)).floor() / pow(10, size)).toString();
+}
+String formatCoin(String amount,
+    {num size = 4, bool fixed = false, Network net}) {
+  net = net ?? $store.net;
+  if (amount == '0') {
+    return '0 ${net.coin}';
+  }
 
-
-String fixedFloat({String number, num size = 2}) {
-  var arr = number.split('.');
-  var intStr = arr[0];
-  var dotStr = arr[1];
-  if (dotStr != null) {
-    return (double.parse(intStr) + double.parse('0.$dotStr').toPrecision(size))
-        .toString();
-  } else {
-    return number;
+  var isFil = net.addressType == AddressType.filecoin.type;
+  try {
+    var str = amount;
+    var v = BigInt.parse(amount);
+    num length = str.length;
+    if (length < 5) {
+      var u = isFil ? 'attoFIL' : 'wei';
+      return '$str $u';
+    } else if (length >= 5 && length <= 13) {
+      var u = isFil ? 'nanoFIL' : 'gwei';
+      var unit = BigInt.from(pow(10, 9));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} $u'
+          : '${truncate(res, size: size)} $u';
+    } else {
+      var u = isFil ? 'FIL' : net.coin;
+      var unit = BigInt.from(pow(10, 18));
+      var res = v / unit;
+      return fixed
+          ? '${res.toStringAsFixed(size)} $u'
+          : '${truncate(res, size: size)} $u';
+    }
+  } catch (e) {
+    return amount;
   }
 }
-/// convert attoFil to different units
-String formatFil({double attoFil, num size = 5}) {
-  var str = attoFil.toString().split('.')[0];
-  num length = str.length;
-  if (length < 5) {
-    return '$str attoFil';
-  } else if (length >= 5 && length <= 13) {
-    return '${(attoFil / pow(10, 9)).toPrecision(size)} nanoFil';
-  } else {
-    return '${(attoFil / pow(10, 18)).toPrecision(size)}Fil';
-  }
-}
 
-/// convert fil to attofil
-String fil2Atto(String fil) {
+String getChainValue(String fil, {int precision = 18}) {
+  if (precision < 10) {
+    return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
+  }
   return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, 9)))
+          BigInt.from(pow(10, precision-9)))
       .toString();
 }
 
-/// convert attofil to fil
-String atto2Fil(String value, {num len = 6}) {
-  return Fil(attofil: value).toFixed(len: len);
-}
-/// convert bytes to different units
-String unitConversion(String byteStr, num length) {
-  int byte = int.parse(byteStr);
-  String res = '';
-  var positive = true;
-  if (byte == 0) {
-    return "0 bytes";
-  }
-  if (byte < 0) {
-    positive = false;
-    res = byte.abs().toString();
-  }
-  var k = 1024;
-  var sizes = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-  var c = (log(byte) / log(k)).truncate();
-  if (c < 0) {
-    res = '';
-  } else {
-    res = (byte / pow(k, c)).toStringAsFixed(length) + " " + sizes[c];
-  }
-
-  return positive ? res : '-$res';
-}
-
-
-String encodeString(String str, [int times = 1]) {
-  List<int> s = utf8.encode(str);
-  return base64Encode(s);
-}
-
-String decodeString(String str) {
-  return utf8.decode(base64Decode(str));
-}
 
 int getSecondSinceEpoch() {
   return (DateTime.now().millisecondsSinceEpoch / 1000).truncate();
@@ -292,6 +280,11 @@ bool isValidPassword(String pass) {
   var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
   return reg.hasMatch(pass);
 }
+bool isValidUrl(String url) {
+  final urlRegExp = new RegExp(
+      r"^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$");
+  return urlRegExp.hasMatch(url);
+}
 
 /// call a function in next tick
 void nextTick(Noop callback) {
@@ -321,8 +314,13 @@ String getValidWCLink(String link) {
   }
 }
 
-String getMaxFee(Gas gas) {
-  var feeCap = gas.feeCap;
-  var gasLimit = gas.gasLimit;
-  return formatFil(attoFil: (double.parse(feeCap) * gasLimit));
+
+String trParams(String tr, [Map<String, String> params = const {}]) {
+  var trans = tr;
+  if (params.isNotEmpty) {
+    params.forEach((key, value) {
+      trans = trans.replaceAll('@$key', value);
+    });
+  }
+  return trans;
 }

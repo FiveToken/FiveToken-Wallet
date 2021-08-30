@@ -26,7 +26,7 @@ class ScanPageState extends State<ScanPage> {
     var valid = false;
     switch (scene) {
       case ScanScene.Address:
-        valid = isValidAddress(result);
+        valid = isValidChainAddress(result, $store.net);
         if (!valid) {
           showCustomError('wrongAddr'.tr);
         }

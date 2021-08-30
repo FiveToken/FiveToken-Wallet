@@ -1,7 +1,5 @@
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
-import 'package:bip39/bip39.dart' as bip39;
-/// check if user has remembered the mne
 class MneCheckPage extends StatefulWidget {
   @override
   State createState() => MneCheckPageState();
@@ -35,42 +33,6 @@ class MneCheckPageState extends State<MneCheckPage> {
   String get mneCk {
     return genCKBase64(mne);
   }
-
-  void createWallet(BuildContext context, String type) async {
-    try {
-      String signType = SignSecp;
-      String pk = '';
-      String ck = '';
-      if (type == '1') {
-        ck = genCKBase64(mne);
-        pk = await Flotus.secpPrivateToPublic(ck: ck);
-      } else {
-        var key = bip39.mnemonicToSeed(mne);
-        signType = SignBls;
-        ck = await Bls.ckgen(num: key.join(""));
-        pk = await Bls.pkgen(num: ck);
-      }
-      String address = await Flotus.genAddress(pk: pk, t: signType);
-      address = Global.netPrefix + address.substring(1);
-      var exist = OpenedBox.addressInsance.containsKey(address);
-      if (exist) {
-        showCustomError('errorExist'.tr);
-        return;
-      }
-      Wallet wallet = Wallet(
-          ck: ck,
-          address: address,
-          label: 'FIL',
-          walletType: 0,
-          mne: mne,
-          type: type);
-      Get.toNamed(passwordSetPage,
-          arguments: {'wallet': wallet, 'create': true});
-    } catch (e) {
-      showCustomError('checkMneFail'.tr);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -81,10 +43,8 @@ class MneCheckPageState extends State<MneCheckPage> {
           showCustomError('wrongMne'.tr);
           return;
         }
-        showWalletSelector(context, (String type) {
-          //print(type);
-          createWallet(context, type);
-        });
+        Get.toNamed(passwordSetPage,
+            arguments: {'type': 0, 'mne': mne, 'label': DefaultWalletName});
       },
       footerText: 'next'.tr,
       body: SingleChildScrollView(

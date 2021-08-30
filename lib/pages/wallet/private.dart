@@ -1,3 +1,4 @@
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 /// display private key of the wallet
 class WalletPrivatekeyPage extends StatefulWidget {
@@ -10,10 +11,13 @@ class WalletPrivatekeyPage extends StatefulWidget {
 class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
   int index = 0;
   bool showCode = false;
-  String pk = Get.arguments['pk'] as String;
+  String private = Get.arguments['private'] as String;
+  ChainWallet wallet = Get.arguments['wallet'] as ChainWallet;
   @override
   Widget build(BuildContext context) {
-    var ck = base64ToHex(pk, Global.cacheWallet.type);
+    var ck = wallet.addressType == 'eth'
+        ? private
+        : base64ToHex(private, wallet.address[1]);
     return CommonScaffold(
       title: 'exportPk'.tr,
       grey: true,

@@ -1,14 +1,13 @@
 import 'package:fil/index.dart';
-export 'package:fil/widgets/wallet.dart';
 export 'scaffold.dart';
 export './card.dart';
 export './text.dart';
-export './button.dart';
 export './style.dart';
 export './tabCard.dart';
 export './dialog.dart';
 export './layout.dart';
 export './bottomSheet.dart';
+export './fresh.dart';
 
 
 
@@ -30,7 +29,7 @@ const Image IconTargetWhite = Image(
 
 const Image ImageFil = Image(
   width: 120,
-  image: AssetImage("icons/filecoin.png"),
+  image: AssetImage("icons/fivetoken.png"),
 );
 const Image ImageAr = Image(
   width: 14,
