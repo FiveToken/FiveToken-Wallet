@@ -57,8 +57,9 @@ class WalletSelectPageState extends State<WalletSelectPage> {
 
   void deleteIdWallet(String hash) async {
     bool needSwitch = hash == $store.wal.groupHash;
-    var keys =
-        box.values.where((wal) => wal.groupHash == hash).map((wal) => wal.key);
+    var keys = box.values
+        .where((wal) => wal.groupHash == hash && wal.type == 0)
+        .map((wal) => wal.key);
     await box.deleteAll(keys);
     if (box.values.isEmpty) {
       goInit();
@@ -68,7 +69,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
   }
 
   void deleteImprotWallet(ChainWallet wal, Network net) async {
-    await box.delete('${wal.address}\_${net.rpc}');
+    await box.delete(wal.key);
     if (box.values.isEmpty) {
       goInit();
     } else {
@@ -81,22 +82,20 @@ class WalletSelectPageState extends State<WalletSelectPage> {
     if (needSwitch) {
       if (idWalletMap.isNotEmpty) {
         var list = idWalletMap.entries.first.value
-            .where((wal) => wal.addressType == $store.net.addressType)
+            .where((wal) => wal.rpc == $store.net.rpc)
             .toList();
 
         if (list.isNotEmpty) {
           var wallet = list[0];
           $store.setWallet(wallet);
-          Global.store.setString('currentWalletAddress', wallet.address);
+          Global.store.setString('currentWalletAddress', wallet.key);
         }
       } else {
         $store.setWallet(importWallets[0]);
-        Global.store
-            .setString('currentWalletAddress', importWallets[0].address);
+        Global.store.setString('currentWalletAddress', importWallets[0].key);
       }
-      setState(() {});
     }
-    // Get.offAllNamed(mainPage);
+    setState(() {});
   }
 
   void goInit() {
@@ -194,57 +193,66 @@ class WalletSelectPageState extends State<WalletSelectPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: CommonText('idMulti'.tr),
-              padding: EdgeInsets.only(left: 12),
-            ),
-            Column(
-              children: List.generate(entry.length, (index) {
-                var hash = entry[index].key;
-                return SwiperWidget(
-                  active: hash == $store.wal.groupHash,
-                  onDelete: () {
-                    showDeleteDialog(context,
-                        title: 'deleteAddr'.tr,
-                        content: 'confirmDelete'.tr, onDelete: () {
-                      deleteIdWallet(hash);
-                    });
-                  },
-                  onSet: () {
-                    Get.toNamed(walletIdPage, arguments: {'groupHash': hash})
-                        .then((value) {
-                      setList();
-                    });
-                  },
-                  onTap: () {
-                    if (hash != $store.wal.groupHash) {
-                      var wallets = OpenedBox.walletInstance.values
-                          .where((wal) =>
-                              wal.groupHash == hash &&
-                              wal.addressType == $store.net.addressType)
-                          .toList();
-                      if (wallets.isNotEmpty) {
-                        $store.setWallet(wallets[0]);
-                        Global.store.setString(
-                            'currentWalletAddress', wallets[0].address);
-                      }
-                    }
-                    Global.eventBus.fire(WalletChangeEvent());
-                    Navigator.of(context)
-                        .popUntil((route) => route.settings.name == mainPage);
-                  },
-                  id: hash,
-                  child: Container(
-                    height: 70,
-                    alignment: Alignment.centerLeft,
-                    child: CommonText(idWallets[index][1], color: Colors.white),
-                  ),
-                );
-              }),
-            ),
-            SizedBox(
-              height: 12,
-            ),
+            Visibility(
+                visible: entry.isNotEmpty,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: CommonText('idMulti'.tr),
+                      padding: EdgeInsets.only(left: 12),
+                    ),
+                    Column(
+                      children: List.generate(entry.length, (index) {
+                        var hash = entry[index].key;
+                        var wals = entry[index].value;
+                        return SwiperWidget(
+                          active: hash == $store.wal.groupHash,
+                          onDelete: () {
+                            showDeleteDialog(context,
+                                title: 'deleteIdWallet'.tr,
+                                content: 'confirmDeleteId'.tr, onDelete: () {
+                              deleteIdWallet(hash);
+                            });
+                          },
+                          onSet: () {
+                            Get.toNamed(walletIdPage,
+                                arguments: {'groupHash': hash}).then((value) {
+                              setList();
+                            });
+                          },
+                          onTap: () {
+                            if (hash != $store.wal.groupHash) {
+                              var wallets = OpenedBox.walletInstance.values
+                                  .where((wal) =>
+                                      wal.groupHash == hash &&
+                                      wal.rpc == $store.net.rpc)
+                                  .toList();
+                              if (wallets.isNotEmpty) {
+                                $store.setWallet(wallets[0]);
+                                Global.store.setString(
+                                    'currentWalletAddress', wallets[0].key);
+                              }
+                            }
+                            Global.eventBus.fire(WalletChangeEvent());
+                            Navigator.of(context).popUntil(
+                                (route) => route.settings.name == mainPage);
+                          },
+                          id: hash,
+                          child: Container(
+                            height: 70,
+                            alignment: Alignment.centerLeft,
+                            child:
+                                CommonText(wals[0].label, color: Colors.white),
+                          ),
+                        );
+                      }),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                  ],
+                )),
             Visibility(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +286,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                           $store.setNet(net);
                           Global.eventBus.fire(WalletChangeEvent());
                           Global.store
-                              .setString('currentWalletAddress', wal.address);
+                              .setString('currentWalletAddress', wal.key);
                           Global.store.setString('activeNetwork', net.rpc);
                           Navigator.of(context).popUntil(
                               (route) => route.settings.name == mainPage);
@@ -297,8 +305,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                   SizedBox(
                                     height: 5,
                                   ),
-                                  CommonText.white(
-                                      dotString(str: net.prefix + wal.address),
+                                  CommonText.white(dotString(str: wal.addr),
                                       size: 12)
                                 ],
                               ),

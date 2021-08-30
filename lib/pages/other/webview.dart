@@ -1,14 +1,6 @@
 import 'dart:io';
 import 'package:fil/index.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// ignore: prefer_collection_literals
-// final Set<JavascriptChannel> jsChannels = [
-//   JavascriptChannel(
-//       name: 'Print',
-//       onMessageReceived: (JavascriptMessage message) {
-//         print(message.message);
-//       }),
-// ].toSet();
 
 class WebviewPage extends StatefulWidget {
   @override
@@ -63,8 +55,8 @@ class WebviewPageState extends State<WebviewPage> {
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           child: AppBar(
-            backgroundColor: Color(FColorWhite),
-            elevation: NavElevation,
+            backgroundColor: Colors.white,
+            elevation: .5,
             leading: IconButton(
               onPressed: () {
                 Get.back();
@@ -72,7 +64,7 @@ class WebviewPageState extends State<WebviewPage> {
               icon: IconNavBack,
               alignment: NavLeadingAlign,
             ),
-            title: Text(title, style: NavTitleStyle),
+            title: Text(title,),
             centerTitle: true,
           ),
           preferredSize: Size.fromHeight(NavHeight),

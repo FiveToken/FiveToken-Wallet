@@ -122,33 +122,6 @@ bool isDecimal(String input) {
   return false;
 }
 
-bool isValidAddress(String input) {
-  var addr = input.trim().toLowerCase();
-  if (addr == '') {
-    return false;
-  }
-  var mainNet = addr[0];
-  if (mainNet != 't' && mainNet != 'f') {
-    return false;
-  }
-  var protocol = addr[1];
-  if (!RegExp(r"^0|1|3$").hasMatch(protocol)) {
-    return false;
-  }
-  var raw = addr.substring(2);
-  if (protocol == "0") {
-    if (raw.length > 20) {
-      return false;
-    }
-  }
-  if (protocol == "3") {
-    if (raw.length < 30 || raw.length > 120) {
-      return false;
-    }
-  }
-  return true;
-}
-
 bool isValidChainAddress(String addr, Network net) {
   return net.addressType == 'eth'
       ? isValidEthAddress(addr)
@@ -186,16 +159,6 @@ bool isValidFilecoinAddress(String address, Network net) {
   return true;
 }
 
-List<String> parseFee(double fee) {
-  if (fee == 0) {
-    return ['0', '1000'];
-  } else if (fee < 0.0000001) {
-    return ['1000', (fee * pow(10, 15)).toStringAsFixed(0)];
-  } else {
-    return [(fee * pow(10, 10)).toStringAsFixed(0), '99999999'];
-  }
-}
-
 String genCKBase64(String mne) {
   var seed = bip39.mnemonicToSeed(mne);
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
@@ -203,16 +166,6 @@ String genCKBase64(String mne) {
   var rs0 = rs.derive(0);
   var ck = base64Encode(rs0.privateKey);
   return ck;
-}
-
-String genRandStr(int size) {
-  String str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  String result = "";
-  var strLen = str.length;
-  for (int i = 0; i < size; i++) {
-    result += str[Random().nextInt(strLen)];
-  }
-  return result;
 }
 
 String hex2str(String hexString) {
@@ -226,62 +179,9 @@ String hex2str(String hexString) {
   return ascii;
 }
 
-String fixedFloat({String number, num size = 2}) {
-  var arr = number.split('.');
-  var intStr = arr[0];
-  var dotStr = arr[1];
-  if (dotStr != null) {
-    return (double.parse(intStr) + double.parse('0.$dotStr').toPrecision(size))
-        .toString();
-  } else {
-    return number;
-  }
-}
-
-String formatFil({double attoFil, num size = 5}) {
-  var str = attoFil.toString().split('.')[0];
-  num length = str.length;
-  if (length < 5) {
-    return '$str attoFil';
-  } else if (length >= 5 && length <= 13) {
-    return '${(attoFil / pow(10, 9)).toPrecision(size)} nanoFil';
-  } else {
-    return '${(attoFil / pow(10, 18)).toPrecision(size)} Fil';
-  }
-}
-
 String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
-
-String formatFIL(String attoFil, {num size = 4, bool fixed = false}) {
-  if (attoFil == '0') {
-    return '0 FIL';
-  }
-  try {
-    var str = attoFil;
-    var v = BigInt.parse(attoFil);
-    num length = str.length;
-    if (length < 5) {
-      return '$str attoFIL';
-    } else if (length >= 5 && length <= 13) {
-      var unit = BigInt.from(pow(10, 9));
-      var res = v / unit;
-      return fixed
-          ? '${res.toStringAsFixed(size)} nanoFIL'
-          : '${truncate(res)} nanoFIL';
-    } else {
-      var unit = BigInt.from(pow(10, 18));
-      var res = v / unit;
-      return fixed
-          ? '${res.toStringAsFixed(size)} FIL'
-          : '${truncate(res, size: size)} FIL';
-    }
-  } catch (e) {
-    return attoFil;
-  }
-}
-
 String formatCoin(String amount,
     {num size = 4, bool fixed = false, Network net}) {
   net = net ?? $store.net;
@@ -317,34 +217,15 @@ String formatCoin(String amount,
   }
 }
 
-String fil2Atto(String fil) {
-  //return parseE((double.parse(fil) * pow(10, 18)).toString()).split('.')[0];
-  return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, 9)))
-      .toString();
-}
-
 String getChainValue(String fil, {int precision = 18}) {
   if (precision < 10) {
     return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
   }
   return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, 9)))
+          BigInt.from(pow(10, precision-9)))
       .toString();
 }
 
-String atto2Fil(String value, {num len = 6}) {
-  return Fil(attofil: value).toFixed(len: len);
-}
-
-String encodeString(String str, [int times = 1]) {
-  List<int> s = utf8.encode(str);
-  return base64Encode(s);
-}
-
-String decodeString(String str) {
-  return utf8.decode(base64Decode(str));
-}
 
 int getSecondSinceEpoch() {
   return (DateTime.now().millisecondsSinceEpoch / 1000).truncate();
@@ -395,6 +276,11 @@ bool isValidPassword(String pass) {
   var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
   return reg.hasMatch(pass);
 }
+bool isValidUrl(String url) {
+  final urlRegExp = new RegExp(
+      r"^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$");
+  return urlRegExp.hasMatch(url);
+}
 
 void nextTick(Noop callback) {
   Future.delayed(Duration.zero).then((value) {
@@ -423,11 +309,6 @@ String getValidWCLink(String link) {
   }
 }
 
-String getMaxFee(ChainGas gas) {
-  var feeCap = gas.gasPrice;
-  var gasLimit = gas.gasLimit;
-  return formatFil(attoFil: (double.parse(feeCap) * gasLimit));
-}
 
 String trParams(String tr, [Map<String, String> params = const {}]) {
   var trans = tr;

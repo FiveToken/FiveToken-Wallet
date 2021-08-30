@@ -1,6 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
-part 'message.g.dart';
+part 'cacheMessage.g.dart';
 
 class MessageDetail {
   String to,
@@ -160,6 +160,8 @@ class CacheMessage {
   String fee;
   @HiveField(13)
   int height;
+  @HiveField(14)
+  String mid; //only for filecoin
   CacheMessage(
       {this.from = '',
       this.to = '',
@@ -174,6 +176,7 @@ class CacheMessage {
       this.token,
       this.fee = '',
       this.height = 0,
+      this.mid='',
       this.exitCode});
   String get formatValue {
     if (token != null) {
@@ -183,16 +186,6 @@ class CacheMessage {
     }
   }
 
-  // CacheMessage.fromJson(Map<dynamic, dynamic> json)
-  //     : this.hash = json['signed_cid'],
-  //       this.to = json['to'],
-  //       this.from = json['from'] ?? 0,
-  //       this.value = json['value'],
-  //       this.blockTime = json['block_time'],
-  //       this.exitCode = json['exit_code'],
-  //       this.owner = json['owner'],
-  //       this.pending = json['pending'],
-  //       this.nonce = json['nonce'];
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'signed_cid': hash,

@@ -18,6 +18,9 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       showCustomError('enterPk'.tr);
       return;
     }
+    if(inputStr.startsWith('0x')){
+      inputStr=inputStr.substring(2);
+    }
     if (name == '') {
       showCustomError('enterName'.tr);
       return;
@@ -43,20 +46,6 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       'net': net,
       'label': name
     });
-    // try {
-    //   PrivateKey privateKey = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
-    //   var type = privateKey.type;
-    //   var key = privateKey.privateKey;
-    //   if (type == 'secp256k1') {
-    //     _genWalletByPkAndType(key, '1', name);
-    //   } else if (type == 'bls') {
-    //     _genWalletByPkAndType(key, '3', name);
-    //   } else {
-    //     showCustomError('wrongPk'.tr);
-    //   }
-    // } catch (e) {
-    //   showCustomError('wrongPk'.tr);
-    // }
   }
 
   void getChainTypeByPaivateKey(String private) {}

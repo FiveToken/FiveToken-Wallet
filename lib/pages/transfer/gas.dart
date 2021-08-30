@@ -2,12 +2,12 @@ import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 
 /// customize gas fee
-class FilGasPage extends StatefulWidget {
+class ChainGasPage extends StatefulWidget {
   @override
-  State createState() => FilGasPageState();
+  State createState() => ChainGasPageState();
 }
 
-class FilGasPageState extends State<FilGasPage> {
+class ChainGasPageState extends State<ChainGasPage> {
   TextEditingController feeCapCtrl = TextEditingController();
   TextEditingController gasLimitCtrl = TextEditingController();
   int index = 0;
@@ -22,20 +22,6 @@ class FilGasPageState extends State<FilGasPage> {
     return $store.g.value;
   }
 
-  String get fastFeeCap {
-    return chainGas.gasPrice;
-  }
-
-  String get slowFeeCap {
-    try {
-      var feeCapNum = int.parse(chainGas.gasPrice);
-      var feeCap = (0.9 * feeCapNum).truncate().toString();
-      return feeCap.toString();
-    } catch (e) {
-      return chainGas.gasPrice;
-    }
-  }
-
   void handleSubmit(BuildContext context) {
     final feeCap = feeCapCtrl.text.trim();
     final gasLimit = gasLimitCtrl.text.trim();
@@ -47,12 +33,13 @@ class FilGasPageState extends State<FilGasPage> {
     if (index == 2) {
       $store.setGas(ChainGas(
           level: 2,
-          gasLimit: double.tryParse(gasLimit).truncate(),
+          gasLimit: int.tryParse(gasLimit),
           gasPrice: isEth
-              ? (BigInt.from(pow(10, 9)) * BigInt.from(feeCapNum)).toString()
+              ? (BigInt.from(pow(10, 9) * feeCapNum)).toString()
               : feeCapNum.truncate().toString(),
-          gasPremium:
-              isEth ? chainGas.gasPremium : (feeCapNum - 100).truncate().toString()));
+          gasPremium: isEth
+              ? chainGas.gasPremium
+              : (feeCapNum - 100).truncate().toString()));
     }
     unFocusOf(context);
     Get.back();
@@ -71,8 +58,19 @@ class FilGasPageState extends State<FilGasPage> {
     }
   }
 
-  void syncGas(ChainGas g) {
-    feeCapCtrl.text = g.gasPrice;
+  void syncGas(ChainGas g, {bool trunc = false}) {
+    if (isEth) {
+      var price = double.tryParse(g.gasPrice);
+      feeCapCtrl.text = price != null
+          ? (trunc
+                  ? truncate(price / pow(10, 9), size: 5)
+                  : (price / pow(10, 9)))
+              .toString()
+          : g.gasPrice;
+    } else {
+      feeCapCtrl.text = g.gasPrice;
+    }
+
     gasLimitCtrl.text = g.gasLimit.toString();
   }
 
@@ -167,60 +165,70 @@ class FilGasPageState extends State<FilGasPage> {
             SizedBox(
               height: 7,
             ),
-            GestureDetector(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                    borderRadius: CustomRadius.b8,
-                    color: index == 1 ? CustomColor.primary : Colors.white),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CommonText(
-                          'normal'.tr,
-                          color: getTextColor(index == 1),
-                        ),
-                        CommonText(
-                          formatCoin(chainGas.slow.gasPrice, size: 5),
-                          size: 10,
-                          color: getTextColor(index == 1),
-                        ),
-                      ],
-                    )),
-                    CommonText(
-                      '<3${'minute'.tr}',
-                      color: getTextColor(index == 1),
-                    )
-                  ],
-                ),
+            Visibility(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: CustomRadius.b8,
+                          color:
+                              index == 1 ? CustomColor.primary : Colors.white),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CommonText(
+                                'normal'.tr,
+                                color: getTextColor(index == 1),
+                              ),
+                              CommonText(
+                                formatCoin(chainGas.slow.gasPrice, size: 5),
+                                size: 10,
+                                color: getTextColor(index == 1),
+                              ),
+                            ],
+                          )),
+                          CommonText(
+                            '<3${'minute'.tr}',
+                            color: getTextColor(index == 1),
+                          )
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        index = 1;
+                        $store.setGas(chainGas.slow);
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                ],
               ),
-              onTap: () {
-                setState(() {
-                  index = 1;
-                  $store.setGas(chainGas.slow);
-                });
-              },
-            ),
-            SizedBox(
-              height: 7,
+              visible: !isEth,
             ),
             index != 2
                 ? GestureDetector(
                     onTap: () {
-                      var n = double.parse(chainGas.gasPrice) / pow(10, 9);
-                      if ($store.net.addressType == 'eth') {
-                        if (n > 1) {
-                          feeCapCtrl.text = n.truncate().toString();
-                        } else {
-                          feeCapCtrl.text = n.toStringAsFixed(1);
-                        }
-                      } else {
-                        feeCapCtrl.text = chainGas.gasPrice;
-                      }
+                      // var n = double.parse(chainGas.gasPrice) / pow(10, 9);
+                      // if (isEth) {
+                      //   if (n > 1) {
+                      //     feeCapCtrl.text = n.truncate().toString();
+                      //   } else {
+                      //     feeCapCtrl.text = n.toStringAsFixed(1);
+                      //   }
+                      // } else {
+                      //   feeCapCtrl.text = chainGas.gasPrice;
+                      // }
+                      syncGas(chainGas,trunc: true);
                       setState(() {
                         index = 2;
                       });
@@ -247,25 +255,31 @@ class FilGasPageState extends State<FilGasPage> {
                         Divider(
                           color: Colors.white,
                         ),
-                        CommonText.white('GasFeeCap', size: 10),
+                        CommonText.white(isEth ? 'GasPrice' : 'GasFeeCap',
+                            size: 10),
                         Field(
                           label: '',
                           controller: feeCapCtrl,
                           type: TextInputType.number,
                           extra: Padding(
                             padding: EdgeInsets.only(right: 12),
-                            child: CommonText($store.net.addressType == 'eth'
-                                ? 'gwei'
-                                : 'attoFIL'),
+                            child: CommonText(isEth ? 'gwei' : 'attoFIL'),
                           ),
-                          inputFormatters: [PrecisionLimitFormatter(8)],
+                          inputFormatters: [
+                            isEth
+                                ? FilteringTextInputFormatter.allow(
+                                    RegExp(r"[0-9.]"))
+                                : FilteringTextInputFormatter.digitsOnly
+                          ],
                         ),
                         CommonText.white('GasLimit', size: 10),
                         Field(
                           label: '',
                           controller: gasLimitCtrl,
                           type: TextInputType.number,
-                          inputFormatters: [PrecisionLimitFormatter(8)],
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
                         )
                       ],
                     ),

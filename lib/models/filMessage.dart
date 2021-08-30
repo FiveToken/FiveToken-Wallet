@@ -1,6 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
-part 'transfer.g.dart';
+part 'filMessage.g.dart';
 
 @HiveType(typeId: 1)
 class TMessage {

@@ -59,7 +59,7 @@ class TokenWidgetState extends State<TokenWidget> {
         var t = widget.token;
         if (numStr is BigInt && numStr.toString() != t.balance) {
           t.balance = numStr.toString();
-          OpenedBox.tokenInstance.put(t.address, t);
+          OpenedBox.tokenInstance.put(t.address+t.rpc, t);
         }
         if (mounted) {
           setState(() {});
@@ -136,7 +136,7 @@ class TokenListState extends State<TokenList> {
   }
 
   void initClient(Network net) {
-    client = Web3Client(net.rpc, http.Client());
+    client = Web3Client(net.url, http.Client());
   }
 
   @override
@@ -180,17 +180,26 @@ class TokenListState extends State<TokenList> {
 
 class MainTokenWidget extends StatelessWidget {
   CoinIcon get coinIcon {
-    var key = $store.net.coin;
+    var net = $store.net;
+    var key = net.coin;
     if (CoinIcon.icons.containsKey(key)) {
       return CoinIcon.icons[key];
     } else {
+      var key = '${net.chainId}${net.browser}${net.rpc}${net.chain}';
+      var addr = hex.encode(utf8.encode(key));
       return CoinIcon(
-          bg: CustomColor.primary, border: false, icon: Container());
+          bg: Colors.transparent, border: false, icon: RandomIcon(addr));
     }
   }
 
-  String get label =>
-      $store.net.chain == '' ? $store.net.coin : $store.net.chain;
+  String get label {
+    var map = {'eth': 'Ethereum', 'binance': 'Binance'};
+    return $store.net.chain == ''
+        ? $store.net.coin
+        : map.containsKey($store.net.chain)
+            ? map[$store.net.chain]
+            : $store.net.chain;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,7 +216,7 @@ class MainTokenWidget extends StatelessWidget {
                     Container(
                       width: 30,
                       height: 30,
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(coinIcon.border ? 2 : 0),
                       decoration: BoxDecoration(
                           border: Border.all(
                               width: coinIcon.border ? .5 : 0,

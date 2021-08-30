@@ -13,12 +13,13 @@ class IdWalletPageState extends State<IdWalletPage> {
   List<List<ChainWallet>> list = [];
   String groupHash = Get.arguments['groupHash'];
   List<ChainWallet> currentMneWallets = [];
-  bool hideTest = false;
+  bool hideTest;
   List<List<Network>> get filterNets =>
       hideTest ? [Network.netList[0]] : Network.netList;
   @override
   void initState() {
     super.initState();
+    hideTest = Global.store.getBool('hideTestnet') ?? false;
     setList();
   }
 
@@ -51,9 +52,9 @@ class IdWalletPageState extends State<IdWalletPage> {
                         var net = nets[i];
                         var wal = currentMneWallets
                             .where((wallet) =>
-                                wallet.addressType == net.addressType)
+                                wallet.rpc == net.rpc)
                             .toList()[0];
-                        var addr = net.prefix + wal.address;
+                        var addr = wal.addr;
                         return GestureDetector(
                           onTap: () {
                             Global.cacheWallet = wal;
@@ -100,6 +101,7 @@ class IdWalletPageState extends State<IdWalletPage> {
               onTap: () {
                 setState(() {
                   hideTest = !hideTest;
+                  Global.store.setBool('hideTestnet', hideTest);
                 });
               },
               child: Container(

@@ -52,7 +52,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: formatCoin(mes.fee),
+                  value: formatCoin(mes.fee,size: 5),
                 ))),
             SizedBox(
               height: 7,

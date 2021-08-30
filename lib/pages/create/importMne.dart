@@ -34,35 +34,6 @@ class ImportMnePageState extends State<ImportMnePage> {
   void handleImport() async {
     String inputStr = inputControl.text.trim();
     String label = nameControl.text.trim();
-
-    // String pk = '';
-    // String ck = '';
-    // String signType = SignSecp;
-    // unFocusOf(context);
-    // if (type == '1') {
-    //   ck = genCKBase64(inputStr);
-    //   pk = await Flotus.secpPrivateToPublic(ck: ck);
-    // } else {
-    //   signType = SignBls;
-    //   var key = bip39.mnemonicToSeed(inputStr);
-    //   ck = await Bls.ckgen(num: key.join(""));
-    //   pk = await Bls.pkgen(num: ck);
-    // }
-    // String address = await Flotus.genAddress(pk: pk, t: signType);
-    // address = Global.netPrefix + address.substring(1);
-    // var exist = OpenedBox.addressInsance.containsKey(address);
-    // if (exist) {
-    //   showCustomError('errorExist'.tr);
-    //   return;
-    // }
-    // Wallet wallet = Wallet(
-    //   ck: ck,
-    //   address: address,
-    //   label: label,
-    //   walletType: 0,
-    //   type: type,
-    //   mne: inputStr,
-    // );
     Get.toNamed(passwordSetPage,
         arguments: {'net': net, 'type': type, 'label': label, 'mne': inputStr});
   }
@@ -70,7 +41,6 @@ class ImportMnePageState extends State<ImportMnePage> {
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Mne}).then((value) {
       try {
-        //var ck = aesDecrypt(value, tokenify('filwallet'));
         inputControl.text = value;
       } catch (e) {
         showCustomError('wrongMne'.tr);

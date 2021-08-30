@@ -50,10 +50,10 @@ class NetSelect extends StatelessWidget {
                                       if (l.isNotEmpty) {
                                         $store.setNet(net);
                                         $store.setWallet(l[0]);
-                                        Global.eventBus.fire(WalletChangeEvent());
+                                        Global.eventBus
+                                            .fire(ShouldRefreshEvent());
                                         Global.store.setString(
-                                            'currentWalletAddress',
-                                            l[0].address);
+                                            'currentWalletAddress', l[0].key);
                                         Global.store.setString(
                                             'activeNetwork', net.rpc);
                                       }
@@ -114,7 +114,7 @@ class NetSelect extends StatelessWidget {
           Obx(() => Visibility(
               visible: $store.wal.type == 0,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.circle,

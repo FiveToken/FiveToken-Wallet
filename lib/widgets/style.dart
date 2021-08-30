@@ -1,4 +1,6 @@
 import 'package:fil/index.dart';
+const double NavHeight = 52;
+const NavLeadingAlign = Alignment(-0.5, 0);
 
 BorderRadius _getBorder(double radius){
   return BorderRadius.all(Radius.circular(radius));

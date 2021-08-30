@@ -34,45 +34,6 @@ class MneCheckPageState extends State<MneCheckPage> {
   String get mneCk {
     return genCKBase64(mne);
   }
-
-  void createWallet(BuildContext context, String type) async {
-    // var pk = EthWallet.genPrivateKeyByMne(mne);
-    // var addr = await EthWallet.genAddrByPrivateKey(pk);
-
-    // try {
-    //   String signType = SignSecp;
-    //   String pk = '';
-    //   String ck = '';
-    //   if (type == '1') {
-    //     ck = genCKBase64(mne);
-    //     pk = await Flotus.secpPrivateToPublic(ck: ck);
-    //   } else {
-    //     var key = bip39.mnemonicToSeed(mne);
-    //     signType = SignBls;
-    //     ck = await Bls.ckgen(num: key.join(""));
-    //     pk = await Bls.pkgen(num: ck);
-    //   }
-    //   String address = await Flotus.genAddress(pk: pk, t: signType);
-    //   address = Global.netPrefix + address.substring(1);
-    //   var exist = OpenedBox.addressInsance.containsKey(address);
-    //   if (exist) {
-    //     showCustomError('errorExist'.tr);
-    //     return;
-    //   }
-    //   Wallet wallet = Wallet(
-    //       ck: ck,
-    //       address: address,
-    //       label: 'FIL',
-    //       walletType: 0,
-    //       mne: mne,
-    //       type: type);
-    //   Get.toNamed(passwordSetPage,
-    //       arguments: {'wallet': wallet, 'create': true});
-    // } catch (e) {
-    //   showCustomError('checkMneFail'.tr);
-    // }
-  }
-
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -84,7 +45,7 @@ class MneCheckPageState extends State<MneCheckPage> {
           return;
         }
         Get.toNamed(passwordSetPage,
-            arguments: {'type': 0, 'mne': mne, 'label': 'FIL'});
+            arguments: {'type': 0, 'mne': mne, 'label': DefaultWalletName});
       },
       footerText: 'next'.tr,
       body: SingleChildScrollView(

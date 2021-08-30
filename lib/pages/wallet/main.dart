@@ -1,6 +1,6 @@
 import 'package:day/day.dart';
 import 'package:fil/index.dart';
-import 'package:fil/pages/wallet/widgets/messageList.dart';
+import 'package:fil/pages/wallet/widgets/messageItem.dart';
 import 'package:fil/widgets/icons.dart';
 import 'package:fil/widgets/random.dart';
 import 'package:web3dart/web3dart.dart' hide AddressType;
@@ -14,7 +14,7 @@ class WalletMainPage extends StatefulWidget {
 }
 
 class WalletMainPageState extends State<WalletMainPage> with RouteAware {
-  // String price;
+  static int pageSize = 10;
   Token token = Global.cacheToken;
   bool get showToken => token != null;
   bool enablePullDown = true;
@@ -80,27 +80,13 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   void initList() {
     var list = getWalletSortedMessages();
-    if (list.isEmpty) {
-      if (isFil) {
-        getMessages().then((lis) {
-          setState(() {
-            messageList = lis;
-            enablePullUp = lis.length == 80;
-          });
-        });
-      } else {
-        client = Web3Client(net.rpc, http.Client());
-      }
+    if (isFil) {
+      loadFilecoinLatestMessages();
     } else {
-      setState(() {
-        messageList = list;
-      });
-      if (isFil) {
-        loadFilecoinLatestMessages();
-      } else {
-        client = Web3Client(net.rpc, http.Client());
-      }
+      client = Web3Client(net.url, http.Client());
     }
+    messageList = list;
+    enablePullUp = list.length >= pageSize;
   }
 
   Future loadLatestMessage() async {
@@ -164,18 +150,12 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   }
 
   Future loadFilecoinLatestMessages() async {
-    var list = messageList;
-    num time;
-    if (list.isNotEmpty) {
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].pending != 1) {
-          time = list[i].blockTime;
-          break;
-        }
-      }
+    var completeList = messageList.where((mes) => mes.mid != '').toList();
+    var mid = '';
+    if (completeList.isNotEmpty) {
+      mid = completeList[0].mid;
     }
-
-    var lis = await getMessages(time: time, direction: 'down', count: 400);
+    var lis = await getMessages(direction: 'down', mid: mid);
 
     if (lis.isNotEmpty) {
       if (mounted) {
@@ -187,22 +167,13 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   }
 
   Future loadFilecoinOldMessages() async {
-    var list = messageList;
-    num time;
-    if (list.isNotEmpty) {
-      for (var i = list.length - 1; i > 0; i--) {
-        var current = list[i];
-        if (current.pending != 1) {
-          time = current.blockTime;
-          break;
-        }
-      }
-    }
-    var lis = await getMessages(time: time, direction: 'up');
+    var completeList = messageList.where((mes) => mes.mid != '').toList();
+    var mid = completeList.last.mid;
+    var lis = await getMessages(direction: 'up', mid: mid);
     if (lis.isNotEmpty) {
       setState(() {
         messageList = getWalletSortedMessages();
-        enablePullUp = lis.length == 80;
+        enablePullUp = lis.length == pageSize;
       });
     } else {
       setState(() {
@@ -215,7 +186,8 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     var list = <CacheMessage>[];
     var address = $store.wal.addr;
     box.values.forEach((message) {
-      if ((message.owner == address) && message.rpc == $store.net.rpc) {
+      if ((message.from == address || message.to == address) &&
+          message.rpc == $store.net.rpc) {
         list.add(message);
       }
     });
@@ -230,18 +202,15 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   }
 
   Future<List<CacheMessage>> getMessages(
-      {num time, String direction = 'up', num count = 80}) async {
+      {String direction = 'up', String mid}) async {
     try {
-      var res = await getMessageList(
-          address: $store.wal.addr,
-          direction: direction,
-          time: time,
-          count: count);
+      var res = await (provider as FilecoinProvider).getFilecoinMessageList(
+          actor: $store.wal.addr, direction: direction, mid: mid);
       if (res.isNotEmpty) {
         List<CacheMessage> messages = [];
         res.forEach((map) {
           var mes = CacheMessage(
-              hash: map['signed_cid'],
+              hash: map['cid'],
               to: map['to'],
               from: map['from'],
               value: map['value'],
@@ -250,23 +219,12 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
               owner: $store.wal.addr,
               pending: 0,
               rpc: net.rpc,
-              height: map['height'],
+              height: map['block_epoch'],
+              fee: map['gas_fee'],
+              mid: map['mid'],
               nonce: map['nonce']);
-          if (map['method_name'] == 'transfer' ||
-              map['method_name'] == 'send') {
-            messages.add(mes);
-          }
+          messages.add(mes);
         });
-        // var nonce = this.currentNonce;
-        // var pendingList = box.values.where((mes) => mes.pending == 1).toList();
-        // if (pendingList.isNotEmpty) {
-        //   for (var k = 0; k < pendingList.length; k++) {
-        //     var mes = pendingList[k];
-        //     if (mes.nonce < nonce) {
-        //       await box.delete(mes.hash);
-        //     }
-        //   }
-        // }
         for (var i = 0; i < messages.length; i++) {
           var m = messages[i];
           await box.put(m.hash, m);
@@ -329,9 +287,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   String get title => showToken ? token.symbol : $store.net.coin;
   Future onRefresh() async {
-    // if (this.currentNonce == null) {
-    //   await getNonce();
-    // }
     getBalance();
     Global.eventBus.fire(RefreshEvent(token: token));
     await loadLatestMessage();
@@ -365,7 +320,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       title: title,
       hasFooter: false,
       body: CustomRefreshWidget(
-          enablePullUp: isFil,
+          enablePullUp: isFil && enablePullUp,
           onLoading: onLoading,
           child: CustomScrollView(
             slivers: [
@@ -435,7 +390,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                           height: 25,
                         ),
                         CommonText(
-                          'noData'.tr,
+                          isFil ? 'noData'.tr : 'noActivity'.tr,
                           color: CustomColor.grey,
                         ),
                         SizedBox(
@@ -553,28 +508,6 @@ class IconBtn extends StatelessWidget {
           onTap();
         }
       },
-    );
-  }
-}
-
-class NoData extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Spacer(),
-        Image(width: 65, image: AssetImage('icons/record.png')),
-        SizedBox(
-          height: 25,
-        ),
-        CommonText(
-          'noData'.tr,
-          color: CustomColor.grey,
-        ),
-        SizedBox(
-          height: 170,
-        ),
-      ],
     );
   }
 }

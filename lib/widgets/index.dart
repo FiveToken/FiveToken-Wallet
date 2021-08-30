@@ -1,5 +1,4 @@
 import 'package:fil/index.dart';
-export 'package:fil/widgets/wallet.dart';
 export 'scaffold.dart';
 export './card.dart';
 export './text.dart';

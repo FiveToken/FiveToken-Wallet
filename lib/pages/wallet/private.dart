@@ -17,7 +17,7 @@ class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
   Widget build(BuildContext context) {
     var ck = wallet.addressType == 'eth'
         ? private
-        : base64ToHex(private, wallet.address[0]);
+        : base64ToHex(private, wallet.address[1]);
     return CommonScaffold(
       title: 'exportPk'.tr,
       grey: true,

@@ -20,15 +20,23 @@ class DrawerBody extends StatelessWidget {
                 SizedBox(
                   width: 12,
                 ),
-                CommonText(
-                  label,
-                  size: 18,
-                  weight: FontWeight.w500,
+                Container(
+                  constraints: BoxConstraints(maxWidth: 200),
+                  child: SingleChildScrollView(
+                    child: CommonText(
+                      label,
+                      size: 18,
+                      weight: FontWeight.w500,
+                    ),
+                  ),
                 ),
                 SizedBox(
                   width: 10,
                 ),
-                Image(width: 20, image: AssetImage('icons/switch.png'))
+                Image(width: 20, image: AssetImage('icons/switch.png')),
+                SizedBox(
+                  width: 12,
+                ),
               ],
             ),
             onTap: () {
@@ -102,14 +110,14 @@ class DrawerBody extends StatelessWidget {
           Divider(thickness: .2),
           DrawerItem(
             onTap: () {
-              openInBrowser('https://twitter.com/FilecoinWallet');
+              openInBrowser('https://twitter.com/fivetokenio');
             },
             label: 'Twitter',
             iconPath: 'twitter.png',
           ),
           DrawerItem(
             onTap: () {
-              openInBrowser('https://filecoinwalletdeveloper.medium.com/');
+              openInBrowser('https://fivetoken.medium.com/');
             },
             label: 'Medium',
             iconPath: 'medium.png',

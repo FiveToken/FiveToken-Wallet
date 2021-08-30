@@ -135,10 +135,10 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   }
 
   void handleScan() {
-    Get.toNamed(scanPage, arguments: {'scene': ScanScene.Address})
+    Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((scanResult) {
       if (scanResult != '') {
-        if (isValidAddress(scanResult)) {
+        if (isValidChainAddress(scanResult,net)) {
           addrCtrl.text = scanResult;
         } else {
           showCustomError('wrongAddr'.tr);

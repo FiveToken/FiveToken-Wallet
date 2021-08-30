@@ -18,7 +18,7 @@ class WalletManagePageState extends State<WalletManagePage> {
   }
 
   String get addr {
-    return net.prefix + wallet.address;
+    return wallet.addr;
   }
 
   CardItem get nameItem {
@@ -89,7 +89,16 @@ class WalletManagePageState extends State<WalletManagePage> {
                               return;
                             }
                             wallet.label = newLabel;
-                            $store.changeWalletName(newLabel);
+                            if (wallet.type == 0) {
+                              if (wallet.groupHash == $store.wal.groupHash) {
+                                $store.changeWalletName(newLabel);
+                              }
+                            } else {
+                              if (wallet.key == $store.wal.key) {
+                                $store.changeWalletName(newLabel);
+                              }
+                            }
+
                             List<ChainWallet> list = [];
                             if (wallet.type != 2) {
                               list = OpenedBox.walletInstance.values
@@ -117,8 +126,16 @@ class WalletManagePageState extends State<WalletManagePage> {
       },
       append: Row(
         children: [
-          CommonText(
-            wallet.label,
+          Container(
+            width: 150,
+            alignment: Alignment.centerRight,
+            child: SingleChildScrollView(
+              child: CommonText(
+                wallet.label,
+                align: TextAlign.right,
+              ),
+              scrollDirection: Axis.horizontal,
+            ),
           ),
           ImageAr
         ],

@@ -41,7 +41,13 @@ class CardItem extends StatelessWidget {
       child: Container(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [CommonText.main(label), append ?? ImageAr],
+          children: [
+            CommonText.main(label),
+            SizedBox(
+              width: 20,
+            ),
+            append ?? ImageAr
+          ],
         ),
         height: 40,
       ),

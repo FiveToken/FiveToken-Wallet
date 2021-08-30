@@ -5,47 +5,35 @@ import 'package:fil/index.dart';
 import 'package:web3dart/web3dart.dart';
 part 'wallet.g.dart';
 
-// abstract class BaseWallet {
-//   String exportPrivateKey(String pass) {
-//     return '';
-//   }
-
-//   String signMessage(String pk) {
-//     return '';
-//   }
-
-//   void sendMessage() async {}
-// }
-
 @HiveType(typeId: 9)
 class ChainWallet {
   @HiveField(0)
   String label;
+  // @HiveField(1)
+  // String ck;
   @HiveField(1)
-  String ck;
-  @HiveField(2)
   String address;
-  @HiveField(3)
+  @HiveField(2)
   int type;
-  @HiveField(4)
+  @HiveField(3)
   String balance;
-  @HiveField(5)
+  @HiveField(4)
   String mne;
-  @HiveField(6)
+  @HiveField(5)
   String skKek;
-  @HiveField(7)
+  @HiveField(6)
   String digest;
-  @HiveField(8)
+  @HiveField(7)
   String groupHash;
-  @HiveField(9)
+  @HiveField(8)
   String addressType;
-  @HiveField(10)
+  @HiveField(9)
   String rpc;
-  String get addr => $store.net.prefix + address;
-  String get key => '$address\_$rpc';
+  String get addr => address;
+  String get key => '$address\_$rpc\_$type';
   String get formatBalance => formatCoin(balance);
   ChainWallet(
-      {this.ck = '',
+      {
       this.label = '',
       this.address = '',
       this.type = 0,
@@ -57,7 +45,6 @@ class ChainWallet {
       this.rpc = '',
       this.addressType = ''});
   ChainWallet.fromJson(Map<dynamic, dynamic> json) {
-    this.ck = json['ck'] as String;
     this.label = json['label'] as String;
     this.address = json['address'] as String;
     this.type = json['type'] as int;
@@ -71,7 +58,6 @@ class ChainWallet {
   }
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'ck': this.ck,
       'label': this.label,
       'address': this.address,
       'type': this.type,
@@ -87,7 +73,6 @@ class ChainWallet {
 
   ChainWallet copyWith() {
     return ChainWallet(
-        ck: ck,
         label: label,
         address: address,
         addressType: addressType,
@@ -149,7 +134,7 @@ class FilecoinWallet extends ChainWallet {
   }
 
   static Future<String> genAddrByPrivateKey(String ck,
-      {String type = SignSecp}) async {
+      {String type = SignSecp, String prefix = 'f'}) async {
     String pk = '';
     if (type == SignSecp) {
       pk = await Flotus.secpPrivateToPublic(ck: ck);
@@ -157,7 +142,7 @@ class FilecoinWallet extends ChainWallet {
       pk = await Bls.pkgen(num: ck);
     }
     String address = await Flotus.genAddress(pk: pk, t: type);
-    return address.substring(1);
+    return prefix + address.substring(1);
   }
 
   static Future<EncryptKey> genEncryptKey(String mne, String pass) async {
@@ -180,16 +165,20 @@ class FilecoinWallet extends ChainWallet {
 
   static Future<EncryptKey> genEncryptKeyByPrivateKey(
       String privateKey, String pass,
-      {String type = SignSecp}) async {
+      {String type = SignSecp, String prefix = 'f'}) async {
     try {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr =
-          await FilecoinWallet.genAddrByPrivateKey(privateKey, type: type);
+          await FilecoinWallet.genAddrByPrivateKey(privateKey, type: type,prefix: prefix);
       var filkek = await genKek(filAddr, pass);
       var filPkList = base64Decode(privateKey);
       var filSkKek = xor(filkek, filPkList);
       var filDigest = await genPrivateKeyDigest(privateKey);
-      return EncryptKey(kek: filSkKek, digest: filDigest, address: filAddr);
+      return EncryptKey(
+          kek: filSkKek,
+          digest: filDigest,
+          address: filAddr,
+          private: privateKey);
     } catch (e) {
       throw (e);
     }
@@ -246,7 +235,11 @@ class EthWallet extends ChainWallet {
       var ethPkList = hex.decode(privateKey);
       var ethSkKek = xor(ethKek, ethPkList);
       var ethDigest = await genPrivateKeyDigest(privateKey);
-      return EncryptKey(kek: ethSkKek, digest: ethDigest, address: ethAddr);
+      return EncryptKey(
+          kek: ethSkKek,
+          digest: ethDigest,
+          address: ethAddr,
+          private: privateKey);
     } catch (e) {
       print(e);
       throw (e);

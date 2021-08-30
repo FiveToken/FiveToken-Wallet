@@ -22,12 +22,14 @@ class TokenAddPageState extends State<TokenAddPage> {
   @override
   void initState() {
     super.initState();
-    client = Web3Client($store.net.rpc, http.Client());
+    client = Web3Client($store.net.url, http.Client());
     node.addListener(() {
       if (!node.hasFocus) {
         var addr = addrCtrl.text.trim();
         if (isValidEthAddress(addr)) {
           getMetaInfo(addr);
+        } else {
+          showCustomError('invalidTokenAddr'.tr);
         }
       }
     });
@@ -90,7 +92,7 @@ class TokenAddPageState extends State<TokenAddPage> {
       return;
     }
     OpenedBox.tokenInstance.put(
-        addr,
+        addr + $store.net.rpc,
         Token(
             symbol: symbolCtrl.text,
             precision: int.parse(preCtrl.text),
@@ -107,7 +109,6 @@ class TokenAddPageState extends State<TokenAddPage> {
       footerText: 'add'.tr,
       onPressed: () {
         submit();
-        // getMetaInfo('addr');
       },
       grey: true,
       body: Padding(
@@ -115,6 +116,17 @@ class TokenAddPageState extends State<TokenAddPage> {
           children: [
             Field(
               label: 'tokenAddr'.tr,
+              append: GestureDetector(
+                child: Image(width: 20, image: AssetImage('icons/cop.png')),
+                onTap: () async {
+                  var data = await Clipboard.getData(Clipboard.kTextPlain);
+                  var addr = data.text;
+                  if (addr != null && isValidChainAddress(addr, $store.net)) {
+                    addrCtrl.text = addr;
+                    getMetaInfo(addr);
+                  }
+                },
+              ),
               controller: addrCtrl,
               placeholder: '0x...',
               focusNode: node,

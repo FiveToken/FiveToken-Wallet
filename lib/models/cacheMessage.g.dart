@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'message.dart';
+part of 'cacheMessage.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -91,6 +91,7 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       token: fields[11] as Token,
       fee: fields[12] as String,
       height: fields[13] as int,
+      mid: fields[14] as String,
       exitCode: fields[6] as num,
     );
   }
@@ -98,7 +99,7 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
   @override
   void write(BinaryWriter writer, CacheMessage obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.from)
       ..writeByte(1)
@@ -126,7 +127,9 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       ..writeByte(12)
       ..write(obj.fee)
       ..writeByte(13)
-      ..write(obj.height);
+      ..write(obj.height)
+      ..writeByte(14)
+      ..write(obj.mid);
   }
 
   @override

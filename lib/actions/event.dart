@@ -7,3 +7,4 @@ class RefreshEvent{
 }
 class WalletChangeEvent{}
 class NetChangeEvent{}
+class ShouldRefreshEvent{}

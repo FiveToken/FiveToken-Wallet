@@ -11,6 +11,7 @@ Future<String> initSharedPreferences() async {
   } else {
     Global.langCode = 'en';
   }
+
   var box = OpenedBox.walletInstance;
   var activeWalletAddr = instance.getString('currentWalletAddress');
   var activeNetwork = instance.getString('activeNetwork');
@@ -20,6 +21,31 @@ Future<String> initSharedPreferences() async {
   } else {
     Global.wcSession = wcSession;
   }
+  // migrate v1.0.0
+  var filList = OpenedBox.addressInsance.values;
+  var keys = OpenedBox.addressInsance.keys;
+  if (filList.isNotEmpty) {
+    var net = Network.filecoinMainNet;
+    for (var wal in filList) {
+      var newWal = ChainWallet(
+          label: wal.label,
+          skKek: wal.skKek,
+          digest: wal.digest,
+          type: wal.mne == '' ? 2 : 1,
+          groupHash: '',
+          mne: wal.mne,
+          addressType: net.addressType,
+          rpc: net.rpc,
+          address: wal.addrWithNet);
+      await box.put(newWal.key, newWal);
+      if (activeWalletAddr == wal.addrWithNet) {
+        activeWalletAddr = newWal.key;
+      }
+    }
+    OpenedBox.addressInsance.deleteAll(keys);
+    $store.setNet(net);
+  }
+
   if (activeNetwork == null) {
     $store.setNet(Network.filecoinMainNet);
   } else {
@@ -30,13 +56,13 @@ Future<String> initSharedPreferences() async {
     } else {
       if (OpenedBox.netInstance.containsKey(activeNetwork)) {
         $store.setNet(OpenedBox.netInstance.get(activeNetwork));
-      }else{
+      } else {
         $store.setNet(Network.filecoinMainNet);
       }
     }
   }
   if (activeWalletAddr != null) {
-    var wal = box.get('$activeWalletAddr\_${$store.net.rpc}');
+    var wal = box.get(activeWalletAddr);
     if (wal == null) {
       initialRoute = initLangPage;
     } else {

@@ -50,11 +50,16 @@ class NetAddPageState extends State<NetAddPage> {
     if (this.loading) {
       return;
     }
-    if (browser != '' && browser[browser.length - 1] == '/') {
-      browser = browser.substring(0, browser.length - 1);
+    if (browser != '') {
+      if (!isValidUrl(browser)) {
+        showCustomError('wrongBrowser'.tr);
+        return;
+      }
+      if (browser[browser.length - 1] == '/') {
+        browser = browser.substring(0, browser.length - 1);
+      }
     }
     this.loading = true;
-
     try {
       showCustomLoading('Loading');
       var id = await client.getNetworkId();
@@ -64,22 +69,34 @@ class NetAddPageState extends State<NetAddPage> {
         showCustomError('errorChainId'.tr);
         return;
       }
+      var walletBox = OpenedBox.walletInstance;
       if (edit && net.rpc != rpc) {
         box.delete(net.rpc);
+        walletBox.values
+            .where((wal) => wal.rpc == net.rpc)
+            .toList()
+            .forEach((wallet) {
+          var wal = wallet.copyWith();
+          wal.rpc = rpc;
+          walletBox.delete(wallet.key);
+          walletBox.put(wal.key, wal);
+        });
       }
-      //add id wallet for new network
-      var wallets = OpenedBox.walletInstance.values
-          .where((wal) => wal.type == 0 && wal.addressType == 'eth')
-          .toList();
-      Map<String, ChainWallet> map = {};
-      for (var wallet in wallets) {
-        map[wallet.groupHash] = wallet;
+      if (!edit) {
+        //add id wallet for new network
+        var wallets = walletBox.values
+            .where((wal) => wal.type == 0 && wal.addressType == 'eth')
+            .toList();
+        Map<String, ChainWallet> map = {};
+        for (var wallet in wallets) {
+          map[wallet.groupHash] = wallet;
+        }
+        map.forEach((key, value) {
+          var wal = value.copyWith();
+          wal.rpc = rpc;
+          walletBox.put(wal.key, wal);
+        });
       }
-      map.forEach((key, value) {
-        var wal = value.copyWith();
-        wal.rpc = rpc;
-        OpenedBox.walletInstance.put(wal.key, wal);
-      });
       box.put(
           rpc,
           Network(
@@ -92,6 +109,7 @@ class NetAddPageState extends State<NetAddPage> {
               coin: symbol));
       Get.back();
     } catch (e) {
+      this.loading = false;
       dismissAllToast();
       showCustomError('invalidRpc'.tr);
     }
@@ -143,8 +161,12 @@ class NetAddPageState extends State<NetAddPage> {
                     color: Colors.white,
                     style: TextStyle(color: Colors.black),
                     onPressed: () {
-                      OpenedBox.netInstance.delete(net.rpc);
-                      Get.back();
+                      showDeleteDialog(context,
+                          title: 'deleteNet'.tr,
+                          content: 'confimrDeleteNet'.tr, onDelete: () {
+                        OpenedBox.netInstance.delete(net.rpc);
+                        Get.back();
+                      });
                     },
                   )),
                   SizedBox(
@@ -176,29 +198,35 @@ class NetAddPageState extends State<NetAddPage> {
               placeholder: 'netName'.tr,
               controller: nameCtrl,
               enabled: !readonly,
+              selectable: readonly,
             ),
             Field(
               label: 'RPC URL',
               placeholder: 'newRpc'.tr,
               controller: rpcCtrl,
+              enabled: !readonly,
+              selectable: readonly,
             ),
             Field(
               label: 'chainId'.tr,
               placeholder: 'chainId'.tr,
               controller: chainCtrl,
               enabled: !readonly,
+              selectable: readonly,
             ),
             Field(
               label: 'symbol'.tr,
               placeholder: 'curNetToken'.tr,
               controller: symbolCtrl,
               enabled: !readonly,
+              selectable: readonly,
             ),
             Field(
               label: 'browser'.tr,
               placeholder: 'browserOptional'.tr,
               controller: browserCtrl,
               enabled: !readonly,
+              selectable: readonly,
             ),
           ],
         ),

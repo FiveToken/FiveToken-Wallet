@@ -31,7 +31,9 @@ class Network {
   String get label {
     return netType == 2 ? name : '$chain$net'.tr;
   }
-
+  String get url{
+    return chain == 'eth' ? (rpc + EthClientID) : rpc;
+  }
   String getDetailLink(String cid) {
     if (addressType == 'eth') {
       return '$browser/tx/$cid';
@@ -48,7 +50,7 @@ class Network {
     }
   }
 
-  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain);
+  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain)||['bnb','eth'].contains(coin.toLowerCase());
   static List<String> get labels =>
       ['mainNet'.tr, 'testNet'.tr, 'customNet'.tr];
   Network(
@@ -64,11 +66,43 @@ class Network {
       this.path = '',
       this.color = '0xffB4B5B7',
       this.coin = ''});
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'chain': chain,
+      'net': net,
+      'netType': netType,
+      'chainId': chainId,
+      'rpc': rpc,
+      'browser': browser,
+      'addressType': addressType,
+      'prefix': prefix,
+      'path': path,
+      'color': color,
+      'coin': coin
+    };
+  }
+
+  Network.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    chain = json['chain'];
+    net = json['net'];
+    netType = json['netType'];
+    chainId = json['chainId'];
+    rpc = json['rpc'];
+    browser = json['browser'];
+    addressType = json['addressType'];
+    prefix = json['prefix'];
+    path = json['path'];
+    color = json['color'];
+    coin = json['coin'];
+  }
+
   static Network get filecoinMainNet => Network(
       chain: 'filecoin',
       net: 'main',
       netType: 0,
-      rpc: 'https://api.filscan.io:8700/rpc/v1',
+      rpc: 'https://api.fivetoken.io',
       coin: 'FIL',
       browser: 'https://filscan.io',
       prefix: 'f',
@@ -79,10 +113,11 @@ class Network {
       chain: 'eth',
       net: 'main',
       netType: 0,
-      rpc: 'https://mainnet.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
+      rpc: 'https://mainnet.infura.io/v3/',
       chainId: '1',
       path: "m/44'/60'/0'/0",
       coin: 'ETH',
+      browser: 'https://etherscan.io',
       color: '0xff29B6AF',
       addressType: 'eth');
   static Network get binanceMainNet => Network(
@@ -91,6 +126,7 @@ class Network {
       netType: 0,
       rpc: 'https://bsc-dataseed1.ninicoin.io',
       coin: 'BNB',
+      browser: 'https://bscscan.com',
       chainId: '56',
       path: "m/44'/60'/0'/0",
       addressType: 'eth');
@@ -100,7 +136,7 @@ class Network {
       net: 'calibration',
       netType: 1,
       path: "m/44'/461'/0'/0",
-      rpc: 'https://calibration.filscan.io:8800/rpc/v1',
+      rpc: 'https://api.calibration.fivetoken.io',
       coin: 'FIL',
       prefix: 't',
       browser: 'https://calibration.filscan.io',
@@ -110,7 +146,7 @@ class Network {
       net: 'kovan',
       netType: 1,
       path: "m/44'/60'/0'/0",
-      rpc: 'https://kovan.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
+      rpc: 'https://kovan.infura.io/v3/',
       coin: 'ETH',
       chainId: '42',
       color: '0xff9064FF',
@@ -121,7 +157,7 @@ class Network {
       net: 'ropsten',
       path: "m/44'/60'/0'/0",
       netType: 1,
-      rpc: 'https://ropsten.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
+      rpc: 'https://ropsten.infura.io/v3/',
       coin: 'ETH',
       chainId: '3',
       color: '0xffFF4A8D',
@@ -134,7 +170,7 @@ class Network {
       chainId: '4',
       path: "m/44'/60'/0'/0",
       color: '0xffF6C343',
-      rpc: 'https://rinkeby.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
+      rpc: 'https://rinkeby.infura.io/v3/',
       coin: 'ETH',
       browser: 'https://rinkeby.etherscan.io',
       addressType: 'eth');
@@ -144,7 +180,7 @@ class Network {
       netType: 1,
       path: "m/44'/60'/0'/0",
       color: '0xff3099f2',
-      rpc: 'https://goerli.infura.io/v3/96837d28a772466ca6ed88eddb221e09',
+      rpc: 'https://goerli.infura.io/v3/',
       coin: 'ETH',
       chainId: '5',
       browser: 'https://goerli.etherscan.io',
@@ -154,8 +190,10 @@ class Network {
       net: 'test',
       netType: 1,
       path: "m/44'/60'/0'/0",
-      rpc: 'https://binancerpc.io',
+      rpc: 'https://data-seed-prebsc-1-s2.binance.org:8545',
       coin: 'BNB',
+      browser: 'https://testnet.bscscan.com',
+      chainId: '97',
       addressType: 'eth');
   static List<Network> get supportNets {
     return [

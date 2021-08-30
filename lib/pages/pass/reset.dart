@@ -53,8 +53,10 @@ class PassResetPageState extends State<PassResetPage> {
       var newP = newCtrl.text.trim();
       var private = await wallet.getPrivateKey(old);
       if (!valid) {
+        this.loading = false;
         return;
       } else {
+        var net = Network.getNetByRpc(wallet.rpc);
         var isId = wallet.type == 0;
         if (isId) {
           var list = OpenedBox.walletInstance.values
@@ -71,11 +73,17 @@ class PassResetPageState extends State<PassResetPage> {
             if (wal.addressType == 'eth') {
               key = await EthWallet.genEncryptKeyByPrivateKey(p, newP);
             } else {
-              key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP);
+              if (wal.rpc == Network.filecoinMainNet.rpc) {
+                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
+                    prefix: 'f');
+              } else {
+                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
+                    prefix: 't');
+              }
             }
             wal.skKek = key.kek;
-            box.put(wal.address, wal);
-            if (same) {
+            box.put(wal.key, wal);
+            if (net.rpc == $store.net.rpc) {
               $store.setWallet(wal);
             }
           }
@@ -84,11 +92,14 @@ class PassResetPageState extends State<PassResetPage> {
           if (wallet.addressType == 'eth') {
             key = await EthWallet.genEncryptKeyByPrivateKey(private, newP);
           } else {
-            key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, newP);
+            key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, newP,
+                prefix: net.prefix);
           }
-          box.put(wallet.address, wallet);
           wallet.skKek = key.kek;
-          $store.setWallet(wallet);
+          box.put(wallet.key, wallet);
+          if (net.rpc == $store.net.rpc) {
+            $store.setWallet(wallet);
+          }
         }
         dismissAllToast();
         this.loading = false;

@@ -4,6 +4,23 @@ import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math';
 
+class FilecoinResponse {
+  int code;
+  dynamic data;
+  String message;
+  String detail;
+  FilecoinResponse({this.code, this.data, this.message, this.detail});
+  FilecoinResponse.fromJson(Map<String, dynamic> map) {
+    code = map['code'];
+    data = map['data'];
+    message = map['message'];
+    detail = map['detail'];
+  }
+  Map<String, dynamic> toJson() {
+    return {'code': code, 'data': data, 'message': message, 'detail': detail};
+  }
+}
+
 abstract class ChainProvider {
   Network net;
   Future<String> getBalance(String addr);
@@ -17,35 +34,37 @@ abstract class ChainProvider {
   Future<ChainGas> getGas({String to, bool isToken = false, Token token});
   Future<int> getNonce();
   ChainGas replaceGas(ChainGas gas, {String chainPremium});
-  Future<ChainMessageDetail> getMessageDetail(String hash);
   void dispose();
 }
 
 class FilecoinProvider extends ChainProvider {
   Network net;
   Dio client;
+  static String balancePath = '/actor/balance';
+  static String pushPath = '/message';
+  static String messageListPath = '/actor/messages';
+  static String feePath = '/recommend/fee';
+  static String clientId = ClientID;
+
   FilecoinProvider(Network net) {
     this.net = net;
     client = Dio();
-    client.options.baseUrl = net.rpc;
+    client.options.baseUrl = net.rpc + '/api$clientId';
     client.options.receiveTimeout = 20000;
   }
   @override
   Future<String> getBalance(String addr) async {
-    var data = JsonRPCRequest(1, 'filscan.BalanceNonceByAddress', [
-      {'address': addr}
-    ]);
     var balance = '0';
     try {
-      var res = await client.post('', data: data);
-      var response = JsonRPCResponse.fromJson(res.data);
-      if (response.error != null) {
-        var error = JsonRPCError.fromJson(response.error);
-        print(error.message);
-      }
-      if (response.result != null) {
-        var result = response.result as Map<String, dynamic>;
-        balance = result['balance'];
+      var res = await client.get(balancePath, queryParameters: {'actor': addr});
+      var response = FilecoinResponse.fromJson(res.data);
+      if (response.code != 200) {
+        print(response.detail);
+      } else {
+        if (response.data is Map<String, dynamic>) {
+          Map<String, dynamic> data = response.data;
+          balance = data['balance'];
+        }
       }
     } on DioError catch (e) {
       if (e.type == DioErrorType.RECEIVE_TIMEOUT) {
@@ -88,34 +107,77 @@ class FilecoinProvider extends ChainProvider {
         sign = await Bls.cksign(num: "$private $cid");
       }
       var sm = SignedMessage(msg, Signature(signType, sign));
-      print(sm.toLotusSignedMessage());
-      
-      String res = await pushSignedMsg(sm.toLotusSignedMessage());
+      print(cid);
+      print(jsonEncode(sm.toLotusSignedMessage()));
+      String res = '';
+      var result = await client.post(pushPath,
+          data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())});
+      var response = FilecoinResponse.fromJson(result.data);
+      if (response.code != 200) {
+        print(response.detail);
+      } else {
+        if (response.data is String && response.data != '') {
+          res = response.data;
+        }
+      }
       return res;
     } catch (e) {
+      print(e);
       return '';
     }
   }
 
+  Future<List<Map<String, dynamic>>> getFilecoinMessageList(
+      {String actor = '',
+      String direction = 'down',
+      String mid = '',
+      int limit = 10}) async {
+    List<Map<String, dynamic>> list = [];
+    var res = await client.get(messageListPath, queryParameters: {
+      'actor': actor,
+      'direction': direction,
+      'mid': mid,
+      'limit': limit
+    });
+    var response = FilecoinResponse.fromJson(res.data);
+    if (response.code != 200) {
+      print(response.detail);
+    } else {
+      if (response.data != null &&
+          response.data is Map &&
+          response.data['messages'] is List) {
+        list = (response.data['messages'] as List)
+            .map((mes) => mes as Map<String, dynamic>)
+            .toList();
+      }
+    }
+    return list;
+  }
+
   @override
   Future<int> getNonce() async {
-    var data = JsonRPCRequest(1, "filscan.BalanceNonceByAddress", [
-      {"address": $store.wal.addr},
-    ]);
-    var rs = await client.post(
-      "",
-      data: data,
-    );
-    if (rs == null) {
-      return -1;
+    var nonce = -1;
+    var addr = $store.wal.addr;
+    try {
+      var res = await client.get(balancePath, queryParameters: {'actor': addr});
+
+      var response = FilecoinResponse.fromJson(res.data);
+      if (response.code != 200) {
+        print(response.detail);
+      } else {
+        if (response.data is Map<String, dynamic>) {
+          Map<String, dynamic> data = response.data;
+          nonce = data['nonce'];
+        }
+      }
+    } on DioError catch (e) {
+      if (e.type == DioErrorType.RECEIVE_TIMEOUT) {
+        print('timeout');
+      }
+    } catch (e) {
+      print(e);
     }
-    var res = JsonRPCResponse.fromJson(rs.data);
-    var r = -1;
-    if (res.result != null) {
-      var result = res.result as Map<String, dynamic>;
-      r = result["nonce"];
-    }
-    return r == null ? -1 : r;
+    return nonce;
   }
 
   @override
@@ -136,71 +198,29 @@ class FilecoinProvider extends ChainProvider {
     if (to == null || to == '') {
       to = $store.net.prefix + '099';
     }
-    var data = JsonRPCRequest(1, "filscan.BaseFeeAndGas", [to, 0]);
     var empty = ChainGas();
     var result = await client
-        .post(
-      "",
-      data: data,
-    )
-        .catchError((e) {
-      print(e);
-    });
-    var response = JsonRPCResponse.fromJson(result.data);
-
-    if (response.error != null) {
+        .get(feePath, queryParameters: {'method': 'Send', 'actor': to});
+    var response = FilecoinResponse.fromJson(result.data);
+    if (response.code != 200) {
       return empty;
     }
-    var res = response.result;
+    var res = response.data;
     if (res != null) {
-      var baseFee = res['base_fee'] ?? '0';
-      //var gasUsed = res['gas_used'] ?? '0';
       var limit = res['gas_limit'] ?? '0';
       var premium = res['gas_premium'] ?? '100000';
-      // var exist = res['actor_exist'] ?? true;
+      var feeCap = res['gas_cap'] ?? '0';
       try {
-        var baseFeeNum = int.parse(baseFee);
-        var limitNum = int.parse(limit);
-        var premiumNum = int.parse(premium);
-        var feeCap = 3 * baseFeeNum + premiumNum;
-        //var gasLimit = (1.25 * gasUsedNum).truncate();
-        // if (!exist) {
-        //   limitNum = 2200000;
-        // }
+        var limitNum = limit;
+        var premiumNum = int.tryParse(premium) ?? 0;
+        var feeCapNum = int.tryParse(feeCap) ?? 0;
         return ChainGas(
-            gasPrice: feeCap.toString(),
+            gasPrice: feeCapNum.toString(),
             gasPremium: premiumNum.toString(),
             gasLimit: limitNum);
       } catch (e) {
         return empty;
       }
-    } else {
-      return empty;
-    }
-  }
-
-  @override
-  Future<ChainMessageDetail> getMessageDetail(String hash) async {
-    var data = JsonRPCRequest(1, "filscan.MessageDetails", [hash]);
-    var result = await client.post(
-      "/rpc/v1",
-      data: data,
-    );
-    var empty = ChainMessageDetail();
-    var response = JsonRPCResponse.fromJson(result.data);
-    if (response.error != null) {
-      return empty;
-    }
-    var res = response.result;
-    if (res != null) {
-      var message = ChainMessageDetail(
-          from: res['from'],
-          to: res['to'],
-          hash: res['signed_cid'],
-          fee: res['all_gas_fee'],
-          value: res['value'],
-          height: res['height']);
-      return message;
     } else {
       return empty;
     }
@@ -215,7 +235,7 @@ class EthProvider extends ChainProvider {
   Web3Client client;
   EthProvider(Network net) {
     this.net = net;
-    client = Web3Client(net.rpc, http.Client());
+    client = Web3Client(net.url, http.Client());
   }
   @override
   Future<String> getBalance(String addr) async {
@@ -311,17 +331,16 @@ class EthProvider extends ChainProvider {
       if (token != null) {
         var abi = ContractAbi.fromJson(Contract.abi, '');
         var con = DeployedContract(abi, EthereumAddress.fromHex(token.address));
-        var data = con.function('transfer').encodeCall([
-          EthereumAddress.fromHex(to),
-          BigInt.from(100*pow(10, token.precision))
-        ]);
+        var data = con
+            .function('transfer')
+            .encodeCall([EthereumAddress.fromHex(to), BigInt.from(1)]);
         res = await Future.wait([
           client.getGasPrice(),
           client.estimateGas(
               to: EthereumAddress.fromHex(token.address),
               sender: toAddr,
               data: data,
-              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
+              value: EtherAmount.fromUnitAndValue(EtherUnit.wei, 0))
         ]);
       } else {
         res = await Future.wait([
@@ -347,20 +366,6 @@ class EthProvider extends ChainProvider {
     } catch (e) {
       print(e);
       return empty;
-    }
-  }
-
-  @override
-  Future<ChainMessageDetail> getMessageDetail(String hash) async {
-    try {
-      var res = await client.getTransactionReceipt(hash);
-      return ChainMessageDetail(
-          from: res.from.toString(),
-          to: res.to.toString(),
-          height: res.blockNumber.blockNum,
-          hash: hash);
-    } catch (e) {
-      return ChainMessageDetail();
     }
   }
 

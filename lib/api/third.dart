@@ -1,11 +1,5 @@
 import 'package:fil/index.dart';
 
-var apiMap = <String, String>{
-  "dev": "http://192.168.19.56:9999",
-  "test": "http://192.168.1.207:9999",
-  "pro": "http://8.209.219.115:8090"
-};
-var mode = 'pro';
 Future<CoinPrice> getFilPrice(String chain) async {
   try {
     Map<String, String> coinMap = {
@@ -13,7 +7,7 @@ Future<CoinPrice> getFilPrice(String chain) async {
       'eth': 'ethereum',
       'binance': 'binancecoin'
     };
-    var url = apiMap[mode];
+    var url = "http://8.209.219.115:8090";
     var coin=coinMap[chain];
     var response = await Dio().get('$url/third/priceByType?coin=$coin');
     print(response);

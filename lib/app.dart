@@ -29,7 +29,6 @@ class AppState extends State<App> with WidgetsBindingObserver  {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     initDevice();
-    initRequest();
     nextTick(() => initUniLinks());
   }
 

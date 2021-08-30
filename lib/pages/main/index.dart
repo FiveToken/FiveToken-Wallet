@@ -29,7 +29,7 @@ class MainPageState extends State<MainPage> {
   WCSession connectedSession;
   WCMeta meta;
   Box<Nonce> nonceBoxInstance = OpenedBox.nonceInsance;
-  final Web3Client client = Web3Client($store.net.rpc, Client());
+  final Web3Client client = Web3Client($store.net.url, Client());
   ChainProvider provider;
   Worker worker;
 
@@ -41,7 +41,7 @@ class MainPageState extends State<MainPage> {
     // if (Get.arguments != null && Get.arguments['create'] != null) {
     //   isCreate = Get.arguments['create'] as bool;
     // }
-    var show = $store.wal.label == 'FIL';
+    var show = $store.wal.label == DefaultWalletName;
     if (show) {
       showChangeNameDialog();
     }
@@ -56,7 +56,6 @@ class MainPageState extends State<MainPage> {
       print('wallet change');
       getBalance();
     });
-    
   }
 
   @override
@@ -68,7 +67,7 @@ class MainPageState extends State<MainPage> {
   List<JsonRpc Function(WCSession, JsonRpc)> genCallback(String type) {
     var callback = (WCSession session, JsonRpc rpc) {
       if ($store.net.addressType != type) {
-        showCustomError('网络类型错误');
+        showCustomError('wrongNet'.tr);
         session.sendResponse(rpc.id, '$type\_sendTransaction',
             error: {'message': 'Reject'});
       }
@@ -116,55 +115,6 @@ class MainPageState extends State<MainPage> {
             this.connectedSession = null;
             this.meta = null;
           });
-        }
-        return rpc;
-      }
-    ];
-  }
-
-  List<JsonRpc Function(WCSession, JsonRpc)> get signMessageCallback {
-    return [
-      (WCSession session, JsonRpc rpc) {
-        var params = rpc.params;
-        if (params != null && params is List && params.isNotEmpty) {
-          try {
-            var p = params[0] as Map<String, dynamic>;
-            var msg = TMessage.fromJson(p);
-            if (msg.valid) {
-              var maxFee = getMaxFee(
-                  ChainGas(gasPrice: msg.gasFeeCap, gasLimit: msg.gasLimit));
-              showCustomModalBottomSheet(
-                  shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
-                  context: context,
-                  builder: (BuildContext context) {
-                    return ConfirmMessageSheet(
-                      address: msg.from,
-                      to: msg.to,
-                      value: msg.value,
-                      session: session,
-                      rpc: rpc,
-                      maxFee: maxFee,
-                      onApprove: () {
-                        showPassDialog(context, (String pass) async {
-                          var wal = $store.wal;
-                          var ck =
-                              await getPrivateKey(wal.address, pass, wal.skKek);
-                          signMessage(msg, ck: ck, session: session, rpc: rpc);
-                        });
-                      },
-                      onReject: () {
-                        session.sendResponse(rpc.id, 'fil_signMessage',
-                            error: {'message': 'Reject'});
-                      },
-                    );
-                  });
-              //(context: null, builder: null);
-            } else {
-              showCustomError('errorParams'.tr);
-            }
-          } catch (e) {
-            showCustomError(e.toString());
-          }
         }
         return rpc;
       }
@@ -281,7 +231,7 @@ class MainPageState extends State<MainPage> {
   void handleScan() async {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((value) async {
-      if (value != null && isValidAddress(value)) {
+      if (value != null && isValidChainAddress(value, $store.net)) {
         Get.toNamed(filTransferPage, arguments: {'to': value});
       } else if (getValidWCLink(value) != '') {
         connectWallet(value);
@@ -544,7 +494,7 @@ class MainPageState extends State<MainPage> {
     var wal = $store.wal;
     provider = initProvider();
     var res = await provider.getBalance(wal.addr);
-    if (res != wal.balance) {
+    if (res != wal.balance && res != '0') {
       $store.changeWalletBalance(res);
       wal.balance = res;
       OpenedBox.walletInstance.put(wal.key, wal);
@@ -614,8 +564,8 @@ class MainPageState extends State<MainPage> {
                     padding: EdgeInsets.only(right: 10),
                   )
                 ],
-                backgroundColor: Color(FColorWhite),
-                elevation: NavElevation,
+                backgroundColor: Colors.white,
+                elevation: .5,
                 leading: Builder(
                   builder: (BuildContext context) {
                     return IconButton(

@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:math';
 
-import 'package:web3dart/web3dart.dart';
-
 class FilTransferNewPage extends StatefulWidget {
   @override
   State createState() => FilTransferNewPageState();
@@ -333,9 +331,12 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var balanceNum =
         BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
     var fee = $store.gas.feeNum;
-    var amountNum = BigInt.from(
-        (double.tryParse(trimAmount) * pow(10, isToken ? token.precision : 18))
-            .truncate());
+    var amountNum = BigInt.from((double.tryParse(trimAmount) *
+        pow(10, isToken ? token.precision : 18)));
+    if (fee > BigInt.tryParse($store.wal.balance) ?? BigInt.zero) {
+      showCustomError('errorLowBalance'.tr);
+      return false;
+    }
     if (isToken) {
       if (amountNum > balanceNum) {
         showCustomError('errorLowBalance'.tr);
@@ -350,27 +351,11 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     return true;
   }
 
-  String get formatBalance {
-    if ($store.net.addressType == 'eth') {
-      return EtherAmount.fromUnitAndValue(EtherUnit.wei, balance)
-              .getValueInUnit(EtherUnit.ether)
-              .toString() +
-          ' ' +
-          $store.net.coin;
-    } else {
-      return formatFIL(BigInt.parse(balance).toString());
-    }
-  }
-
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Address})
         .then((scanResult) {
       if (scanResult != '') {
-        if (isValidAddress(scanResult)) {
-          addressCtrl.text = scanResult;
-        } else {
-          showCustomError('errorAddr'.tr);
-        }
+        addressCtrl.text = scanResult;
       }
     });
   }
@@ -463,11 +448,16 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                 ),
                 onTap: () {
                   Get.toNamed(addressSelectPage).then((value) {
+                    var addr = '';
                     if (value is ContactAddress) {
-                      addressCtrl.text = value.address;
+                      addr = value.address;
                     } else if (value is ChainWallet) {
-                      addressCtrl.text = value.addr;
+                      addr = value.addr;
                     }
+                    if (addr.length > 0 && isValidChainAddress(addr, net)) {
+                      getGas(addr);
+                    }
+                    addressCtrl.text = addr;
                   });
                 },
               ),

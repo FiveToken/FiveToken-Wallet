@@ -36,12 +36,12 @@ class CommonScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor:
-            this.background ?? (grey ? Color(0xfff8f8f8) : Color(FColorWhite)),
+            this.background ?? (grey ? Color(0xfff8f8f8) : Colors.white),
         resizeToAvoidBottomInset: resizeToAvoidBottomInset,
         appBar: PreferredSize(
           child: AppBar(
             backgroundColor:
-                barColor ?? (grey ? Color(0xfff8f8f8) : Color(FColorWhite)),
+                barColor ?? (grey ? Color(0xfff8f8f8) : Colors.white),
             elevation: 0,
             title: CommonText(
               title,
