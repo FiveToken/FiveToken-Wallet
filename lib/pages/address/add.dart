@@ -1,5 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
+
 /// add address to local db or edit a address that was exist
 class AddressBookAddPage extends StatefulWidget {
   @override
@@ -138,7 +139,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((scanResult) {
       if (scanResult != '') {
-        if (isValidChainAddress(scanResult,net)) {
+        if (isValidChainAddress(scanResult, net)) {
           addrCtrl.text = scanResult;
         } else {
           showCustomError('wrongAddr'.tr);

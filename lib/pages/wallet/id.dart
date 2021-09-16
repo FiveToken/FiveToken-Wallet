@@ -51,8 +51,7 @@ class IdWalletPageState extends State<IdWalletPage> {
                       children: List.generate(nets.length, (i) {
                         var net = nets[i];
                         var wal = currentMneWallets
-                            .where((wallet) =>
-                                wallet.rpc == net.rpc)
+                            .where((wallet) => wallet.rpc == net.rpc)
                             .toList()[0];
                         var addr = wal.addr;
                         return GestureDetector(

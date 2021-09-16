@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fil/index.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
 class WebviewPage extends StatefulWidget {
   @override
   State createState() => WebviewPageState();
@@ -63,7 +64,9 @@ class WebviewPageState extends State<WebviewPage> {
               icon: IconNavBack,
               alignment: NavLeadingAlign,
             ),
-            title: Text(title,),
+            title: Text(
+              title,
+            ),
             centerTitle: true,
           ),
           preferredSize: Size.fromHeight(NavHeight),

@@ -1,5 +1,6 @@
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
+
 class MneCheckPage extends StatefulWidget {
   @override
   State createState() => MneCheckPageState();
@@ -33,6 +34,7 @@ class MneCheckPageState extends State<MneCheckPage> {
   String get mneCk {
     return genCKBase64(mne);
   }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(

@@ -1,6 +1,7 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
+
 /// rename,export mne,export private key, reset pass
 class WalletManagePage extends StatefulWidget {
   @override

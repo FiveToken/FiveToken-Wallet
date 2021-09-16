@@ -28,6 +28,7 @@ String aesDecrypt(String raw, String mix) {
   var decoded = encrypter.decrypt(encrypted, iv: encrypt.IV.fromLength(16));
   return decoded;
 }
+
 /// use aes algorithm to encrypt a string
 String aesEncrypt(String raw, String mix) {
   if (raw == '') {
@@ -40,6 +41,7 @@ String aesEncrypt(String raw, String mix) {
   var encoded = encrypter.encrypt(raw, iv: encrypt.IV.fromLength(16));
   return encoded.base64;
 }
+
 /// generate the digest of the given string
 String tokenify(String str, {String salt = psalt}) {
   var key = utf8.encode(salt);
@@ -49,10 +51,12 @@ String tokenify(String str, {String salt = psalt}) {
   var digest = hmacSha.convert(bytes);
   return digest.toString();
 }
+
 /// hide keyboard
 void unFocusOf(BuildContext context) {
   FocusScope.of(context).requestFocus(FocusNode());
 }
+
 /// set  data of clipboard to the given [text] then call the [callback]
 void copyText(String text, {Function callback}) {
   var data = ClipboardData(text: text);
@@ -62,6 +66,7 @@ void copyText(String text, {Function callback}) {
     }
   });
 }
+
 /// convert a long string to short
 String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
   int strLen = str.length;
@@ -77,6 +82,7 @@ String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
 
   return "$headStr...$tailStr";
 }
+
 /// convert a big float number in exponential form to int string
 String parseE(String str) {
   final isE = RegExp(r"[eE][+-]\d+$");
@@ -184,6 +190,7 @@ String hex2str(String hexString) {
 String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
+
 String formatCoin(String amount,
     {num size = 4, bool fixed = false, Network net}) {
   net = net ?? $store.net;
@@ -224,10 +231,9 @@ String getChainValue(String fil, {int precision = 18}) {
     return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
   }
   return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, precision-9)))
+          BigInt.from(pow(10, precision - 9)))
       .toString();
 }
-
 
 int getSecondSinceEpoch() {
   return (DateTime.now().millisecondsSinceEpoch / 1000).truncate();
@@ -249,6 +255,7 @@ String formatDouble(String str, {bool truncate = false, int size = 4}) {
     return '0';
   }
 }
+
 /// convert a base64 encode private key to hex encode private key. [type] represent different algorithm
 String base64ToHex(String pk, String type) {
   String t = type == '1' ? 'secp256k1' : 'bls';
@@ -280,6 +287,7 @@ bool isValidPassword(String pass) {
   var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
   return reg.hasMatch(pass);
 }
+
 bool isValidUrl(String url) {
   final urlRegExp = new RegExp(
       r"^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$");
@@ -313,7 +321,6 @@ String getValidWCLink(String link) {
     }
   }
 }
-
 
 String trParams(String tr, [Map<String, String> params = const {}]) {
   var trans = tr;

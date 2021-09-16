@@ -1,6 +1,7 @@
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
-/// select a address when transfer 
+
+/// select a address when transfer
 class AddressBookSelectPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -55,8 +56,8 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
                 Image(width: 18, image: AssetImage('icons/right-w.png'))
               ]),
               onTap: () {
-                Get.toNamed(addressWalletPage).then((value){
-                  if(value is ChainWallet){
+                Get.toNamed(addressWalletPage).then((value) {
+                  if (value is ChainWallet) {
                     Get.back(result: value);
                   }
                 });

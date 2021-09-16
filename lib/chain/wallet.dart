@@ -33,8 +33,7 @@ class ChainWallet {
   String get key => '$address\_$rpc\_$type';
   String get formatBalance => formatCoin(balance);
   ChainWallet(
-      {
-      this.label = '',
+      {this.label = '',
       this.address = '',
       this.type = 0,
       this.balance = '0',
@@ -168,8 +167,8 @@ class FilecoinWallet extends ChainWallet {
       {String type = SignSecp, String prefix = 'f'}) async {
     try {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
-      var filAddr =
-          await FilecoinWallet.genAddrByPrivateKey(privateKey, type: type,prefix: prefix);
+      var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
+          type: type, prefix: prefix);
       var filkek = await genKek(filAddr, pass);
       var filPkList = base64Decode(privateKey);
       var filSkKek = xor(filkek, filPkList);

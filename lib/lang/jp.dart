@@ -115,7 +115,7 @@ const Map<String, String> JP_LANG = {
   "fail": "失敗",
   "finish": "完成",
   "noData": "当面、あなたのトランザクション記録がございません！",
-  'noActivity':'当面、あなたのトランザクション記録がございません！',
+  'noActivity': '当面、あなたのトランザクション記録がございません！',
   "pkExport": "秘密鍵エクスポート",
   "mneExport": "ニーモニック語エクスポート",
   "manageWallet": "ウォレット管理",
@@ -146,11 +146,11 @@ const Map<String, String> JP_LANG = {
   'hasPending': '未確認の取引がございますが、新規送金を続きますか？',
   'speedup': '未確認の取引を速めます',
   'continueNew': '新規取引を続きます',
-  'connecting':'接続中',
-  'connect':'接続',
-  'approve':'承認する',
-  'disConnect':'接続を切断',
-  'reject':'拒否',
+  'connecting': '接続中',
+  'connect': '接続',
+  'approve': '承認する',
+  'disConnect': '接続を切断',
+  'reject': '拒否',
   "errorExist": "当該ウォレットアドレスはすでに存在しています",
   "errorNet": "現在のネットワークに変動があります。正しく接続しているかチェックしてください",
   "errorSetGas": "手数料取得に失敗しました。ネットワーク状況をチェックしてください",
@@ -158,7 +158,7 @@ const Map<String, String> JP_LANG = {
   "errorLowBalance": "残高不足",
   "errorAddr": "アドレスフォーマットは間違っています。受信アドレスが正しいかをチェックしてください",
   "errorFromAsTo": "送信アドレスは受信アドレスと同じものであってはなりません",
-  'errorParams':'パラメータエラー',
+  'errorParams': 'パラメータエラー',
   "next": "次へ",
   'filecoinmain': 'Filecoin メインネット',
   'ethmain': 'ETH メインネット',
@@ -169,9 +169,9 @@ const Map<String, String> JP_LANG = {
   'ethrinkeby': 'Rinkeby テストネット',
   'ethgoerli': 'Goerli テストネット',
   'binancetest': 'BSC テストネット',
-
   "addAddrBook": "アドレスブック追加",
-  "netNotMatch": "現在、@currentNetにあるが、追加する当該アドレスは@newNetの下のあるので、@newNetに切り替えてから見られますが、続けますか",
+  "netNotMatch":
+      "現在、@currentNetにあるが、追加する当該アドレスは@newNetの下のあるので、@newNetに切り替えてから見られますが、続けますか",
   "showCurrentAddr": "現在のネットワークにおけるアドレスブックを表示する",
   "selectAddrNet": "アドレスブックのネットワークを選ぶ",
   "mainNet": "メインネット",
@@ -218,8 +218,7 @@ const Map<String, String> JP_LANG = {
   "deleteIdWallet": "IDウォレットを削除しますか",
   "confirmDeleteId": "IDウォレット削除成功",
   "noMore": "これ以上記録なし",
-
-  'wrongNet':'ネットワークタイプエラー',
-  'wrongBrowser':'ブラウザURLフォーマットエラー',
-  'confimrDeleteNet':'ネットワークの削除を確認しますか？'
+  'wrongNet': 'ネットワークタイプエラー',
+  'wrongBrowser': 'ブラウザURLフォーマットエラー',
+  'confimrDeleteNet': 'ネットワークの削除を確認しますか？'
 };

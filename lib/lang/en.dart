@@ -72,7 +72,7 @@ const Map<String, String> EN_LANG = {
   "createSucc": "Create successfully",
   "lang": "Language",
   "service": "Privacy Policy",
-  'clause':'Terms of Service',
+  'clause': 'Terms of Service',
   "version": "Version No.",
   "pass": "Payment password",
   "setPass": "Set payment password",
@@ -154,11 +154,11 @@ const Map<String, String> EN_LANG = {
       'There is unconfirmed transaction. Do you want to continue to transfer?',
   'speedup': 'Speed up unconfirmed transactions',
   'continueNew': 'Continue to send the new transaction',
-  'connecting':'Connecting',
-  'connect':'Connect',
-  'disConnect':'DisConnect',
-  'approve':'Approve',
-  'reject':'Reject',
+  'connecting': 'Connecting',
+  'connect': 'Connect',
+  'disConnect': 'DisConnect',
+  'approve': 'Approve',
+  'reject': 'Reject',
   "errorExist": "Wallet address already exists",
   "errorNet":
       "The current network is unstable, please check that the connection is coorect",
@@ -168,7 +168,7 @@ const Map<String, String> EN_LANG = {
   "errorAddr":
       "Address format error, please check that receiving address is correct",
   "errorFromAsTo": "Sending address cannot be the same as receiving address",
-  'errorParams':'Wrong Parameter',
+  'errorParams': 'Wrong Parameter',
   "next": "Next",
   'filecoinmain': 'Filecoin Mainnet',
   'ethmain': 'ETH Mainnet',
@@ -179,9 +179,9 @@ const Map<String, String> EN_LANG = {
   'ethrinkeby': 'Rinkeby Testnet',
   'ethgoerli': 'Goerli Testnet',
   'binancetest': 'BSC Testnet',
-
   "addAddrBook": "Add address book",
-  "netNotMatch": "You are currently under @currentNet, and the address you added is under @newNet. After adding, you need to switch to @newNet to check whether to continue adding",
+  "netNotMatch":
+      "You are currently under @currentNet, and the address you added is under @newNet. After adding, you need to switch to @newNet to check whether to continue adding",
   "showCurrentAddr": "Display the address book under the current network",
   "selectAddrNet": "Select the network of your address book",
   "mainNet": "Mainnet",
@@ -194,7 +194,8 @@ const Map<String, String> EN_LANG = {
   "enterNet": "Please enter the network name",
   "enterRpc": "Please enter the RPC address",
   "enterTokenName": "Please enter the token name",
-  "netExist": "The current network has been added, so please do not add it repeatedly",
+  "netExist":
+      "The current network has been added, so please do not add it repeatedly",
   "errorChainId": "Error in Chain ID",
   "invalidRpc": "Invalid RPC URL",
   "editNet": "Edit network",
@@ -228,7 +229,7 @@ const Map<String, String> EN_LANG = {
   "deleteIdWallet": "Are you sure you want to delete the identity wallet?",
   "confirmDeleteId": "Confirmed to delete the identity wallet",
   "noMore": "No more records",
-  'wrongNet':'Wrong net type',
-  'wrongBrowser':'Wrong browser url',
-  'confimrDeleteNet':'Confirm to delete this network?'
+  'wrongNet': 'Wrong net type',
+  'wrongBrowser': 'Wrong browser url',
+  'confimrDeleteNet': 'Confirm to delete this network?'
 };

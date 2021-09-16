@@ -1,5 +1,6 @@
 import 'package:fil/index.dart';
 part 'address.g.dart';
+
 @HiveType(typeId: 10)
 class ContactAddress {
   @HiveField(0)
@@ -9,5 +10,5 @@ class ContactAddress {
   @HiveField(2)
   String rpc;
   ContactAddress({this.label = '', this.address = '', this.rpc = ''});
-  String get key=>'$address\_$rpc';
+  String get key => '$address\_$rpc';
 }

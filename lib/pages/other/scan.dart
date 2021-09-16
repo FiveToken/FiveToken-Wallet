@@ -3,6 +3,7 @@ import 'package:scan/scan.dart';
 import 'package:image_picker/image_picker.dart';
 
 enum ScanScene { Address, PrivateKey, Mne, Connect }
+
 /// scan qrcode
 class ScanPage extends StatefulWidget {
   @override

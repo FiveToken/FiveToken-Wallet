@@ -41,10 +41,13 @@ class _MyAppState extends State<MyApp> {
       """;
     cid = await Flotus.messageCid(msg: msg);
 
-    var prk = await Flotus.secpPrivateToPublic(ck: "67WMRDA2ldmfcQ87DSHCy+ppKs3iSyNjxfBD7dR68Qw=");
-    var sig = await Flotus.secpSign(ck: "67WMRDA2ldmfcQ87DSHCy+ppKs3iSyNjxfBD7dR68Qw=", msg: "AXGg5AIgA7aUiB+WKlJZi77CrBo4OgwytRmXbBXj8ratzAtshGM=");
+    var prk = await Flotus.secpPrivateToPublic(
+        ck: "67WMRDA2ldmfcQ87DSHCy+ppKs3iSyNjxfBD7dR68Qw=");
+    var sig = await Flotus.secpSign(
+        ck: "67WMRDA2ldmfcQ87DSHCy+ppKs3iSyNjxfBD7dR68Qw=",
+        msg: "AXGg5AIgA7aUiB+WKlJZi77CrBo4OgwytRmXbBXj8ratzAtshGM=");
     platformVersion = "$addr -- $cid : \n$prk \n $sig";
-    
+
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.

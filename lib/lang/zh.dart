@@ -218,7 +218,7 @@ const Map<String, String> ZH_LANG = {
   'deleteIdWallet': '您是否确认要删除该身份钱包',
   'confirmDeleteId': '已确认移除该身份钱包',
   'noMore': '没有更多记录',
-  'wrongNet':'网络类型错误',
-  'wrongBrowser':'浏览器URL格式错误',
-  'confimrDeleteNet':'确认删除该网络？'
+  'wrongNet': '网络类型错误',
+  'wrongBrowser': '浏览器URL格式错误',
+  'confimrDeleteNet': '确认删除该网络？'
 };
