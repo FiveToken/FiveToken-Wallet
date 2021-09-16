@@ -22,7 +22,7 @@ class App extends StatefulWidget {
   }
 }
 
-class AppState extends State<App> with WidgetsBindingObserver  {
+class AppState extends State<App> with WidgetsBindingObserver {
   StreamSubscription _sub;
   @override
   void initState() {
@@ -44,7 +44,8 @@ class AppState extends State<App> with WidgetsBindingObserver  {
       void checkAndGo(String link) {
         var l = getValidWCLink(link);
         if (l != '') {
-          Get.offAll(MainPage(),transition: Transition.fadeIn,arguments: {'url': l});
+          Get.offAll(MainPage(),
+              transition: Transition.fadeIn, arguments: {'url': l});
         }
       }
 
@@ -78,13 +79,15 @@ class AppState extends State<App> with WidgetsBindingObserver  {
       }
     });
   }
-@override
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState appLifecycleState) {
     super.didChangeAppLifecycleState(appLifecycleState);
     if (appLifecycleState == AppLifecycleState.resumed) {
       Global.eventBus.fire(AppStateChangeEvent());
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return OKToast(

@@ -30,4 +30,3 @@ class CacheGas {
   num gasLimit;
   CacheGas({this.feeCap, this.premium, this.cid, this.gasLimit});
 }
-

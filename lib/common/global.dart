@@ -11,7 +11,7 @@ const SignBls = "bls";
 const SignTypeBls = 2;
 const SignTypeSecp = 1;
 const String NetPrefix = 'f';
-const String DefaultWalletName='ID-Wallet ';
+const String DefaultWalletName = 'ID-Wallet ';
 
 class Global {
   static String version = "v1.2.0";

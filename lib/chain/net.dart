@@ -31,9 +31,11 @@ class Network {
   String get label {
     return netType == 2 ? name : '$chain$net'.tr;
   }
-  String get url{
+
+  String get url {
     return chain == 'eth' ? (rpc + EthClientID) : rpc;
   }
+
   String getDetailLink(String cid) {
     if (addressType == 'eth') {
       return '$browser/tx/$cid';
@@ -50,7 +52,9 @@ class Network {
     }
   }
 
-  bool get hasPrice => ['filecoin', 'eth', 'binance'].contains(chain)||['bnb','eth'].contains(coin.toLowerCase());
+  bool get hasPrice =>
+      ['filecoin', 'eth', 'binance'].contains(chain) ||
+      ['bnb', 'eth'].contains(coin.toLowerCase());
   static List<String> get labels =>
       ['mainNet'.tr, 'testNet'.tr, 'customNet'.tr];
   Network(

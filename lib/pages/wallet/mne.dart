@@ -1,5 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
 /// display mne of the wallet
 class WalletMnePage extends StatefulWidget {
   @override

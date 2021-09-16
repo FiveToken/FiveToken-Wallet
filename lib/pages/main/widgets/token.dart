@@ -59,7 +59,7 @@ class TokenWidgetState extends State<TokenWidget> {
         var t = widget.token;
         if (numStr is BigInt && numStr.toString() != t.balance) {
           t.balance = numStr.toString();
-          OpenedBox.tokenInstance.put(t.address+t.rpc, t);
+          OpenedBox.tokenInstance.put(t.address + t.rpc, t);
         }
         if (mounted) {
           setState(() {});

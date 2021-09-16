@@ -9,8 +9,8 @@ List<GetPage> getCreateRoutes() {
   var importPrivate =
       GetPage(name: importPrivateKeyPage, page: () => ImportPrivateKeyPage());
   var importMne = GetPage(name: importMnePage, page: () => ImportMnePage());
-  var warn=GetPage(name: createWarnPage, page: ()=>CreateWarnPage());
-  var import=GetPage(name: importIndexPage, page: ()=>ImportIndexPage());
+  var warn = GetPage(name: createWarnPage, page: () => CreateWarnPage());
+  var import = GetPage(name: importIndexPage, page: () => ImportIndexPage());
   list
     ..add(mne)
     ..add(mneCheck)

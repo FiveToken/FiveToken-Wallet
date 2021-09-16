@@ -3,10 +3,8 @@ export './create/importPrivateKey.dart';
 export './create/importMne.dart';
 export './create/mneCreate.dart';
 
-
 export 'transfer/detail.dart';
 export 'transfer/gas.dart';
-
 
 export './other/scan.dart';
 export './other/webview.dart';

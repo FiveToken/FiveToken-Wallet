@@ -1,5 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
+
 class FilDetailPage extends StatefulWidget {
   @override
   State createState() => FilDetailPageState();
@@ -51,7 +52,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: formatCoin(mes.fee,size: 5),
+                  value: formatCoin(mes.fee, size: 5),
                 ))),
             SizedBox(
               height: 7,
@@ -84,28 +85,28 @@ class FilDetailPageState extends State<FilDetailPage> {
                   ),
                 ),
                 Visibility(
-                  visible: $store.net.browser!='',
+                    visible: $store.net.browser != '',
                     child: GestureDetector(
-                  onTap: () {
-                    goBrowser(mes);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    height: 48,
-                    child: CommonText(
-                      'more'.tr,
-                      size: 14,
-                      weight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                    decoration: BoxDecoration(
-                        color: CustomColor.primary,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8))),
-                  ),
-                ))
+                      onTap: () {
+                        goBrowser(mes);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        height: 48,
+                        child: CommonText(
+                          'more'.tr,
+                          size: 14,
+                          weight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                        decoration: BoxDecoration(
+                            color: CustomColor.primary,
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(8),
+                                bottomRight: Radius.circular(8))),
+                      ),
+                    ))
               ],
             )),
           ],

@@ -1,6 +1,7 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
+
 /// import wallet by private key
 class ImportPrivateKeyPage extends StatefulWidget {
   @override
@@ -18,8 +19,8 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       showCustomError('enterPk'.tr);
       return;
     }
-    if(inputStr.startsWith('0x')){
-      inputStr=inputStr.substring(2);
+    if (inputStr.startsWith('0x')) {
+      inputStr = inputStr.substring(2);
     }
     if (name == '') {
       showCustomError('enterName'.tr);

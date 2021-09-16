@@ -228,7 +228,7 @@ class ChainGasPageState extends State<ChainGasPage> {
                       // } else {
                       //   feeCapCtrl.text = chainGas.gasPrice;
                       // }
-                      syncGas(chainGas,trunc: true);
+                      syncGas(chainGas, trunc: true);
                       setState(() {
                         index = 2;
                       });

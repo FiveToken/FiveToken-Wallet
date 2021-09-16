@@ -2,6 +2,7 @@ import 'package:fil/chain/net.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
+
 /// import wallet by mne
 class ImportMnePage extends StatefulWidget {
   @override
@@ -24,7 +25,9 @@ class ImportMnePageState extends State<ImportMnePage> {
       showCustomError('enterName'.tr);
       return false;
     }
-    if (!bip39.validateMnemonic(inputStr,)) {
+    if (!bip39.validateMnemonic(
+      inputStr,
+    )) {
       showCustomError('wrongMne'.tr);
       return false;
     }

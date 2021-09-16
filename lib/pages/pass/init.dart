@@ -89,7 +89,7 @@ class PassInitPageState extends State<PassInitPage> {
                 rpc: net.rpc,
                 addressType: type);
             wal.digest = key.digest;
-            wal.address =  key.address;
+            wal.address = key.address;
             wal.skKek = key.kek;
             box.put(wal.key, wal);
             var currentNet = $store.net;
@@ -123,7 +123,7 @@ class PassInitPageState extends State<PassInitPage> {
             rpc: net.rpc,
             addressType: net.addressType);
         wal.digest = key.digest;
-        wal.address =  key.address;
+        wal.address = key.address;
         wal.skKek = key.kek;
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
@@ -167,7 +167,7 @@ class PassInitPageState extends State<PassInitPage> {
             rpc: net.rpc,
             addressType: net.addressType);
         wal.digest = key.digest;
-        wal.address =  key.address;
+        wal.address = key.address;
         wal.skKek = key.kek;
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);

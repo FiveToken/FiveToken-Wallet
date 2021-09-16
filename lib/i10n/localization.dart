@@ -14,6 +14,7 @@ class ChineseCupertinoLocalizations implements CupertinoLocalizations {
     ml = await materialDelegate.load(local);
     print(ml.pasteButtonLabel);
   }
+
   @override
   String get alertDialogLabel => ml.alertDialogLabel;
 
@@ -42,9 +43,10 @@ class ChineseCupertinoLocalizations implements CupertinoLocalizations {
   }
 
   @override
-  String tabSemanticsLabel({int tabIndex, int tabCount}){
+  String tabSemanticsLabel({int tabIndex, int tabCount}) {
     return '第$tabIndex页，共$tabCount页';
   }
+
   @override
   String datePickerHour(int hour) {
     return hour.toString().padLeft(2, "0");

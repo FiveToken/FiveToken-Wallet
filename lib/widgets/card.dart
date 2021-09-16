@@ -22,9 +22,7 @@ class TapCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 12
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 12),
         width: double.infinity,
         height: 70,
         child: child,

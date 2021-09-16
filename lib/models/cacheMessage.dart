@@ -176,7 +176,7 @@ class CacheMessage {
       this.token,
       this.fee = '',
       this.height = 0,
-      this.mid='',
+      this.mid = '',
       this.exitCode});
   String get formatValue {
     if (token != null) {

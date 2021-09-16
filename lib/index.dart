@@ -1,7 +1,7 @@
 export 'dart:convert';
 export 'dart:math';
 export 'dart:async';
-export  'package:fbutton/fbutton.dart';
+export 'package:fbutton/fbutton.dart';
 export 'package:convert/convert.dart';
 export 'package:flutter/services.dart';
 export 'package:flutter/foundation.dart';
@@ -25,7 +25,7 @@ export './common/index.dart';
 
 export 'package:flotus/flotus.dart';
 export 'package:bls/bls.dart';
-export 'package:get/get.dart' hide FormData,Response,MultipartFile;
+export 'package:get/get.dart' hide FormData, Response, MultipartFile;
 export 'package:fil/store/store.dart';
 export 'init/hive.dart';
 export 'init/prefer.dart';
@@ -34,6 +34,6 @@ export './api/index.dart';
 export './widgets/field.dart';
 export './widgets/card.dart';
 export './chain/index.dart';
-export 'package:http/http.dart' hide MultipartFile,Response ;
+export 'package:http/http.dart' hide MultipartFile, Response;
 export './actions/event.dart';
 export './conf/conf.dart';

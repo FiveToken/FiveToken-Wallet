@@ -13,7 +13,7 @@ class ChainGas {
   int level;
   String get maxFee {
     try {
-      return formatCoin(feeNum.toString(),size: 5);
+      return formatCoin(feeNum.toString(), size: 5);
     } catch (e) {
       return '';
     }

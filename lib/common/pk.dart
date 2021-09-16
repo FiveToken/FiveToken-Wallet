@@ -57,7 +57,7 @@ String xor(List<int> first, List<int> second, {int size = 32}) {
 Future<bool> validatePrivateKey(
     String addr, String pass, String skKek, String dig) async {
   var sk = await getPrivateKey(addr, pass, skKek);
-  var s=hex.encode(base64Decode(sk));
+  var s = hex.encode(base64Decode(sk));
   var digest = await genPrivateKeyDigest(s);
   if (dig != digest) {
     return false;
@@ -68,7 +68,7 @@ Future<bool> validatePrivateKey(
 
 /// decrypt the private key by address, password and skkek
 ///  [addr] wallet address
-///  [pass] password for encryption 
+///  [pass] password for encryption
 ///  [skKek] a string related to address, password and private key, store in database
 Future<String> getPrivateKey(
   String addr,
