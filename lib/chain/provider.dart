@@ -16,9 +16,6 @@ class FilecoinResponse {
     message = map['message'];
     detail = map['detail'];
   }
-  Map<String, dynamic> toJson() {
-    return {'code': code, 'data': data, 'message': message, 'detail': detail};
-  }
 }
 
 abstract class ChainProvider {
@@ -46,9 +43,9 @@ class FilecoinProvider extends ChainProvider {
   static String feePath = '/recommend/fee';
   static String clientId = ClientID;
 
-  FilecoinProvider(Network net) {
+  FilecoinProvider(Network net, {Dio httpClient}) {
     this.net = net;
-    client = Dio();
+    this.client = httpClient ?? Dio();
     client.options.baseUrl = net.rpc + '/api$clientId';
     client.options.receiveTimeout = 20000;
   }
@@ -58,17 +55,11 @@ class FilecoinProvider extends ChainProvider {
     try {
       var res = await client.get(balancePath, queryParameters: {'actor': addr});
       var response = FilecoinResponse.fromJson(res.data);
-      if (response.code != 200) {
-        print(response.detail);
-      } else {
+      if (response.code == 200) {
         if (response.data is Map<String, dynamic>) {
           Map<String, dynamic> data = response.data;
           balance = data['balance'];
         }
-      }
-    } on DioError catch (e) {
-      if (e.type == DioErrorType.RECEIVE_TIMEOUT) {
-        print('timeout');
       }
     } catch (e) {
       print(e);
@@ -82,8 +73,9 @@ class FilecoinProvider extends ChainProvider {
       String amount,
       String private,
       ChainGas gas,
+      String source,
       int nonce}) async {
-    var from = $store.wal.addr;
+    var from = source ?? $store.wal.addr;
     var msg = TMessage(
         version: 0,
         method: 0,
@@ -113,16 +105,13 @@ class FilecoinProvider extends ChainProvider {
       var result = await client.post(pushPath,
           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())});
       var response = FilecoinResponse.fromJson(result.data);
-      if (response.code != 200) {
-        print(response.detail);
-      } else {
+      if (response.code == 200) {
         if (response.data is String && response.data != '') {
           res = response.data;
         }
       }
       return res;
     } catch (e) {
-      print(e);
       return '';
     }
   }
@@ -170,10 +159,6 @@ class FilecoinProvider extends ChainProvider {
           nonce = data['nonce'];
         }
       }
-    } on DioError catch (e) {
-      if (e.type == DioErrorType.RECEIVE_TIMEOUT) {
-        print('timeout');
-      }
     } catch (e) {
       print(e);
     }
@@ -207,7 +192,7 @@ class FilecoinProvider extends ChainProvider {
     }
     var res = response.data;
     if (res != null) {
-      var limit = res['gas_limit'] ?? '0';
+      var limit = res['gas_limit'] ?? 0;
       var premium = res['gas_premium'] ?? '100000';
       var feeCap = res['gas_cap'] ?? '0';
       try {
@@ -233,9 +218,9 @@ class FilecoinProvider extends ChainProvider {
 class EthProvider extends ChainProvider {
   Network net;
   Web3Client client;
-  EthProvider(Network net) {
+  EthProvider(Network net, {Web3Client web3client}) {
     this.net = net;
-    client = Web3Client(net.url, http.Client());
+    client = web3client ?? Web3Client(net.url, http.Client());
   }
   @override
   Future<String> getBalance(String addr) async {
@@ -249,10 +234,10 @@ class EthProvider extends ChainProvider {
   }
 
   @override
-  Future<int> getNonce() async {
+  Future<int> getNonce({String from}) async {
     try {
-      return await client
-          .getTransactionCount(EthereumAddress.fromHex($store.wal.addr));
+      return await client.getTransactionCount(
+          EthereumAddress.fromHex(from ?? $store.wal.addr));
     } catch (e) {
       return -1;
     }
@@ -283,7 +268,7 @@ class EthProvider extends ChainProvider {
             nonce: nonce,
             value: EtherAmount.inWei(BigInt.parse(amount)),
           ),
-          chainId: int.parse($store.net.chainId));
+          chainId: int.tryParse($store.net.chainId) ?? 1);
       return res;
     } catch (e) {
       print(e);
@@ -310,7 +295,7 @@ class EthProvider extends ChainProvider {
           nonce: nonce,
           gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)));
       var res = await client.sendTransaction(credentials, transaction,
-          chainId: int.parse($store.net.chainId));
+          chainId: int.tryParse($store.net.chainId) ?? 1);
       return res;
     } catch (e) {
       print(e);

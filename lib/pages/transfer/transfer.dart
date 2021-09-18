@@ -506,7 +506,7 @@ class SpeedupSheet extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),
-                TabCard(
+                TapItemCard(
                   items: [
                     CardItem(
                       label: 'speedup'.tr,
@@ -520,7 +520,7 @@ class SpeedupSheet extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),
-                TabCard(
+                TapItemCard(
                   items: [
                     CardItem(
                       label: 'continueNew'.tr,

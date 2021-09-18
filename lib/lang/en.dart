@@ -119,7 +119,7 @@ const Map<String, String> EN_LANG = {
   "share": "Share",
   "fail": "failed",
   "finish": "Completed",
-  "noData": "No transaction records",
+  "noData": "No transaction record in recent 90 days",
   "noActivity": "No activity records",
   "pkExport": "Private key export",
   "mneExport": "Mnemonics export",

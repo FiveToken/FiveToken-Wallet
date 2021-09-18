@@ -3,11 +3,11 @@ export 'scaffold.dart';
 export './card.dart';
 export './text.dart';
 export './style.dart';
-export './tabCard.dart';
 export './dialog.dart';
 export './layout.dart';
 export './bottomSheet.dart';
 export './fresh.dart';
+export './toast.dart';
 
 const Image IconNavBack = Image(
   width: 20,

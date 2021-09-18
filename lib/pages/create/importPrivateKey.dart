@@ -2,7 +2,6 @@ import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
-/// import wallet by private key
 class ImportPrivateKeyPage extends StatefulWidget {
   @override
   State createState() => ImportPrivateKeyPageState();
@@ -49,7 +48,6 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
     });
   }
 
-  void getChainTypeByPaivateKey(String private) {}
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.PrivateKey})
         .then((value) {

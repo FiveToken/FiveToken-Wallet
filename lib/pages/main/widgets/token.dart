@@ -108,6 +108,8 @@ class TokenWidgetState extends State<TokenWidget> {
 }
 
 class TokenList extends StatefulWidget {
+  final Web3Client defaultClient;
+  TokenList({this.defaultClient});
   @override
   State<StatefulWidget> createState() {
     return TokenListState();
@@ -136,7 +138,7 @@ class TokenListState extends State<TokenList> {
   }
 
   void initClient(Network net) {
-    client = Web3Client(net.url, http.Client());
+    client = widget.defaultClient ?? Web3Client(net.url, http.Client());
   }
 
   @override

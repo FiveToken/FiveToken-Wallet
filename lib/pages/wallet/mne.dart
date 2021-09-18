@@ -1,7 +1,6 @@
 import 'package:fil/index.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-/// display mne of the wallet
 class WalletMnePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -23,47 +22,49 @@ class WalletMnePageState extends State<WalletMnePage> {
         showCustomToast('copySucc'.tr);
       },
       footerText: 'copy'.tr,
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                  child: TabItem(
-                active: index == 0,
-                label: 'mne'.tr,
-                onTap: () {
-                  setState(() {
-                    index = 0;
-                  });
-                },
-              )),
-              Expanded(
-                  child: TabItem(
-                active: index == 1,
-                label: 'code'.tr,
-                onTap: () {
-                  setState(() {
-                    index = 1;
-                  });
-                },
-              )),
-            ],
-          ),
-          index == 0
-              ? KeyString(
-                  data: mne,
-                  isMne: true,
-                )
-              : KeyCode(
-                  data: mne,
-                  showCode: showCode,
-                  onView: () {
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                    child: TabItem(
+                  active: index == 0,
+                  label: 'mne'.tr,
+                  onTap: () {
                     setState(() {
-                      showCode = true;
+                      index = 0;
                     });
                   },
-                )
-        ],
+                )),
+                Expanded(
+                    child: TabItem(
+                  active: index == 1,
+                  label: 'code'.tr,
+                  onTap: () {
+                    setState(() {
+                      index = 1;
+                    });
+                  },
+                )),
+              ],
+            ),
+            index == 0
+                ? KeyString(
+                    data: mne,
+                    isMne: true,
+                  )
+                : KeyCode(
+                    data: mne,
+                    showCode: showCode,
+                    onView: () {
+                      setState(() {
+                        showCode = true;
+                      });
+                    },
+                  )
+          ],
+        ),
       ),
     );
   }

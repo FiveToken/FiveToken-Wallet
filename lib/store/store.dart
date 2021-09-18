@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 class StoreController extends GetxController {
   var wallet = ChainWallet().obs;
   var g = ChainGas().obs;
-  var message = StoreMessage().obs;
   var scanResult = ''.obs;
   var network = Network().obs;
   var tok = Token().obs;
@@ -16,10 +15,6 @@ class StoreController extends GetxController {
 
   Network get net {
     return network.value;
-  }
-
-  StoreMessage get mes {
-    return message.value;
   }
 
   ChainGas get gas {
@@ -48,12 +43,6 @@ class StoreController extends GetxController {
     });
   }
 
-  void changeWalletAddress(String addr) {
-    wallet.update((val) {
-      val.address = addr;
-    });
-  }
-
   void changeWalletBalance(String balance) {
     wallet.update((val) {
       val.balance = balance;
@@ -62,14 +51,6 @@ class StoreController extends GetxController {
 
   void setGas(ChainGas gas) {
     g.value = gas;
-  }
-
-  void setMessage(StoreMessage mes) {
-    message.value = mes;
-  }
-
-  void scan(String res) {
-    scanResult.value = res;
   }
 }
 

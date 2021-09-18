@@ -7,7 +7,6 @@ List<GetPage> getInitRoutes() {
       page: () => SelectLangPage(),
       transition: Transition.fadeIn);
   var wallet = GetPage(name: initWalletPage, page: () => WalletInitPage());
-  var boot = GetPage(name: initBootPage, page: () => BootPage());
-  list..add(wallet)..add(lang)..add(boot);
+  list..add(wallet)..add(lang);
   return list;
 }

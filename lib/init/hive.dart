@@ -17,7 +17,6 @@ const cacheMessageBox = 'cacheMessageBox';
 Future initHive() async {
   await Hive.initFlutter();
   Hive.registerAdapter(WalletAdapter());
-  Hive.registerAdapter(StoreMessageAdapter());
   Hive.registerAdapter(NonceAdapter());
   Hive.registerAdapter(CacheGasAdapter());
   Hive.registerAdapter(NetworkAdapter());
@@ -26,7 +25,6 @@ Future initHive() async {
   Hive.registerAdapter(ContactAddressAdapter());
   Hive.registerAdapter(CacheMessageAdapter());
   Hive.registerAdapter(ChainGasAdapter());
-  await Hive.openBox<StoreMessage>(messageBox);
   await Hive.openBox<Wallet>(addressBox);
   await Hive.openBox<ContactAddress>(addressBookBox);
   await Hive.openBox<Nonce>(nonceBox);
@@ -38,45 +36,32 @@ Future initHive() async {
   // await OpenedBox.walletInstance.deleteFromDisk();
   // await OpenedBox.mesInstance.deleteFromDisk();
   // await OpenedBox.tokenInstance.deleteFromDisk();
+  OpenedBox.initBox();
 }
 
 class OpenedBox {
-  /// box to store all local messages
-  static Box<StoreMessage> get messageInsance {
-    return Hive.box<StoreMessage>(messageBox);
-  }
+  static Box<Wallet> addressInsance;
+  static Box<ContactAddress> addressBookInsance;
+  static Box<Nonce> nonceInsance;
 
-  /// box to store all address in address book
-  static Box<Wallet> get addressInsance {
-    return Hive.box<Wallet>(addressBox);
-  }
+  static Box<ChainGas> gasInsance;
 
-  static Box<ContactAddress> get addressBookInsance {
-    return Hive.box<ContactAddress>(addressBookBox);
-  }
+  static Box<Network> netInstance;
 
-  /// box to store all used nonce
-  static Box<Nonce> get nonceInsance {
-    return Hive.box<Nonce>(nonceBox);
-  }
+  static Box<Token> tokenInstance;
 
-  static Box<ChainGas> get gasInsance {
-    return Hive.box<ChainGas>(gasBox);
-  }
+  static Box<ChainWallet> walletInstance;
 
-  static Box<Network> get netInstance {
-    return Hive.box<Network>(netBox);
-  }
+  static Box<CacheMessage> mesInstance;
 
-  static Box<Token> get tokenInstance {
-    return Hive.box<Token>(tokenBox);
-  }
-
-  static Box<ChainWallet> get walletInstance {
-    return Hive.box<ChainWallet>(walletBox);
-  }
-
-  static Box<CacheMessage> get mesInstance {
-    return Hive.box<CacheMessage>(cacheMessageBox);
+  static void initBox() {
+    OpenedBox.addressInsance = Hive.box<Wallet>(addressBox);
+    OpenedBox.addressBookInsance = Hive.box<ContactAddress>(addressBookBox);
+    OpenedBox.nonceInsance = Hive.box<Nonce>(nonceBox);
+    OpenedBox.gasInsance = Hive.box<ChainGas>(gasBox);
+    OpenedBox.netInstance = Hive.box<Network>(netBox);
+    OpenedBox.tokenInstance = Hive.box<Token>(tokenBox);
+    OpenedBox.walletInstance = Hive.box<ChainWallet>(walletBox);
+    OpenedBox.mesInstance = Hive.box<CacheMessage>(cacheMessageBox);
   }
 }

@@ -1,12 +1,12 @@
 import 'package:fil/index.dart';
 import 'package:fil/pages/transfer/transfer.dart';
 
-class ConectedWallet extends StatelessWidget {
+class ConnectWallet extends StatelessWidget {
   final WCMeta meta;
   final Noop onConnect;
   final Noop onCancel;
   final Widget footer;
-  ConectedWallet({this.meta, this.onCancel, this.onConnect, this.footer});
+  ConnectWallet({this.meta, this.onCancel, this.onConnect, this.footer});
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(

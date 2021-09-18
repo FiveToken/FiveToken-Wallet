@@ -16,7 +16,6 @@ const String filGasPage = "/transfer/gas";
 //init
 const String initLangPage = '/init/lang';
 const String initWalletPage = '/init/wallet';
-const String initBootPage = '/init/boot';
 
 //create
 const String mnePage = "/mne";

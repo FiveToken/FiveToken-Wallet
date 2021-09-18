@@ -40,19 +40,6 @@ class TMessage {
       this.args,
       this.method});
 
-  TMessage.fromJson(Map<String, dynamic> json)
-      : this.version = json['Version'],
-        this.to = json['To'],
-        this.from = json['From'],
-        this.value = json['Value'],
-        this.gasFeeCap = json['GasFeeCap'],
-        this.gasLimit = json['GasLimit'],
-        this.gasPremium = json['GasPremium'],
-        this.params = json['Params'],
-        this.nonce = json['Nonce'],
-        this.args = json['Args'],
-        this.method = json['Method'];
-
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "Version": this.version,
@@ -133,10 +120,6 @@ class SignedMessage {
   Signature signature;
 
   SignedMessage(this.message, this.signature);
-
-  SignedMessage.fromJson(Map<String, dynamic> json)
-      : this.message = TMessage.fromJson(json['Message']),
-        this.signature = Signature.fromJson(json['Signature']);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

@@ -6,6 +6,8 @@ import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/web3dart.dart';
 
 class TokenAddPage extends StatefulWidget {
+  final Web3Client defaultClient;
+  TokenAddPage({this.defaultClient});
   @override
   State<StatefulWidget> createState() {
     return TokenAddPageState();
@@ -22,7 +24,7 @@ class TokenAddPageState extends State<TokenAddPage> {
   @override
   void initState() {
     super.initState();
-    client = Web3Client($store.net.url, http.Client());
+    client = widget.defaultClient ?? Web3Client($store.net.url, http.Client());
     node.addListener(() {
       if (!node.hasFocus) {
         var addr = addrCtrl.text.trim();
@@ -69,6 +71,7 @@ class TokenAddPageState extends State<TokenAddPage> {
         }
       }
     } catch (e) {
+      print(e);
       this.loading = false;
       dismissAllToast();
       showCustomError('searchTokenFail'.tr);

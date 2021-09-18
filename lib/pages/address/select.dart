@@ -1,7 +1,6 @@
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
-/// select a address when transfer
 class AddressBookSelectPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {

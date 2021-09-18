@@ -7,11 +7,9 @@ export 'transfer/detail.dart';
 export 'transfer/gas.dart';
 
 export './other/scan.dart';
-export './other/webview.dart';
 export './other/set.dart';
 
 export './init/lang.dart';
-export './init/boot.dart';
 export './init/wallet.dart';
 
 export './pass/init.dart';

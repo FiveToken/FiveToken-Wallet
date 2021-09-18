@@ -34,44 +34,6 @@ class CustomRadius {
   }
 }
 
-class CustomPadding {
-  static EdgeInsetsGeometry get all10 {
-    return EdgeInsets.all(10);
-  }
-
-  static EdgeInsetsGeometry get v10 {
-    return EdgeInsets.symmetric(vertical: 10);
-  }
-
-  static EdgeInsetsGeometry get h10 {
-    return EdgeInsets.symmetric(horizontal: 10);
-  }
-
-  static EdgeInsetsGeometry get all15 {
-    return EdgeInsets.all(15);
-  }
-
-  static EdgeInsetsGeometry get v15 {
-    return EdgeInsets.symmetric(vertical: 15);
-  }
-
-  static EdgeInsetsGeometry get h15 {
-    return EdgeInsets.symmetric(horizontal: 15);
-  }
-
-  static EdgeInsetsGeometry get all20 {
-    return EdgeInsets.all(20);
-  }
-
-  static EdgeInsetsGeometry get v20 {
-    return EdgeInsets.symmetric(vertical: 20);
-  }
-
-  static EdgeInsetsGeometry get h20 {
-    return EdgeInsets.symmetric(horizontal: 20);
-  }
-}
-
 class CustomColor {
   static Color get primary {
     return Color(0xff5CC1CB);

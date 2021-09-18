@@ -1,6 +1,5 @@
 import 'package:fil/index.dart';
 
-/// create or import different wallet
 class WalletInitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,7 @@ class WalletInitPage extends StatelessWidget {
                       size: 14,
                     ),
                   ),
-                  TabCard(
+                  TapItemCard(
                     items: [
                       CardItem(
                           label: 'createWallet'.tr,
@@ -75,7 +74,7 @@ class WalletInitPage extends StatelessWidget {
                   SizedBox(
                     height: 12,
                   ),
-                  TabCard(
+                  TapItemCard(
                     items: [
                       CardItem(
                           label: 'pkImport'.tr,

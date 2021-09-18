@@ -4,18 +4,11 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
-import 'package:connectivity/connectivity.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
 const psalt = "vFIzIawYOU";
-Future<bool> checkNetStatus() async {
-  var connectivityResult = await Connectivity().checkConnectivity();
-  bool isOn = connectivityResult != ConnectivityResult.none;
-  return isOn;
-}
 
-/// decrypt the string that was encrypted
 String aesDecrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -29,7 +22,6 @@ String aesDecrypt(String raw, String mix) {
   return decoded;
 }
 
-/// use aes algorithm to encrypt a string
 String aesEncrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -42,7 +34,6 @@ String aesEncrypt(String raw, String mix) {
   return encoded.base64;
 }
 
-/// generate the digest of the given string
 String tokenify(String str, {String salt = psalt}) {
   var key = utf8.encode(salt);
   var bytes = utf8.encode(str.trim());
@@ -52,12 +43,10 @@ String tokenify(String str, {String salt = psalt}) {
   return digest.toString();
 }
 
-/// hide keyboard
 void unFocusOf(BuildContext context) {
   FocusScope.of(context).requestFocus(FocusNode());
 }
 
-/// set  data of clipboard to the given [text] then call the [callback]
 void copyText(String text, {Function callback}) {
   var data = ClipboardData(text: text);
   Clipboard.setData(data).then((_) {
@@ -67,7 +56,6 @@ void copyText(String text, {Function callback}) {
   });
 }
 
-/// convert a long string to short
 String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
   int strLen = str.length;
   if (strLen < headLen + tailLen) {
@@ -83,45 +71,6 @@ String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
   return "$headStr...$tailStr";
 }
 
-/// convert a big float number in exponential form to int string
-String parseE(String str) {
-  final isE = RegExp(r"[eE][+-]\d+$");
-  if (!isE.hasMatch(str)) {
-    return str;
-  }
-  str = str.toLowerCase();
-  var parts = str.split('e');
-  var n = parts[0];
-  var p = parts[1];
-  var sign = p[0];
-  var len = int.parse(p.substring(1)); //Number(p.slice(1))
-  var r = "";
-  if (sign == '+') {
-    r = "1";
-    for (var i = 0; i < len; i++) {
-      r += "0";
-    }
-    n = n.replaceAll('.', '');
-    r = n + r.substring(n.length);
-  } else {
-    r = "0.";
-    for (var i = 0; i < len; i++) {
-      r += "0";
-    }
-    n = n.replaceFirst('0', '');
-    n = n.replaceFirst('.', '');
-    r = r.substring(0, r.length - 1) + n;
-  }
-  return r;
-}
-
-String toFixed(double input, int len) {
-  var r = input.toStringAsFixed(len).replaceFirst(RegExp(r"0+$"), "");
-  r = r.replaceFirst(RegExp(r"\.$"), "");
-  return parseE(r);
-}
-
-/// verify if [input] is a valid double number
 bool isDecimal(String input) {
   var r = RegExp(r"(^\d+(?:\.\d+)?([eE]-?\d+)?$|^\.\d+([eE]-?\d+)?$)");
   if (r.hasMatch(input.trim())) {
@@ -256,7 +205,6 @@ String formatDouble(String str, {bool truncate = false, int size = 4}) {
   }
 }
 
-/// convert a base64 encode private key to hex encode private key. [type] represent different algorithm
 String base64ToHex(String pk, String type) {
   String t = type == '1' ? 'secp256k1' : 'bls';
   PrivateKey privateKey = PrivateKey(t, pk);
@@ -268,7 +216,6 @@ String base64ToHex(String pk, String type) {
   return result;
 }
 
-/// launch a [url] to open other app or open in browser
 Future openInBrowser(String url) async {
   if (await canLaunch(url)) {
     await launch(
@@ -281,7 +228,6 @@ Future openInBrowser(String url) async {
   }
 }
 
-/// verify if the [pass] is valid
 bool isValidPassword(String pass) {
   pass = pass.trim();
   var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
@@ -294,7 +240,6 @@ bool isValidUrl(String url) {
   return urlRegExp.hasMatch(url);
 }
 
-/// call a function in next tick
 void nextTick(Noop callback) {
   Future.delayed(Duration.zero).then((value) {
     callback();

@@ -2,7 +2,6 @@ import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 
-/// rename,export mne,export private key, reset pass
 class WalletManagePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -144,7 +143,7 @@ class WalletManagePageState extends State<WalletManagePage> {
     );
   }
 
-  TabCard get exportCard {
+  TapItemCard get exportCard {
     List<CardItem> list = [
       CardItem(
           label: 'pkExport'.tr,
@@ -173,7 +172,7 @@ class WalletManagePageState extends State<WalletManagePage> {
     if (wallet.type == 2) {
       list.removeAt(1);
     }
-    return TabCard(
+    return TapItemCard(
       items: list,
     );
   }
@@ -209,10 +208,10 @@ class WalletManagePageState extends State<WalletManagePage> {
               height: 15,
             ),
             isId
-                ? TabCard(
+                ? TapItemCard(
                     items: [nameItem, passItem],
                   )
-                : TabCard(
+                : TapItemCard(
                     items: [
                       addrItem,
                       nameItem,
@@ -222,7 +221,7 @@ class WalletManagePageState extends State<WalletManagePage> {
               height: 15,
             ),
             isId
-                ? TabCard(
+                ? TapItemCard(
                     items: [
                       CardItem(
                         label: 'walletAddr'.tr,
@@ -239,7 +238,7 @@ class WalletManagePageState extends State<WalletManagePage> {
             ),
             isId
                 ? exportCard
-                : TabCard(
+                : TapItemCard(
                     items: [passItem],
                   )
           ],

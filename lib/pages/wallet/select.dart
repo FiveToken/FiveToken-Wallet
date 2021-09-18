@@ -140,7 +140,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TabCard(
+                              TapItemCard(
                                 items: [
                                   CardItem(
                                     label: 'createWallet'.tr,
@@ -158,7 +158,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                   color: CustomColor.primary,
                                 ),
                               ),
-                              TabCard(
+                              TapItemCard(
                                 items: [
                                   CardItem(
                                     label: 'pkImport'.tr,

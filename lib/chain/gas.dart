@@ -77,9 +77,9 @@ class ChainGas {
       this.gasPrice = '0',
       this.level = 0});
   ChainGas.fromJson(Map<String, dynamic> json) {
-    gasPrice = json['feeCap'];
-    gasLimit = json['gasLimit'];
-    gasPremium = json['premium'];
-    level = json['level'];
+    gasPrice = json['feeCap'] ?? '0';
+    gasLimit = json['gasLimit'] ?? 0;
+    gasPremium = json['premium'] ?? '0';
+    level = json['level'] ?? 0;
   }
 }

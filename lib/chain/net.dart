@@ -70,23 +70,6 @@ class Network {
       this.path = '',
       this.color = '0xffB4B5B7',
       this.coin = ''});
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'name': name,
-      'chain': chain,
-      'net': net,
-      'netType': netType,
-      'chainId': chainId,
-      'rpc': rpc,
-      'browser': browser,
-      'addressType': addressType,
-      'prefix': prefix,
-      'path': path,
-      'color': color,
-      'coin': coin
-    };
-  }
-
   Network.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     chain = json['chain'];

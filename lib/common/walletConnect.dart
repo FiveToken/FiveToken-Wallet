@@ -54,20 +54,6 @@ class WCUri {
     return 'wc:$topic@$version?bridge=$encodedBridgeUrl&key=$keyHex';
   }
 
-  String universalLink(appLink) {
-    return appLink +
-        (appLink.endsWith('/') ? '' : '/') +
-        'wc?uri=' +
-        Uri.encodeComponent(toString(encode: true));
-  }
-
-  String deepLink(String appLink) {
-    return appLink +
-        (appLink.endsWith(':') ? '//' : (appLink.endsWith('/') ? '' : '/')) +
-        'wc?uri=' +
-        Uri.encodeComponent(toString(encode: true));
-  }
-
   static WCUri fromString(String wcUrl) {
     var rx = RegExp(r'wc:([^@]+)@(\d+)\?bridge=([^&]+)&key=([0-9a-fA-F]+)');
     var match = rx.firstMatch(wcUrl.trim());
@@ -618,27 +604,4 @@ void processMessage(WCSession wcSession, JsonRpc jsonRpc) {
   } else {
     logger.d('uknown request $method');
   }
-}
-
-JsonRpc echoHandler(WCSession wcSession, JsonRpc jsonRpc) {
-  var method = jsonRpc.method;
-  var result = jsonRpc.result;
-  var error = jsonRpc.error;
-  var id = jsonRpc.id;
-  var logger = wcSession.logger;
-  if (method != null) {
-    var echoResult = {
-      'request': {'params': jsonRpc.params, 'method': method, 'id': id}
-    };
-    logger.i('$wcSession get request $jsonRpc');
-    if (method != 'wc_sessionUpdate') {
-      wcSession.sendResponse(id, method, result: echoResult);
-    }
-    return JsonRpc(id, result: echoResult);
-  } else if (result != null) {
-    logger.d('should not be here, $result');
-  } else if (error != null) {
-    logger.d('should not be here either, $error');
-  }
-  return JsonRpc(id, result: {});
 }

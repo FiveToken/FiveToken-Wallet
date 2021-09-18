@@ -464,7 +464,7 @@ class MainPageState extends State<MainPage> {
           shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
           context: context,
           builder: (BuildContext context) {
-            return ConectedWallet(
+            return ConnectWallet(
               meta: meta,
               onCancel: () {
                 handle(false);
@@ -523,7 +523,7 @@ class MainPageState extends State<MainPage> {
                             borderRadius: CustomRadius.top),
                         context: context,
                         builder: (BuildContext context) {
-                          return ConectedWallet(
+                          return ConnectWallet(
                             meta: meta,
                             footer: Container(
                               padding: EdgeInsets.symmetric(horizontal: 20),

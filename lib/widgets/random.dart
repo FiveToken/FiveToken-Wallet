@@ -5,15 +5,6 @@ class RandomIcon extends StatelessWidget {
   final String address;
   final double size;
   RandomIcon(this.address, {this.size = 30});
-  bool get valid {
-    try {
-      BigInt.parse(address.substring(2), radix: 16);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   String get numStr {
     return address.substring(2);
   }

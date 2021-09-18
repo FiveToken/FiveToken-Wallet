@@ -114,7 +114,7 @@ const Map<String, String> KR_LANG = {
   "share": "공유",
   "fail": "실패",
   "finish": "완성",
-  "noData": "당신은 잠시 거래 기록이 없습니다.",
+  "noData": "근 90 일 거래 기록 없 음",
   'noActivity': '당신은 잠시 거래 기록이 없습니다.',
   "pkExport": "비밀 키 내보내기",
   "mneExport": "도움말 내보내기",

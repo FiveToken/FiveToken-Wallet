@@ -14,7 +14,6 @@ class MneCheckPageState extends State<MneCheckPage> {
   void initState() {
     super.initState();
     var list = mne.split(' ');
-    print(mne);
     list.shuffle();
     unSelectedList = list;
   }

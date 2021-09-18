@@ -5,9 +5,6 @@ Future<String> initSharedPreferences() async {
   var initialRoute = mainPage;
   var instance = await SharedPreferences.getInstance();
   Global.store = instance;
-
-  /// If the the app was opened for the first time, English is preferred.
-  /// If there is a cached lang code in device, set language to that
   var langCode = instance.getString(StoreKeyLanguage);
   if (langCode != null) {
     Global.langCode = langCode;
@@ -43,6 +40,7 @@ Future<String> initSharedPreferences() async {
       await box.put(newWal.key, newWal);
       if (activeWalletAddr == wal.addrWithNet) {
         activeWalletAddr = newWal.key;
+        Global.store.setString('currentWalletAddress', activeWalletAddr);
       }
     }
     OpenedBox.addressInsance.deleteAll(keys);

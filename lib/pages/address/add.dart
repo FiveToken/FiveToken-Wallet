@@ -1,7 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
 
-/// add address to local db or edit a address that was exist
 class AddressBookAddPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {

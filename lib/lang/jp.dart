@@ -114,7 +114,7 @@ const Map<String, String> JP_LANG = {
   "share": "共有",
   "fail": "失敗",
   "finish": "完成",
-  "noData": "当面、あなたのトランザクション記録がございません！",
+  "noData": "ここ90日間は取引記録がありません。",
   'noActivity': '当面、あなたのトランザクション記録がございません！',
   "pkExport": "秘密鍵エクスポート",
   "mneExport": "ニーモニック語エクスポート",

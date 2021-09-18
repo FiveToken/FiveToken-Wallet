@@ -46,50 +46,12 @@ class Wallet {
     this.digest = digest;
     this.push = push;
   }
-  Wallet.fromJson(Map<dynamic, dynamic> json) {
-    this.ck = json['ck'] as String;
-    this.label = json['label'] as String;
-    this.address = json['address'] as String;
-    this.type = json['type'] as String;
-    this.walletType = json['walletType'] as int;
-    this.balance = json['balance'] as String;
-    this.mne = json['mne'] as String;
-    this.skKek = json['skKek'] as String;
-    this.digest = json['digest'] as String;
-  }
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'ck': this.ck,
-      'label': this.label,
-      'address': this.address,
-      'type': this.type,
-      'walletType': this.walletType,
-      'balance': this.balance,
-      "mne": this.mne,
-      'skKek': this.skKek,
-      'digest': this.digest,
-    };
-  }
-
   String get addr {
     return address;
   }
 
   String get addrWithNet {
     return Global.netPrefix + addr.substring(1);
-  }
-}
-
-class WalletMeta {
-  int nonce;
-  String balance;
-  WalletMeta({this.nonce, this.balance});
-  WalletMeta.fromJson(Map json) {
-    balance = json['balance'];
-    nonce = json['nonce'];
-  }
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{'nonce': nonce, 'balance': balance};
   }
 }
 

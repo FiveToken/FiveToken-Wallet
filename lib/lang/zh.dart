@@ -116,7 +116,7 @@ const Map<String, String> ZH_LANG = {
   'share': '分享',
   'fail': '失败',
   'finish': "完成",
-  'noData': '您暂时没有交易记录！',
+  'noData': '近90天无交易记录',
   'noActivity': '您暂时没有活动记录！',
   'pkExport': "私钥导出",
   'mneExport': "助记词导出",

@@ -1,6 +1,5 @@
 import 'package:fil/index.dart';
 
-/// setting page
 class SetPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -22,7 +21,7 @@ class SetPageState extends State<SetPage> {
       body: Padding(
         child: Column(
           children: [
-            TabCard(
+            TapItemCard(
               items: [
                 CardItem(
                   label: 'addrBook'.tr,
@@ -35,7 +34,7 @@ class SetPageState extends State<SetPage> {
             SizedBox(
               height: 15,
             ),
-            TabCard(
+            TapItemCard(
               items: [
                 CardItem(
                   label: 'lang'.tr,
@@ -54,7 +53,7 @@ class SetPageState extends State<SetPage> {
             SizedBox(
               height: 15,
             ),
-            TabCard(
+            TapItemCard(
               items: [
                 CardItem(
                   label: 'service'.tr,

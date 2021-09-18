@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:fil/index.dart';
 
-/// get uuid, platform and os version of the device
 Future initDeviceInfo() async {
   DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   if (Platform.isAndroid) {
