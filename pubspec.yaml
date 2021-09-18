@@ -35,9 +35,9 @@ dependencies:
   crypto: 2.1.3
   encrypt: ^4.0.0
   flotus:
-    git: git@github.com:FiveToken/flotus.git
+    git: https://github.com/FiveToken/flotus.git
   bls:
-    git: git@github.com:FiveToken/bls.git
+    git: https://github.com/FiveToken/bls.git
   permission_handler: 3.0.1
   image_gallery_saver: ^1.1.0
   get:
@@ -64,7 +64,7 @@ dependencies:
   uuid: 2.2.2
   web_socket_channel: 1.2.0
   web3dart: 
-     git: git@github.com:FiveToken/web3dart.git
+     git: https://github.com/FiveToken/web3dart.git
   random_color: ^1.0.5
   event_bus: ^1.1.1
   #flutter_local_notifications: ^3.0.3
