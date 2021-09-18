@@ -48,6 +48,10 @@ FiveToken targets to solve the problems via developing cross-chain payment proto
 
 After install the dependencies above, clone this project and enter the root directory. Then you can run `flutter pub get` to install third-party code required for this project. When the above operations are completed，run `flutter run` to start app.
 
+## Run Unit Test
+
+`flutter test`
+
 ## How to build
 
 ### Android
@@ -68,3 +72,12 @@ Check [FiveToken Documentation](https://docs.fivetoken.io/userguide/app.html)
 
 [MIT](https://github.com/FiveToken/FiveToken-Wallet/blob/master/LICENSE)
 
+## Links
+
+[Project structure](./doc/code-tree.txt)
+
+[functional-module](./functional-module.md)
+
+[Release log](./doc/release.md)
+
+[Design documents](./doc/impl.md)
