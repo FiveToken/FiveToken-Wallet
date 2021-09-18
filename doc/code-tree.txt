@@ -1,0 +1,137 @@
+├─README.md ---------------------- // project description documentation
+├─lib ---------------------------- // code documents
+│ ├─actions 
+│ │ └─event.dart ----------------- // global events definition
+│ ├─api -------------------------- // APIs
+│ │ ├─index.dart 
+│ │ └─third.dart ----------------- // third party APIs
+│ ├─app.dart --------------------- // global APP configuration
+│ ├─chain ------------------------ // chain-related
+│ │ ├─contract.dart -------------- // smart contract
+│ │ ├─gas.dart ------------------- // service fee
+│ │ ├─index.dart 
+│ │ ├─key.dart ------------------- // encryption
+│ │ ├─message.dart --------------- // message details
+│ │ ├─net.dart ------------------- // supported network by default
+│ │ ├─provider.dart -------------- // providers of multiple chains
+│ │ ├─token.dart ----------------- // contract token
+│ │ ├─wallet.dart ---------------- // wallet
+│ ├─common ----------------------- // common function wait
+│ │ ├─back.dart ------------------ // return to the android desktop
+│ │ ├─formatter.dart ------------- // input box and format the inputted content
+│ │ ├─global.dart ---------------- // global constants
+│ │ ├─index.dart 
+│ │ ├─navigation.dart ------------ // routine listening
+│ │ ├─pk.dart -------------------- // private key encryption
+│ │ ├─time.dart ------------------ // time formats
+│ │ ├─utils.dart ----------------- // common utility functions
+│ │ └─walletConnect.dart --------- // support WalletConnect protocol
+│ ├─conf 
+│ │ └─conf.dart 
+│ ├─i10n 
+│ │ └─localization.dart ---------- // support multiple language
+│ ├─index.dart 
+│ ├─init ------------------------- // about initialization
+│ │ ├─device.dart ---------------- // intialize device information
+│ │ ├─hive.dart ------------------ // intialize database
+│ │ └─prefer.dart ---------------- // intialize route homepage
+│ ├─lang ------------------------- // language package
+│ │ ├─en.dart -------------------- // English
+│ │ ├─index.dart 
+│ │ ├─jp.dart -------------------- // Japanese
+│ │ ├─kr.dart -------------------- // Korean
+│ │ └─zh.dart -------------------- // Chinese
+│ ├─main.dart -------------------- // main function
+│ ├─models 
+│ │ ├─address.dart --------------- // address book model
+│ │ ├─cacheMessage.dart ---------- // cache info. model
+│ │ ├─filMessage.dart ------------ // filecoin unsigned-message signed-message
+│ │ ├─index.dart 
+│ │ ├─nonce.dart ----------------- // nonce model
+│ │ ├─private.dart --------------- // filecoin private key model
+│ │ ├─wallet.dart ---------------- // wallet model
+│ ├─pages ------------------------ // all codes on the APP page
+│ │ ├─address -------------------- // address book
+│ │ │ ├─add.dart ----------------- // add address book
+│ │ │ ├─index.dart --------------- // address book list
+│ │ │ ├─net.dart ----------------- // select address book network
+│ │ │ ├─select.dart -------------- // select address
+│ │ │ └─wallet.dart -------------- // select address in the wallet
+│ │ ├─create --------------------- // create the wallet
+│ │ │ ├─import.dart -------------- // access
+│ │ │ ├─importMne.dart ----------- // import mnemonic words
+│ │ │ ├─importPrivateKey.dart ---- // import private key
+│ │ │ ├─mneCheck.dart ------------ // verify mnemonic words
+│ │ │ ├─mneCreate.dart ----------- // generate mnemonic words
+│ │ │ └─warn.dart ---------------- // alert
+│ │ ├─index.dart 
+│ │ ├─init ----------------------- // initilization
+│ │ │ ├─boot.dart 
+│ │ │ ├─lang.dart ---------------- // select the language
+│ │ │ └─wallet.dart -------------- // create or import
+│ │ ├─main 
+│ │ │ ├─drawer.dart -------------- // drawer
+│ │ │ ├─index.dart --------------- // home page
+│ │ │ ├─walletConnect.dart ------- // walletconnect
+│ │ │ └─widgets ------------------ // widgets
+│ │ │   ├─net.dart --------------- // select the networks
+│ │ │   ├─price.dart ------------- // token price
+│ │ │   └─token.dart ------------- // token
+│ │ ├─net ------------------------ // network
+│ │ │ ├─add.dart ----------------- // add the network
+│ │ │ ├─index.dart 
+│ │ │ ├─list.dart ---------------- // network list
+│ │ │ └─token.dart --------------- // add token in the network
+│ │ ├─other ---------------------- // other
+│ │ │ ├─lang.dart ---------------- // multiple language to switch to
+│ │ │ ├─scan.dart ---------------- // scan QR code
+│ │ │ ├─set.dart ----------------- // setting
+│ │ │ └─webview.dart ------------- // web page
+│ │ ├─pass ----------------------- // password
+│ │ │ ├─init.dart ---------------- // set up the password
+│ │ │ └─reset.dart --------------- // change the password
+│ │ ├─transfer ------------------- // transfer
+│ │ │ ├─detail.dart -------------- // details of transaction record
+│ │ │ ├─gas.dart ----------------- // set the service fee
+│ │ │ └─transfer.dart ------------ // transfer
+│ │ └─wallet --------------------- // wallet
+│ │   ├─code.dart ---------------- // wallet QR code
+│ │   ├─id.dart ------------------ // identity wallet
+│ │   ├─index.dart 
+│ │   ├─main.dart ---------------- // balance and message list
+│ │   ├─manage.dart -------------- // manage the wallet
+│ │   ├─mne.dart ----------------- // export mnemonic words of the wallet
+│ │   ├─private.dart ------------- // export private key of the wallet
+│ │   ├─select.dart -------------- // select a wallet
+│ │   └─widgets 
+│ │     └─messageItem.dart 
+│ ├─routes 
+│ │ ├─address.dart --------------- // routes of address book
+│ │ ├─create.dart ---------------- // routes of creating wallet
+│ │ ├─init.dart ------------------ // routes of initializing
+│ │ ├─net.dart ------------------- // routes of networks
+│ │ ├─other.dart ----------------- // routes of scanning and setting
+│ │ ├─pass.dart ------------------ // routes of password
+│ │ ├─path.dart ------------------ // routes of path
+│ │ ├─routes.dart ---------------- // routes of root
+│ │ ├─transfer.dart -------------- // routes of transaction
+│ │ └─wallet.dart ---------------- // routes of managing wallet
+│ ├─store 
+│ │ └─store.dart ----------------- // global status of app
+│ └─widgets ---------------------- // global widgets
+│   ├─bottomSheet.dart ----------- // pop-up box in 
+│   ├─card.dart ------------------ // cards
+│   ├─dialog.dart ---------------- // pop up the dialog box
+│   ├─field.dart ----------------- // input box
+│   ├─fresh.dart ----------------- // refresh
+│   ├─icons.dart ----------------- // icon
+│   ├─index.dart 
+│   ├─layout.dart ---------------- // layout
+│   ├─random.dart ---------------- // random icon
+│   ├─scaffold.dart -------------- // scaffold
+│   ├─toast.dart ----------------- // toast units
+│   ├─style.dart ----------------- // style
+│   └─text.dart ------------------ // text
+├─pubspec.lock 
+├─pubspec.yaml ------------------- // project dependency
+└─test --------------------------- // unit test

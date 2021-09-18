@@ -56,7 +56,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: b91b2ee1faab8f676923c81e58b62c465aeb8ad8
-      url: "git@github.com:FiveToken/bls.git"
+      url: "https://github.com/FiveToken/bls.git"
     source: git
     version: "0.0.1"
   boolean_selector:
@@ -324,7 +324,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: "85d6d4379f51228ff40c2ef93de9e695fdd5c829"
-      url: "git@github.com:FiveToken/flotus.git"
+      url: "https://github.com/FiveToken/flotus.git"
     source: git
     version: "0.0.1"
   flutter:
@@ -925,7 +925,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: cd5c6dbc190c2f59928e73e1fce59a2bf07b78f0
-      url: "git@github.com:FiveToken/web3dart.git"
+      url: "https://github.com/FiveToken/web3dart.git"
     source: git
     version: "1.2.3"
   web_socket_channel:
