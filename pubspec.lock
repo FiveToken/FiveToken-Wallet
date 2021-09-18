@@ -53,9 +53,11 @@ packages:
   bls:
     dependency: "direct main"
     description:
-      path: "plugins/bls"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: b91b2ee1faab8f676923c81e58b62c465aeb8ad8
+      url: "git@github.com:FiveToken/bls.git"
+    source: git
     version: "0.0.1"
   boolean_selector:
     dependency: transitive
@@ -168,7 +170,7 @@ packages:
       name: code_builder
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.2.1"
+    version: "3.7.0"
   collection:
     dependency: transitive
     description:
@@ -319,9 +321,11 @@ packages:
   flotus:
     dependency: "direct main"
     description:
-      path: "plugins/flotus"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "85d6d4379f51228ff40c2ef93de9e695fdd5c829"
+      url: "git@github.com:FiveToken/flotus.git"
+    source: git
     version: "0.0.1"
   flutter:
     dependency: "direct main"
@@ -539,6 +543,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.9.7"
+  mockito:
+    dependency: "direct dev"
+    description:
+      name: mockito
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.1.4"
   node_interop:
     dependency: transitive
     description:
@@ -911,9 +922,11 @@ packages:
   web3dart:
     dependency: "direct main"
     description:
-      path: "plugins/web3dart-1.2.3"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: cd5c6dbc190c2f59928e73e1fce59a2bf07b78f0
+      url: "git@github.com:FiveToken/web3dart.git"
+    source: git
     version: "1.2.3"
   web_socket_channel:
     dependency: "direct main"
