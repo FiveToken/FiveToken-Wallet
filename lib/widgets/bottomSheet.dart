@@ -683,7 +683,7 @@ Future<T> showCustomModalBottomSheet<T>({
   return Navigator.of(context, rootNavigator: useRootNavigator)
       .push(_ModalBottomSheetRoute<T>(
     builder: builder,
-    theme: Theme.of(context, shadowThemeOnly: true),
+    theme: Theme.of(context),
     isScrollControlled: isScrollControlled,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     backgroundColor: backgroundColor,
