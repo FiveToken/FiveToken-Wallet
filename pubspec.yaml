@@ -29,17 +29,17 @@ dependencies:
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
   path_provider: any
-  bip39: ^1.0.3
+  bip39: any
   bip32: ^1.0.5
   dio: ^3.0.0
-  crypto: 2.1.3
-  encrypt: ^4.0.0
+  crypto: any
+  encrypt: any
   flotus:
     git: https://github.com/FiveToken/flotus.git
   bls:
     git: https://github.com/FiveToken/bls.git
-  permission_handler: 3.0.1
-  image_gallery_saver: ^1.1.0
+  permission_handler: any
+  image_gallery_saver: any
   get:
   qr_flutter: ^3.1.0
   flutter_slidable: ^0.5.7
@@ -58,13 +58,13 @@ dependencies:
   flutter_swipe_action_cell: ^1.3.4
   day: ^0.6.4
   uni_links: ^0.4.0
-  cryptography: ^1.4.1
+  cryptography: any
   logger: 0.9.4
   tuple: 1.0.3
-  uuid: 2.2.2
+  uuid: any
   web_socket_channel: 1.2.0
-  web3dart: 
-     git: https://github.com/FiveToken/web3dart.git
+  web3dart:
+    git: https://gitlab.com/abu0306/web3dart.git
   random_color: ^1.0.5
   event_bus: ^1.1.1
   #flutter_local_notifications: ^3.0.3
@@ -73,7 +73,7 @@ dev_dependencies:
     sdk: flutter
   hive_generator: ^0.8.2
   build_runner: ^1.10.11
-  mockito: ^4.1.4
+  mockito: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
