@@ -17,6 +17,14 @@ class ChineseCupertinoLocalizations implements CupertinoLocalizations {
 
   @override
   String get alertDialogLabel => ml.alertDialogLabel;
+  @override
+  String get searchTextFieldPlaceholderLabel => '';
+  @override
+  List<String> get timerPickerHourLabels => [''];
+  @override
+  List<String> get timerPickerMinuteLabels => [''];
+  @override 
+  List<String> get timerPickerSecondLabels => [''];
 
   @override
   String get anteMeridiemAbbreviation => ml.anteMeridiemAbbreviation;
