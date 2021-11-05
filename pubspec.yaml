@@ -31,7 +31,7 @@ dependencies:
   path_provider: any
   bip39: any
   bip32: ^1.0.5
-  dio: ^3.0.0
+  dio: any
   crypto: any
   encrypt: any
   flotus:
@@ -63,16 +63,15 @@ dependencies:
   tuple: 1.0.3
   uuid: any
   web_socket_channel: 1.2.0
-  web3dart:
-    git: https://gitlab.com/abu0306/web3dart.git
+  web3dart: any
   random_color: ^1.0.5
   event_bus: ^1.1.1
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^0.8.2
-  build_runner: ^1.10.11
+  hive_generator: any
+  build_runner: any
   mockito: any
 
 # For information on the generic Dart part of this file, see the
