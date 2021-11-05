@@ -38,20 +38,20 @@ dependencies:
     git: https://gitlab.com/abu0306/flotus.git
   bls:
     git: https://gitlab.com/abu0306/bls.git
-  permission_handler: any
+  permission_handler: 8.2.5
   image_gallery_saver: any
   get:
   qr_flutter: ^3.1.0
   flutter_slidable: ^0.5.7
   scan: ^0.0.7
-  connectivity: ^2.0.2
+  connectivity: any
   pull_to_refresh: any
-  image_picker: ^0.6.7+21
+  image_picker: any
   fbutton: ^2.0.1
   package_info: ^0.4.3+2
-  webview_flutter: ^1.0.7
-  device_info: ^1.0.0
-  url_launcher: ^5.7.10
+  webview_flutter: any
+  device_info: any
+  url_launcher: any
   gesture_password_widget: ^1.0.6
   share: ^0.6.5+4
   oktoast: any
