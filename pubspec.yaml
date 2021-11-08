@@ -66,6 +66,11 @@ dependencies:
   web3dart: any
   random_color: ^1.0.5
   event_bus: ^1.1.1
+  dio_log: any
+  bloc: any
+  flutter_bloc: any
+  equatable: any
+  http: any
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:

@@ -27,6 +27,9 @@ class Network {
   String path;
   @HiveField(11)
   String color;
+
+
+  
   Color c = CustomColor.bgGrey;
   String get label {
     return netType == 2 ? name : '$chain$net'.tr;

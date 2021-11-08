@@ -1,5 +1,4 @@
-bimport 'dart:io';
-
+import 'dart:io';
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:get/get.dart';
