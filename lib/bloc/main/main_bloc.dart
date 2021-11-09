@@ -12,5 +12,15 @@ class MainBloc extends Bloc<MainEvent, MainState> {
       // TODO: implement event handler
       // debugPrint("================AppOpenEvent=========" + event.count.toString());
     });
+    on<TestNetIsShowEvent>((event, emit){
+      bool hideTestnet = event.hideTestnet;
+      List<List<Network>> nets = !hideTestnet ? [Network.netList[0]] : Network.netList;
+      Global.store.setBool('hideTestnet', !hideTestnet);
+      debugPrint("================TestNetIsShowEvent=========");
+      emit(state.copyWithMainStateHideTestNet(
+          hideTestnet:!hideTestnet,
+          filterNets:nets
+      ));
+    });
   }
 }
