@@ -34,8 +34,9 @@ Future<Uint8List> genKek(String addr, String pass, {int size = 32}) async {
   final newSecretKey = await pbkdf2.deriveKey(
       secretKey: SecretKey(utf8.encode(pass)),
       nonce:  nonce);
+  final listInt = await newSecretKey.extractBytes();
 
-  return newSecretKey.extractBytes();
+  return Uint8List.fromList(listInt) ;
 }
 
 Uint8List decodePrivate(String pk) {
