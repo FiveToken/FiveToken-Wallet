@@ -26,8 +26,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.7
-  hive: ^1.4.4+1
-  hive_flutter: ^0.3.1
+  hive: any
+  hive_flutter: any
   path_provider: any
   bip39: any
   bip32: ^1.0.5
@@ -53,7 +53,7 @@ dependencies:
   device_info: any
   url_launcher: any
   gesture_password_widget: ^1.0.6
-  share: ^0.6.5+4
+  share: any
   oktoast: any
   flutter_swipe_action_cell: ^1.3.4
   day: ^0.6.4
@@ -62,8 +62,8 @@ dependencies:
   logger: 0.9.4
   tuple: 1.0.3
   uuid: any
-  web_socket_channel: 1.2.0
-  web3dart: any
+  web_socket_channel: any
+  web3dart: 2.3.2
   random_color: ^1.0.5
   event_bus: ^1.1.1
   dio_log: any

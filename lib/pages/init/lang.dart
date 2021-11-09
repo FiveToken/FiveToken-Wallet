@@ -1,12 +1,15 @@
+import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/index.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SelectLangPage extends StatelessWidget {
-  void selectLang(String lang) async {
+  void selectLang(String lang,context) async {
     Locale l = Locale(lang);
     Get.updateLocale(l);
     Global.langCode = lang;
     Global.store.setString(StoreKeyLanguage, lang);
     Get.toNamed(initWalletPage);
+    BlocProvider.of<MainBloc>(context).add(AppOpenEvent(count: 1));
   }
 
   @override
@@ -51,7 +54,7 @@ class SelectLangPage extends StatelessWidget {
                       CardItem(
                           label: 'English',
                           onTap: () {
-                            selectLang('en');
+                            selectLang('en',context);
                           })
                     ],
                   ),
@@ -63,7 +66,7 @@ class SelectLangPage extends StatelessWidget {
                       CardItem(
                           label: '한국어',
                           onTap: () {
-                            selectLang('kr');
+                            selectLang('kr',context);
                           })
                     ],
                   ),
@@ -75,7 +78,7 @@ class SelectLangPage extends StatelessWidget {
                       CardItem(
                           label: '日本語',
                           onTap: () {
-                            selectLang('jp');
+                            selectLang('jp',context);
                           })
                     ],
                   ),
@@ -87,7 +90,7 @@ class SelectLangPage extends StatelessWidget {
                       CardItem(
                           label: '中文',
                           onTap: () {
-                            selectLang('zh');
+                            selectLang('zh',context);
                           })
                     ],
                   ),

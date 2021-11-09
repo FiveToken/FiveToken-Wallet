@@ -238,3 +238,4 @@ class AddressType {
   static List<AddressType> get supportTypes =>
       [AddressType.filecoin, AddressType.eth];
 }
+

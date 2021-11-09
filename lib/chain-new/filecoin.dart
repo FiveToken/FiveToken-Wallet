@@ -1,13 +1,13 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:fil/chain/provider.dart';
+import 'package:fil/chain-new/provider.dart';
 import 'package:fil/config/constant.dart';
 import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/models-new/rpc_network.dart';
 import 'package:fil/models-new/token.dart';
 import 'package:fil/repository/http/http.dart';
+import 'package:fil/models-new/chain_info.dart';
 
 class Filecoin extends ChainProvider {
   Dio client;
@@ -17,10 +17,14 @@ class Filecoin extends ChainProvider {
   static String feePath = '/recommend/fee';
   static String clientId = clientID;
 
-  Filecoin(RpcNetwork network, {Dio httpClient}) {
-    this.network = network;
+  // Filecoin(RpcNetwork network, {Dio httpClient}) {
+  //   this.network = network;
+  //   client = httpClient ?? http;
+  //   client.options.baseUrl = network.rpc + '/api$clientId';
+  // }
+  Filecoin(String rpc, {Dio httpClient}) {
     client = httpClient ?? http;
-    client.options.baseUrl = network.rpc + '/api$clientId';
+    client.options.baseUrl = rpc + '/api$clientId';
   }
 
   @override
@@ -37,14 +41,27 @@ class Filecoin extends ChainProvider {
   }
 
   @override
+  Future<ChainInfo> getBlockByNumber(int number) async{
+    return ChainInfo(
+        gasUsed:BigInt.from(0),
+        gasLimit:BigInt.from(0),
+        blockHeight:BigInt.from(0),
+        timestamp:BigInt.from(0)
+    );
+  }
+
+  @override
   Future<String> sendTransaction(
       {String to,
         String amount,
         String private,
         ChainGas gas,
-        String source,
         int nonce}) async {
-    return '';
+    try {
+      return '';
+    } catch (e) {
+      return '';
+    }
   }
 
   Future<List<Map<String, dynamic>>> getFilecoinMessageList(

@@ -4,6 +4,8 @@
 /// chain : ""
 /// rpc : ""
 /// balance : ""
+/// currency : ""
+/// tokenType : ""
 
 class Token {
   Token({
@@ -12,7 +14,10 @@ class Token {
     this.address,
     this.chain,
     this.rpc,
-    this.balance,});
+    this.balance,
+    this.currency,
+    this.tokenType
+  });
 
   Token.fromJson(dynamic json) {
     symbol = json['symbol'];
@@ -21,6 +26,8 @@ class Token {
     chain = json['chain'];
     rpc = json['rpc'];
     balance = json['balance'];
+    currency = json['currency'];
+    tokenType = json['tokenType'];
   }
   String symbol;
   int precision;
@@ -28,6 +35,8 @@ class Token {
   String chain;
   String rpc;
   String balance;
+  String currency;
+  String tokenType;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -37,7 +46,8 @@ class Token {
     map['chain'] = chain;
     map['rpc'] = rpc;
     map['balance'] = balance;
+    map['currency'] = currency;
+    map['tokenType'] = tokenType;
     return map;
   }
-
 }

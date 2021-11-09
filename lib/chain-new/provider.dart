@@ -24,7 +24,7 @@ abstract class ChainProvider {
 
   Future<ChainInfo> getBlockByNumber(int number);
 
-  Future<String> getBlockByHash(String hash);
+  // Future<String> getBlockByHash(String hash);
 
   void dispose();
 }

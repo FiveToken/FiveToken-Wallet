@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:web3dart/json_rpc.dart';
 
-class RpcJson extends RpcService {
+class RpcJson implements RpcService {
   RpcJson(this.url, this.client);
 
   final String url;

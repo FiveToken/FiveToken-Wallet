@@ -6,6 +6,8 @@ import 'package:fil/widgets/random.dart';
 import 'package:web3dart/web3dart.dart' hide AddressType;
 import 'package:http/http.dart' as http;
 
+
+
 class WalletMainPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -123,26 +125,27 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
             map[mes.hash] = t;
           }
         }
-        if (map.isNotEmpty) {
-          var futures = map.values
-              .map((t) => client.getBlockByNumber(t.blockNumber.blockNum))
-              .toList();
-          var mesList = map.keys.toList();
-          var blocks = await Future.wait(futures);
-          for (var i = 0; i < mesList.length; i++) {
-            var block = blocks[i];
-            var key = mesList[i];
-            var mes = box.get(key);
-            if (block.timestamp != null && block.timestamp is int) {
-              mes.pending = 0;
-              mes.blockTime = block.timestamp;
-              mes.height = block.number;
-              mes.exitCode = map[key].status ? 0 : 1;
-              box.put(key, mes);
-            }
-          }
-          setList();
-        }
+        // bowen notes
+        // if (map.isNotEmpty) {
+        //   var futures = map.values
+        //       .map((t) => client.getBlockByNumber(t.blockNumber.blockNum))
+        //       .toList();
+        //   var mesList = map.keys.toList();
+        //   var blocks = await Future.wait(futures);
+        //   for (var i = 0; i < mesList.length; i++) {
+        //     var block = blocks[i];
+        //     var key = mesList[i];
+        //     var mes = box.get(key);
+        //     if (block.timestamp != null && block.timestamp is int) {
+        //       mes.pending = 0;
+        //       mes.blockTime = block.timestamp;
+        //       mes.height = block.number;
+        //       mes.exitCode = map[key].status ? 0 : 1;
+        //       box.put(key, mes);
+        //     }
+        //   }
+        //   setList();
+        // }
       } catch (e) {
         print(e);
       }
