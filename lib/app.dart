@@ -2,7 +2,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/navigation.dart';
 import 'package:fil/i10n/localization.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:fil/lang/index.dart';
 import 'package:fil/pages/main/index.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,6 +12,15 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import './routes/routes.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/init/device.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/actions/event.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 

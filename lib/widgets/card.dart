@@ -1,4 +1,8 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/index.dart';
 
 class CommonCard extends StatelessWidget {
   final Widget child;

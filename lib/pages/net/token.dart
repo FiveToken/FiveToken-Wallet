@@ -1,9 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:fil/chain/token.dart';
-import 'package:fil/index.dart';
+import 'package:fil/chain/contract.dart';
+// import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/store/store.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/common/formatter.dart';
 
 class TokenAddPage extends StatefulWidget {
   final Web3Client defaultClient;

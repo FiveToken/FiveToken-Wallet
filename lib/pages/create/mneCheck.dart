@@ -1,5 +1,14 @@
 import 'package:fil/common/index.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/toast.dart';
+import './mneCreate.dart';
 
 class MneCheckPage extends StatefulWidget {
   @override

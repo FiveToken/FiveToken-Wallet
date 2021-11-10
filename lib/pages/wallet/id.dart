@@ -1,7 +1,18 @@
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/layout.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/routes/path.dart';
+// import 'package:fil/index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class IdWalletPage extends StatefulWidget {

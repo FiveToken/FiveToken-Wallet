@@ -1,6 +1,14 @@
+import 'dart:math';
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:fbutton/fbutton.dart';
 import 'package:fil/pages/main/drawer.dart';
 import 'package:fil/pages/main/widgets/net.dart';
 import 'package:fil/pages/main/widgets/price.dart';
@@ -11,6 +19,27 @@ import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import './walletConnect.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/dialog.dart';
+import 'package:fil/widgets/bottomSheet.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/fresh.dart';
+import 'package:fil/actions/event.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/init/hive.dart';
+import 'package:flotus/flotus.dart';
+import 'package:bls/bls.dart';
+import 'package:fil/chain/provider.dart';
+import 'package:fil/chain/gas.dart';
+import 'package:fil/pages/wallet/main.dart';
+import 'package:fil/pages/other/scan.dart';
+import 'package:fil/widgets/index.dart';
+import 'package:http/http.dart';
+
 
 typedef WCCallback = List<JsonRpc Function(WCSession, JsonRpc)> Function(
     String type);

@@ -1,4 +1,9 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/common/global.dart';
 
 class LangPage extends StatefulWidget {
   @override

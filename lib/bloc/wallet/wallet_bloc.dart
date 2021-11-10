@@ -1,9 +1,6 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:fil/chain-new/filecoin.dart';
-import 'package:fil/index.dart';
 import 'wallet_state.dart';
 part 'wallet_event.dart';
 
@@ -17,7 +14,5 @@ class WalletBloc extends Bloc<BalanceEvent, WalletState> {
       case 'filecoin':
         Filecoin(event.rpc).getBalance(event.address);
     }
-
-
   }
 }

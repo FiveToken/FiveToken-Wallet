@@ -1,11 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/index.dart';
+import 'package:fil/widgets/field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:math';
-
+import 'package:fil/common/global.dart';
+import 'package:fil/common/formatter.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/pages/other/scan.dart';
+import 'package:fil/chain/provider.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/gas.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/common/pk.dart';
 class FilTransferNewPage extends StatefulWidget {
   @override
   State createState() => FilTransferNewPageState();

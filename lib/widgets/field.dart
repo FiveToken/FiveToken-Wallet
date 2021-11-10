@@ -1,4 +1,10 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/common/utils.dart';
 
 class Field extends StatelessWidget {
   final String label;

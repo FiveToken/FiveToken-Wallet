@@ -1,6 +1,19 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/pages/other/scan.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/models/index.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/common/utils.dart';
+
 
 class ImportPrivateKeyPage extends StatefulWidget {
   @override

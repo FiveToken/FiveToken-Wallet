@@ -1,4 +1,9 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/index.dart';
 
 typedef dynamic OnPress();
 
