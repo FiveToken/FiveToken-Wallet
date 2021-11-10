@@ -1,4 +1,15 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/utils.dart';
+import 'dart:math';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/api/third.dart';
 
 class CoinPriceWidget extends StatefulWidget {
   @override

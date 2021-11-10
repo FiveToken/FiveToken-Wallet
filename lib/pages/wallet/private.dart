@@ -1,5 +1,12 @@
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/pages/wallet/mne.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/common/utils.dart';
 
 class WalletPrivatekeyPage extends StatefulWidget {
   @override

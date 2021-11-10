@@ -1,5 +1,14 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/pages/create/mneCreate.dart';
 
 class WalletMnePage extends StatefulWidget {
   @override

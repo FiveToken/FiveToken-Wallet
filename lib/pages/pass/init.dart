@@ -1,8 +1,22 @@
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/index.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/init/hive.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class PassInitPage extends StatefulWidget {
   @override

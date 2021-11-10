@@ -1,6 +1,17 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
+
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:get/get.dart';
+import 'package:fil/routes/path.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/pages/other/scan.dart';
+
 
 class ImportMnePage extends StatefulWidget {
   @override

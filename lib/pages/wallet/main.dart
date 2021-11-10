@@ -1,12 +1,29 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:day/day.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:fil/pages/wallet/widgets/messageItem.dart';
 import 'package:fil/widgets/icons.dart';
 import 'package:fil/widgets/random.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/fresh.dart';
 import 'package:web3dart/web3dart.dart' hide AddressType;
 import 'package:http/http.dart' as http;
-
-
+import 'package:fil/models/index.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/time.dart';
+import 'package:fil/chain/provider.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/app.dart';
+import 'package:fil/actions/event.dart';
 
 class WalletMainPage extends StatefulWidget {
   @override

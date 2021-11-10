@@ -1,4 +1,17 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/widgets/bottomSheet.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/layout.dart';
+import 'package:fil/widgets/dialog.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/actions/event.dart';
 
 class NetSelect extends StatelessWidget {
   @override

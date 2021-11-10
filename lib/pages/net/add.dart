@@ -1,8 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:fbutton/fbutton.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/index.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/chain/wallet.dart';
 
 class NetAddPage extends StatefulWidget {
   @override

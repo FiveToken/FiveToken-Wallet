@@ -1,4 +1,15 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/widgets/index.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/store/store.dart';
+
 
 class WalletInitPage extends StatelessWidget {
   @override

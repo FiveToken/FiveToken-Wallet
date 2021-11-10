@@ -1,4 +1,6 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/style.dart';
 
 class CommonText extends StatelessWidget {
   final String text;
