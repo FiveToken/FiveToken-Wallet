@@ -4,7 +4,7 @@ import 'package:fil/models-new/token.dart';
 import 'package:fil/models-new/chain_info.dart';
 
 abstract class ChainProvider {
-  RpcNetwork network;
+  String rpc;
 
   Future<String> getBalance(String address);
 
@@ -24,7 +24,9 @@ abstract class ChainProvider {
 
   Future<ChainInfo> getBlockByNumber(int number);
 
-  // Future<String> getBlockByHash(String hash);
+  Future getTransactionReceipt(String hash);
+
+  Future<List<Map<String, dynamic>>> getFilecoinMessageList({String actor ,String direction, String mid,int limit});
 
   void dispose();
 }

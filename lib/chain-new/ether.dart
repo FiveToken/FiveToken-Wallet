@@ -12,9 +12,9 @@ import 'package:fil/repository/web3/json_rpc.dart';
 class Ether extends ChainProvider {
   Web3Client client;
   RpcJson rpcJson;
-  Ether(RpcNetwork network, {Web3Client web3client}) {
-    this.network = network;
-    final web3Rpc = web3.Web3(network.rpc);
+  Ether(String rpc, {Web3Client web3client}) {
+    this.rpc = rpc;
+    final web3Rpc = web3.Web3(rpc);
     client = web3Rpc.client;
     rpcJson = web3Rpc.rpcJson;
   }
@@ -81,7 +81,15 @@ class Ether extends ChainProvider {
       final credentials = EthPrivateKey.fromHex(private);
     } catch (e) {
 
+    }
+  }
 
+  @override
+  Future getTransactionReceipt(String hash) async{
+    try{
+        var res = await client.getTransactionReceipt(hash);
+
+    }catch(error){
 
     }
   }
@@ -90,6 +98,11 @@ class Ether extends ChainProvider {
   Future<ChainGas> getGas(
       {String to, bool isToken = false, Token token}) async {
     var empty = ChainGas();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getFilecoinMessageList({String actor ,String direction, String mid,int limit}) async{
+
   }
 
   @override

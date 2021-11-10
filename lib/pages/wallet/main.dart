@@ -1,4 +1,5 @@
 import 'package:day/day.dart';
+import 'package:fil/chain-new/global.dart';
 import 'package:fil/index.dart';
 import 'package:fil/pages/wallet/widgets/messageItem.dart';
 import 'package:fil/widgets/icons.dart';
@@ -207,8 +208,10 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   Future<List<CacheMessage>> getMessages(
       {String direction = 'up', String mid}) async {
     try {
-      var res = await (provider as FilecoinProvider).getFilecoinMessageList(
-          actor: $store.wal.addr, direction: direction, mid: mid);
+      // var res = await (provider as FilecoinProvider).getFilecoinMessageList(
+      //     actor: $store.wal.addr, direction: direction, mid: mid);
+      Chain.setRpcNetwork($store.net.rpc,$store.net.addressType);
+      var res = await Chain.chainProvider.getFilecoinMessageList(actor: $store.wal.addr, direction: direction, mid: mid);
       if (res.isNotEmpty) {
         List<CacheMessage> messages = [];
         res.forEach((map) {
