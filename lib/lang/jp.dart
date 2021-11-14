@@ -142,7 +142,7 @@ const Map<String, String> JP_LANG = {
   'secp': "f1，(ベース Secp256k1)",
   'bls': "f3，(ベース  Bls)",
   'today': '今日',
-  'yestoday': '昨日',
+  'yesterday': '昨日',
   'hasPending': '未確認の取引がございますが、新規送金を続きますか？',
   'speedup': '未確認の取引を速めます',
   'continueNew': '新規取引を続きます',

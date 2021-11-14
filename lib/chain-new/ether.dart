@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:fil/models-new/message_pending.dart';
+import 'package:fil/models-new/message_pending_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
 import 'package:fil/chain-new/provider.dart';
@@ -27,25 +29,25 @@ class Ether extends ChainProvider {
       return ChainInfo.fromJson(res.result);
     } catch (error) {
       return ChainInfo(
-        gasUsed: BigInt.from(0),
-        gasLimit: BigInt.from(0),
-        blockHeight: BigInt.from(0),
-        timestamp: BigInt.from(0),
+        gasUsed: 0,
+        gasLimit:0,
+        number:0,
+        timestamp: 0,
       );
     }
   }
   @override
   Future<String> getBalance(String address) async {
+    String balance = '0';
     try {
-      debugPrint(address);
       var res = await client.getBalance(EthereumAddress.fromHex(address));
-      return res.getInWei.toString();
+      balance = res.getInWei.toString();
     } catch (e) {
       if (e is FormatException) {
         debugPrint(jsonEncode(e.message));
       }
-      return '0';
     }
+    return balance;
   }
 
   @override
@@ -101,9 +103,10 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getFilecoinMessageList({String actor ,String direction, String mid,int limit}) async{
+  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{ }
 
-  }
+  @override
+  Future<List> getMessagePendingState(List param) async{}
 
   @override
   void dispose() {

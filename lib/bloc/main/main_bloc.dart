@@ -1,20 +1,23 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fil/chain-new/global.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/global.dart';// Global
-import 'package:flutter/material.dart';
+import 'package:fil/store/store.dart'; // $store
+import 'package:fil/init/hive.dart'; // OpenedBox
 part 'main_state.dart';
 part 'main_event.dart';
 
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(MainState.idle()) {
     on<AppOpenEvent>((event, emit) {
-      // TODO: implement event handler
       // debugPrint("================AppOpenEvent=========" + event.count.toString());
     });
+
     on<TestNetIsShowEvent>((event, emit){
       bool hideTestnet = event.hideTestnet;
       List<List<Network>> nets = !hideTestnet ? [Network.netList[0]] : Network.netList;
@@ -23,6 +26,18 @@ class MainBloc extends Bloc<MainEvent, MainState> {
           hideTestnet:!hideTestnet,
           filterNets:nets
       ));
+    });
+
+    on<GetBalanceEvent>((event, emit) async{
+      Chain.setRpcNetwork(event.rpc,event.chainType);
+      final balance = await Chain.chainProvider.getBalance(event.address);
+      var wal = $store.wal;
+      if (balance != wal.balance) {
+          $store.changeWalletBalance(balance);
+          wal.balance = balance;
+          OpenedBox.walletInstance.put(wal.key, wal);
+      }
+      emit(state.copyWithMainState(balance: balance));
     });
   }
 }

@@ -142,7 +142,7 @@ const Map<String, String> ZH_LANG = {
   'secp': "f1地址，(基于Secp256k1)",
   'bls': "f3地址，(基于Bls)",
   'today': '今日',
-  'yestoday': '昨日',
+  'yesterday': '昨日',
   'hasPending': '您当前有未确认的交易是否继续发送新的转账',
   'speedup': '加速未确认交易',
   'continueNew': '继续发送新的交易',

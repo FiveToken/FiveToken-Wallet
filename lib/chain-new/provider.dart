@@ -1,5 +1,6 @@
 import 'package:fil/models-new/chain_gas.dart';
-import 'package:fil/models-new/rpc_network.dart';
+import 'package:fil/models-new/message_pending.dart';
+import 'package:fil/models-new/message_pending_response.dart';
 import 'package:fil/models-new/token.dart';
 import 'package:fil/models-new/chain_info.dart';
 
@@ -26,7 +27,9 @@ abstract class ChainProvider {
 
   Future getTransactionReceipt(String hash);
 
-  Future<List<Map<String, dynamic>>> getFilecoinMessageList({String actor ,String direction, String mid,int limit});
+  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit});
+
+  Future<List> getMessagePendingState(List params);
 
   void dispose();
 }

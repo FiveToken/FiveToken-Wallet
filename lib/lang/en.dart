@@ -149,7 +149,7 @@ const Map<String, String> EN_LANG = {
   'bls': "f3 address，(base on Bls)",
   'selectAddrType': "Select Address Type",
   'today': 'Today',
-  'yestoday': 'Yestoday',
+  'yesterday': 'yesterday',
   'hasPending':
       'There is unconfirmed transaction. Do you want to continue to transfer?',
   'speedup': 'Speed up unconfirmed transactions',

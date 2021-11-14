@@ -142,7 +142,7 @@ const Map<String, String> KR_LANG = {
   'secp': "f1， (기초 하 다 Secp256k1)",
   'bls': "f3， (기초 하 다 Bls)",
   'today': '오늘',
-  'yestoday': '어제',
+  'yesterday': '어제',
   'hasPending': ' 당신은 현재 미확인 거래가 있어서 새로운 이체를 계속 보낼수 있습니까?',
   'speedup': '가속미확인거래',
   'continueNew': '새로운 거래 계속 보내기',

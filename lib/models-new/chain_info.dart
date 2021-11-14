@@ -9,27 +9,27 @@ class ChainInfo {
   ChainInfo({
     this.gasUsed,
     this.gasLimit,
-    this.blockHeight,
+    this.number,
     this.timestamp,
   });
 
   ChainInfo.fromJson(dynamic json) {
-    gasUsed = hexToInt(json['gasUsed']);
-    gasLimit = hexToInt(json['gasLimit']);
-    blockHeight = hexToInt(json['number']);
-    timestamp = hexToInt(json['timestamp']);
+    gasUsed = hexToDartInt(json['gasUsed']);
+    gasLimit = hexToDartInt(json['gasLimit']);
+    number = hexToDartInt(json['number']);
+    timestamp = hexToDartInt(json['timestamp']);
   }
 
-  BigInt gasUsed;
-  BigInt gasLimit;
-  BigInt blockHeight;
-  BigInt timestamp;
+  int gasUsed;
+  int gasLimit;
+  int number;
+  int timestamp;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['gasUsed'] = gasUsed.toString();
     map['gasLimit'] = gasLimit.toString();
-    map['number'] = blockHeight.toString();
+    map['number'] = number.toString();
     map['timestamp'] = timestamp.toString();
     return map;
   }
