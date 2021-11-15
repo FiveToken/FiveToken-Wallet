@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:dio_log/dio_log.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/index.dart';
@@ -256,6 +257,8 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    showDebugBtn(context);
+
     BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
         $store.net.rpc,
         $store.net.addressType,

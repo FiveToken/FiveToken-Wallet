@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 class HttpInterceptors extends InterceptorsWrapper {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // TODO: implement onRequest
-    debugPrint("执行了这里");
     super.onRequest(options, handler);
   }
 
@@ -17,14 +15,11 @@ class HttpInterceptors extends InterceptorsWrapper {
     debugPrint(response.requestOptions.path);
     debugPrint(response.requestOptions.headers.toString());
     debugPrint(response.requestOptions.queryParameters.toString());
-    debugPrint(jsonEncode(response.data));
-    debugPrint(response.data.runtimeType.toString());
-    debugPrint((response.data is Map).toString());
     if (response.data is Map) {
       final responseData = ResponseData.formJson(response.data);
       response.data = responseData.data;
       if (responseData.success) {
-        handler.resolve(response);
+        handler.next(response);
       } else {
         handler.reject(DioError(
             requestOptions: response.requestOptions, response: response));
@@ -34,11 +29,6 @@ class HttpInterceptors extends InterceptorsWrapper {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    // TODO: implement onError
-
-
-    debugPrint('+================执行了这'  + jsonEncode(err.message) );
-
     super.onError(err, handler);
   }
 }
