@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'package:fil/models-new/message_pending.dart';
-import 'package:fil/models-new/message_pending_response.dart';
+import 'package:fil/chain/contract.dart';
+import 'package:fil/chain/token.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
 import 'package:fil/chain-new/provider.dart';
 import 'package:fil/models-new/chain_gas.dart';
-import 'package:fil/models-new/token.dart';
 import 'package:fil/models-new/chain_info.dart';
-import 'package:fil/models-new/rpc_network.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
 
@@ -18,6 +16,7 @@ class Ether extends ChainProvider {
     this.rpc = rpc;
     final web3Rpc = web3.Web3(rpc);
     client = web3Rpc.client;
+    // client = web3client ?? Web3Client(net.url, http.Client());
     rpcJson = web3Rpc.rpcJson;
   }
 
@@ -48,6 +47,29 @@ class Ether extends ChainProvider {
       }
     }
     return balance;
+  }
+
+  @override
+  Future<String> getBalanceOfToken(String mainAddress,String tokenAddress) async{
+    var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
+    var con = DeployedContract(abi, EthereumAddress.fromHex(tokenAddress));
+    String balance = '0';
+    try {
+      var list = await client.call(
+          contract: con,
+          function: con.function('balanceOf'),
+          params: [EthereumAddress.fromHex(mainAddress)]);
+      if (list.isNotEmpty) {
+        var numStr = list[0];
+        if (numStr is BigInt) {
+          balance = numStr.toString();
+        }
+      }
+      return balance;
+    } catch (e) {
+      return balance;
+      print(e);
+    }
   }
 
   @override
@@ -90,7 +112,7 @@ class Ether extends ChainProvider {
   Future getTransactionReceipt(String hash) async{
     try{
         var res = await client.getTransactionReceipt(hash);
-
+        return res;
     }catch(error){
 
     }

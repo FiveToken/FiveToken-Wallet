@@ -27,8 +27,8 @@ class Network {
   String path;
   @HiveField(11)
   String color;
-
-
+  @HiveField(12)
+  int decimals;
   
   Color c = CustomColor.bgGrey;
   String get label {
@@ -61,7 +61,8 @@ class Network {
   static List<String> get labels =>
       ['mainNet'.tr, 'testNet'.tr, 'customNet'.tr];
   Network(
-      {this.name = '',
+      {
+        this.name = '',
       this.chain = '',
       this.net = '',
       this.netType = 0,
@@ -72,7 +73,9 @@ class Network {
       this.prefix = '',
       this.path = '',
       this.color = '0xffB4B5B7',
-      this.coin = ''});
+      this.coin = '',
+        this.decimals = 0,
+      });
   Network.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     chain = json['chain'];
@@ -86,6 +89,7 @@ class Network {
     path = json['path'];
     color = json['color'];
     coin = json['coin'];
+    decimals = json['decimals'];
   }
 
   static Network get filecoinMainNet => Network(
@@ -98,6 +102,7 @@ class Network {
       prefix: 'f',
       color: '0xff5CC1CB',
       path: "m/44'/461'/0'/0",
+      decimals:18,
       addressType: 'filecoin');
   static Network get ethMainNet => Network(
       chain: 'eth',
@@ -109,6 +114,7 @@ class Network {
       coin: 'ETH',
       browser: 'https://etherscan.io',
       color: '0xff29B6AF',
+      decimals:18,
       addressType: 'eth');
   static Network get binanceMainNet => Network(
       chain: 'binance',
@@ -119,6 +125,7 @@ class Network {
       browser: 'https://bscscan.com',
       chainId: '56',
       path: "m/44'/60'/0'/0",
+      decimals:18,
       addressType: 'eth');
 
   static Network get filecoinTestNet => Network(
@@ -130,6 +137,7 @@ class Network {
       coin: 'FIL',
       prefix: 't',
       browser: 'https://calibration.filscan.io',
+      decimals:18,
       addressType: 'filecoin');
   static Network get ethKovanNet => Network(
       chain: 'eth',
@@ -141,6 +149,7 @@ class Network {
       chainId: '42',
       color: '0xff9064FF',
       browser: 'https://kovan.etherscan.io',
+      decimals:18,
       addressType: 'eth');
   static Network get ethRopstenNet => Network(
       chain: 'eth',
@@ -152,6 +161,7 @@ class Network {
       chainId: '3',
       color: '0xffFF4A8D',
       browser: 'https://ropsten.etherscan.io',
+      decimals:18,
       addressType: 'eth');
   static Network get ethRinkebyNet => Network(
       chain: 'eth',
@@ -163,6 +173,7 @@ class Network {
       rpc: 'https://rinkeby.infura.io/v3/',
       coin: 'ETH',
       browser: 'https://rinkeby.etherscan.io',
+      decimals:18,
       addressType: 'eth');
   static Network get ethGoerliNet => Network(
       chain: 'eth',
@@ -174,6 +185,7 @@ class Network {
       coin: 'ETH',
       chainId: '5',
       browser: 'https://goerli.etherscan.io',
+      decimals:18,
       addressType: 'eth');
   static Network get binanceTestnet => Network(
       chain: 'binance',
@@ -184,6 +196,7 @@ class Network {
       coin: 'BNB',
       browser: 'https://testnet.bscscan.com',
       chainId: '97',
+      decimals:18,
       addressType: 'eth');
   static List<Network> get supportNets {
     return [

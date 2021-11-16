@@ -27,6 +27,15 @@ class Token {
     }
   }
 
+  Token.fromJson(dynamic json) {
+    symbol = json['symbol'];
+    precision = json['precision'];
+    address = json['address'];
+    chain = json['chain'];
+    rpc = json['rpc'];
+    balance = json['balance'];
+  }
+
   Token(
       {this.symbol = '',
       this.precision = 18,
