@@ -1,4 +1,6 @@
 // import 'package:fil/index.dart';
+import 'package:fil/bloc/mne/mne_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,63 +20,63 @@ class WalletMnePage extends StatefulWidget {
 }
 
 class WalletMnePageState extends State<WalletMnePage> {
-  int index = 0;
-  bool showCode = false;
+
+  void onTap(context, int idx){
+    BlocProvider.of<MneBloc>(context).add(SetMneEvent(index:idx));
+  }
+
+  void onView(context){
+    BlocProvider.of<MneBloc>(context).add(SetMneEvent(showCode: true));
+  }
+
   @override
   Widget build(BuildContext context) {
     var mne = Get.arguments['mne'] as String;
-    return CommonScaffold(
-      title: 'exportMne'.tr,
-      grey: true,
-      onPressed: () {
-        copyText(mne);
-        showCustomToast('copySucc'.tr);
-      },
-      footerText: 'copy'.tr,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                    child: TabItem(
-                  active: index == 0,
-                  label: 'mne'.tr,
-                  onTap: () {
-                    setState(() {
-                      index = 0;
-                    });
-                  },
-                )),
-                Expanded(
-                    child: TabItem(
-                  active: index == 1,
-                  label: 'code'.tr,
-                  onTap: () {
-                    setState(() {
-                      index = 1;
-                    });
-                  },
-                )),
-              ],
-            ),
-            index == 0
-                ? KeyString(
-                    data: mne,
-                    isMne: true,
-                  )
-                : KeyCode(
-                    data: mne,
-                    showCode: showCode,
-                    onView: () {
-                      setState(() {
-                        showCode = true;
-                      });
-                    },
-                  )
-          ],
-        ),
-      ),
+    return BlocProvider(
+        create: (context) => MneBloc()..add(SetMneEvent()),
+        child: BlocBuilder<MneBloc, MneState>(builder: (ctx,state){
+          return CommonScaffold(
+              title: 'exportMne'.tr,
+              grey: true,
+              onPressed: () {
+                copyText(mne);
+                showCustomToast('copySucc'.tr);
+              },
+              footerText: 'copy'.tr,
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: TabItem(
+                              active: state.index == 0,
+                              label: 'mne'.tr,
+                              onTap: ()=>{ onTap(ctx, 0)},
+                            )),
+                        Expanded(
+                            child: TabItem(
+                              active: state.index == 1,
+                              label: 'code'.tr,
+                              onTap: ()=>{onTap(ctx,1)},
+                            )),
+                      ],
+                    ),
+                    state.index == 0
+                        ? KeyString(
+                      data: mne,
+                      isMne: true,
+                    )
+                        : KeyCode(
+                      data: mne,
+                      showCode: state.showCode,
+                      onView: ()=>{onView(ctx)},
+                    )
+                  ],
+                ),
+              ),
+            );
+        }),
     );
   }
 }
