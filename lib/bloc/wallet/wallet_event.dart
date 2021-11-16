@@ -4,6 +4,14 @@ class WalletEvent {
   const WalletEvent();
 }
 
+class GetMessageListEvent extends WalletEvent {
+  String rpc;
+  String chainType;
+  String actor;
+  String direction;
+  GetMessageListEvent(this.rpc,this.chainType,this.actor,this.direction);
+}
+
 class GetFileCoinMessageListEvent extends WalletEvent {
   String rpc;
   String chainType;
@@ -15,8 +23,7 @@ class GetFileCoinMessageListEvent extends WalletEvent {
 class UpdateEthMessageListStateEvent extends WalletEvent{
   String rpc;
   String chainType;
-  List storeMessageList;
-  UpdateEthMessageListStateEvent(this.rpc,this.chainType,this.storeMessageList);
+  UpdateEthMessageListStateEvent(this.rpc,this.chainType);
 }
 
 class GetEthTransactionReceiptEvent extends WalletEvent{
@@ -35,3 +42,11 @@ class GetStoreMessageListEvent extends WalletEvent{
   String chainType;
   GetStoreMessageListEvent(this.rpc, this.chainType);
 }
+
+class SetEnablePullUpEvent extends WalletEvent{
+  bool enablePullUp;
+  SetEnablePullUpEvent(this.enablePullUp);
+}
+
+
+
