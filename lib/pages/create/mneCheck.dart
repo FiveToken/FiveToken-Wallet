@@ -1,7 +1,9 @@
+import 'package:fil/bloc/create/create_bloc.dart';
 import 'package:fil/common/index.dart';
 // import 'package:fil/index.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -27,16 +29,12 @@ class MneCheckPageState extends State<MneCheckPage> {
     unSelectedList = list;
   }
 
-  void handleSelect(num index) {
-    var rm = unSelectedList.removeAt(index);
-    selectedList.add(rm);
-    setState(() {});
+  void handleSelect(BuildContext context, state,  num index) {
+    BlocProvider.of<CreateBloc>(context).add(UpdateEvent(type: index));
   }
 
-  void handleRemove(num index) {
-    var rm = selectedList.removeAt(index);
-    unSelectedList.add(rm);
-    setState(() {});
+  void handleRemove(BuildContext context,state,  num index) {
+    BlocProvider.of<CreateBloc>(context).add(DeleteEvent(type: index));
   }
 
   String get mneCk {
@@ -45,92 +43,98 @@ class MneCheckPageState extends State<MneCheckPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      grey: true,
-      onPressed: () {
-        var str = selectedList.join(' ');
-        if (str != mne || selectedList.length < 12) {
-          showCustomError('wrongMne'.tr);
-          return;
-        }
-        Get.toNamed(passwordSetPage,
-            arguments: {'type': 0, 'mne': mne, 'label': DefaultWalletName});
-      },
-      footerText: 'next'.tr,
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            Container(
+    return BlocProvider(
+        create: (context) => CreateBloc()..add(SetCreateEvent(unSelectedList: unSelectedList)),
+        child: BlocBuilder<CreateBloc, CreateState>(builder: (ctx, state){
+          return CommonScaffold(
+            grey: true,
+            onPressed: () {
+              var str = state.selectedList.join(' ');
+              if (str != mne || state.selectedList.length < 12) {
+                showCustomError('wrongMne'.tr);
+                return;
+              }
+              Get.toNamed(passwordSetPage,
+                  arguments: {'type': 0, 'mne': mne, 'label': DefaultWalletName});
+            },
+            footerText: 'next'.tr,
+            body: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CommonText(
-                    'checkMne'.tr,
-                    size: 14,
-                    weight: FontWeight.w500,
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CommonText(
+                          'checkMne'.tr,
+                          size: 14,
+                          weight: FontWeight.w500,
+                        ),
+                        CommonText(
+                          'clickMne'.tr,
+                          size: 14,
+                          color: Color(0xffB4B5B7),
+                        ),
+                      ],
+                    ),
+                    width: double.infinity,
                   ),
-                  CommonText(
-                    'clickMne'.tr,
-                    size: 14,
-                    color: Color(0xffB4B5B7),
+                  SizedBox(height: 20),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 200),
+                      child: GridView.count(
+                        padding: EdgeInsets.all(10),
+                        physics: NeverScrollableScrollPhysics(),
+                        crossAxisCount: 3,
+                        shrinkWrap: true,
+                        childAspectRatio: 2.1,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        children: List.generate(state.selectedList.length, (index) {
+                          return MneItem(
+                            remove: true,
+                            label: state.selectedList[index],
+                            onTap: () {
+                              handleRemove(ctx, state, index);
+                            },
+                          );
+                        }),
+                      ),
+                    ),
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  GridView.count(
+                    crossAxisCount: 3,
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    childAspectRatio: 2.1,
+                    mainAxisSpacing: 15,
+                    crossAxisSpacing: 15,
+                    children: List.generate(state.unSelectedList.length, (index) {
+                      return MneItem(
+                        label: state.unSelectedList[index],
+                        bg: CustomColor.primary,
+                        onTap: () {
+                          handleSelect(ctx,state,index);
+                        },
+                      );
+                    }),
+                  )
                 ],
               ),
-              width: double.infinity,
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: 200),
-                child: GridView.count(
-                  padding: EdgeInsets.all(10),
-                  physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 3,
-                  shrinkWrap: true,
-                  childAspectRatio: 2.1,
-                  mainAxisSpacing: 15,
-                  crossAxisSpacing: 15,
-                  children: List.generate(selectedList.length, (index) {
-                    return MneItem(
-                      remove: true,
-                      label: selectedList[index],
-                      onTap: () {
-                        handleRemove(index);
-                      },
-                    );
-                  }),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            GridView.count(
-              crossAxisCount: 3,
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              childAspectRatio: 2.1,
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-              children: List.generate(unSelectedList.length, (index) {
-                return MneItem(
-                  label: unSelectedList[index],
-                  bg: CustomColor.primary,
-                  onTap: () {
-                    handleSelect(index);
-                  },
-                );
-              }),
+              padding: EdgeInsets.fromLTRB(12, 20, 12, 100),
             )
-          ],
-        ),
-        padding: EdgeInsets.fromLTRB(12, 20, 12, 100),
-      ),
+          );
+        },
+     )
     );
   }
 }
