@@ -32,7 +32,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   ContactAddress addr;
   var box = OpenedBox.addressBookInsance;
   int mode = 0;
-  Network net = $store.net;
+  // Network net = $store.net;
   @override
   void initState() {
     super.initState();
@@ -41,11 +41,15 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
-      net = Network.getNetByRpc(addr.rpc);
+      if(mounted){
+        // net = Network.getNetByRpc(addr.rpc);
+        BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: Network.getNetByRpc(addr.rpc)));
+      }
+
     }
   }
 
-  bool checkValid() {
+  bool checkValid(net) {
     var addr = addrCtrl.text.trim();
     var name = nameCtrl.text.trim();
     if (!isValidChainAddress(addr, net)) {
@@ -63,18 +67,18 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return true;
   }
 
-  void handleConfirm() {
-    if (!checkValid()) {
+  void handleConfirm(net) {
+    if (!checkValid(net)) {
       return;
     }
     if (net.rpc != $store.net.rpc) {
-      showDialog();
+      showDialog(net);
     } else {
-      confirmAdd();
+      confirmAdd(net);
     }
   }
 
-  void confirmAdd() {
+  void confirmAdd(net) {
     var address = addrCtrl.text.trim();
     var label = nameCtrl.text.trim();
     if (edit) {
@@ -90,7 +94,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return addr != null;
   }
 
-  void showDialog() {
+  void showDialog(net) {
     showCustomDialog(
         context,
         Column(
@@ -142,7 +146,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
                     ),
                     onTap: () {
                       Get.back();
-                      confirmAdd();
+                      confirmAdd(net);
                     },
                   )),
                 ],
@@ -152,7 +156,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
         ));
   }
 
-  void handleScan() {
+  void handleScan(net) {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((scanResult) {
       if (scanResult != '') {
@@ -164,65 +168,65 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       }
     });
   }
-  void onChange(Network net){
-    setState(() {
-       this.net = net;
-    });
+  void onChange(context, Network net){
+    BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: net));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => AddressBloc()..add(AddressListEvent(network: $store.net)),
-        child: CommonScaffold(
-          title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
-          footerText: !edit ? 'add'.tr : 'save'.tr,
-          grey: true,
-          onPressed: handleConfirm,
-          actions: [
-            Padding(
-              child: GestureDetector(
-                  onTap: handleScan,
-                  child: Image(
-                    width: 20,
-                    image: AssetImage('icons/scan.png'),
-                  )),
-              padding: EdgeInsets.only(right: 10),
-            )
-          ],
-          body: Padding(
-            child: Column(
-              children: [
-                NetEntranceWidget(
-                    network: net,
-                    onChange: (net)=>{onChange(net)}
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                Field(
-                  controller: addrCtrl,
-                  label: 'contactAddr'.tr,
-                  append: GestureDetector(
-                    child: Image(width: 20, image: AssetImage('icons/cop.png')),
-                    onTap: () async {
-                      var data = await Clipboard.getData(Clipboard.kTextPlain);
-                      addrCtrl.text = data.text;
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Field(
-                  controller: nameCtrl,
-                  label: 'remark'.tr,
-                ),
-              ],
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-          ),
-        ),
+        child: BlocBuilder<AddressBloc, AddressState>(builder: (context, state){
+             return CommonScaffold(
+               title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
+               footerText: !edit ? 'add'.tr : 'save'.tr,
+               grey: true,
+               onPressed: ()=>{handleConfirm(state.net)},
+               actions: [
+                 Padding(
+                   child: GestureDetector(
+                       onTap: ()=>{ handleScan(state.net)},
+                       child: Image(
+                         width: 20,
+                         image: AssetImage('icons/scan.png'),
+                       )),
+                   padding: EdgeInsets.only(right: 10),
+                 )
+               ],
+               body: Padding(
+                 child: Column(
+                   children: [
+                     NetEntranceWidget(
+                         network: state.net,
+                         onChange: (net)=>{onChange(context, net)}
+                     ),
+                     SizedBox(
+                       height: 12,
+                     ),
+                     Field(
+                       controller: addrCtrl,
+                       label: 'contactAddr'.tr,
+                       append: GestureDetector(
+                         child: Image(width: 20, image: AssetImage('icons/cop.png')),
+                         onTap: () async {
+                           var data = await Clipboard.getData(Clipboard.kTextPlain);
+                           addrCtrl.text = data.text;
+                         },
+                       ),
+                     ),
+                     SizedBox(
+                       height: 20,
+                     ),
+                     Field(
+                       controller: nameCtrl,
+                       label: 'remark'.tr,
+                     ),
+                   ],
+                 ),
+                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+               ),
+             );
+        }),
     );
   }
 }

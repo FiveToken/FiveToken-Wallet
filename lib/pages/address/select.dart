@@ -52,7 +52,7 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
                  ),
                  onTap: () {
                    Get.toNamed(addressAddPage).then((value) {
-                     // setList(context);
+                     setList(context);
                    });
                  },
                )
