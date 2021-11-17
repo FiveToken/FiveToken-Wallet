@@ -13,6 +13,9 @@ part 'select_state.dart';
 
 class SelectBloc extends Bloc<SelectEvent, SelectState> {
   SelectBloc() : super(SelectState.idle()) {
+    on<LabelEvent>((event, emit){
+      emit(state.copy(label:event.label));
+    });
     on<IdDeleteEvent>((event, emit){
       var box = OpenedBox.walletInstance;
       var keys = box.values
@@ -43,6 +46,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
         wal.label = event.newLabel;
         box.put(wal.key, wal);
       });
+      emit(state.copy(label: event.wallet.label));
     });
 
   }

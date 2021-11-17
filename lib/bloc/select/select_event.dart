@@ -4,6 +4,11 @@ class SelectEvent {
   const SelectEvent();
 }
 
+class LabelEvent extends SelectEvent{
+   final String label;
+   LabelEvent(this.label);
+}
+
 class IdDeleteEvent extends SelectEvent{
    final String hash;
    IdDeleteEvent({this.hash});

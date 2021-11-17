@@ -1,8 +1,10 @@
+import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 // import 'package:fil/index.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/widgets/text.dart';
@@ -28,6 +30,7 @@ class WalletManagePageState extends State<WalletManagePage> {
   ChainWallet wallet = Get.arguments['wallet'];
   Network net = Get.arguments['net'];
   TextEditingController controller = TextEditingController();
+
   bool get isId {
     return wallet.type == 0;
   }
@@ -36,7 +39,7 @@ class WalletManagePageState extends State<WalletManagePage> {
     return wallet.addr;
   }
 
-  CardItem get nameItem {
+  CardItem _nameItem(BuildContext context) {
     return CardItem(
       label: isId ? 'idName'.tr : 'walletName'.tr,
       onTap: () {
@@ -114,19 +117,22 @@ class WalletManagePageState extends State<WalletManagePage> {
                               }
                             }
 
-                            List<ChainWallet> list = [];
-                            if (wallet.type != 2) {
-                              list = OpenedBox.walletInstance.values
-                                  .where((wal) => wal.groupHash == hash)
-                                  .toList();
-                            } else {
-                              list = [wallet];
-                            }
-                            list.forEach((wal) {
-                              wal.label = newLabel;
-                              OpenedBox.walletInstance.put(wal.key, wal);
-                            });
-                            setState(() {});
+                            // List<ChainWallet> list = [];
+                            // if (wallet.type != 2) {
+                            //   list = OpenedBox.walletInstance.values
+                            //       .where((wal) => wal.groupHash == hash)
+                            //       .toList();
+                            // } else {
+                            //   list = [wallet];
+                            // }
+                            // list.forEach((wal) {
+                            //   wal.label = newLabel;
+                            //   OpenedBox.walletInstance.put(wal.key, wal);
+                            // });
+                            // setState(() {});
+                            BlocProvider.of<SelectBloc>(context)
+                              ..add(WalletDeleteEvent(
+                                  wallet: wallet, newLabel: newLabel));
                             Get.back();
                             showCustomToast('changeNameSucc'.tr);
                           },
@@ -139,21 +145,25 @@ class WalletManagePageState extends State<WalletManagePage> {
             ),
             color: CustomColor.bgGrey);
       },
-      append: Row(
-        children: [
-          Container(
-            width: 150,
-            alignment: Alignment.centerRight,
-            child: SingleChildScrollView(
-              child: CommonText(
-                wallet.label,
-                align: TextAlign.right,
+      append: BlocBuilder<SelectBloc, SelectState>(
+        builder: (context, state) {
+          return Row(
+            children: [
+              Container(
+                width: 150,
+                alignment: Alignment.centerRight,
+                child: SingleChildScrollView(
+                  child: CommonText(
+                    state.label,
+                    align: TextAlign.right,
+                  ),
+                  scrollDirection: Axis.horizontal,
+                ),
               ),
-              scrollDirection: Axis.horizontal,
-            ),
-          ),
-          ImageAr
-        ],
+              ImageAr
+            ],
+          );
+        },
       ),
     );
   }
@@ -210,55 +220,79 @@ class WalletManagePageState extends State<WalletManagePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: 'manageWallet'.tr,
-      grey: true,
-      hasFooter: false,
-      body: Padding(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 15,
-            ),
-            isId
-                ? TapItemCard(
-                    items: [nameItem, passItem],
-                  )
-                : TapItemCard(
-                    items: [
-                      addrItem,
-                      nameItem,
-                    ],
-                  ),
-            SizedBox(
-              height: 15,
-            ),
-            isId
-                ? TapItemCard(
-                    items: [
-                      CardItem(
-                        label: 'walletAddr'.tr,
-                        onTap: () {},
-                        append: CommonText(
-                          dotString(str: addr),
-                        ),
-                      )
-                    ],
-                  )
-                : exportCard,
-            SizedBox(
-              height: 15,
-            ),
-            isId
-                ? exportCard
-                : TapItemCard(
-                    items: [passItem],
-                  )
+  // Id manage
+  Widget _idChild(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 15,
+        ),
+        TapItemCard(items: [_nameItem(context), passItem]),
+        SizedBox(
+          height: 15,
+        ),
+        TapItemCard(
+          items: [
+            CardItem(
+              label: 'walletAddr'.tr,
+              onTap: () {},
+              append: CommonText(
+                dotString(str: addr),
+              ),
+            )
           ],
         ),
-        padding: EdgeInsets.symmetric(horizontal: 12),
+        SizedBox(
+          height: 15,
+        ),
+        exportCard
+      ],
+    );
+  }
+
+  // wallet manage
+  Widget _walletChild(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 15,
+        ),
+        TapItemCard(
+          items: [
+            addrItem,
+            _nameItem(context),
+          ],
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        exportCard,
+        SizedBox(
+          height: 15,
+        ),
+        TapItemCard(
+          items: [passItem],
+        )
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => SelectBloc()..add(WalletDeleteEvent())..add(LabelEvent(wallet.label)),
+      child: CommonScaffold(
+        title: 'manageWallet'.tr,
+        grey: true,
+        hasFooter: false,
+        body: BlocBuilder<SelectBloc, SelectState>(
+          builder: (context, state) {
+            return Padding(
+              child: isId ? _idChild(context) : _walletChild(context),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+            );
+          },
+        ),
       ),
     );
   }

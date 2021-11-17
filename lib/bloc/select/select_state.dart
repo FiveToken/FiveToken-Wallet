@@ -3,12 +3,12 @@ part of 'select_bloc.dart';
 class SelectState extends Equatable {
   final List<ChainWallet> importList;
   final List<List<String>> idList;
-
-  const SelectState({this.importList, this.idList});
+  final String label;
+  const SelectState({this.importList, this.idList, this.label});
 
   @override
   // TODO: implement props
-  List<Object> get props => [importList, idList];
+  List<Object> get props => [importList, idList, label];
 
   factory SelectState.idle() {
     var box = OpenedBox.walletInstance;
@@ -23,13 +23,14 @@ class SelectState extends Equatable {
     map.forEach((key, value) {
       ids.add([key, value]);
     });
-    return SelectState(importList: importList, idList: ids);
+    return SelectState(importList: importList, idList: ids, label: '');
   }
 
-  SelectState copy({List<ChainWallet> importList,  List<List<String>> idList}){
+  SelectState copy({List<ChainWallet> importList,  List<List<String>> idList, String label}){
     return SelectState(
         importList: importList ?? this.importList,
-        idList: idList ??  this.idList
+        idList: idList ??  this.idList,
+        label: label ?? this.label
     );
   }
 
