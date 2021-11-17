@@ -1,6 +1,8 @@
 // import 'package:fil/index.dart';
+import 'package:fil/bloc/address/address_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/models/index.dart';
@@ -170,54 +172,57 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
-      footerText: !edit ? 'add'.tr : 'save'.tr,
-      grey: true,
-      onPressed: handleConfirm,
-      actions: [
-        Padding(
-          child: GestureDetector(
-              onTap: handleScan,
-              child: Image(
-                width: 20,
-                image: AssetImage('icons/scan.png'),
-              )),
-          padding: EdgeInsets.only(right: 10),
-        )
-      ],
-      body: Padding(
-        child: Column(
-          children: [
-            NetEntranceWidget(
-              network: net,
-              onChange: (net)=>{onChange(net)}
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            Field(
-              controller: addrCtrl,
-              label: 'contactAddr'.tr,
-              append: GestureDetector(
-                child: Image(width: 20, image: AssetImage('icons/cop.png')),
-                onTap: () async {
-                  var data = await Clipboard.getData(Clipboard.kTextPlain);
-                  addrCtrl.text = data.text;
-                },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Field(
-              controller: nameCtrl,
-              label: 'remark'.tr,
-            ),
+    return BlocProvider(
+        create: (context) => AddressBloc()..add(AddressListEvent(network: $store.net)),
+        child: CommonScaffold(
+          title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
+          footerText: !edit ? 'add'.tr : 'save'.tr,
+          grey: true,
+          onPressed: handleConfirm,
+          actions: [
+            Padding(
+              child: GestureDetector(
+                  onTap: handleScan,
+                  child: Image(
+                    width: 20,
+                    image: AssetImage('icons/scan.png'),
+                  )),
+              padding: EdgeInsets.only(right: 10),
+            )
           ],
+          body: Padding(
+            child: Column(
+              children: [
+                NetEntranceWidget(
+                    network: net,
+                    onChange: (net)=>{onChange(net)}
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Field(
+                  controller: addrCtrl,
+                  label: 'contactAddr'.tr,
+                  append: GestureDetector(
+                    child: Image(width: 20, image: AssetImage('icons/cop.png')),
+                    onTap: () async {
+                      var data = await Clipboard.getData(Clipboard.kTextPlain);
+                      addrCtrl.text = data.text;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Field(
+                  controller: nameCtrl,
+                  label: 'remark'.tr,
+                ),
+              ],
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+          ),
         ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      ),
     );
   }
 }

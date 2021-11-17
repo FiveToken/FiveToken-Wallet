@@ -38,28 +38,28 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AddressBloc()..add(AddressListEvent( network: $store.net)),
-      child: CommonScaffold(
-          title: 'selectAddr'.tr,
-          hasFooter: false,
-          grey: true,
-          actions: [
-            GestureDetector(
-              child: Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: Icon(Icons.add_circle_outline),
-              ),
-              onTap: () {
-                Get.toNamed(addressAddPage).then((value) {
-                  setList(context);
-                });
-              },
-            )
-          ],
-          body: SingleChildScrollView(
+      create: (context) => AddressBloc()..add(AddressListEvent(network: $store.net)),
+      child: BlocBuilder<AddressBloc, AddressState>(builder: (context, state){
+         return CommonScaffold(
+             title: 'selectAddr'.tr,
+             hasFooter: false,
+             grey: true,
+             actions: [
+               GestureDetector(
+                 child: Padding(
+                   padding: EdgeInsets.only(right: 12),
+                   child: Icon(Icons.add_circle_outline),
+                 ),
+                 onTap: () {
+                   Get.toNamed(addressAddPage).then((value) {
+                     // setList(context);
+                   });
+                 },
+               )
+             ],
+            body: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(12, 20, 12, 20),
-              child: BlocBuilder<AddressBloc, AddressState>(builder:(ctx, state){
-                return Layout.colStart([
+               child: Layout.colStart([
                   CommonText($store.net.label),
                   SizedBox(
                     height: 12,
@@ -122,9 +122,10 @@ class AddressBookSelectPageState extends State<AddressBookSelectPage> {
                       },
                     ),
                   )
-                ]); // layout
-              })
-          )),
+                ]) // layout
+            )
+         );
+    })
     );
   }
 }
