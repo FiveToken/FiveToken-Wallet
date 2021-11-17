@@ -5,43 +5,50 @@ class WalletState extends Equatable {
   final String mid;
   final List storeMessageList;
   final List interfaceMessageList;
+  final bool enablePullUp;
 
   @override
   // TODO: implement props
   List<Object> get props =>
       [this.accountName, this.storeMessageList, this.interfaceMessageList];
 
-  WalletState({
-    this.accountName,
-    this.mid,
-    this.storeMessageList,
-    this.interfaceMessageList,
-  });
+  WalletState(
+      {this.accountName,
+      this.mid,
+      this.storeMessageList,
+      this.interfaceMessageList,
+      this.enablePullUp});
 
   factory WalletState.idle() {
     return WalletState(
-        accountName: '',
-        mid:'',
-        storeMessageList: [],
-        interfaceMessageList: [],
+      accountName: '',
+      mid: '',
+      storeMessageList: [],
+      interfaceMessageList: [],
+      enablePullUp: true,
     );
   }
 
   WalletState copyWithWalletState({
-   String accountName,
+    String accountName,
     String mid,
     List storeMessageList,
     List interfaceMessageList,
+    bool enablePullUp,
   }) {
+    final one = [];
+    one.addAll(this.interfaceMessageList);
+    one.addAll(interfaceMessageList ?? []);
+
     return WalletState(
         accountName: accountName ?? this.accountName,
-        mid:mid ?? this.mid,
+        mid: mid ?? this.mid,
         storeMessageList: storeMessageList ?? this.storeMessageList,
-        interfaceMessageList: interfaceMessageList ?? this.interfaceMessageList,
-    );
+        interfaceMessageList: one,
+        enablePullUp: enablePullUp ?? this.enablePullUp);
   }
 
-  Map<String, List<CacheMessage>> get formatMessageList{
+  Map<String, List<CacheMessage>> get formatMessageList {
     Map<String, List<CacheMessage>> messageMap = {};
     final list = [];
     String formatStr = 'YYYY-MM-DD';
@@ -57,8 +64,6 @@ class WalletState extends Equatable {
     });
     return messageMap;
   }
-
-
 }
 
 // class WalletInitial extends WalletState {

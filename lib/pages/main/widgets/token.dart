@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:fil/bloc/home/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/token.dart';
 import 'package:convert/convert.dart';
-// import 'package:fil/index.dart';
 import 'package:fil/widgets/icons.dart';
 import 'package:fil/widgets/random.dart';
 import 'package:web3dart/web3dart.dart';
@@ -14,12 +15,81 @@ import 'package:fil/widgets/text.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/widgets/style.dart';
-import 'package:fil/init/hive.dart';
 import 'package:fil/actions/event.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/net.dart';
 
+
+class MainTokenWidget extends StatelessWidget {
+  CoinIcon get coinIcon {
+    var net = $store.net;
+    var key = net.coin;
+    if (CoinIcon.icons.containsKey(key)) {
+      return CoinIcon.icons[key];
+    } else {
+      var key = '${net.chainId}${net.browser}${net.rpc}${net.chain}';
+      var addr = hex.encode(utf8.encode(key));
+      return CoinIcon(
+          bg: Colors.transparent, border: false, icon: RandomIcon(addr));
+    }
+  }
+
+  String get label {
+    var map = {'eth': 'Ethereum', 'binance': 'Binance'};
+    return $store.net.chain == ''
+        ? $store.net.coin
+        : map.containsKey($store.net.chain)
+        ? map[$store.net.chain]
+        : $store.net.chain;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+            border:
+            Border(bottom: BorderSide(color: Colors.grey[200], width: .5))),
+        padding: EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Obx(() => Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  padding: EdgeInsets.all(coinIcon.border ? 2 : 0),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: coinIcon.border ? .5 : 0,
+                          color: Colors.grey[400]),
+                      color: coinIcon.bg,
+                      borderRadius: BorderRadius.circular(15)),
+                  child: coinIcon.icon,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                CommonText(
+                  label,
+                  color: CustomColor.primary,
+                ),
+              ],
+            )),
+            Spacer(),
+            Obx(() => CommonText(
+              $store.wal.formatBalance,
+              color: CustomColor.primary,
+            )),
+          ],
+        ),
+      ),
+      onTap: () {
+        Get.toNamed(walletMainPage);
+      },
+    );
+  }
+}
 
 
 class TokenWidget extends StatefulWidget {
@@ -41,16 +111,16 @@ class TokenWidgetState extends State<TokenWidget> {
   void initState() {
     super.initState();
     balance = widget.token.balance ?? "0";
-    getBalance();
+    // getBalance();
     nextTick(() {
       sub = Global.eventBus.on<RefreshEvent>().listen((event) {
         if (event.token == null ||
             event.token.address == widget.token.address) {
-          getBalance();
+          // getBalance();
         }
       });
       sub2 = Global.eventBus.on<WalletChangeEvent>().listen((event) {
-        getBalance();
+        // getBalance();
       });
     });
   }
@@ -60,31 +130,6 @@ class TokenWidgetState extends State<TokenWidget> {
     super.dispose();
     sub?.cancel();
     sub2?.cancel();
-  }
-
-  void getBalance() async {
-    var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
-    var con =
-        DeployedContract(abi, EthereumAddress.fromHex(widget.token.address));
-    try {
-      var list = await widget.client.call(
-          contract: con,
-          function: con.function('balanceOf'),
-          params: [EthereumAddress.fromHex($store.wal.addr)]);
-      if (list.isNotEmpty) {
-        var numStr = list[0];
-        var t = widget.token;
-        if (numStr is BigInt && numStr.toString() != t.balance) {
-          t.balance = numStr.toString();
-          OpenedBox.tokenInstance.put(t.address + t.rpc, t);
-        }
-        if (mounted) {
-          setState(() {});
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   @override
@@ -139,11 +184,9 @@ class TokenListState extends State<TokenList> {
   @override
   void initState() {
     super.initState();
-    initClient($store.net);
     worker = ever($store.network, (net) {
-      initClient(net);
       if (mounted) {
-        setState(() {});
+        BlocProvider.of<HomeBloc>(context).add(GetTokenListEvent($store.wal.addr));
       }
     });
   }
@@ -154,116 +197,48 @@ class TokenListState extends State<TokenList> {
     worker.dispose();
   }
 
-  void initClient(Network net) {
-    client = widget.defaultClient ?? Web3Client(net.url, http.Client());
-  }
-
   @override
   Widget build(BuildContext context) {
-    var list = OpenedBox.tokenInstance.values
-        .where((token) => token.rpc == $store.net.rpc)
-        .toList();
-    return Column(
-      children: [
-        Column(
-          children: List.generate(list.length, (index) {
-            return TokenWidget(
-              token: list[index],
-              client: client,
-              key: ValueKey(list[index].address),
-            );
-          }),
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        Visibility(
-            visible: $store.net.chain != 'filecoin',
-            child: GestureDetector(
-              onTap: () {
-                Get.toNamed(netTokenAddPage).then((value) {
-                  setState(() {});
-                });
-              },
-              child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Icon(Icons.add), CommonText('addToken'.tr)],
+    // var list = OpenedBox.tokenInstance.values
+    //     .where((token) => token.rpc == $store.net.rpc)
+    //     .toList();
+    return BlocProvider(
+      create: (ctx)=> HomeBloc()..add(GetTokenListEvent($store.wal.addr)),
+      child: BlocBuilder<HomeBloc,HomeState>(
+          builder: (context,state){
+            return Column(
+              children: [
+                Column(
+                  children: List.generate(state.tokenList.length, (index) {
+                    return TokenWidget(
+                      token: state.tokenList[index],
+                      client: client,
+                      key: ValueKey(state.tokenList[index].address),
+                    );
+                  }),
                 ),
-              ),
-            ))
-      ],
-    );
-  }
-}
-
-class MainTokenWidget extends StatelessWidget {
-  CoinIcon get coinIcon {
-    var net = $store.net;
-    var key = net.coin;
-    if (CoinIcon.icons.containsKey(key)) {
-      return CoinIcon.icons[key];
-    } else {
-      var key = '${net.chainId}${net.browser}${net.rpc}${net.chain}';
-      var addr = hex.encode(utf8.encode(key));
-      return CoinIcon(
-          bg: Colors.transparent, border: false, icon: RandomIcon(addr));
-    }
-  }
-
-  String get label {
-    var map = {'eth': 'Ethereum', 'binance': 'Binance'};
-    return $store.net.chain == ''
-        ? $store.net.coin
-        : map.containsKey($store.net.chain)
-            ? map[$store.net.chain]
-            : $store.net.chain;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        decoration: BoxDecoration(
-            border:
-                Border(bottom: BorderSide(color: Colors.grey[200], width: .5))),
-        padding: EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Obx(() => Row(
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      padding: EdgeInsets.all(coinIcon.border ? 2 : 0),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              width: coinIcon.border ? .5 : 0,
-                              color: Colors.grey[400]),
-                          color: coinIcon.bg,
-                          borderRadius: BorderRadius.circular(15)),
-                      child: coinIcon.icon,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    CommonText(
-                      label,
-                      color: CustomColor.primary,
-                    ),
-                  ],
-                )),
-            Spacer(),
-            Obx(() => CommonText(
-                  $store.wal.formatBalance,
-                  color: CustomColor.primary,
-                )),
-          ],
-        ),
+                SizedBox(
+                  height: 30,
+                ),
+                Visibility(
+                    visible: $store.net.chain != 'filecoin',
+                    child: GestureDetector(
+                      onTap: () async{
+                       await Get.toNamed(netTokenAddPage);
+                       context.read<HomeBloc>().add(GetTokenListEvent($store.wal.addr));
+                      },
+                      child: Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [Icon(Icons.add), CommonText('addToken'.tr)],
+                        ),
+                      ),
+                    ))
+              ],
+            );
+          }
       ),
-      onTap: () {
-        Get.toNamed(walletMainPage);
-      },
     );
   }
 }
+

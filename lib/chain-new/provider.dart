@@ -1,7 +1,5 @@
+import 'package:fil/chain/token.dart';
 import 'package:fil/models-new/chain_gas.dart';
-import 'package:fil/models-new/message_pending.dart';
-import 'package:fil/models-new/message_pending_response.dart';
-import 'package:fil/models-new/token.dart';
 import 'package:fil/models-new/chain_info.dart';
 
 abstract class ChainProvider {
@@ -30,6 +28,8 @@ abstract class ChainProvider {
   Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit});
 
   Future<List> getMessagePendingState(List params);
+
+  Future<String> getBalanceOfToken(String mainAddress,String tokenAddress);
 
   void dispose();
 }

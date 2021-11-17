@@ -141,12 +141,11 @@ String truncate(double value, {int size = 4}) {
 }
 
 String formatCoin(String amount,
-    {num size = 4, bool fixed = false, Network net}) {
+    {num size = 4, bool fixed = false,double min, Network net}) {
   net = net ?? $store.net;
   if (amount == '0') {
     return '0 ${net.coin}';
   }
-
   var isFil = net.addressType == AddressType.filecoin.type;
   try {
     var str = amount;
@@ -166,8 +165,12 @@ String formatCoin(String amount,
       var u = isFil ? 'FIL' : net.coin;
       var unit = BigInt.from(pow(10, 18));
       var res = v / unit;
+      String esc = '';
+      if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (res < min)){
+        esc = '...';
+      }
       return fixed
-          ? '${res.toStringAsFixed(size)} $u'
+          ? '${res.toStringAsFixed(size)} $esc $u'
           : '${truncate(res, size: size)} $u';
     }
   } catch (e) {

@@ -35,7 +35,7 @@ class MessageItem extends StatelessWidget {
   bool get isToken => mes.token != null;
   String get value {
     var v =
-        isToken ? mes.token.getFormatBalance(mes.value) : formatCoin(mes.value);
+        isToken ? mes.token.getFormatBalance(mes.value) : formatCoin(mes.value,fixed:true,min:0.0001);
     var unit = isToken ? $store.net.coin : mes.token?.symbol;
     if (v == '0') {
       return '0 $unit';

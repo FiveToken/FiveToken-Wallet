@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
+import 'package:fil/bloc/home/home_bloc.dart';
+import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
@@ -82,8 +85,12 @@ class MainPageState extends State<MainPage> {
     }
     reConnect();
     Global.eventBus.on<WalletChangeEvent>().listen((event) {
-      print('wallet change');
-      getBalance();
+      // getBalance();
+      BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
+        $store.net.rpc,
+        $store.net.chain,
+        $store.wal.addr,
+      ));
     });
   }
 
@@ -140,10 +147,8 @@ class MainPageState extends State<MainPage> {
       (WCSession session, JsonRpc rpc) {
         if (!session.isConnected) {
           Global.store.remove('wcSession');
-          setState(() {
-            this.connectedSession = null;
-            this.meta = null;
-          });
+          BlocProvider.of<HomeBloc>(context).add(SetMetaEvent(meta:null));
+          BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: null));
         }
         return rpc;
       }
@@ -173,9 +178,7 @@ class MainPageState extends State<MainPage> {
         }
         print(m['theirMeta']);
         wc.connect().then((value) {
-          setState(() {
-            connectedSession = wc;
-          });
+          BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: wc));
         });
       } catch (e) {}
     }
@@ -479,10 +482,9 @@ class MainPageState extends State<MainPage> {
           .then((value) {
         if (approved) {
           var s = session.toString();
-          setState(() {
-            connectedSession = session;
-            this.meta = WCMeta.fromJson(rawMeta);
-          });
+          var m = WCMeta.fromJson(rawMeta);
+          BlocProvider.of<HomeBloc>(context).add(SetMetaEvent(meta:m));
+          BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: session));
           Global.store.setString('wcSession', s);
         }
       });
@@ -508,7 +510,12 @@ class MainPageState extends State<MainPage> {
 
   Future onRefresh() async {
     Global.eventBus.fire(RefreshEvent());
-    await getBalance();
+    // await getBalance();
+    BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
+      $store.net.rpc,
+      $store.net.chain,
+      $store.wal.addr,
+    ));
   }
 
   ChainProvider initProvider() {
@@ -519,183 +526,189 @@ class MainPageState extends State<MainPage> {
     }
   }
 
-  Future getBalance() async {
-    var wal = $store.wal;
-    provider = initProvider();
-    var res = await provider.getBalance(wal.addr);
-    if (res != wal.balance && res != '0') {
-      $store.changeWalletBalance(res);
-      wal.balance = res;
-      OpenedBox.walletInstance.put(wal.key, wal);
-    }
-  }
+  // Future getBalance() async {
+  //   var wal = $store.wal;
+  //   provider = initProvider();
+  //   var res = await provider.getBalance(wal.addr);
+  //   if (res != wal.balance && res != '0') {
+  //     $store.changeWalletBalance(res);
+  //     wal.balance = res;
+  //     OpenedBox.walletInstance.put(wal.key, wal);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        child: Scaffold(
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          floatingActionButton: Visibility(
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: CustomColor.primary),
-              child: IconButton(
-                  icon: Image(
-                    image: AssetImage('icons/wc.png'),
+    return BlocProvider(
+      create: (ctx)=> HomeBloc(),
+      child: BlocBuilder<HomeBloc,HomeState>(
+        builder: (context,state){
+          return WillPopScope(
+              child: Scaffold(
+                floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                floatingActionButton: Visibility(
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: CustomColor.primary),
+                    child: IconButton(
+                        icon: Image(
+                          image: AssetImage('icons/wc.png'),
+                        ),
+                        onPressed: () {
+                          showCustomModalBottomSheet(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: CustomRadius.top),
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ConnectWallet(
+                                  meta: meta,
+                                  footer: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    margin: EdgeInsets.only(bottom: 40),
+                                    child: FButton(
+                                      text: 'disConnect'.tr,
+                                      alignment: Alignment.center,
+                                      onPressed: () {
+                                        Get.back();
+                                        state.connectedSession.destroy();
+                                        Global.store.remove('wcSession');
+                                        BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: null));
+                                      },
+                                      height: 40,
+                                      style: TextStyle(color: Colors.white),
+                                      color: CustomColor.primary,
+                                      corner: FCorner.all(6),
+                                    ),
+                                  ),
+                                );
+                              });
+                        }),
                   ),
-                  onPressed: () {
-                    showCustomModalBottomSheet(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: CustomRadius.top),
-                        context: context,
+                  visible: connectedSession != null,
+                ),
+                appBar: PreferredSize(
+                    child: AppBar(
+                      actions: [
+                        Padding(
+                          child: GestureDetector(
+                              onTap: handleScan,
+                              child: Image(
+                                width: 20,
+                                image: AssetImage('icons/scan.png'),
+                              )),
+                          padding: EdgeInsets.only(right: 10),
+                        )
+                      ],
+                      backgroundColor: Colors.white,
+                      elevation: .5,
+                      leading: Builder(
                         builder: (BuildContext context) {
-                          return ConnectWallet(
-                            meta: meta,
-                            footer: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              margin: EdgeInsets.only(bottom: 40),
-                              child: FButton(
-                                text: 'disConnect'.tr,
-                                alignment: Alignment.center,
-                                onPressed: () {
-                                  Get.back();
-                                  this.connectedSession.destroy();
-                                  Global.store.remove('wcSession');
-                                  setState(() {
-                                    this.connectedSession = null;
-                                  });
-                                },
-                                height: 40,
-                                style: TextStyle(color: Colors.white),
-                                color: CustomColor.primary,
-                                corner: FCorner.all(6),
-                              ),
-                            ),
+                          return IconButton(
+                            onPressed: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                            icon: IconList,
+                            alignment: NavLeadingAlign,
                           );
-                        });
-                  }),
-            ),
-            visible: connectedSession != null,
-          ),
-          appBar: PreferredSize(
-              child: AppBar(
-                actions: [
-                  Padding(
-                    child: GestureDetector(
-                        onTap: handleScan,
-                        child: Image(
-                          width: 20,
-                          image: AssetImage('icons/scan.png'),
-                        )),
-                    padding: EdgeInsets.only(right: 10),
-                  )
-                ],
-                backgroundColor: Colors.white,
-                elevation: .5,
-                leading: Builder(
-                  builder: (BuildContext context) {
-                    return IconButton(
-                      onPressed: () {
-                        Scaffold.of(context).openDrawer();
-                      },
-                      icon: IconList,
-                      alignment: NavLeadingAlign,
-                    );
-                  },
-                ),
-                title: NetSelect(),
-                centerTitle: true,
-              ),
-              preferredSize: Size.fromHeight(NavHeight)),
-          drawer: Drawer(
-            child: DrawerBody(),
-          ),
-          backgroundColor: Colors.white,
-          body: CustomRefreshWidget(
-            onRefresh: onRefresh,
-            enablePullUp: false,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 25,
-                ),
-                CoinPriceWidget(),
-                SizedBox(
-                  height: 8,
-                ),
-                Obx(
-                  () => CommonText(
-                    $store.wal.label,
-                    size: 14,
-                    color: Color(0xffB4B5B7),
-                  ),
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 25,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                      child: Obx(() => CommonText(
-                            dotString(str: $store.wal.addr),
-                            size: 14,
-                            color: Color(0xffB4B5B7),
-                          )),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Color(0xfff8f8f8)),
-                    ),
-                    SizedBox(
-                      width: 14,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        copyText($store.wal.addr);
-                        showCustomToast('copyAddr'.tr);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                            color: CustomColor.primary,
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Image(
-                            fit: BoxFit.fitWidth,
-                            width: 17,
-                            height: 17,
-                            image: AssetImage('icons/copy-w.png')),
+                        },
                       ),
-                    )
-                  ],
+                      title: NetSelect(),
+                      centerTitle: true,
+                    ),
+                    preferredSize: Size.fromHeight(NavHeight)),
+                drawer: Drawer(
+                  child: DrawerBody(),
                 ),
-                SizedBox(
-                  height: 18,
-                ),
-                WalletService(mainPage),
-                SizedBox(
-                  height: 40,
-                ),
-                MainTokenWidget(),
-                Expanded(
-                    child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 40),
+                backgroundColor: Colors.white,
+                body: CustomRefreshWidget(
+                  onRefresh: onRefresh,
+                  enablePullUp: false,
                   child: Column(
-                    children: [TokenList()],
+                    children: [
+                      SizedBox(
+                        height: 25,
+                      ),
+                      CoinPriceWidget(),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Obx(
+                            () => CommonText(
+                          $store.wal.label,
+                          size: 14,
+                          color: Color(0xffB4B5B7),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 18,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 25,
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            child: Obx(() => CommonText(
+                              dotString(str: $store.wal.addr),
+                              size: 14,
+                              color: Color(0xffB4B5B7),
+                            )),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Color(0xfff8f8f8)),
+                          ),
+                          SizedBox(
+                            width: 14,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              copyText($store.wal.addr);
+                              showCustomToast('copyAddr'.tr);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                  color: CustomColor.primary,
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: Image(
+                                  fit: BoxFit.fitWidth,
+                                  width: 17,
+                                  height: 17,
+                                  image: AssetImage('icons/copy-w.png')),
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 18,
+                      ),
+                      WalletService(mainPage),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      MainTokenWidget(),
+                      Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(bottom: 40),
+                            child: Column(
+                              children: [TokenList()],
+                            ),
+                          )),
+                    ],
                   ),
-                )),
-              ],
-            ),
-          ),
-        ),
-        onWillPop: () async {
-          AndroidBackTop.backDeskTop();
-          return false;
-        });
+                ),
+              ),
+              onWillPop: () async {
+                AndroidBackTop.backDeskTop();
+                return false;
+              });
+        },
+      ),
+    );
+
   }
 }
 

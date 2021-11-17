@@ -1,6 +1,7 @@
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
+import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:get/get.dart';
 
 class StoreController extends GetxController {

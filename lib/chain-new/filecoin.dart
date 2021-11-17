@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:fil/models-new/message_pending.dart';
-import 'package:fil/models-new/message_pending_response.dart';
+import 'package:fil/chain/token.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/chain-new/provider.dart';
 import 'package:fil/config/constant.dart';
 import 'package:fil/models-new/chain_gas.dart';
-import 'package:fil/models-new/token.dart';
 import 'package:fil/models-new/chain_info.dart';
-import 'package:fil/models-new/filecoin_response.dart';
 
 class Filecoin extends ChainProvider {
   Dio client;
@@ -130,6 +127,10 @@ class Filecoin extends ChainProvider {
     return null;
   }
 
+  @override
+  Future<String> getBalanceOfToken(String mainAddress,String tokenAddress) async{
+    return '0';
+  }
   @override
   void dispose() {}
 }
