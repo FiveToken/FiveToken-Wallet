@@ -36,7 +36,7 @@ class AddressBookNetState extends State<AddressBookNetPage> {
         child: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => MainBloc()..add(TestNetIsShowEvent()),
+              create: (context) => MainBloc()..add(TestNetIsShowEvent(hideTestnet: true)),
             )
           ],
           child: BlocBuilder<MainBloc, MainState>(builder: (context, state){

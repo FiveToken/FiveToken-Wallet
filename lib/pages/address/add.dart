@@ -162,6 +162,11 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       }
     });
   }
+  void onChange(Network net){
+    setState(() {
+       this.net = net;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,12 +190,8 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
         child: Column(
           children: [
             NetEntranceWidget(
-              net: net,
-              onChange: (net) {
-                setState(() {
-                  this.net = net;
-                });
-              },
+              network: net,
+              onChange: (net)=>{onChange(net)}
             ),
             SizedBox(
               height: 12,
