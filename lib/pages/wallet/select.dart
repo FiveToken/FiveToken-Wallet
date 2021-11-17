@@ -74,7 +74,6 @@ class WalletSelectPageState extends State<WalletSelectPage> {
         Global.store.setString('currentWalletAddress', state.importList[0].key);
       }
     }
-    setState(() {});
   }
 
   void goInit() {
@@ -257,7 +256,6 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                        Get.toNamed(walletMangePage,
                                            arguments: {'net': net, 'wallet': wal})
                                            .then((value) {
-                                         setState(() {});
                                        });
                                      },
                                      onTap: () {
