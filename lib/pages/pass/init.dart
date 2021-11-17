@@ -1,6 +1,8 @@
+import 'package:fil/bloc/pass/pass_bloc.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'dart:convert';
@@ -258,69 +260,72 @@ class PassField extends StatefulWidget {
 }
 
 class PassFieldState extends State<PassField> {
-  bool passShow = false;
+  void onTap(context, state){
+    BlocProvider.of<PassBloc>(context)..add(SetPassEvent(passShow: !state.passShow));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Visibility(
-          child: Column(
+    return BlocProvider(
+        create: (context) => PassBloc()..add(SetPassEvent()),
+        child: BlocBuilder<PassBloc, PassState>(builder: (ctx, state){
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CommonText(
-                widget.label,
-                size: 14,
-                weight: FontWeight.w500,
+              Visibility(
+                child: Column(
+                  children: [
+                    CommonText(
+                      widget.label,
+                      size: 14,
+                      weight: FontWeight.w500,
+                    ),
+                    SizedBox(
+                      height: 13,
+                    ),
+                  ],
+                ),
+                visible: widget.label != '',
               ),
-              SizedBox(
-                height: 13,
-              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                          autofocus: widget.autofocus,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp("[^\u4e00-\u9fa5]"),
+                            ),
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                            LengthLimitingTextInputFormatter(20)
+                          ],
+                          style: TextStyle(fontSize: 12),
+                          obscureText: !state.passShow,
+                          controller: widget.controller,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration.collapsed(
+                              hintText: widget.hintText,
+                              hintStyle:
+                              TextStyle(color: Color(0xffcccccc), fontSize: 14)),
+                        )),
+                    GestureDetector(
+                      child: Image(
+                          width: 22,
+                          image: AssetImage(!state.passShow
+                              ? 'icons/close-eye-d.png'
+                              : 'icons/open-d.png')),
+                      onTap: ()=>{onTap(ctx, state)},
+                    ),
+                  ],
+                ),
+              )
             ],
-          ),
-          visible: widget.label != '',
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            children: [
-              Expanded(
-                  child: TextField(
-                autofocus: widget.autofocus,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp("[^\u4e00-\u9fa5]"),
-                  ),
-                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                  LengthLimitingTextInputFormatter(20)
-                ],
-                style: TextStyle(fontSize: 12),
-                obscureText: !passShow,
-                controller: widget.controller,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration.collapsed(
-                    hintText: widget.hintText,
-                    hintStyle:
-                        TextStyle(color: Color(0xffcccccc), fontSize: 14)),
-              )),
-              GestureDetector(
-                child: Image(
-                    width: 22,
-                    image: AssetImage(!passShow
-                        ? 'icons/close-eye-d.png'
-                        : 'icons/open-d.png')),
-                onTap: () {
-                  setState(() {
-                    passShow = !passShow;
-                  });
-                },
-              ),
-            ],
-          ),
-        )
-      ],
+          );
+        }),
     );
   }
 }
