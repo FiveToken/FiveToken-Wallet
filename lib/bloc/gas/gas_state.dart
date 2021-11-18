@@ -1,23 +1,19 @@
 part of 'gas_bloc.dart';
 
 class GasState extends Equatable {
-  final int index;
   final ChainGas chainGas;
   @override
   // TODO: implement props
-  List<Object> get props => [index, chainGas];
+  List<Object> get props => [this.chainGas];
 
-  const GasState({this.index, this.chainGas});
+  const GasState({ this.chainGas});
 
   factory GasState.idle() {
-    return GasState(index: 0, chainGas: ChainGas());
+    return GasState(chainGas: ChainGas());
   }
 
-
-
-  GasState copy({int index, ChainGas chainGas}){
+  GasState copyWithGasState({String handlingFee, ChainGas chainGas}){
     return GasState(
-      index: index ?? this.index,
       chainGas: chainGas ??  this.chainGas
     );
   }
