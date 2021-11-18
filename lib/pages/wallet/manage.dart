@@ -116,20 +116,6 @@ class WalletManagePageState extends State<WalletManagePage> {
                                 $store.changeWalletName(newLabel);
                               }
                             }
-
-                            // List<ChainWallet> list = [];
-                            // if (wallet.type != 2) {
-                            //   list = OpenedBox.walletInstance.values
-                            //       .where((wal) => wal.groupHash == hash)
-                            //       .toList();
-                            // } else {
-                            //   list = [wallet];
-                            // }
-                            // list.forEach((wal) {
-                            //   wal.label = newLabel;
-                            //   OpenedBox.walletInstance.put(wal.key, wal);
-                            // });
-                            // setState(() {});
                             BlocProvider.of<SelectBloc>(context)
                               ..add(WalletDeleteEvent(
                                   wallet: wallet, newLabel: newLabel));

@@ -51,6 +51,17 @@ class ScanPageState extends State<ScanPage> {
     return valid;
   }
 
+  void onCapture(data){
+    setState(() {
+      controller.pause();
+      if (checkScanResultBySene(data)) {
+        Get.back(result: data);
+      } else {
+        controller.resume();
+      }
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -61,16 +72,7 @@ class ScanPageState extends State<ScanPage> {
               controller: controller,
               scanAreaScale: 1,
               scanLineColor: Colors.green.shade400,
-              onCapture: (data) {
-                setState(() {
-                  controller.pause();
-                  if (checkScanResultBySene(data)) {
-                    Get.back(result: data);
-                  } else {
-                    controller.resume();
-                  }
-                });
-              },
+              onCapture: (data)=>{onCapture(data)},
             ),
             top: 0,
             left: 0,

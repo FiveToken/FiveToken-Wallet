@@ -1,5 +1,7 @@
 // import 'package:fil/index.dart';
+import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
@@ -22,23 +24,25 @@ class CoinPriceState extends State<CoinPriceWidget> {
   CoinPrice price = CoinPrice();
   Worker worker;
   String marketPrice = '';
+  BuildContext _context;
   // StreamSubscription sub;
   @override
   void initState() {
     super.initState();
-    worker = ever($store.wallet, (ChainWallet wal) {
-      var net = Network.getNetByRpc(wal.rpc);
-      if (net.hasPrice) {
-        setState(() {
-          marketPrice = '';
-        });
-        getPrice(net);
-      }
-    });
-    // sub = Global.eventBus.on<RefreshEvent>().listen((event) {
-    //   getPrice($store.net);
-    // });
-    getPrice($store.net);
+    if(mounted){
+      worker = ever($store.wallet, (ChainWallet wal) {
+        var net = Network.getNetByRpc(wal.rpc);
+        if (net.hasPrice) {
+          getPrice(context, net);
+          // BlocProvider.of<PriceBloc>(_context)..add(GetPriceEvent(net: net));
+        }
+      });
+      // sub = Global.eventBus.on<RefreshEvent>().listen((event) {
+      //   getPrice($store.net);
+      // });
+      getPrice(context, $store.net);
+      // BlocProvider.of<PriceBloc>(_context)..add(GetPriceEvent(net: $store.net));
+    }
   }
 
   @override
@@ -54,7 +58,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
     return lang == 'en' ? price.usd : price.cny;
   }
 
-  void getPrice(Network net) async {
+  void getPrice(context, Network net) async {
     var coin = net.chain;
     var map = {'eth': 'eth', 'bnb': 'binance'};
     if (coin == '' && map.containsKey(net.coin.toLowerCase())) {
@@ -64,24 +68,31 @@ class CoinPriceState extends State<CoinPriceWidget> {
     Global.price = res;
     if (res.cny != 0) {
       if (mounted) {
-        setState(() {
-          price = res;
-          marketPrice = getMarketPrice($store.wal.balance, res.usd);
-        });
+        price = res;
+        String priceTmp = getMarketPrice($store.wal.balance, res.usd);
+        BlocProvider.of<PriceBloc>(_context)..add(SetPriceEvent(marketPrice:priceTmp ));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Visibility(
-          child: CommonText(
-            marketPrice,
-            size: 30,
-            weight: FontWeight.w800,
-          ),
-          visible: $store.net.hasPrice,
-        ));
+    return BlocProvider(
+        create: (context) => PriceBloc()..add(SetPriceEvent()),
+        child: BlocBuilder<PriceBloc, PriceState>(builder: (ctx, state){
+          _context = ctx;
+          return Obx(
+              () => Visibility(
+                child: CommonText(
+                  state.priceMarket,
+                  size: 30,
+                  weight: FontWeight.w800,
+                ),
+                visible: $store.net.hasPrice,
+              )
+          );
+        })
+    );
   }
 }
 

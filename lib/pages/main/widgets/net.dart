@@ -12,13 +12,14 @@ import 'package:fil/store/store.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/actions/event.dart';
+import 'package:fil/utils/enum.dart';
 
 class NetSelect extends StatelessWidget {
   @override
   build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if ($store.wal.type != 0) {
+        if ($store.wal.type != WalletType.id) {
           return;
         }
         showCustomModalBottomSheet(
@@ -125,7 +126,7 @@ class NetSelect extends StatelessWidget {
             weight: FontWeight.w500,
           ),
           Obx(() => Visibility(
-              visible: $store.wal.type == 0,
+              visible: $store.wal.type == WalletType.id,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

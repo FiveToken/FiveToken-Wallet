@@ -7,6 +7,7 @@ import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 import 'package:fil/init/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:fil/utils/enum.dart';
 
 part 'select_event.dart';
 part 'select_state.dart';
@@ -19,7 +20,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
     on<IdDeleteEvent>((event, emit){
       var box = OpenedBox.walletInstance;
       var keys = box.values
-          .where((wal) => wal.groupHash == event.hash && wal.type == 0)
+          .where((wal) => wal.groupHash == event.hash && wal.type == WalletType.id)
           .map((wal) => wal.key);
       box.deleteAll(keys);
       emit(SelectState.idle());
@@ -35,7 +36,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
     on<WalletDeleteEvent>((event, emit){
       var box = OpenedBox.walletInstance;
       List<ChainWallet> list = [];
-      if (event.wallet.type != 2) {
+      if (event.wallet.type != WalletType.privateKey) {
         list = OpenedBox.walletInstance.values
             .where((wal) => wal.groupHash == event.wallet.groupHash)
             .toList();
