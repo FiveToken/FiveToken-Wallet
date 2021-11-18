@@ -20,8 +20,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     on<GetMessageListEvent>((event, emit) async {
       if(event.chainType == 'filecoin'){
         add(GetStoreMessageListEvent(event.rpc, event.chainType));
-        add(GetFileCoinMessageListEvent(event.rpc,event.chainType,event.actor,event.direction));
-        add(UpdateFileCoinPendingStateEvent(event.rpc, event.chainType));
+        add(UpdateFileCoinPendingStateEvent(event.rpc,event.chainType,event.actor,event.direction));
+        // add(GetFileCoinMessageListEvent(event.rpc,event.chainType,event.actor,event.direction));
       }else{
         add(GetStoreMessageListEvent(event.rpc, event.chainType));
         add(UpdateEthMessageListStateEvent(event.rpc, event.chainType));
@@ -76,12 +76,17 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           state.storeMessageList.forEach((n) async {
             param.add({"from":n.from,"nonce":n.nonce});
           });
+          // Get the status of the local store pending message
           var result = await Chain.chainProvider.getMessagePendingState(param);
           result.forEach((n) {
             var message = n['message'];
             if(message.isNotEmpty){
               state.storeMessageList.forEach((m) {
+                // Filter the same message returned by local store and interface
                 if((message["from"] == m.from) && (message["nonce"] == m.nonce)){
+                  // If the hash is the same, judge whether the message is successfully chained according to the code，
+                  // If the hash are different, the message sending fails. Delete the local store record of this message and get the list returned by the interface
+                  // exit_code == 0 ? "success":"fail"
                   if(message["cid"] == m.hash ){
                     var mes = CacheMessage(
                         hash: message["cid"],
@@ -100,27 +105,14 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
                     );
                     box.put(n["message"]["cid"],mes);
                   }else{
-                    var mes = CacheMessage(
-                        hash: message["cid"],
-                        to: message['to'],
-                        from: message['from'],
-                        value: message['value'],
-                        blockTime: message['block_time'],
-                        exitCode: message['exit_code'],
-                        owner: message["from"],
-                        pending: -1,
-                        rpc: m.rpc,
-                        height: message['block_epoch'],
-                        fee: message['gas_fee'],
-                        mid: message['mid'],
-                        nonce: message['nonce']
-                    );
-                    box.put(n["message"]["cid"],mes);
+                    box.delete(m.hash);
                   }
                 }
               });
             }
           });
+
+          add(GetFileCoinMessageListEvent(event.rpc,event.chainType,event.actor,event.direction));
           List storeList = getStoreMsgList();
           emit(state.copyWithWalletState(storeMessageList: storeList ));
         }
