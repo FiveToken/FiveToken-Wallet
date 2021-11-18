@@ -116,10 +116,10 @@ bool isValidFilecoinAddress(String address, Network net) {
   return true;
 }
 
-String genCKBase64(String mne) {
+String genCKBase64(String mne, {String path}) {
   var seed = bip39.mnemonicToSeed(mne);
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
-  var rs = nodeFromSeed.derivePath("m/44'/461'/0'/0");
+  var rs = nodeFromSeed.derivePath(path??"m/44'/461'/0'/0");
   var rs0 = rs.derive(0);
   var ck = base64Encode(rs0.privateKey);
   return ck;

@@ -132,8 +132,13 @@ class FilecoinWallet extends ChainWallet {
     return ck;
   }
 
-  static Future<String> genAddrByPrivateKey(String ck,
-      {String type = SignSecp, String prefix = 'f'}) async {
+  static Future<String> genAddrByPrivateKey(
+      String ck,
+      {
+        String type = SignSecp,
+        String prefix = 'f'
+      }
+      ) async {
     String pk = '';
     if (type == SignSecp) {
       pk = await Flotus.secpPrivateToPublic(ck: ck);
@@ -186,14 +191,9 @@ class FilecoinWallet extends ChainWallet {
 
 class EthWallet extends ChainWallet {
   EthWallet.fromJson(Map<String, dynamic> map) : super.fromJson(map);
-  static String genPrivateKeyByMne(
-    String m,
-  ) {
-    var seed = bip39.mnemonicToSeed(m);
-    bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
-    var rs = nodeFromSeed.derivePath("m/44'/60'/0'/0");
-    var rs0 = rs.derive(0);
-    return hex.encode(rs0.privateKey);
+  static String genPrivateKeyByMne(String m) {
+    var ck = genCKBase64(m, path:"m/44'/60'/0'/0");
+    return ck;
   }
 
   static Future<String> genAddrByMne(
