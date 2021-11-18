@@ -1,4 +1,5 @@
 import 'package:fil/index.dart';
+import 'package:fil/models-new/chain_gas.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'constant.dart';
