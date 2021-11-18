@@ -19,6 +19,8 @@ import 'package:fil/store/store.dart';
 import 'package:fil/init/hive.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fil/utils/enum.dart';
+
 
 class PassInitPage extends StatefulWidget {
   @override
@@ -54,12 +56,71 @@ class PassInitPageState extends State<PassInitPage> {
   @override
   void initState() {
     super.initState();
-    var arg = Get.arguments ?? {'type': 0};
+    var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
     mne = arg['mne'];
     label = arg['label'];
     privateKey = arg['privateKey'];
     net = arg['net'];
+  }
+
+   Future<EncryptKey> getKey(String addressType, String pass, String mne, String prefix) async {
+    EncryptKey key;
+       switch(addressType){
+         case 'eth':
+          var ethPk =  await compute(EthWallet.genPrivateKeyByMne, mne);
+          key = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
+          break;
+         case 'filecoin':
+          var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+          key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
+          break;
+         case 'calibration':
+          var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+          key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: prefix);
+           break;
+         default:
+           var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+           key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
+           break;
+
+       }
+    return key;
+  }
+
+  Future<EncryptKey> getKey2(String addressType, String privateKey,  String pass) async{
+    EncryptKey key;
+    switch(addressType){
+      case 'eth':
+        key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
+        break;
+      default:
+        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
+        var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
+        var pk = filPk.privateKey;
+        key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass, type: type, prefix: net.prefix);
+        break;
+    }
+    return key;
+  }
+
+  ChainWallet getWallet(type, EncryptKey key,Network net){
+    return ChainWallet(
+      label: label,
+      mne: type!= WalletType.privateKey ?aesEncrypt(mne, key.private): '',
+      groupHash: type!= WalletType.privateKey ?tokenify(mne): '',
+      type: type,
+      rpc: net.rpc,
+      addressType: net.addressType,
+      digest: key.digest,
+      address: key.address,
+      skKek: key.kek,
+    );
+  }
+
+  void AddWallet(ChainWallet wallet){
+    var box = OpenedBox.walletInstance;
+    box.put(wallet.key, wallet);
   }
 
   void handleSubmit() async {
@@ -73,18 +134,10 @@ class PassInitPageState extends State<PassInitPage> {
 
     this.loading = true;
     showCustomLoading('Loading');
-    if (type == 0 || (type == 1 && net == null)) {
+    if (type == WalletType.id || (type == WalletType.mne && net == null)) {
       try {
-        Map<String, EncryptKey> keyMap = {};
-        var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
-        var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-        keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
-        keyMap['filecoin'] =
-            await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-        keyMap['calibration'] = await FilecoinWallet.genEncryptKeyByPrivateKey(
-            filPk, pass,
-            prefix: 't');
-        var key = keyMap['eth'].address + '_' + Network.ethMainNet.rpc + '_0';
+        EncryptKey ethKey = await getKey('eth', pass, mne, 't');
+        var key = ethKey.address + '_' + Network.ethMainNet.rpc + '_0';
         if (box.containsKey(key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
@@ -92,22 +145,10 @@ class PassInitPageState extends State<PassInitPage> {
         }
         for (var nets in Network.netList) {
           for (var net in nets) {
-            var type = net.addressType;
-            EncryptKey key = keyMap[type];
-            if (net.rpc == Network.filecoinTestNet.rpc) {
-              key = keyMap[net.net];
-            }
-            var wal = ChainWallet(
-                label: label,
-                mne: aesEncrypt(mne, key.private),
-                groupHash: tokenify(mne),
-                type: 0,
-                rpc: net.rpc,
-                addressType: type);
-            wal.digest = key.digest;
-            wal.address = key.address;
-            wal.skKek = key.kek;
-            box.put(wal.key, wal);
+            var type = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
+            EncryptKey key = await getKey(type, pass, mne, 't');
+            var wal = getWallet(type, key, net);
+            AddWallet(wal);
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
               $store.setWallet(wal);
@@ -120,33 +161,16 @@ class PassInitPageState extends State<PassInitPage> {
         this.loading = false;
         dismissAllToast();
       }
-    } else if (type == 1 && net != null) {
+    } else if (type == WalletType.mne && net != null) {
       try {
-        EncryptKey key;
-        if (net.addressType == 'eth') {
-          var private = await compute(EthWallet.genPrivateKeyByMne, mne);
-          key = await EthWallet.genEncryptKeyByPrivateKey(private, pass);
-        } else {
-          var private = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass,
-              prefix: net.prefix);
-        }
-        var wal = ChainWallet(
-            label: label,
-            mne: aesEncrypt(mne, key.private),
-            groupHash: tokenify(mne),
-            type: 1,
-            rpc: net.rpc,
-            addressType: net.addressType);
-        wal.digest = key.digest;
-        wal.address = key.address;
-        wal.skKek = key.kek;
+        EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
+        var wal = getWallet(type, key, net);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
           return;
         }
-        box.put(wal.key, wal);
+        AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
@@ -158,39 +182,19 @@ class PassInitPageState extends State<PassInitPage> {
       }
     } else {
       try {
-        EncryptKey key;
-        if (net.addressType == 'eth') {
-          if (privateKey.length > 64) {
-            showCustomError('wrongPk'.tr);
-            this.loading = false;
-            return;
-          }
-          key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
-        } else {
-          PrivateKey filPk =
-              PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
-          var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
-          var pk = filPk.privateKey;
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass,
-              type: type, prefix: net.prefix);
+        EncryptKey key = await getKey2(net.addressType, privateKey, pass);
+        if (net.addressType == 'eth' && privateKey.length > 64) {
+          showCustomError('wrongPk'.tr);
+          this.loading = false;
+          return;
         }
-
-        var wal = ChainWallet(
-            label: label,
-            mne: '',
-            groupHash: '',
-            type: 2,
-            rpc: net.rpc,
-            addressType: net.addressType);
-        wal.digest = key.digest;
-        wal.address = key.address;
-        wal.skKek = key.kek;
+        var wal = getWallet(type, key, net);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
           return;
         }
-        box.put(wal.key, wal);
+        AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
