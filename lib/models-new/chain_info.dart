@@ -11,6 +11,7 @@ class ChainInfo {
     this.gasLimit,
     this.number,
     this.timestamp,
+    this.baseFeePerGas,
   });
 
   ChainInfo.fromJson(dynamic json) {
@@ -18,12 +19,14 @@ class ChainInfo {
     gasLimit = hexToDartInt(json['gasLimit']);
     number = hexToDartInt(json['number']);
     timestamp = hexToDartInt(json['timestamp']);
+    baseFeePerGas = hexToDartInt(json['baseFeePerGas']);
   }
 
   int gasUsed;
   int gasLimit;
   int number;
   int timestamp;
+  int baseFeePerGas;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -31,6 +34,7 @@ class ChainInfo {
     map['gasLimit'] = gasLimit.toString();
     map['number'] = number.toString();
     map['timestamp'] = timestamp.toString();
+    map['baseFeePerGas'] = baseFeePerGas.toString();
     return map;
   }
 }

@@ -1,4 +1,5 @@
-import 'package:fil/chain/gas.dart';
+
+import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
