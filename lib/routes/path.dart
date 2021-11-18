@@ -12,6 +12,7 @@ const String passwordResetPage = "/pass/reset";
 const String filDetailPage = "/transfer/detail";
 const String filTransferPage = "/transfer/index";
 const String filGasPage = "/transfer/gas";
+const String transferConfrimPage = "/transfer/confirm";
 
 //init
 const String initLangPage = '/init/lang';
