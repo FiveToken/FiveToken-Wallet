@@ -28,6 +28,7 @@ dependencies:
   shared_preferences: ^0.5.7
   hive: any
   hive_flutter: any
+  flutter_secure_storage: any
   path_provider: any
   bip39: any
   bip32: ^1.0.5
