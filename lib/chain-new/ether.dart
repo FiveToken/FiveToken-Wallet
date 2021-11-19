@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/token.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,8 +7,10 @@ import 'package:fil/repository/web3/web3.dart' as web3;
 import 'package:fil/chain-new/provider.dart';
 import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/models-new/chain_info.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
+import 'package:fil/config/config.dart';
 
 class Ether extends ChainProvider {
   Web3Client client;
@@ -35,6 +38,33 @@ class Ether extends ChainProvider {
       );
     }
   }
+
+  @override
+  Future<String> getMaxPriorityFeePerGas() async{
+    try {
+      var res = await rpcJson.call('eth_maxPriorityFeePerGas');
+      var maxPriority = hexToInt(res.result);
+      var unit = BigInt.from(pow(10, 9));
+      var result = maxPriority/unit;
+      return result.toString();
+    } catch (error) {
+      return '0';
+    }
+  }
+
+  @override
+  Future<String> getMaxFeePerGas() async{
+    try{
+      int block = await client.getBlockNumber();
+      var blockInfo = await getBlockByNumber(block);
+      var unit = BigInt.from(pow(10, 9));
+      var maxFeePerGas = BigInt.from(blockInfo.baseFeePerGas) * BigInt.from(Config.baseFeePerGasToMaxFeePerGas)/unit;
+      return maxFeePerGas.toString();
+    }catch(error){
+      return '0';
+    }
+  }
+
   @override
   Future<String> getBalance(String address) async {
     String balance = '0';
@@ -69,6 +99,56 @@ class Ether extends ChainProvider {
     } catch (e) {
       return balance;
       print(e);
+    }
+  }
+
+  @override
+  Future<ChainGas> getGas({ String to, bool isToken = false, Token token }) async {
+    var empty = ChainGas();
+    var toAddr = EthereumAddress.fromHex(to);
+    try {
+      List<dynamic> res = [];
+      if (token != null) {
+        var abi = ContractAbi.fromJson(Contract.abi, '');
+        var con = DeployedContract(abi, EthereumAddress.fromHex(token.address));
+        var data = con
+            .function('transfer')
+            .encodeCall([EthereumAddress.fromHex(to), BigInt.from(1)]);
+        res = await Future.wait([
+          client.getGasPrice(),
+          client.estimateGas(
+              to: EthereumAddress.fromHex(token.address),
+              sender: toAddr,
+              data: data,
+              value: EtherAmount.fromUnitAndValue(EtherUnit.wei, 0))
+        ]);
+      } else {
+        res = await Future.wait([
+          client.getGasPrice(),
+          client.estimateGas(
+              to: toAddr,
+              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
+        ]);
+      }
+      if (res.length == 2) {
+        EtherAmount gasPrice = res[0];
+        BigInt gasLimit = res[1];
+        print(gasPrice);
+        int realLimit = gasLimit.toInt();
+        if (isToken) {
+          realLimit = (gasLimit.toInt() * 2).truncate();
+        }
+        var unit = BigInt.from(pow(10, 9));
+        return ChainGas(
+                gasLimit: realLimit,
+                gasPrice: (gasPrice.getInWei/unit).toString()
+        );
+      } else {
+        return empty;
+      }
+    } catch (e) {
+      print(e);
+      return empty;
     }
   }
 
@@ -116,12 +196,6 @@ class Ether extends ChainProvider {
     }catch(error){
 
     }
-  }
-
-  @override
-  Future<ChainGas> getGas(
-      {String to, bool isToken = false, Token token}) async {
-    var empty = ChainGas();
   }
 
   @override

@@ -151,28 +151,16 @@ String formatCoin(String amount,
     var str = amount;
     var v = BigInt.parse(amount);
     num length = str.length;
-    if (length < 5) {
-      var u = isFil ? 'attoFIL' : 'wei';
-      return '$str $u';
-    } else if (length >= 5 && length <= 13) {
-      var u = isFil ? 'nanoFIL' : 'gwei';
-      var unit = BigInt.from(pow(10, 9));
-      var res = v / unit;
-      return fixed
-          ? '${res.toStringAsFixed(size)} $u'
-          : '${truncate(res, size: size)} $u';
-    } else {
-      var u = isFil ? 'FIL' : net.coin;
-      var unit = BigInt.from(pow(10, 18));
-      var res = v / unit;
-      String esc = '';
-      if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (res < min)){
-        esc = '...';
-      }
-      return fixed
-          ? '${res.toStringAsFixed(size)} $esc $u'
-          : '${truncate(res, size: size)} $u';
+    var u = isFil ? 'FIL' : net.coin;
+    var unit = BigInt.from(pow(10, 18));
+    var res = v / unit;
+    String esc = '';
+    if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (res < min)){
+      esc = '...';
     }
+    return fixed
+        ? '${res.toStringAsFixed(size)} $esc $u'
+        : '${truncate(res, size: size)} $u';
   } catch (e) {
     return amount;
   }

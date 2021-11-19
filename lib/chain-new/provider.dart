@@ -31,5 +31,9 @@ abstract class ChainProvider {
 
   Future<String> getBalanceOfToken(String mainAddress,String tokenAddress);
 
+  Future<String> getMaxPriorityFeePerGas();
+
+  Future<String> getMaxFeePerGas();
+
   void dispose();
 }

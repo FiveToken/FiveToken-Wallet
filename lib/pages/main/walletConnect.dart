@@ -1,7 +1,6 @@
 // import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fil/pages/transfer/transfer.dart';
 import 'package:fbutton/fbutton.dart';
 import 'package:fil/models/index.dart';
 import 'package:fil/widgets/text.dart';
@@ -109,45 +108,46 @@ class ConfirmMessageSheet extends StatelessWidget {
     return ConstrainedBox(
       child: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: 30),
-        child: ConfirmSheet(
-          from: address,
-          to: to,
-          gas: maxFee,
-          value: value,
-          footer: Row(
-            children: [
-              Expanded(
-                  child: FButton(
-                alignment: Alignment.center,
-                height: 40,
-                onPressed: () {
-                  Get.back();
-                  onReject();
-                },
-                strokeWidth: .5,
-                strokeColor: Color(0xffcccccc),
-                corner: FCorner.all(6),
-                text: 'reject'.tr,
-              )),
-              SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                  child: FButton(
-                text: 'approve'.tr,
-                alignment: Alignment.center,
-                onPressed: () {
-                  Get.back();
-                  onApprove();
-                },
-                height: 40,
-                style: TextStyle(color: Colors.white),
-                color: CustomColor.primary,
-                corner: FCorner.all(6),
-              )),
-            ],
-          ),
-        ),
+        // bowen notes 2021-11-18
+        // child: ConfirmSheet(
+        //   from: address,
+        //   to: to,
+        //   gas: maxFee,
+        //   value: value,
+        //   footer: Row(
+        //     children: [
+        //       Expanded(
+        //           child: FButton(
+        //         alignment: Alignment.center,
+        //         height: 40,
+        //         onPressed: () {
+        //           Get.back();
+        //           onReject();
+        //         },
+        //         strokeWidth: .5,
+        //         strokeColor: Color(0xffcccccc),
+        //         corner: FCorner.all(6),
+        //         text: 'reject'.tr,
+        //       )),
+        //       SizedBox(
+        //         width: 20,
+        //       ),
+        //       Expanded(
+        //           child: FButton(
+        //         text: 'approve'.tr,
+        //         alignment: Alignment.center,
+        //         onPressed: () {
+        //           Get.back();
+        //           onApprove();
+        //         },
+        //         height: 40,
+        //         style: TextStyle(color: Colors.white),
+        //         color: CustomColor.primary,
+        //         corner: FCorner.all(6),
+        //       )),
+        //     ],
+        //   ),
+        // ),
       ),
       constraints: BoxConstraints(maxHeight: 800),
     );

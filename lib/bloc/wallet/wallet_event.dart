@@ -34,7 +34,9 @@ class GetEthTransactionReceiptEvent extends WalletEvent{
 class UpdateFileCoinPendingStateEvent extends WalletEvent{
   String rpc;
   String chainType;
-  UpdateFileCoinPendingStateEvent(this.rpc, this.chainType);
+  String actor;
+  String direction;
+  UpdateFileCoinPendingStateEvent(this.rpc, this.chainType,this.actor,this.direction);
 }
 
 class GetStoreMessageListEvent extends WalletEvent{

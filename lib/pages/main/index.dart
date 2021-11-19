@@ -8,7 +8,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/index.dart';
-// import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:fbutton/fbutton.dart';
@@ -16,7 +15,6 @@ import 'package:fil/pages/main/drawer.dart';
 import 'package:fil/pages/main/widgets/net.dart';
 import 'package:fil/pages/main/widgets/price.dart';
 import 'package:fil/pages/main/widgets/token.dart';
-import 'package:fil/pages/transfer/transfer.dart';
 import 'package:logger/logger.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/crypto.dart';
@@ -37,7 +35,8 @@ import 'package:fil/init/hive.dart';
 import 'package:flotus/flotus.dart';
 import 'package:bls/bls.dart';
 import 'package:fil/chain/provider.dart';
-import 'package:fil/chain/gas.dart';
+
+import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/pages/wallet/main.dart';
 import 'package:fil/pages/other/scan.dart';
 import 'package:fil/widgets/index.dart';
@@ -395,71 +394,72 @@ class MainPageState extends State<MainPage> {
           nonceBoxInstance.put(address, Nonce(time: now, value: nonce));
         }
       }
-      showCustomModalBottomSheet(
-          shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
-          context: context,
-          builder: (BuildContext context) {
-            return ConstrainedBox(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: 30),
-                child: ConfirmSheet(
-                  from: address,
-                  to: to,
-                  gas: gas.maxFee,
-                  value: getChainValue(value.toString()),
-                  footer: Row(
-                    children: [
-                      Expanded(
-                          child: FButton(
-                        alignment: Alignment.center,
-                        height: 40,
-                        onPressed: () {
-                          Get.back();
-                          session.sendResponse(rpc.id, '$type\_sendTransaction',
-                              error: {'message': 'Reject'});
-                        },
-                        strokeWidth: .5,
-                        strokeColor: Color(0xffcccccc),
-                        corner: FCorner.all(6),
-                        text: 'reject'.tr,
-                      )),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                          child: FButton(
-                        text: 'approve'.tr,
-                        alignment: Alignment.center,
-                        onPressed: () {
-                          Get.back();
-                          showPassDialog(context, (String pass) async {
-                            var wal = controller.wal;
-                            var private = await wal.getPrivateKey(pass);
-                            pushMsg(
-                                private: private,
-                                value: value,
-                                gas: gas,
-                                wallet: wallet,
-                                rpc: rpc,
-                                to: to,
-                                type: type,
-                                session: session,
-                                nonce: nonce);
-                            // onConfirm(ck);
-                          });
-                        },
-                        height: 40,
-                        style: TextStyle(color: Colors.white),
-                        color: CustomColor.primary,
-                        corner: FCorner.all(6),
-                      )),
-                    ],
-                  ),
-                ),
-              ),
-              constraints: BoxConstraints(maxHeight: 800),
-            );
-          });
+      // bowen notes 2021-11-18
+      // showCustomModalBottomSheet(
+      //     shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return ConstrainedBox(
+      //         child: SingleChildScrollView(
+      //           padding: EdgeInsets.only(bottom: 30),
+      //           child: ConfirmSheet(
+      //             from: address,
+      //             to: to,
+      //             gas: gas.maxFee,
+      //             value: getChainValue(value.toString()),
+      //             footer: Row(
+      //               children: [
+      //                 Expanded(
+      //                     child: FButton(
+      //                   alignment: Alignment.center,
+      //                   height: 40,
+      //                   onPressed: () {
+      //                     Get.back();
+      //                     session.sendResponse(rpc.id, '$type\_sendTransaction',
+      //                         error: {'message': 'Reject'});
+      //                   },
+      //                   strokeWidth: .5,
+      //                   strokeColor: Color(0xffcccccc),
+      //                   corner: FCorner.all(6),
+      //                   text: 'reject'.tr,
+      //                 )),
+      //                 SizedBox(
+      //                   width: 20,
+      //                 ),
+      //                 Expanded(
+      //                     child: FButton(
+      //                   text: 'approve'.tr,
+      //                   alignment: Alignment.center,
+      //                   onPressed: () {
+      //                     Get.back();
+      //                     showPassDialog(context, (String pass) async {
+      //                       var wal = controller.wal;
+      //                       var private = await wal.getPrivateKey(pass);
+      //                       pushMsg(
+      //                           private: private,
+      //                           value: value,
+      //                           gas: gas,
+      //                           wallet: wallet,
+      //                           rpc: rpc,
+      //                           to: to,
+      //                           type: type,
+      //                           session: session,
+      //                           nonce: nonce);
+      //                       // onConfirm(ck);
+      //                     });
+      //                   },
+      //                   height: 40,
+      //                   style: TextStyle(color: Colors.white),
+      //                   color: CustomColor.primary,
+      //                   corner: FCorner.all(6),
+      //                 )),
+      //               ],
+      //             ),
+      //           ),
+      //         ),
+      //         constraints: BoxConstraints(maxHeight: 800),
+      //       );
+      //     });
     });
   }
 

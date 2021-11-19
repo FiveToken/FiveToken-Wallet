@@ -82,19 +82,32 @@ class Filecoin extends ChainProvider {
   }
 
 
-  // var response = FilecoinResponse.fromJson(res.data);
-  // if (response.code != 200) {
-  //   print(response.detail);
-  // } else {
-  //   if (response.data != null &&
-  //       response.data is Map &&
-  //       response.data['messages'] is List) {
-  //     list = (response.data['messages'] as List)
-  //         .map((mes) => mes as Map<String, dynamic>)
-  //         .toList();
-  //   }
-  // }
-  // return list;
+  @override
+  Future<ChainGas> getGas(
+      {String to, bool isToken = false, Token token}) async {
+    var empty = ChainGas();
+    var result = await client
+        .get(feePath, queryParameters: {'method': 'Send', 'actor': to});
+    var res = result.data;
+    if (res != null) {
+      var limit = res['gas_limit'] ?? 0;
+      var premium = res['gas_premium'] ?? '100000';
+      var feeCap = res['gas_cap'] ?? '0';
+      try {
+        var limitNum = limit;
+        var premiumNum = int.tryParse(premium) ?? 0;
+        var feeCapNum = int.tryParse(feeCap) ?? 0;
+        return ChainGas(
+            gasFeeCap: feeCapNum.toString(),
+            gasPremium: premiumNum.toString(),
+            gasLimit: limitNum);
+      } catch (e) {
+        return empty;
+      }
+    } else {
+      return empty;
+    }
+  }
 
   @override
   Future<List> getMessagePendingState(List param) async{
@@ -113,14 +126,16 @@ class Filecoin extends ChainProvider {
 
   @override
   ChainGas replaceGas(ChainGas gas, {String chainPremium}) {
-    // TODO: implement getGas
+    var caculatePremium = (int.parse(gas.gasPremium) * 1.3).truncate();
+    var realPremium = int.parse(chainPremium) > caculatePremium ? int.parse(chainPremium): caculatePremium;
+    var oldPrice = int.parse(gas.gasPrice);
+    var realPrice = oldPrice <= realPremium ? realPremium + 100 : oldPrice;
+    return ChainGas(
+        gasLimit: gas.gasLimit,
+        gasPremium: realPremium.toString(),
+        gasPrice: realPrice.toString());
   }
 
-  @override
-  Future<ChainGas> getGas(
-      {String to, bool isToken = false, Token token}) async {
-    // TODO: implement getGas
-  }
 
   @override
   Future getTransactionReceipt(String hash) async{
@@ -130,6 +145,16 @@ class Filecoin extends ChainProvider {
   @override
   Future<String> getBalanceOfToken(String mainAddress,String tokenAddress) async{
     return '0';
+  }
+
+  @override
+  Future<String> getMaxPriorityFeePerGas() async{
+    return "0";
+  }
+
+  @override
+  Future<String> getMaxFeePerGas() async{
+    return "0";
   }
   @override
   void dispose() {}
