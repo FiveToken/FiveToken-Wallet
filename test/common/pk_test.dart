@@ -78,7 +78,8 @@ void main() {
     227
   ];
   test("generate salt", () async {
-    var list = await genSalt(addr, pass);
+    var str = '${addr}filwalllet$pass';
+    var list = await genSalt(str);
     expect(list, equals(saltList));
   });
   test('generate privatekey digest', () async {

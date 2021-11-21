@@ -15,7 +15,7 @@ class SelectState extends Equatable {
   List<Object> get props => [importList, idList, label];
 
   factory SelectState.idle() {
-    var box = OpenedBox.walletInstance;
+    var box = OpenedBox.get<ChainWallet>();
     List<ChainWallet> importList = box.values.where((wal) => wal.type != WalletType.id).toList();
     List<List<String>> ids = [];
     Map<String, String> map = {};
@@ -39,7 +39,7 @@ class SelectState extends Equatable {
   }
 
   Map<String, List<ChainWallet>> get idWalletMap {
-    var box = OpenedBox.walletInstance;
+    var box = OpenedBox.get<ChainWallet>();
     Map<String, List<ChainWallet>> res = {};
     box.values.where((wal) => wal.type == WalletType.id).forEach((wal) {
       if (res.containsKey(wal.groupHash)) {

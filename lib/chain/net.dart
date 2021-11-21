@@ -203,17 +203,17 @@ class Network {
       Network.filecoinMainNet,
       Network.ethMainNet,
       Network.binanceMainNet,
-      Network.filecoinTestNet,
-      Network.ethKovanNet,
-      Network.ethRinkebyNet,
-      Network.ethRopstenNet,
-      Network.ethGoerliNet,
-      Network.binanceTestnet
+      // Network.filecoinTestNet,
+      // Network.ethKovanNet,
+      // Network.ethRinkebyNet,
+      // Network.ethRopstenNet,
+      // Network.ethGoerliNet,
+      // Network.binanceTestnet
     ];
   }
 
   static List<List<Network>> get netList {
-    var custom = OpenedBox.netInstance.values.toList();
+    var custom = OpenedBox.get<Network>().values.toList();
     return [
       [
         Network.filecoinMainNet,
@@ -221,12 +221,12 @@ class Network {
         Network.binanceMainNet,
       ],
       [
-        Network.filecoinTestNet,
-        Network.ethKovanNet,
-        Network.ethRinkebyNet,
-        Network.ethRopstenNet,
-        Network.ethGoerliNet,
-        Network.binanceTestnet
+        // Network.filecoinTestNet,
+        // Network.ethKovanNet,
+        // Network.ethRinkebyNet,
+        // Network.ethRopstenNet,
+        // Network.ethGoerliNet,
+        // Network.binanceTestnet
       ],
       custom
     ];
@@ -237,7 +237,7 @@ class Network {
     if (nets.isNotEmpty) {
       return nets[0];
     } else {
-      var custom = OpenedBox.netInstance.get(rpc);
+      var custom = OpenedBox.get<Network>().get(rpc);
       return custom ?? Network();
     }
   }

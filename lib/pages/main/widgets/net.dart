@@ -1,5 +1,6 @@
 // import 'package:fil/index.dart';
 
+import 'package:fil/chain/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/global.dart';
@@ -55,7 +56,7 @@ class NetSelect extends StatelessWidget {
                                   var active = $store.net.rpc == net.rpc;
                                   return GestureDetector(
                                     onTap: () {
-                                      var l = OpenedBox.walletInstance.values
+                                      var l = OpenedBox.get<ChainWallet>().values
                                           .where((wal) =>
                                               wal.rpc == net.rpc &&
                                               wal.groupHash ==

@@ -17,12 +17,12 @@ MockBox<ContactAddress> mockAddressBookBox() {
 
 MockBox<ChainWallet> mockChainWalletBox() {
   var box = MockBox<ChainWallet>();
-  OpenedBox.walletInstance = box;
+  OpenedBox.get<ChainWallet>() = box;
   return box;
 }
 
 MockBox<Token> mockTokenBox() {
   var box = MockBox<Token>();
-  OpenedBox.tokenInstance = box;
+  OpenedBox.get<Token>() = box;
   return box;
 }

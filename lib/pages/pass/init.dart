@@ -38,7 +38,7 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
-  var box = OpenedBox.walletInstance;
+  var box = OpenedBox.get<Wallet>();
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
@@ -119,7 +119,7 @@ class PassInitPageState extends State<PassInitPage> {
   }
 
   void AddWallet(ChainWallet wallet){
-    var box = OpenedBox.walletInstance;
+    var box = OpenedBox.get<ChainWallet>();
     box.put(wallet.key, wallet);
   }
 
@@ -177,8 +177,8 @@ class PassInitPageState extends State<PassInitPage> {
         Global.store.setString('activeNetwork', net.rpc);
       } catch (e) {
         print(e);
-        dismissAllToast();
         this.loading = false;
+        dismissAllToast();
       }
     } else {
       try {

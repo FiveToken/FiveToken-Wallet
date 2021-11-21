@@ -35,7 +35,7 @@ class MainBloc extends Bloc<MainEvent, MainState> {
       if (balance != wal.balance) {
           $store.changeWalletBalance(balance);
           wal.balance = balance;
-          OpenedBox.walletInstance.put(wal.key, wal);
+          OpenedBox.get<ChainWallet>().put(wal.key, wal);
       }
       emit(state.copyWithMainState(balance: balance));
     });

@@ -1,5 +1,6 @@
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/models/wallet.dart';
 // import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class PassResetPageState extends State<PassResetPage> {
   final TextEditingController oldCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
   final TextEditingController newConfirmCtrl = TextEditingController();
-  var box = OpenedBox.walletInstance;
+  var box = OpenedBox.get<ChainWallet>();
   bool loading = false;
   ChainWallet wallet = Get.arguments['wallet'];
   Future<bool> checkValid() async {
@@ -68,7 +69,7 @@ class PassResetPageState extends State<PassResetPage> {
         var net = Network.getNetByRpc(wallet.rpc);
         var isId = wallet.type == 0;
         if (isId) {
-          var list = OpenedBox.walletInstance.values
+          var list = OpenedBox.get<ChainWallet>().values
               .where((wal) => wal.groupHash == wallet.groupHash)
               .toList();
           for (var i = 0; i < list.length; i++) {
@@ -82,13 +83,9 @@ class PassResetPageState extends State<PassResetPage> {
             if (wal.addressType == 'eth') {
               key = await EthWallet.genEncryptKeyByPrivateKey(p, newP);
             } else {
-              if (wal.rpc == Network.filecoinMainNet.rpc) {
-                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
-                    prefix: 'f');
-              } else {
-                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
-                    prefix: 't');
-              }
+               var prefix = wal.rpc == Network.filecoinMainNet.rpc? 'f': 't';
+               key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
+                   prefix: prefix);
             }
             wal.skKek = key.kek;
             box.put(wal.key, wal);

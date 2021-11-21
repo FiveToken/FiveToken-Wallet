@@ -181,8 +181,8 @@ class FilecoinWallet extends ChainWallet {
       return EncryptKey(
           kek: filSkKek,
           digest: filDigest,
-          address: filAddr,
-          private: privateKey);
+          address: filAddr,   // publicKey
+          private: privateKey);  // value
     } catch (e) {
       throw (e);
     }

@@ -104,7 +104,7 @@ class TokenAddPageState extends State<TokenAddPage> {
       showCustomError('enterTokenPre'.tr);
       return;
     }
-    OpenedBox.tokenInstance.put(
+    OpenedBox.get<Token>().put(
         addr + $store.net.rpc,
         Token(
             symbol: symbolCtrl.text,
