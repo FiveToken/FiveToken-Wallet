@@ -42,8 +42,11 @@ class PassInitPageState extends State<PassInitPage> {
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
-    if (!isValidPassword(pass)) {
-      showCustomError('enterValidPass'.tr);
+    if (!isValidPass(pass)) {
+      showCustomError('placeholderValidPass'.tr);
+      return false;
+    } else if(!isValidPass(confirm)){
+      showCustomError('placeholderValidPass'.tr);
       return false;
     } else if (pass != confirm) {
       showCustomError('diffPass'.tr);
@@ -229,7 +232,7 @@ class PassInitPageState extends State<PassInitPage> {
             PassField(
               controller: passCtrl,
               label: 'setPass'.tr,
-              hintText: 'enterValidPass'.tr,
+              hintText: 'placeholderValidPass'.tr,
             ),
             SizedBox(
               height: 20,

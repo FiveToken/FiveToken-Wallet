@@ -75,7 +75,7 @@ class Field extends StatelessWidget {
                       textInputAction: inputAction ?? TextInputAction.done,
                       decoration: InputDecoration.collapsed(
                           hintText: placeholder,
-                          hintStyle: TextStyle(fontSize: 13)),
+                          hintStyle: TextStyle(color: Color(0xffcccccc), fontSize: 13)),
                     )),
                     extra ??
                         Container(
