@@ -11,7 +11,7 @@ class EncryptType{
 
 class HiveBoxType{
   static final messageBox = 'messageBox';
-  static final addressBox = 'address';
+  static final addressBox = 'addressBox';
   static final addressBookBox = 'addressBookBox';
   static final nonceBox = 'nonceBox';
   static final gasBox = 'gasBox';
@@ -30,6 +30,19 @@ class HiveBoxType{
     map['tokenBox'] = tokenBox.toString();
     map['walletBox'] = walletBox.toString();
     map['cacheMessageBox'] = cacheMessageBox.toString();
+    return map;
+  }
+  static  Map<String, dynamic> getType() {
+    final map = <String, dynamic>{};
+    map['messageBox'] = 'messageBox';
+    map['addressBox'] = 'Wallet';
+    map['addressBookBox'] = 'ContactAddress';
+    map['nonceBox'] = 'Nonce';
+    map['gasBox'] = 'ChainGas';
+    map['netBox'] = 'Network';
+    map['tokenBox'] = 'Token';
+    map['walletBox'] = 'ChainWallet';
+    map['cacheMessageBox'] = 'CacheMessage';
     return map;
   }
 }

@@ -46,16 +46,30 @@ Future initHive() async {
   var encryptionKey = base64Url.decode(await secureStorage.read(key: hiveKey));
 
   Map<String, dynamic> map = {};
-  
-  print(HiveBoxType.getMap());
 
 
-  HiveBoxType.getMap().keys.forEach((value)async{
-    var itemBox = await Hive.openBox(
-      value, encryptionCipher: HiveAesCipher(encryptionKey));
-     itemBox.put(secret, hiveKey);
-    map[value] = itemBox;
-  });
+  var keys = HiveBoxType.getMap().keys.toList();
+
+  print(keys);
+
+  // await Hive.openBox('nonceBox',encryptionCipher: HiveAesCipher(encryptionKey));
+
+  final one = await Future.wait(HiveBoxType.getMap().keys.map((value) =>
+      Hive.openBox(value,
+      encryptionCipher: HiveAesCipher(encryptionKey))));
+  print(one);
+  for(var i = 0 ; i < one.length; i++){
+    var itemBox = one[i];
+    itemBox.put(secret,hiveKey);
+    map[keys[i]] = itemBox;
+  }
+
+  // HiveBoxType.getMap().keys.forEach((value)async{
+  //   var itemBox = await Hive.openBox(
+  //     value, encryptionCipher: HiveAesCipher(encryptionKey));
+  //    itemBox.put(secret, hiveKey);
+  //   map[value] = itemBox;
+  // });
 
 
   //
@@ -84,14 +98,16 @@ class OpenedBox {
   // static Box<CacheMessage> mesInstance;
 
 
-  static Map<String, Box<dynamic>> _mmap;
+  static Map<String, Box<dynamic>> _mmap={};
+
 
 
   static Box<T> get<T>() {
     Box box;
+    var types = HiveBoxType.getType();
     _mmap.forEach((key, value) {
-      if (value.runtimeType == T.runtimeType) {
-        box = value;
+      if (types[key] == T.toString()) {
+        box = value as Box<dynamic>;
         return;
       }
     });
