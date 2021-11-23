@@ -6,6 +6,7 @@ import 'package:fil/widgets/style.dart';
 import 'package:fil/widgets/index.dart';
 
 typedef dynamic OnPress();
+typedef dynamic OBack();
 
 class CommonScaffold extends StatelessWidget {
   final String title;
@@ -22,6 +23,7 @@ class CommonScaffold extends StatelessWidget {
   final bool resizeToAvoidBottomInset;
   final Widget leading;
   final Widget footer;
+  final OBack backFn;
   CommonScaffold(
       {this.title = '',
       this.body,
@@ -36,7 +38,9 @@ class CommonScaffold extends StatelessWidget {
       this.leading,
       this.footer,
       this.resizeToAvoidBottomInset = false,
-      this.hasFooter = true});
+      this.hasFooter = true,
+        this.backFn
+      });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +62,11 @@ class CommonScaffold extends StatelessWidget {
                 Visibility(
                   child: IconButton(
                     onPressed: () {
-                      Get.back();
+                      if(this.backFn != null){
+                        this.backFn();
+                      }else{
+                        Get.back();
+                      }
                     },
                     icon: IconNavBack,
                     alignment: NavLeadingAlign,
