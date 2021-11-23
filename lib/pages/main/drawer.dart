@@ -24,35 +24,25 @@ class DrawerBody extends StatelessWidget {
           SizedBox(
             height: 50,
           ),
-          GestureDetector(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 12,
-                ),
-                Container(
-                  constraints: BoxConstraints(maxWidth: 200),
-                  child: SingleChildScrollView(
-                    child: CommonText(
-                      label,
-                      size: 18,
-                      weight: FontWeight.w500,
-                    ),
+          Row(
+            children: [
+              SizedBox(
+                width: 12,
+              ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: SingleChildScrollView(
+                  child: CommonText(
+                    label,
+                    size: 18,
+                    weight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Image(width: 20, image: AssetImage('icons/switch.png')),
-                SizedBox(
-                  width: 12,
-                ),
-              ],
-            ),
-            onTap: () {
-              Get.back();
-              Get.toNamed(walletSelectPage);
-            },
+              ),
+              SizedBox(
+                width: 10,
+              ),
+            ],
           ),
           SizedBox(
             height: 5,
@@ -74,7 +64,7 @@ class DrawerBody extends StatelessWidget {
           Divider(thickness: .2),
           DrawerItem(
             onTap: () {
-              Get.back();
+              Get.toNamed(walletSelectPage);
             },
             label: 'wallet'.tr,
             iconPath: 'wal.png',
