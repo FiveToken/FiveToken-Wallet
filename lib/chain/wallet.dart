@@ -204,9 +204,13 @@ class EthWallet extends ChainWallet {
   }
 
   static Future<String> genAddrByPrivateKey(String pk) async {
-    var addr = await EthPrivateKey.fromHex(pk).extractAddress();
-    return addr.hex;
-  }
+    try {
+      var addr = await EthPrivateKey.fromHex(pk).extractAddress();
+      return addr.hex;
+    }catch(e){
+      print(e);
+    }
+    }
 
   static Future<EncryptKey> genEncryptKey(String mne, String pass) async {
     try {
