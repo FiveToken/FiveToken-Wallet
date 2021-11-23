@@ -37,7 +37,11 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
     if (name == '') {
       showCustomError('enterName'.tr);
       return;
-    }
+    } else if( name.length>20){
+      showCustomError('upName'.tr);
+      return;
+    }else{}
+
     if (net.chain == 'filecoin') {
       try {
         PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
