@@ -46,32 +46,36 @@ class WalletMnePageState extends State<WalletMnePage> {
               body: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: TabItem(
-                              active: state.index == 0,
-                              label: 'mne'.tr,
-                              onTap: ()=>{ onTap(ctx, 0)},
-                            )),
-                        Expanded(
-                            child: TabItem(
-                              active: state.index == 1,
-                              label: 'code'.tr,
-                              onTap: ()=>{onTap(ctx,1)},
-                            )),
-                      ],
-                    ),
-                    state.index == 0
-                        ? KeyString(
+                    KeyString(
                       data: mne,
                       isMne: true,
                     )
-                        : KeyCode(
-                      data: mne,
-                      showCode: state.showCode,
-                      onView: ()=>{onView(ctx)},
-                    )
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //         child: TabItem(
+                    //           active: state.index == 0,
+                    //           label: 'mne'.tr,
+                    //           onTap: ()=>{ onTap(ctx, 0)},
+                    //         )),
+                    //     Expanded(
+                    //         child: TabItem(
+                    //           active: state.index == 1,
+                    //           label: 'code'.tr,
+                    //           onTap: ()=>{onTap(ctx,1)},
+                    //         )),
+                    //   ],
+                    // ),
+                    // state.index == 0
+                    //     ? KeyString(
+                    //   data: mne,
+                    //   isMne: true,
+                    // )
+                    //     : KeyCode(
+                    //   data: mne,
+                    //   showCode: state.showCode,
+                    //   onView: ()=>{onView(ctx)},
+                    // )
                   ],
                 ),
               ),

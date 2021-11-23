@@ -1,7 +1,6 @@
 import 'package:fil/bloc/mne/mne_bloc.dart';
 import 'package:fil/chain/wallet.dart';
-// import 'package:fil/index.dart';
-
+import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -48,31 +47,34 @@ class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
             },
             body: Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                        child: TabItem(
-                            active: state.index == 0,
-                            label: 'pk'.tr,
-                            onTap: ()=>{onTap(ctx, 0)}
-                        )),
-                    Expanded(
-                        child: TabItem(
-                          active: state.index == 1,
-                          label: 'code'.tr,
-                          onTap: ()=>{onTap(ctx, 1)},
-                        )),
-                  ],
-                ),
-                state.index == 0
-                    ? KeyString(
+                KeyString(
                   data: ck,
                 )
-                    : KeyCode(
-                  data: ck,
-                  showCode:state.showCode,
-                  onView: ()=>{onView(ctx)},
-                )
+                // Row(
+                //   children: [
+                //     Expanded(
+                //         child: TabItem(
+                //             active: state.index == 0,
+                //             label: 'pk'.tr,
+                //             onTap: ()=>{onTap(ctx, 0)}
+                //         )),
+                //     Expanded(
+                //         child: TabItem(
+                //           active: state.index == 1,
+                //           label: 'code'.tr,
+                //           onTap: ()=>{onTap(ctx, 1)},
+                //         )),
+                //   ],
+                // ),
+                // state.index == 0
+                //     ? KeyString(
+                //   data: ck,
+                // )
+                //     : KeyCode(
+                //   data: ck,
+                //   showCode:state.showCode,
+                //   onView: ()=>{onView(ctx)},
+                // )
               ],
             ),
           );
