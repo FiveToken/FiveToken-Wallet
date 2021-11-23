@@ -25,17 +25,37 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
       try{
         var map = {
           'eth': 'ethereum',
-          'binance': 'filecoin',
+          'binance': 'binancecoin',
           'filecoin':'filecoin'
         };
+        List param = [
+          {
+            "id":map[event.chainType],
+            "vs":"usd"
+          },
+          {
+            "id":map[event.chainType],
+            "vs":"cny"
+          }
+        ];
         Chain.setRpcNetwork('filecoin', 'https://api.fivetoken.io');
-        var res = await Chain.chainProvider.getTokenPrice(map[event.chainType], 'usd');
-        if(res != '0'){
-          Global.price = CoinPrice.fromJson({
-            "usd":double.parse(res),
-            "cny":0.0
+        var res = await Chain.chainProvider.getTokenPrice(param);
+        if(res.length > 0){
+          double usd = 0;
+          double cny = 0;
+          res.forEach((n) {
+            if(n["vs"] == 'usd'){
+              usd = n["price"];
+            }
+            if(n["vs"] == 'cny'){
+              cny = n["price"];
+            }
           });
-          String priceTmp = getMarketPrice($store.wal.balance, double.parse(res));
+          Global.price = CoinPrice.fromJson({
+            "usd":usd,
+            "cny":cny
+          });
+          String priceTmp = getMarketPrice($store.wal.balance, usd);
           emit(state.copy(priceMarket: priceTmp));
         }
       }catch(error){

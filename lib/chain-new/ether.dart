@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/repository/http/http.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
@@ -12,8 +13,6 @@ import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
 import 'package:fil/config/config.dart';
-
-import 'filecoin.dart';
 
 class Ether extends ChainProvider {
   Web3Client client;
@@ -239,20 +238,28 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{ }
+  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{
+    return [];
+  }
 
   @override
-  Future<List> getMessagePendingState(List param) async{}
+  Future<List> getMessagePendingState(List param) async{
+    return [];
+  }
 
   @override
-  Future<String> getTokenPrice(String id,String vs) async{
+  Future<List> getTokenPrice(param) async{
     try{
-      String tokenPrice = '/token/price';
-      var provider = Filecoin('https://api.fivetoken.io');
-      var result = await provider.client.get(tokenPrice,queryParameters:{"id":id,"vs":vs});
-      return result.toString();
+      String baseApi = 'https://api.fivetoken.io' + '/api' + Config.clientID;
+      String tokenPrice = '/token/prices';
+      var res = [];
+      final response = await http.post(baseApi+tokenPrice,data: param);
+      if(response.statusCode == 200){
+        res = response.data;
+      }
+      return res;
     }catch(error){
-      return '0';
+      return [];
     }
   }
 

@@ -45,7 +45,7 @@ abstract class ChainProvider {
 
   Future<String> getMaxFeePerGas();
 
-  Future<String> getTokenPrice(String id,String vs);
+  Future<List> getTokenPrice(List param);
 
   void dispose();
 }

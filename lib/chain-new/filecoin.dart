@@ -9,7 +9,7 @@ import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/chain-new/provider.dart';
-import 'package:fil/config/constant.dart';
+import 'package:fil/config/config.dart';
 import 'package:fil/models-new/chain_info.dart';
 
 class Filecoin extends ChainProvider {
@@ -18,9 +18,9 @@ class Filecoin extends ChainProvider {
   static String pushPath = '/message';
   static String messageListPath = '/actor/messages';
   static String feePath = '/recommend/fee';
-  static String clientId = clientID;
+  static String clientId = Config.clientID;
   static String messagePending = '/message/pending';
-  static String tokenPrice = '/token/price';
+  static String tokenPrice = '/token/prices';
 
   Filecoin(String rpc, {Dio httpClient}) {
     this.rpc = rpc;
@@ -147,15 +147,14 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<String> getTokenPrice(String id,String vs) async{
+  Future<List> getTokenPrice(List param) async{
     try{
-      var res = '0';
-      var result = await client.get(tokenPrice,queryParameters:{"id":id,"vs":vs});
+      var res = [];
+      var result = await client.post(tokenPrice,data:param);
       return res;
     }catch(error){
-      return '0';
+      return [];
     }
-
   }
 
   @override
