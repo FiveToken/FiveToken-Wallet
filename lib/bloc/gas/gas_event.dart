@@ -18,3 +18,8 @@ class GetGasEvent extends GasEvent {
   final String rpcType;
   GetGasEvent(this.rpc,this.chainType,this.to,this.isToken,this.token,this.rpcType);
 }
+
+class SetGasEvent extends GasEvent{
+  final ChainGas gas;
+  SetGasEvent(this.gas);
+}
