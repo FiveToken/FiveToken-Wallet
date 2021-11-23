@@ -224,6 +224,11 @@ bool isValidPassword(String pass) {
   return reg.hasMatch(pass);
 }
 
+bool isValidPass(String pass){
+  pass = pass.trim();
+  return pass.length > 7;
+}
+
 bool isValidUrl(String url) {
   final urlRegExp = new RegExp(
       r"^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$");
@@ -265,4 +270,12 @@ String trParams(String tr, [Map<String, String> params = const {}]) {
     });
   }
   return trans;
+}
+
+String StringTrim(String str){
+  if(str.trim()==''){ return str; }
+  var arr1 = str.split(' ');
+  var arr2 =arr1.where((ele)=>ele!='');
+  String  res =arr2.join(' ');
+  return res;
 }
