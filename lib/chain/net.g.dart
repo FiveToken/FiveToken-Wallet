@@ -29,13 +29,14 @@ class NetworkAdapter extends TypeAdapter<Network> {
       path: fields[10] as String,
       color: fields[11] as String,
       coin: fields[6] as String,
+      decimals: fields[12] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Network obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -59,7 +60,9 @@ class NetworkAdapter extends TypeAdapter<Network> {
       ..writeByte(10)
       ..write(obj.path)
       ..writeByte(11)
-      ..write(obj.color);
+      ..write(obj.color)
+      ..writeByte(12)
+      ..write(obj.decimals);
   }
 
   @override
