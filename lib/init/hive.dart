@@ -1,3 +1,4 @@
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
@@ -8,7 +9,6 @@ import 'package:fil/models/nonce.dart';
 import 'package:fil/models/wallet.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const messageBox = 'message';

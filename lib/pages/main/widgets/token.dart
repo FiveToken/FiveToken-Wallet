@@ -1,6 +1,8 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+import 'package:fil/actions/event.dart';
 import 'package:fil/bloc/home/home_bloc.dart';
+import 'package:fil/common/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -8,16 +10,11 @@ import 'package:fil/chain/token.dart';
 import 'package:convert/convert.dart';
 import 'package:fil/widgets/icons.dart';
 import 'package:fil/widgets/random.dart';
-import 'package:web3dart/web3dart.dart';
-import 'package:http/http.dart' as http;
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/widgets/style.dart';
-import 'package:fil/actions/event.dart';
-import 'package:fil/common/utils.dart';
-import 'package:fil/chain/net.dart';
 
 
 class MainTokenWidget extends StatelessWidget {
@@ -78,7 +75,7 @@ class MainTokenWidget extends StatelessWidget {
             )),
             Spacer(),
             Obx(() => CommonText(
-              $store.wal.formatBalance,
+              $store.wal.formatBalance + $store.net.coin,
               color: CustomColor.primary,
             )),
           ],
@@ -94,9 +91,8 @@ class MainTokenWidget extends StatelessWidget {
 
 class TokenWidget extends StatefulWidget {
   final Token token;
-  final Web3Client client;
   final Key key;
-  TokenWidget({this.token, this.client, this.key});
+  TokenWidget({this.token, this.key});
   @override
   State<StatefulWidget> createState() {
     return TokenWidgetState();
@@ -105,31 +101,15 @@ class TokenWidget extends StatefulWidget {
 
 class TokenWidgetState extends State<TokenWidget> {
   String balance;
-  StreamSubscription sub;
-  StreamSubscription sub2;
   @override
   void initState() {
     super.initState();
     balance = widget.token.balance ?? "0";
-    // getBalance();
-    nextTick(() {
-      sub = Global.eventBus.on<RefreshEvent>().listen((event) {
-        if (event.token == null ||
-            event.token.address == widget.token.address) {
-          // getBalance();
-        }
-      });
-      sub2 = Global.eventBus.on<WalletChangeEvent>().listen((event) {
-        // getBalance();
-      });
-    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    sub?.cancel();
-    sub2?.cancel();
   }
 
   @override
@@ -170,8 +150,7 @@ class TokenWidgetState extends State<TokenWidget> {
 }
 
 class TokenList extends StatefulWidget {
-  final Web3Client defaultClient;
-  TokenList({this.defaultClient});
+  TokenList();
   @override
   State<StatefulWidget> createState() {
     return TokenListState();
@@ -179,65 +158,73 @@ class TokenList extends StatefulWidget {
 }
 
 class TokenListState extends State<TokenList> {
-  Worker worker;
-  Web3Client client;
   @override
+  StreamSubscription sub;
+
   void initState() {
     super.initState();
-    worker = ever($store.network, (net) {
-      if (mounted) {
-        BlocProvider.of<HomeBloc>(context).add(GetTokenListEvent($store.wal.addr));
-      }
+    nextTick(() {
+      sub = Global.eventBus.on<WalletChangeEvent>().listen((event) {
+        if(mounted){
+          try {
+            BlocProvider.of<HomeBloc>(context).add(GetTokenListEvent(
+                $store.net.rpc,
+                $store.net.chain,
+                $store.wal.addr
+            ));
+          }catch (e){
+            debugPrint('================');
+          }
+        }
+      });
     });
+
   }
 
   @override
   void dispose() {
     super.dispose();
-    worker.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // var list = OpenedBox.tokenInstance.values
-    //     .where((token) => token.rpc == $store.net.rpc)
-    //     .toList();
-    return BlocProvider(
-      create: (ctx)=> HomeBloc()..add(GetTokenListEvent($store.wal.addr)),
-      child: BlocBuilder<HomeBloc,HomeState>(
-          builder: (context,state){
-            return Column(
-              children: [
-                Column(
-                  children: List.generate(state.tokenList.length, (index) {
-                    return TokenWidget(
-                      token: state.tokenList[index],
-                      client: client,
-                      key: ValueKey(state.tokenList[index].address),
-                    );
-                  }),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                Visibility(
-                    visible: $store.net.chain != 'filecoin',
-                    child: GestureDetector(
-                      onTap: () async{
-                       await Get.toNamed(netTokenAddPage);
-                       context.read<HomeBloc>().add(GetTokenListEvent($store.wal.addr));
-                      },
-                      child: Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.add), CommonText('addToken'.tr)],
-                        ),
+    return BlocBuilder<HomeBloc,HomeState>(
+        builder: (context,state){
+          return Column(
+            children: [
+              Column(
+                children: List.generate(state.tokenList.length, (index) {
+                  return TokenWidget(
+                    token: state.tokenList[index],
+                    key: ValueKey(state.tokenList[index].address),
+                  );
+                }),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Visibility(
+                visible: $store.net.chain != 'filecoin',
+                  child:GestureDetector(
+                    onTap: () async{
+                      await Get.toNamed(netTokenAddPage);
+                      context.read<HomeBloc>().add(GetTokenListEvent(
+                          $store.net.rpc,
+                          $store.net.chain,
+                          $store.wal.addr
+                      ));
+                    },
+                    child: Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.add), CommonText('addToken'.tr)],
                       ),
-                    ))
-              ],
-            );
-          }
-      ),
+                    ),
+                  ),
+              )
+            ],
+          );
+        }
     );
   }
 }

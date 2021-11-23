@@ -1,9 +1,10 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math';
+
+import 'gas.dart';
 
 class FilecoinResponse {
   int code;

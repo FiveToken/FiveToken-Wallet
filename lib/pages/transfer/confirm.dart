@@ -1,8 +1,11 @@
+import 'dart:math';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
+import 'package:fil/init/hive.dart';
 import 'package:fil/models/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +14,8 @@ import 'package:get/get.dart';
 import 'package:fil/widgets/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/routes/path.dart';
+import 'package:oktoast/oktoast.dart';
 
-import 'package:fil/models-new/chain_gas.dart';
 
 class TransferConfirmPage extends StatefulWidget {
   @override
@@ -20,14 +23,37 @@ class TransferConfirmPage extends StatefulWidget {
 }
 
 class TransferConfirmPageState extends State<TransferConfirmPage> {
+  var nonceBoxInstance = OpenedBox.nonceInsance;
   Token token = Global.cacheToken;
   bool get isToken => token != null;
   String get title => token != null ? token.symbol : $store.net.coin;
   final EdgeInsets padding = EdgeInsets.symmetric(horizontal: 12, vertical: 14);
   ChainGas gas;
+  String from = $store.wal.addr;
+  String rpc = $store.net.rpc;
+  String chainType = $store.net.chain;
   String to = '';
   String amount = '';
+  bool loading = false;
+  String prePage;
+  bool isSpeedUp = false;
+  List<CacheMessage> get pendingList {
+    return OpenedBox.mesInstance.values
+        .where((mes) =>
+    mes.pending == 1 && mes.from == from && mes.rpc == rpc)
+        .toList();
+  }
 
+  bool get showSpeed {
+    return pendingList.isNotEmpty;
+  }
+
+  String get handlingFee {
+    var fee = $store.gas.handlingFee;
+    var unit = BigInt.from(pow(10, 18));
+    var res = (BigInt.parse(fee)/unit).toString();
+    return res;
+  }
 
   @override
   void initState(){
@@ -39,6 +65,12 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if (Get.arguments['amount'] != null) {
         amount = Get.arguments['amount'];
       }
+      if (Get.arguments['prePage'] != null) {
+        prePage = Get.arguments['prePage'];
+      }
+      if (Get.arguments['isSpeedUp'] != null) {
+        isSpeedUp = Get.arguments['isSpeedUp'];
+      }
     }
   }
   @override
@@ -49,23 +81,38 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               create: (context) => WalletBloc()
           ),
           BlocProvider(
-              create: (context) => TransferBloc()
+              create: (context) => TransferBloc()..add(
+                  GetNonceEvent(rpc, chainType, from)
+              )
           )
         ],
-        child: BlocBuilder<WalletBloc, WalletState>(
-          builder: (context, state){
-            return BlocBuilder<TransferBloc,TransferState>(
-                builder:(ctx,data){
-                  return CommonScaffold(
+        child: BlocBuilder<TransferBloc,TransferState>(
+            builder:(ctx,data){
+              return BlocListener<TransferBloc,TransferState>(
+                  listener: (context,state){
+                    if(state.transactionHash!=''){
+                      pushMsgCallBack(state.nonce,state.transactionHash);
+                    }
+                  },
+                  child: CommonScaffold(
                       grey: true,
                       title: 'send'.tr + title,
                       footerText: 'next'.tr,
-                      onPressed:(){},
+                      onPressed:(){
+                        showPassDialog(context, (String pass) async {
+                          try{
+                            var wal = $store.wal;
+                            var ck = await wal.getPrivateKey(pass);
+                            pushMsg(data.nonce,ck,ctx);
+                          }catch(error){
+                            print('error');
+                          }
+                        });
+                      },
                       body:_body()
-                  );
-                }
-            );
-          },
+                  )
+              );
+            }
         )
     );
   }
@@ -113,7 +160,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                       ),
                     ),
                     Obx(() => SetGas(
-                          maxFee: $store.gas.handlingFee + $store.net.coin,
+                          maxFee: handlingFee + $store.net.coin,
                           gas: gas,
                         )),
                   ]
@@ -122,9 +169,181 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         )
     );
   }
+
+  void increaseGas(last){
+    try{
+      var lastNonce = last.nonce;
+      var key = '$from\_$lastNonce\_$rpc';
+      var cacheGas = OpenedBox.gasInsance.get(key);
+      var realMaxFeePerGas = $store.gas.maxFeePerGas;
+      var realGasFeeCap = $store.gas.gasFeeCap;
+      var realGasPrice = $store.gas.gasPrice;
+
+      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
+        var increaseMaxFeePerGas = (int.parse(cacheGas.maxFeePerGas) * 1.3).truncate();
+        realMaxFeePerGas = (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
+      }else if( $store.net.chain == 'filecoin'){
+        var increaseGasFeeCap = (int.parse(cacheGas.gasFeeCap) * 1.3).truncate();
+        realGasFeeCap = (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
+      }else{
+        var increaseGasPrice = (int.parse(cacheGas.gasPrice) * 1.3).truncate();
+        realGasPrice = (max(int.parse(realGasPrice), increaseGasPrice)).toString();
+      }
+
+      var _gas = {
+        "gasLimit":$store.gas.gasLimit,
+        "gasPremium":$store.gas.gasPremium,
+        "gasPrice":realGasPrice,
+        "rpcType":$store.gas.rpcType,
+        "gasFeeCap":realGasFeeCap,
+        "maxPriorityFee":$store.gas.maxPriorityFee,
+        "maxFeePerGas":realMaxFeePerGas
+      };
+      ChainGas transferGas = ChainGas.fromJson(_gas);
+      $store.setGas(transferGas);
+      print('success');
+    }catch(error){
+      print('error');
+    }
+
+  }
+
+  void pushMsg(int nonce,String ck,context) async {
+    if (loading) {
+      return;
+    }
+    if (!Global.online) {
+      showCustomError('errorNet'.tr);
+      return;
+    }
+    try {
+      if(isSpeedUp){
+        pendingList.sort((a, b) {
+          if (a.nonce != null && b.nonce != null) {
+            return b.nonce.compareTo(a.nonce);
+          } else {
+            return -1;
+          }
+        });
+        var last = pendingList.last;
+        increaseGas(last);
+        bool _isToken = last.token != null;
+        BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
+            rpc,
+            chainType,
+            from,
+            last.to,
+            last.value,
+            ck,
+            last.nonce,
+            $store.gas,
+            _isToken,
+            last.token
+        ));
+      }else{
+        var value = getChainValue(amount, precision: token?.precision ?? 18);
+        this.loading = true;
+        showCustomLoading('Loading');
+        var realNonce = nonce;
+        var nonceKey = '$from\_${$store.net.rpc}';
+        if(nonceBoxInstance.get(nonceKey) != null){
+          realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
+        }
+        BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
+            rpc,
+            chainType,
+            from,
+            to,
+            value,
+            ck,
+            realNonce,
+            $store.gas,
+            isToken,
+            token
+        ));
+      }
+
+    } catch (e) {
+      this.loading = false;
+      dismissAllToast();
+      showCustomError('sendFail'.tr);
+      print(e);
+    }
+  }
+
+  void pushMsgCallBack(nonce,hash){
+    try{
+      this.loading = false;
+      var value = getChainValue(amount, precision: token?.precision ?? 18);
+      dismissAllToast();
+      showCustomToast('sended'.tr);
+      var nonceKey = '$from\_${rpc}';
+      var gasKey = '$from\_$nonce\_${rpc}';
+      var _gas = {
+        "gasLimit":$store.gas.gasLimit,
+        "gasPremium":$store.gas.gasPremium,
+        "gasPrice":$store.gas.gasPrice,
+        "rpcType":$store.gas.rpcType,
+        "gasFeeCap":$store.gas.gasFeeCap,
+        "maxPriorityFee":$store.gas.maxPriorityFee,
+        "maxFeePerGas":$store.gas.maxFeePerGas
+      };
+      ChainGas transferGas = ChainGas.fromJson(_gas);
+      $store.setGas(transferGas);
+      OpenedBox.gasInsance.put(gasKey, ChainGas(
+          gasLimit:$store.gas.gasLimit,
+          gasPremium:$store.gas.gasPremium,
+          gasPrice:$store.gas.gasPrice,
+          rpcType:$store.gas.rpcType,
+          gasFeeCap:$store.gas.gasFeeCap,
+          maxPriorityFee:$store.gas.maxPriorityFee,
+          maxFeePerGas:$store.gas.maxFeePerGas
+      ));
+      OpenedBox.mesInstance.put(
+          hash,
+          CacheMessage(
+              pending: 1,
+              from: from,
+              to: to,
+              value: value,
+              owner: from,
+              nonce: nonce,
+              hash: hash,
+              rpc: rpc,
+              token: token,
+              gas: $store.gas,
+              exitCode:-1,
+              fee: $store.gas.handlingFee ?? 0,
+              blockTime:
+              (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
+      var realNonce = nonce;
+      if(nonceBoxInstance.get(nonceKey) != null){
+        realNonce = nonce > nonceBoxInstance.get(nonceKey).value ? nonce : nonceBoxInstance.get(nonceKey).value;
+      }
+      var oldNonce = nonceBoxInstance.get(nonceKey);
+      if(oldNonce != null){
+        nonceBoxInstance.put(
+            nonceKey, Nonce(value: realNonce + 1, time: oldNonce.time));
+      }
+
+      if (mounted) {
+        goBack();
+      }
+    }catch(error){
+      print('error');
+    }
+  }
+
+  void goBack() {
+    Get.offAndToNamed(walletMainPage);
+    // if (prePage != walletMainPage) {
+    //   Get.offAndToNamed(walletMainPage);
+    // } else {
+    //   Get.back();
+    // }
+  }
+
 }
-
-
 
 class SetGas extends StatelessWidget {
   final String maxFee;

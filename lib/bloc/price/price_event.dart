@@ -10,8 +10,8 @@ class SetPriceEvent  extends PriceEvent {
 }
 
 class GetPriceEvent extends PriceEvent{
-  final Network net;
-  GetPriceEvent({this.net});
+  final String chainType;
+  GetPriceEvent(this.chainType);
 }
 
 

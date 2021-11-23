@@ -164,6 +164,7 @@ const Map<String, String> ZH_LANG = {
   'errorFromAsTo': '发送地址和接收地址相同',
   'errorParams': '参数错误',
   'next': '下一步',
+  'gasFail':'获取手续费失败',
 
   'filecoinmain': 'Filecoin主网',
   'ethmain': '以太坊主网',

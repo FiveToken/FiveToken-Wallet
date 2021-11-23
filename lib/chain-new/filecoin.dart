@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'package:bls/bls.dart';
 import 'package:dio/dio.dart';
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/models/filMessage.dart';
+import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/chain-new/provider.dart';
 import 'package:fil/config/constant.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/models-new/chain_info.dart';
 
 class Filecoin extends ChainProvider {
@@ -16,6 +20,7 @@ class Filecoin extends ChainProvider {
   static String feePath = '/recommend/fee';
   static String clientId = clientID;
   static String messagePending = '/message/pending';
+  static String tokenPrice = '/token/price';
 
   Filecoin(String rpc, {Dio httpClient}) {
     this.rpc = rpc;
@@ -29,13 +34,14 @@ class Filecoin extends ChainProvider {
     try {
       var result =  await client.get(balancePath, queryParameters: {'actor': address});
       debugPrint("========" + jsonEncode(result.data));
-        Map<String, dynamic> data = result.data;
-        balance = data['balance'];
-
+        if(result.data != null){
+          balance = result.data['balance'];
+        }
+      return balance;
     } catch (e) {
+      return balance;
       debugPrint(jsonEncode(e.message));
     }
-    return balance;
   }
 
   @override
@@ -50,13 +56,44 @@ class Filecoin extends ChainProvider {
 
   @override
   Future<String> sendTransaction(
-      {String to,
-        String amount,
-        String private,
-        ChainGas gas,
-        int nonce}) async {
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce,
+  ) async {
+    var msg = TMessage(
+        version: 0,
+        method: 0,
+        nonce: nonce,
+        from: from,
+        to: to,
+        params: "",
+        value: amount,
+        gasFeeCap: gas.gasFeeCap,
+        gasLimit: gas.gasLimit,
+        gasPremium: gas.gasPremium);
     try {
-      return '';
+      String sign = '';
+      num signType;
+      var cid = await Flotus.messageCid(msg: jsonEncode(msg));
+      if (from[1] == '1') {
+        signType = SignTypeSecp;
+        sign = await Flotus.secpSign(ck: private, msg: cid);
+      } else {
+        signType = SignTypeBls;
+        sign = await Bls.cksign(num: "$private $cid");
+      }
+      var sm = SignedMessage(msg, Signature(signType, sign));
+      print(cid);
+      print(jsonEncode(sm.toLotusSignedMessage()));
+      String res = '';
+      var result = await client.post(
+          pushPath,
+          data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}
+      );
+      return result.toString();
     } catch (e) {
       return '';
     }
@@ -110,6 +147,18 @@ class Filecoin extends ChainProvider {
   }
 
   @override
+  Future<String> getTokenPrice(String id,String vs) async{
+    try{
+      var res = '0';
+      var result = await client.get(tokenPrice,queryParameters:{"id":id,"vs":vs});
+      return res;
+    }catch(error){
+      return '0';
+    }
+
+  }
+
+  @override
   Future<List> getMessagePendingState(List param) async{
     try {
       var result =  await client.post(messagePending, data: param );
@@ -120,8 +169,16 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<int> getNonce() async {
-    // TODO: implement getNonce
+  Future<int> getNonce(String address) async {
+    var nonce = -1;
+    try {
+      var res = await client.get(balancePath, queryParameters: {'actor': address});
+      print('getnonce');
+      return res.data["nonce"] ?? -1;
+    } catch (e) {
+      print(e);
+      return -1;
+    }
   }
 
   @override
@@ -156,6 +213,19 @@ class Filecoin extends ChainProvider {
   Future<String> getMaxFeePerGas() async{
     return "0";
   }
+
+  @override
+  Future<String> sendToken(
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce
+  ) async{
+    return "0";
+  }
+
   @override
   void dispose() {}
 }

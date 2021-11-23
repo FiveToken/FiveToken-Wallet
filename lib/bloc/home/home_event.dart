@@ -16,6 +16,8 @@ class SetMetaEvent extends HomeEvent{
 }
 
 class GetTokenListEvent extends HomeEvent{
+  final String rpc;
+  final String chainType;
   final String mainAddress;
-  GetTokenListEvent(this.mainAddress);
+  GetTokenListEvent(this.rpc,this.chainType,this.mainAddress);
 }

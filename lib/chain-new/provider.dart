@@ -1,5 +1,5 @@
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/models-new/chain_info.dart';
 
 abstract class ChainProvider {
@@ -7,17 +7,27 @@ abstract class ChainProvider {
 
   Future<String> getBalance(String address);
 
-  Future<String> sendTransaction({
-    String to,
-    String amount,
-    String private,
-    ChainGas gas,
-    int nonce,
-  });
+  Future<String> sendTransaction(
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce,
+  );
+
+  Future<String> sendToken(
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce
+  );
 
   Future<ChainGas> getGas({String to, bool isToken = false, Token token});
 
-  Future<int> getNonce();
+  Future<int> getNonce(String address);
 
   ChainGas replaceGas(ChainGas gas, {String chainPremium});
 
@@ -34,6 +44,8 @@ abstract class ChainProvider {
   Future<String> getMaxPriorityFeePerGas();
 
   Future<String> getMaxFeePerGas();
+
+  Future<String> getTokenPrice(String id,String vs);
 
   void dispose();
 }

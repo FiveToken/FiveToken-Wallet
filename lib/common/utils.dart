@@ -151,7 +151,6 @@ String formatCoin(String amount,
     var str = amount;
     var v = BigInt.parse(amount);
     num length = str.length;
-    var u = isFil ? 'FIL' : net.coin;
     var unit = BigInt.from(pow(10, 18));
     var res = v / unit;
     String esc = '';
@@ -159,8 +158,8 @@ String formatCoin(String amount,
       esc = '...';
     }
     return fixed
-        ? '${res.toStringAsFixed(size)} $esc $u'
-        : '${truncate(res, size: size)} $u';
+        ? '${res.toStringAsFixed(size)} $esc'
+        : '${truncate(res, size: size)}';
   } catch (e) {
     return amount;
   }
