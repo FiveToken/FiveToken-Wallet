@@ -27,11 +27,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetTokenListEvent>((event, emit) async {
       try {
         var tokenList = OpenedBox.get<Token>().values
-            .where((token) => token.rpc == $store.net.rpc)
+            .where((token) => token.rpc == event.rpc)
             .toList();
         List<Token> list = [];
         if (tokenList.length > 0) {
-          Chain.setRpcNetwork($store.net.rpc, $store.net.chain);
+          Chain.setRpcNetwork(event.rpc, event.chainType);
           final balances = await Future.wait([
             ...tokenList
                 .map((e) => Chain.chainProvider
@@ -55,7 +55,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                 Token.fromJson(item)
             );
           }
-          emit(state.copyWithHomeState(tokenList: list));
+          emit(state.copyWithHomeState(tokenList: list,chainType:event.chainType));
+        }else{
+          emit(state.copyWithHomeState(tokenList: list,chainType:event.chainType));
         }
       } catch (error) {
         print("================GetTokenListEvent2=========");

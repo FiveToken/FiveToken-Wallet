@@ -1,5 +1,5 @@
+import 'package:fil/chain/gas.dart';
 import 'package:fil/index.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -10,7 +10,7 @@ void main() {
     $store = Get.find();
     $store.setNet(Network.filecoinMainNet);
     test("test normal gas", () {
-      expect(gas.feeNum, BigInt.from(300000));
+      expect(BigInt.parse(gas.handlingFee), BigInt.from(300000));
     });
     // test("test fast gas", () {
     //   expect(gas.fast.feeNum, BigInt.from(330000));
@@ -20,7 +20,7 @@ void main() {
     // });
     test("test max fee", () {
       var fee = '0.00029 nanoFIL';
-      expect(gas.maxFee, fee);
+      expect(gas.handlingFee, fee);
     });
   });
 }

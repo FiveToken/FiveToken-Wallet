@@ -121,7 +121,7 @@ String genCKBase64(String mne, {String path}) {
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
   var rs = nodeFromSeed.derivePath(path??"m/44'/461'/0'/0");
   var rs0 = rs.derive(0);
-  var ck = base64Encode(rs0.privateKey);
+  var ck = path!="m/44'/60'/0'/0" ? base64Encode(rs0.privateKey):hex.encode(rs0.privateKey);
   return ck;
 }
 
@@ -151,7 +151,6 @@ String formatCoin(String amount,
     var str = amount;
     var v = BigInt.parse(amount);
     num length = str.length;
-    var u = isFil ? 'FIL' : net.coin;
     var unit = BigInt.from(pow(10, 18));
     var res = v / unit;
     String esc = '';
@@ -159,8 +158,8 @@ String formatCoin(String amount,
       esc = '...';
     }
     return fixed
-        ? '${res.toStringAsFixed(size)} $esc $u'
-        : '${truncate(res, size: size)} $u';
+        ? '${res.toStringAsFixed(size)} $esc'
+        : '${truncate(res, size: size)}';
   } catch (e) {
     return amount;
   }

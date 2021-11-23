@@ -88,6 +88,7 @@ const Map<String, String> JP_LANG = {
   "newPass": "新支払パスワード",
   "advanced": "高度な設定",
   "fee": "手数料",
+  'gasFail':'手数料の取得に失敗しました',
   "feeRate": "手数料率",
   "fast": "ファスト",
   "minute": "分",

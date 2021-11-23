@@ -1,16 +1,19 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:fil/chain/contract.dart';
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/store/store.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
 import 'package:fil/chain-new/provider.dart';
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:fil/models-new/chain_info.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
 import 'package:fil/config/config.dart';
+
+import 'filecoin.dart';
 
 class Ether extends ChainProvider {
   Web3Client client;
@@ -57,8 +60,7 @@ class Ether extends ChainProvider {
     try{
       int block = await client.getBlockNumber();
       var blockInfo = await getBlockByNumber(block);
-      var unit = BigInt.from(pow(10, 9));
-      var maxFeePerGas = BigInt.from(blockInfo.baseFeePerGas) * BigInt.from(Config.baseFeePerGasToMaxFeePerGas)/unit;
+      var maxFeePerGas = BigInt.from(blockInfo.baseFeePerGas) * BigInt.from(Config.baseFeePerGasToMaxFeePerGas);
       return maxFeePerGas.toString();
     }catch(error){
       return '0';
@@ -138,10 +140,9 @@ class Ether extends ChainProvider {
         if (isToken) {
           realLimit = (gasLimit.toInt() * 2).truncate();
         }
-        var unit = BigInt.from(pow(10, 9));
         return ChainGas(
                 gasLimit: realLimit,
-                gasPrice: (gasPrice.getInWei/unit).toString()
+                gasPrice: (gasPrice.getInWei).toString()
         );
       } else {
         return empty;
@@ -153,7 +154,14 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<int> getNonce({String from}) async {}
+  Future<int> getNonce(String address) async {
+    try {
+      return await client.getTransactionCount(
+          EthereumAddress.fromHex(address));
+    } catch (e) {
+      return -1;
+    }
+  }
 
   @override
   ChainGas replaceGas(ChainGas gas, {String chainPremium}) {
@@ -164,27 +172,59 @@ class Ether extends ChainProvider {
 
   @override
   Future<String> sendTransaction(
-      {String to,
-        String amount,
-        String private,
-        ChainGas gas,
-        int nonce}) async {
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce
+  ) async {
     try {
-      final credentials = EthPrivateKey.fromHex(private);
-    } catch (e) {}
+      var credentials = await client.credentialsFromPrivateKey(private);
+      var res = await client.sendTransaction(
+          credentials,
+          Transaction(
+            from:EthereumAddress.fromHex(from),
+            to: EthereumAddress.fromHex(to),
+            gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)),
+            maxGas: gas.gasLimit,
+            nonce: nonce,
+            value: EtherAmount.inWei(BigInt.parse(amount)),
+          ),
+          chainId: int.tryParse($store.net.chainId) ?? 1);
+      return res;
+    } catch (e) {
+      print(e);
+      return '';
+    }
   }
 
+  @override
   Future<String> sendToken(
-      {String to,
-        String amount,
-        String private,
-        ChainGas gas,
-        String addr,
-        int nonce}) async {
+      String from,
+      String to,
+      String amount,
+      String private,
+      ChainGas gas,
+      int nonce
+    ) async {
     try {
-      final credentials = EthPrivateKey.fromHex(private);
+      var credentials = await client.credentialsFromPrivateKey(private);
+      var abi = ContractAbi.fromJson(Contract.abi, '');
+      var con = DeployedContract(abi, EthereumAddress.fromHex(from));
+      var transaction = Transaction.callContract(
+          contract: con,
+          function: con.function('transfer'),
+          parameters: [EthereumAddress.fromHex(to), BigInt.parse(amount)],
+          maxGas: gas.gasLimit,
+          nonce: nonce,
+          gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)));
+      var res = await client.sendTransaction(credentials, transaction,
+          chainId: int.tryParse($store.net.chainId) ?? 1);
+      return res;
     } catch (e) {
-
+      print(e);
+      return '';
     }
   }
 
@@ -203,6 +243,18 @@ class Ether extends ChainProvider {
 
   @override
   Future<List> getMessagePendingState(List param) async{}
+
+  @override
+  Future<String> getTokenPrice(String id,String vs) async{
+    try{
+      String tokenPrice = '/token/price';
+      var provider = Filecoin('https://api.fivetoken.io');
+      var result = await provider.client.get(tokenPrice,queryParameters:{"id":id,"vs":vs});
+      return result.toString();
+    }catch(error){
+      return '0';
+    }
+  }
 
   @override
   void dispose() {

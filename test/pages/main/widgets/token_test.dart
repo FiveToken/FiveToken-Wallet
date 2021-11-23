@@ -27,9 +27,7 @@ void main() {
       .thenAnswer((realInvocation) async => ['100']);
   testWidgets('test render token widget', (tester) async {
     await tester.pumpWidget(MaterialApp(
-      home: TokenList(
-        defaultClient: client,
-      ),
+      home: TokenList(),
     ));
     await tester.pumpAndSettle(Duration(seconds: 3));
     expect(find.byType(RandomIcon), findsOneWidget);

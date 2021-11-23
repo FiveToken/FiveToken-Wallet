@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:fil/bloc/gas/gas_bloc.dart';
-import 'package:fil/chain-new/global.dart';
+import 'package:fil/chain/gas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -10,8 +10,6 @@ import 'package:fil/widgets/toast.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/store/store.dart';
-import 'package:fil/models-new/chain_gas.dart';
-import 'package:fil/common/utils.dart';
 import 'package:flutter/services.dart';
 
 /// customize gas fee
@@ -32,6 +30,13 @@ class ChainGasPageState extends State<ChainGasPage> {
 
   ChainGas storeGas = $store.gas;
 
+  String get handlingFee {
+    var fee = $store.gas.handlingFee;
+    var unit = BigInt.from(pow(10, 18));
+    var res = (BigInt.parse(fee)/unit).toString();
+    return res;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,22 +54,50 @@ class ChainGasPageState extends State<ChainGasPage> {
 
 
   void handleSubmit(BuildContext context) {
-    // final feeCap = feeCapCtrl.text.trim();
-    // final gasLimit = gasLimitCtrl.text.trim();
-    // var feeCapNum = double.parse(feeCap);
-    // if (feeCap == '' || gasLimit == '') {
-    //   showCustomError('errorSetGas'.tr);
-    //   return;
-    // }
-    // unFocusOf(context);
-    // Get.back();
+    final maxPriorityFee = maxPriorityFeeCtrl.text.trim();
+    final maxFeePerGas = gasLimitCtrl.text.trim();
+    final gasFeeCap = gasFeeCapCtrl.text.trim();
+    final gasPrice = gasPriceCtrl.text.trim();
+    final gasPremium = gasPremiumCtrl.text.trim();
+    final gasLimit = gasLimitCtrl.text.trim();
+
+    if(rpcType == 'ethMain'){
+      if(maxPriorityFee == '' || maxFeePerGas == '' || gasLimit == ''){
+        showCustomError('errorSetGas'.tr);
+        return;
+      }
+    }else if(rpcType == 'filecoin'){
+      if(gasFeeCap == '' || gasPremium == '' || gasLimit == ''){
+        showCustomError('errorSetGas'.tr);
+        return;
+      }
+    }else{
+      if(gasPrice == '' || gasLimit == ''){
+        showCustomError('errorSetGas'.tr);
+        return;
+      }
+    }
+    var unit = BigInt.from(pow(10, 9));
+    var _gas = {
+      "maxPriorityFee":maxPriorityFee,
+      "maxFeePerGas":(BigInt.parse(maxFeePerGas)*unit).toString(),
+      "gasLimit":int.parse(gasLimit),
+      "gasPremium":gasPremium,
+      "gasPrice":(BigInt.parse(gasPrice)*unit).toString(),
+      "rpcType":rpcType,
+      "gasFeeCap":gasFeeCap,
+    };
+    ChainGas gas = ChainGas.fromJson(_gas);
+    $store.setGas(gas);
+    Get.back();
   }
 
   void initGas() {
+    var unit = BigInt.from(pow(10, 9));
     maxPriorityFeeCtrl.text = storeGas.maxPriorityFee;
-    maxFeePerGasCtrl.text = storeGas.maxFeePerGas;
+    maxFeePerGasCtrl.text = (BigInt.parse(storeGas.maxFeePerGas)/unit).toString();//storeGas.maxFeePerGas;
     gasFeeCapCtrl.text = storeGas.gasFeeCap;
-    gasPriceCtrl.text = storeGas.gasPrice;
+    gasPriceCtrl.text = (BigInt.parse(storeGas.gasPrice)/unit).toString();//storeGas.gasPrice;
     gasPremiumCtrl.text = storeGas.gasPremium;
     gasLimitCtrl.text = storeGas.gasLimit.toString();
   }
@@ -98,7 +131,7 @@ class ChainGasPageState extends State<ChainGasPage> {
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
                              CommonText.white('fee'.tr),
-                             Obx(() => CommonText.white($store.gas.handlingFee + $store.net.coin, size: 18))
+                             Obx(() => CommonText.white(handlingFee + $store.net.coin, size: 18))
                            ],
                          ),
                          SizedBox(

@@ -149,10 +149,16 @@ class PassInitPageState extends State<PassInitPage> {
         }
         for (var nets in Network.netList) {
           for (var net in nets) {
-            var type = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
-            EncryptKey key = await getKey(type, pass, mne, 't');
-            var wal = getWallet(type, key, net);
-            AddWallet(wal);
+            var addrType = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
+            var wal;
+            try {
+              EncryptKey key = await getKey(addrType, pass, mne, 't');
+              wal = getWallet(type, key, net);
+              AddWallet(wal);
+            }catch(e){
+              print(e);
+            }
+
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
               $store.setWallet(wal);
