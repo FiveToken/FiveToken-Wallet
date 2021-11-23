@@ -37,7 +37,7 @@ void main() {
     expect(state.mode, 1);
     expect(find.text('save'.tr), findsOneWidget);
     var newNet = Network.ethMainNet;
-    state.net = newNet;
+    // state.net = newNet;
     await tester.enterText(find.byType(TextField).first, EthAddr);
     await tester.pump();
     await tester.tap(find.text('save'.tr));
