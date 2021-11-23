@@ -106,6 +106,7 @@ const Map<String, String> EN_LANG = {
   "tradeFail": "Transaction failed",
   "rec": "Receive",
   "send": "Send",
+  'gasFail':'Failed to get handling fee',
   "reced": "Received",
   "sended": "Sent",
   "sending": "Transaction sending",

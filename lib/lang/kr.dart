@@ -84,6 +84,7 @@ const Map<String, String> KR_LANG = {
   "newPass": "새 결제 비밀번호",
   "advanced": "고급 설정",
   "fee": "수수료",
+  'gasFail':'수수료를 받지 못했습니다',
   "feeRate": "수수료율",
   "fast": "쾌속",
   "minute": "분",
