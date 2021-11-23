@@ -206,7 +206,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                         var trimAmount = amount.trim();
                         var trimAddress = toAddress.trim();
                         if (trimAddress.length > 0 && isValidChainAddress(trimAddress, $store.net)){
-                          List<CacheMessage> pendingList = OpenedBox.mesInstance.values
+                          List<CacheMessage> pendingList = OpenedBox.get<CacheMessage>().values
                               .where((mes) =>
                           mes.pending == 1 && mes.from == from && mes.rpc == rpc)
                               .toList();

@@ -213,8 +213,7 @@ class Network {
   }
 
   static List<List<Network>> get netList {
-    var custom = OpenedBox.get<Network>().values.toList();
-    return [
+    var arr = [
       [
         Network.filecoinMainNet,
         Network.ethMainNet,
@@ -222,14 +221,23 @@ class Network {
       ],
       [
         // Network.filecoinTestNet,
-        // Network.ethKovanNet,
-        // Network.ethRinkebyNet,
-        // Network.ethRopstenNet,
-        // Network.ethGoerliNet,
-        // Network.binanceTestnet
+        Network.ethKovanNet,
+        Network.ethRinkebyNet,
+        Network.ethRopstenNet,
+        Network.ethGoerliNet,
+        Network.binanceTestnet
       ],
-      custom
     ];
+    var netBox = OpenedBox.get<Network>();
+    var custom = netBox.values.toList();
+    if(custom.length>0){
+      List<Network> arr1 = [];
+      custom.forEach((item)=>{
+        arr1.add(item)
+      });
+      arr.add(arr1);
+    }
+    return arr;
   }
 
   static Network getNetByRpc(String rpc) {
