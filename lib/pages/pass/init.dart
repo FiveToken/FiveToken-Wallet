@@ -120,6 +120,7 @@ class PassInitPageState extends State<PassInitPage> {
 
   void AddWallet(ChainWallet wallet){
     var box = OpenedBox.get<ChainWallet>();
+
     box.put(wallet.key, wallet);
   }
 

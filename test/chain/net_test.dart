@@ -42,7 +42,7 @@ void main() {
     });
     test('test netList', () {
       mockNetbox();
-      when(OpenedBox.netInstance.values)
+      when(OpenedBox.get<Network>().values)
           .thenAnswer((realInvocation) => [Network.binanceMainNet]);
       var allList = Network.netList;
       var mainList = allList[0];

@@ -9,6 +9,11 @@ class EncryptType{
   static final argon2 = 'argon2'; // encrypt argon2 libsodium
 }
 
+class HiveKey {
+  static final key = 'key';
+  static final secret = 'secret';
+}
+
 class HiveBoxType{
   static final messageBox = 'messageBox';
   static final addressBox = 'addressBox';
