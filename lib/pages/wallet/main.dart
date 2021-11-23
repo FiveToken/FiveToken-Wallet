@@ -55,13 +55,11 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   void dispose() {
     routeObserver.unsubscribe(this);
     super.dispose();
-    // provider?.dispose();
   }
 
   @override
   void didPopNext() {
     super.didPopNext();
-    // setList();
   }
 
   CoinIcon get coinIcon {
@@ -84,7 +82,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     ));
 
     Global.eventBus.fire(RefreshEvent(token: token));
-    // await loadLatestMessage();
   }
 
   Future onLoading(BuildContext context) async {
@@ -122,6 +119,10 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
               int count = messageKeys.length;
               return CommonScaffold(
                 title: title,
+                backFn:(){
+                  Get.toNamed(mainPage);
+                  // walletMainPage   Get.toNamed
+                },
                 hasFooter: false,
                 body: CustomRefreshWidget(
                     enablePullUp: isFil && walletState.enablePullUp,
@@ -168,7 +169,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                                       ),
                                       !showToken
                                           ? CommonText(
-                                              formatCoin(state.balance),
+                                              formatCoin(state.balance) + $store.net.coin,
                                               size: 30,
                                               weight: FontWeight.w800,
                                             )
