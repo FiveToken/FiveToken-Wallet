@@ -1,15 +1,15 @@
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
+import 'package:fil/bloc/wallet/wallet_bloc.dart';
+import 'package:fil/chain/gas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
-// import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/index.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:oktoast/oktoast.dart';
 import 'dart:math';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/formatter.dart';
@@ -20,11 +20,10 @@ import 'package:fil/pages/other/scan.dart';
 import 'package:fil/chain/provider.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/net.dart';
-
-import 'package:fil/models-new/chain_gas.dart';
 import 'package:flutter/services.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/common/pk.dart';
+import 'package:oktoast/oktoast.dart';
 class FilTransferNewPage extends StatefulWidget {
   @override
   State createState() => FilTransferNewPageState();
@@ -36,7 +35,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   TextEditingController addressCtrl = TextEditingController();
   int nonce;
   FocusNode focusNode = FocusNode();
-  ChainProvider provider;
+  String from = $store.wal.addr;
+  String rpc = $store.net.rpc;
   Network net = $store.net;
   ChainGas gas;
   ChainWallet wallet = $store.wal;
@@ -45,6 +45,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   String prePage;
   String rpcType;
   var nonceBoxInstance = OpenedBox.nonceInsance;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +53,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     if (Get.arguments != null) {
       if (Get.arguments['to'] != null) {
         addressCtrl.text = Get.arguments['to'];
+        getGas();
       }
       if (Get.arguments['page'] != null) {
         prePage = Get.arguments['page'];
@@ -65,51 +67,47 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         rpcType = 'ethOthers';
       }
 
-      // if (Get.arguments['token'] != null) {
-      //   this.token = Get.arguments['token'];
-      // }
+      if (Get.arguments['token'] != null) {
+        this.token = Get.arguments['token'];
+      }
     }
-    // focusNode.addListener(() {
-    //   if (!focusNode.hasFocus) {
-    //     var to = addressCtrl.text.trim();
-    //     if (isValidChainAddress(to, net)) {
-    //       getGas(to);
-    //     }
-    //   }
-    // });
-    // provider = initProvider();
-    // getGas(wallet.addr);
-    // getNonce();
-  }
 
-  // ChainProvider initProvider() {
-  //   if (net.addressType == 'eth') {
-  //     return EthProvider(net);
-  //   } else {
-  //     return FilecoinProvider(net);
-  //   }
-  // }
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        getGas();
+      }
+    });
+
+
+  }
 
   @override
   void dispose() {
     $store.setGas(ChainGas());
     amountCtrl.dispose();
     addressCtrl.dispose();
-    // provider.dispose();
     super.dispose();
   }
-  //
-  // bool get showSpeed {
-  //   return pendingList.isNotEmpty;
-  // }
 
   bool get isToken => token != null;
 
-  void goBack() {
-    if (prePage != walletMainPage) {
-      Get.offAndToNamed(walletMainPage);
-    } else {
-      Get.back();
+  void getGas(){
+    var to = addressCtrl.text.trim();
+    if (isValidChainAddress(to, net)) {
+      try{
+        if(mounted){
+          BlocProvider.of<GasBloc>(_buildContext).add(GetGasEvent(
+              $store.net.rpc,
+              $store.net.chain,
+              to,
+              isToken,
+              token,
+              rpcType
+          ));
+        }
+      }catch(error){
+        print('error');
+      }
     }
   }
 
@@ -141,7 +139,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
     var balanceNum =
         BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
-    var fee = $store.gas.feeNum;
+    var fee = BigInt.parse($store.gas.handlingFee);
     var amountNum = BigInt.from((double.tryParse(trimAmount) *
         pow(10, isToken ? token.precision : 18)));
     if (fee > BigInt.tryParse($store.wal.balance) ?? BigInt.zero) {
@@ -172,6 +170,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   }
 
   String get title => token != null ? token.symbol : $store.net.coin;
+
+  BuildContext _buildContext;
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -181,100 +181,191 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         ],
         child: BlocBuilder<TransferBloc,TransferState>(
             builder:(ctx,data){
-             return BlocListener<GasBloc,GasState>(listener: (context,state){
-               var amount = amountCtrl.text;
-               var toAddress = addressCtrl.text;
-               var trimAmount = amount.trim();
-               var trimAddress = toAddress.trim();
-                if (state.chainGas.gasLimit != 0){
-                  Get.toNamed(transferConfrimPage, arguments: {"to": trimAddress,"amount":trimAmount});
-                }
-              },
-               child: BlocBuilder<GasBloc,GasState>(
-                   builder:(ctx,data){
-                     return CommonScaffold(
-                       grey: true,
-                       title: 'send'.tr + title,
-                       footerText: 'next'.tr,
-                       actions: [
-                         Padding(
-                           child: GestureDetector(
-                               onTap: handleScan,
-                               child: Image(
-                                 width: 20,
-                                 image: AssetImage('icons/scan.png'),
-                               )),
-                           padding: EdgeInsets.only(right: 10),
-                         )
-                       ],
-                       onPressed: () async {
-                         if (checkInputValid()) {
-                           var amount = amountCtrl.text;
-                           var toAddress = addressCtrl.text;
-                           var trimAmount = amount.trim();
-                           var trimAddress = toAddress.trim();
-                           if (toAddress.length > 0 && isValidChainAddress(toAddress, net)) {
-                             BlocProvider.of<GasBloc>(ctx).add(GetGasEvent(
-                                 $store.net.rpc,
-                                 $store.net.chain,
-                                 toAddress,
-                                 isToken,
-                                 token,
-                                 rpcType
-                             ));
-                           }
-                         }
-                       },
-                       body: Padding(
-                         padding: EdgeInsets.symmetric(horizontal: 12),
-                         child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: [
-                             Field(
-                               controller: addressCtrl,
-                               label: 'to'.tr,
-                               focusNode: focusNode,
-                               extra: GestureDetector(
-                                 child: Padding(
-                                   child: Image(width: 20, image: AssetImage('icons/book.png')),
-                                   padding: EdgeInsets.symmetric(horizontal: 12),
-                                 ),
-                                 onTap: () {
-                                   Get.toNamed(addressSelectPage).then((value) {
-                                     var addr = '';
-                                     if (value is ContactAddress) {
-                                       addr = value.address;
-                                     } else if (value is ChainWallet) {
-                                       addr = value.addr;
-                                     }
-                                     addressCtrl.text = addr;
-                                   });
-                                 },
-                               ),
-                             ),
-                             Field(
-                               controller: amountCtrl,
-                               type: TextInputType.numberWithOptions(decimal: true),
-                               inputFormatters: [PrecisionLimitFormatter(8)],
-                               label: 'amount'.tr,
-                               append: CommonText(
-                                 token == null
-                                     ? formatCoin($store.wal.balance)
-                                     : token.formatBalance,
-                                 color: CustomColor.grey,
-                               ),
-                             ),
-                           ],
-                         ),
-                       ),
-                     );
-                   }
-               ),
-             );
+              return BlocBuilder<GasBloc,GasState>(builder: (context,state){
+                _buildContext = context;
+                return CommonScaffold(
+                  grey: true,
+                  title: 'send'.tr + title,
+                  footerText: 'next'.tr,
+                  actions: [
+                    Padding(
+                      child: GestureDetector(
+                          onTap: handleScan,
+                          child: Image(
+                            width: 20,
+                            image: AssetImage('icons/scan.png'),
+                          )),
+                      padding: EdgeInsets.only(right: 10),
+                    )
+                  ],
+                  onPressed: () async {
+                    try{
+                      if (checkInputValid()) {
+                        var amount = amountCtrl.text;
+                        var toAddress = addressCtrl.text;
+                        var trimAmount = amount.trim();
+                        var trimAddress = toAddress.trim();
+                        if (trimAddress.length > 0 && isValidChainAddress(trimAddress, $store.net)){
+                          List<CacheMessage> pendingList = OpenedBox.mesInstance.values
+                              .where((mes) =>
+                          mes.pending == 1 && mes.from == from && mes.rpc == rpc)
+                              .toList();
+
+                          bool showSpeed = pendingList.isNotEmpty;
+                          if (showSpeed){
+                            pendingList.sort((a, b) {
+                              if (a.nonce != null && b.nonce != null) {
+                                return b.nonce.compareTo(a.nonce);
+                              } else {
+                                return -1;
+                              }
+                            });
+                            var lastMessage = pendingList.last;
+                            showCustomModalBottomSheet(
+                                shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SpeedupSheet(trimAddress,trimAmount,this.prePage,lastMessage);
+                                }
+                            );
+                          }else{
+                            Get.toNamed(transferConfrimPage, arguments: {
+                              "to": trimAddress,
+                              "amount":trimAmount,
+                              "prePage":prePage,
+                              "isSpeedUp":false
+                            });
+                          }
+                        }
+                      }
+                    }catch(error){
+                      print('error');
+                    }
+                  },
+                  body: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Field(
+                          controller: addressCtrl,
+                          label: 'to'.tr,
+                          focusNode: focusNode,
+                          extra: GestureDetector(
+                            child: Padding(
+                              child: Image(width: 20, image: AssetImage('icons/book.png')),
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            onTap: () {
+                              Get.toNamed(addressSelectPage).then((value) {
+                                var addr = '';
+                                if (value is ContactAddress) {
+                                  addr = value.address;
+                                } else if (value is ChainWallet) {
+                                  addr = value.addr;
+                                }
+                                if (addr.length > 0 && isValidChainAddress(addr, net)) {
+                                  BlocProvider.of<GasBloc>(ctx).add(GetGasEvent(
+                                      $store.net.rpc,
+                                      $store.net.chain,
+                                      addr,
+                                      isToken,
+                                      token,
+                                      rpcType
+                                  ));
+                                }
+                                addressCtrl.text = addr;
+                              });
+                            },
+                          ),
+                        ),
+                        Field(
+                          controller: amountCtrl,
+                          type: TextInputType.numberWithOptions(decimal: true),
+                          inputFormatters: [PrecisionLimitFormatter(8)],
+                          label: 'amount'.tr,
+                          append: CommonText(
+                            token == null
+                                ? formatCoin($store.wal.balance) + $store.net.coin
+                                : token.formatBalance,
+                            color: CustomColor.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
             }
         )
     );
 
+  }
+}
+
+class SpeedupSheet extends StatelessWidget {
+  final String address;
+  final String amount;
+  final String prePage;
+  final lastMessage;
+  SpeedupSheet(this.address,this.amount,this.prePage,this.lastMessage);
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CommonTitle(
+          'sendConfirm'.tr,
+          showDelete: true,
+        ),
+        Container(
+            padding: EdgeInsets.fromLTRB(15, 15, 15, 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonText('hasPending'.tr),
+                SizedBox(
+                  height: 15,
+                ),
+                TapItemCard(
+                  items: [
+                    CardItem(
+                      label: 'speedup'.tr,
+                      onTap: () {
+                        var _isToken = lastMessage.token != null;
+                        var unit = _isToken ? BigInt.from(pow(10, lastMessage.token.precision)) : BigInt.from(pow(10, 18));
+                        var amount = (BigInt.parse(lastMessage.value) / unit).toString();
+                        Get.toNamed(transferConfrimPage, arguments: {
+                          "to": lastMessage.to,
+                          "amount": amount,
+                          "prePage":prePage,
+                          "isSpeedUp":true
+                        });
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                TapItemCard(
+                  items: [
+                    CardItem(
+                      label: 'continueNew'.tr,
+                      onTap: () {
+                        Get.toNamed(transferConfrimPage, arguments: {
+                          "to": address,
+                          "amount":amount,
+                          "prePage":prePage,
+                          "isSpeedUp":false
+                        });
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ))
+      ],
+    );
   }
 }
 
@@ -309,58 +400,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
 //   }
 // }
 
-// class SpeedupSheet extends StatelessWidget {
-//   final Noop onSpeedUp;
-//   final Noop onNew;
-//   SpeedupSheet({this.onSpeedUp, this.onNew});
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: [
-//         CommonTitle(
-//           'sendConfirm'.tr,
-//           showDelete: true,
-//         ),
-//         Container(
-//             padding: EdgeInsets.fromLTRB(15, 15, 15, 30),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 CommonText('hasPending'.tr),
-//                 SizedBox(
-//                   height: 15,
-//                 ),
-//                 TapItemCard(
-//                   items: [
-//                     CardItem(
-//                       label: 'speedup'.tr,
-//                       onTap: () {
-//                         Get.back();
-//                         onSpeedUp();
-//                       },
-//                     )
-//                   ],
-//                 ),
-//                 SizedBox(
-//                   height: 15,
-//                 ),
-//                 TapItemCard(
-//                   items: [
-//                     CardItem(
-//                       label: 'continueNew'.tr,
-//                       onTap: () {
-//                         Get.back();
-//                         onNew();
-//                       },
-//                     )
-//                   ],
-//                 ),
-//               ],
-//             ))
-//       ],
-//     );
-//   }
-// }
 //
 // class ConfirmSheet extends StatelessWidget {
 //   final String from;
