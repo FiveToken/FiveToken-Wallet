@@ -15,7 +15,7 @@ import 'package:fil/utils/enum.dart';
 
 class AddressBookWalletSelect extends StatelessWidget {
   List<ChainWallet> get idWallets {
-    var list = OpenedBox.walletInstance.values
+    var list = OpenedBox.get<ChainWallet>().values
         .where((wal) =>
             wal.type == WalletType.id &&
             wal.rpc == $store.net.rpc &&
@@ -25,7 +25,7 @@ class AddressBookWalletSelect extends StatelessWidget {
   }
 
   List<ChainWallet> get importWallets {
-    var list = OpenedBox.walletInstance.values
+    var list = OpenedBox.get<ChainWallet>().values
         .where((wal) =>
             wal.type != WalletType.id &&
             wal.rpc == $store.net.rpc &&

@@ -43,7 +43,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   String prePage;
   String rpcType;
   bool isSpeedUp;
-  var nonceBoxInstance = OpenedBox.nonceInsance;
+  var nonceBoxInstance = OpenedBox.get<Nonce>();
 
   @override
   void initState() {

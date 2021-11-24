@@ -27,7 +27,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       var result = await Chain.chainProvider.getNonce(address);
       var now = getSecondSinceEpoch();
       if (result != -1) {
-        var nonceBoxInstance = OpenedBox.nonceInsance;
+        var nonceBoxInstance = OpenedBox.get<Nonce>();
         var key = '$address\_${event.rpc}';
         if (!nonceBoxInstance.containsKey(key)) {
           nonceBoxInstance.put(key, Nonce(time: now, value: result));

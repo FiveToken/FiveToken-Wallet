@@ -1,5 +1,7 @@
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/models/wallet.dart';
+// import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,7 +24,7 @@ class PassResetPageState extends State<PassResetPage> {
   final TextEditingController passCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
   final TextEditingController confirmCtrl = TextEditingController();
-  var box = OpenedBox.walletInstance;
+  var box = OpenedBox.get<ChainWallet>();
   bool loading = false;
   ChainWallet wallet = Get.arguments['wallet'];
 

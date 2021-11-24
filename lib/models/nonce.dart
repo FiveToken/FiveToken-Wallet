@@ -8,7 +8,10 @@ class Nonce {
   int time;
   @HiveField(1)
   int value;
-  Nonce({this.time, this.value});
+  Nonce({
+    this.time = 0,
+    this.value = 0
+  });
   Nonce.fromJson(Map<dynamic, dynamic> json) {
     time = json['time'];
     value = json['value'];

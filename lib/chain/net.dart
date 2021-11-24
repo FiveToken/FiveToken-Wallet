@@ -203,33 +203,41 @@ class Network {
       Network.filecoinMainNet,
       Network.ethMainNet,
       Network.binanceMainNet,
-      Network.filecoinTestNet,
-      Network.ethKovanNet,
-      Network.ethRinkebyNet,
-      Network.ethRopstenNet,
-      Network.ethGoerliNet,
-      Network.binanceTestnet
+      // Network.filecoinTestNet,
+      // Network.ethKovanNet,
+      // Network.ethRinkebyNet,
+      // Network.ethRopstenNet,
+      // Network.ethGoerliNet,
+      // Network.binanceTestnet
     ];
   }
 
   static List<List<Network>> get netList {
-    var custom = OpenedBox.netInstance.values.toList();
-    return [
+    var arr = [
       [
         Network.filecoinMainNet,
         Network.ethMainNet,
         Network.binanceMainNet,
       ],
       [
-        Network.filecoinTestNet,
+        // Network.filecoinTestNet,
         Network.ethKovanNet,
         Network.ethRinkebyNet,
         Network.ethRopstenNet,
         Network.ethGoerliNet,
         Network.binanceTestnet
       ],
-      custom
     ];
+    var netBox = OpenedBox.get<Network>();
+    var custom = netBox.values.toList();
+    if(custom.length>0){
+      List<Network> arr1 = [];
+      custom.forEach((item)=>{
+        arr1.add(item)
+      });
+      arr.add(arr1);
+    }
+    return arr;
   }
 
   static Network getNetByRpc(String rpc) {
@@ -237,7 +245,7 @@ class Network {
     if (nets.isNotEmpty) {
       return nets[0];
     } else {
-      var custom = OpenedBox.netInstance.get(rpc);
+      var custom = OpenedBox.get<Network>().get(rpc);
       return custom ?? Network();
     }
   }

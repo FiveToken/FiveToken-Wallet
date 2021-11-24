@@ -1,7 +1,10 @@
+import 'package:fil/bloc/add/add_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/net.dart';
 // import 'package:fil/index.dart';
+import 'dart:convert' as convert;
 import 'package:fbutton/fbutton.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/web3dart.dart';
@@ -14,6 +17,7 @@ import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/utils/enum.dart';
 
 class NetAddPage extends StatefulWidget {
   @override
@@ -28,17 +32,48 @@ class NetAddPageState extends State<NetAddPage> {
   TextEditingController chainCtrl = TextEditingController();
   TextEditingController symbolCtrl = TextEditingController();
   TextEditingController browserCtrl = TextEditingController();
+
   Network net;
   Web3Client client;
   bool readonly = false;
   bool loading = false;
-  var box = OpenedBox.netInstance;
+  var box = OpenedBox.get<Network>();
+  final formList = [
+    {
+      "label": 'netName'.tr,
+      "placeholder": 'netName'.tr,
+      "controller": TextEditingController()
+    },
+    {
+      "label": 'RPC URL',
+      " placeholder ": 'newRpc'.tr,
+      "controller": TextEditingController()
+    },
+    {
+      "label": 'chainId'.tr,
+      " placeholder ": 'chainId'.tr,
+      "controller": TextEditingController()
+    },
+    {
+      "label": 'symbol'.tr,
+      " placeholder ": 'curNetToken'.tr,
+      "controller": TextEditingController()
+    },
+    {
+      "label": 'browser'.tr,
+      " placeholder ": 'browserOptional'.tr,
+      "controller": TextEditingController()
+    },
+  ];
   void submit() async {
+    // get controller text
     var name = nameCtrl.text.trim();
     var rpc = rpcCtrl.text.trim();
     var chain = chainCtrl.text.trim();
     var symbol = symbolCtrl.text.trim();
     var browser = browserCtrl.text.trim();
+
+    // text not null
     if (name == '') {
       showCustomError('enterNet'.tr);
       return;
@@ -51,8 +86,10 @@ class NetAddPageState extends State<NetAddPage> {
       showCustomError('enterTokenName'.tr);
       return;
     }
+
+    // rpc in supportNet or in netInstance but not edit
     if ((Network.supportNets.map((net) => net.rpc).contains(rpc) ||
-            OpenedBox.netInstance.containsKey(rpc)) &&
+        OpenedBox.get<Network>().containsKey(rpc)) &&
         !edit) {
       showCustomError('netExist'.tr);
       return;
@@ -61,6 +98,7 @@ class NetAddPageState extends State<NetAddPage> {
     if (this.loading) {
       return;
     }
+    // browser not null
     if (browser != '') {
       if (!isValidUrl(browser)) {
         showCustomError('wrongBrowser'.tr);
@@ -76,11 +114,16 @@ class NetAddPageState extends State<NetAddPage> {
       var id = await client.getNetworkId();
       this.loading = false;
       dismissAllToast();
+
+      // chain
       if (id.toString() != chain) {
         showCustomError('errorChainId'.tr);
         return;
       }
-      var walletBox = OpenedBox.walletInstance;
+      var walletBox = OpenedBox.get<ChainWallet>();
+
+      // edit and rpc not in net
+
       if (edit && net.rpc != rpc) {
         box.delete(net.rpc);
         walletBox.values
@@ -93,10 +136,12 @@ class NetAddPageState extends State<NetAddPage> {
           walletBox.put(wal.key, wal);
         });
       }
+
+      // not edit
       if (!edit) {
         //add id wallet for new network
         var wallets = walletBox.values
-            .where((wal) => wal.type == 0 && wal.addressType == 'eth')
+            .where((wal) => wal.type == WalletType.id && wal.addressType == 'eth')
             .toList();
         Map<String, ChainWallet> map = {};
         for (var wallet in wallets) {
@@ -108,16 +153,28 @@ class NetAddPageState extends State<NetAddPage> {
           walletBox.put(wal.key, wal);
         });
       }
-      box.put(
-          rpc,
-          Network(
-              name: name,
-              addressType: 'eth',
-              rpc: rpc,
-              netType: 2,
-              browser: browser,
-              chainId: chain,
-              coin: symbol));
+
+      BlocProvider.of<AddBloc>(context).add(AddListEvent(
+          rpc:rpc,
+          network: Network(
+          name: name,
+          addressType: 'eth',
+          rpc: rpc,
+          netType: 2,
+          browser: browser,
+          chainId: chain,
+          coin: symbol)
+      ));
+      // box.put(
+      //     rpc,
+      //     Network(
+      //         name: name,
+      //         addressType: 'eth',
+      //         rpc: rpc,
+      //         netType: 2,
+      //         browser: browser,
+      //         chainId: chain,
+      //         coin: symbol));
       Get.back();
     } catch (e) {
       this.loading = false;
@@ -130,9 +187,11 @@ class NetAddPageState extends State<NetAddPage> {
   @override
   void initState() {
     super.initState();
+
     if (Get.arguments != null && Get.arguments['net'] != null) {
       net = Get.arguments['net'] as Network;
       readonly = net.netType != 2;
+      debugPrint("text" + formList.toString());
       nameCtrl.text = net.label;
       browserCtrl.text = net.browser;
       symbolCtrl.text = net.coin;
@@ -147,102 +206,96 @@ class NetAddPageState extends State<NetAddPage> {
     client?.dispose();
   }
 
+  Widget buildChild(){
+    List<Widget> titles = [];
+    final l = [nameCtrl,rpcCtrl,chainCtrl,symbolCtrl, browserCtrl];
+    final List len = Iterable<int>.generate(l.length).toList();
+    len.map((index)=>{
+      formList[index]['controller'] = l[index],
+      formList[index]['enabled'] = !readonly,
+      formList[index]['selectable'] = readonly
+    });
+    titles.add(CommonText('newRpc'.tr));
+    titles.add(CommonText('byRpc'.tr));
+    Widget content;
+    print(formList);
+    for(var index in len){
+      var item = formList[index];
+      titles.add(Field(
+          label: item['label'],
+          placeholder: item['placeholder'],
+          controller: l[index],
+          enabled: item['enabled'],
+          selectable: item['selectable']
+      ));
+    }
+    content = new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: titles
+    );
+    return content;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     var kH = MediaQuery.of(context).viewInsets.bottom;
-    return CommonScaffold(
-      grey: true,
-      title: edit ? 'editNet'.tr : 'net'.tr,
-      footerText: 'add'.tr,
-      onPressed: submit,
-      hasFooter: kH == 0 && (net == null || net.netType == 2),
-      resizeToAvoidBottomInset: kH != 0,
-      footer: edit
-          ? Container(
+    return BlocProvider(
+        create: (context) => AddBloc()..add(AddListEvent())..add(DeleteListEvent()),
+        child: CommonScaffold(
+            grey: true,
+            title: edit ? 'editNet'.tr : 'net'.tr,
+            footerText: 'add'.tr,
+            onPressed: submit,
+            hasFooter: kH == 0 && (net == null || net.netType == 2),
+            resizeToAvoidBottomInset: kH != 0,
+            footer: edit
+                ? Container(
               padding: EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 children: [
                   Expanded(
                       child: FButton(
-                    height: 45,
-                    strokeColor: Colors.grey[200],
-                    corner: FCorner.all(6),
-                    alignment: Alignment.center,
-                    text: 'deleteNet'.tr,
-                    color: Colors.white,
-                    style: TextStyle(color: Colors.black),
-                    onPressed: () {
-                      showDeleteDialog(context,
+                        height: 45,
+                        strokeColor: Colors.grey[200],
+                        corner: FCorner.all(6),
+                        alignment: Alignment.center,
+                        text: 'deleteNet'.tr,
+                        color: Colors.white,
+                        style: TextStyle(color: Colors.black),
+                        onPressed:() {
+                        showDeleteDialog(
+                            context,
                           title: 'deleteNet'.tr,
                           content: 'confimrDeleteNet'.tr, onDelete: () {
-                        OpenedBox.netInstance.delete(net.rpc);
-                        Get.back();
-                      });
-                    },
-                  )),
+                          // OpenedBox.netInstance.delete(net.rpc);
+                            BlocProvider.of<AddBloc>(context).add(DeleteListEvent(rpc: net.rpc));
+                            Get.back();
+                          });
+                      },
+                      )),
                   SizedBox(
                     width: 20,
                   ),
                   Expanded(
                       child: FButton(
-                    height: 45,
-                    corner: FCorner.all(6),
-                    alignment: Alignment.center,
-                    color: CustomColor.primary,
-                    style: TextStyle(color: Colors.white),
-                    text: 'changeNet'.tr,
-                    onPressed: submit,
-                  )),
+                        height: 45,
+                        corner: FCorner.all(6),
+                        alignment: Alignment.center,
+                        color: CustomColor.primary,
+                        style: TextStyle(color: Colors.white),
+                        text: 'changeNet'.tr,
+                        onPressed: submit,
+                      )),
                 ],
               ),
             )
-          : null,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CommonText('newRpc'.tr),
-            CommonText('byRpc'.tr),
-            Field(
-              label: 'netName'.tr,
-              placeholder: 'netName'.tr,
-              controller: nameCtrl,
-              enabled: !readonly,
-              selectable: readonly,
-              maxLength: 20,
-            ),
-            Field(
-              label: 'RPC URL',
-              placeholder: 'newRpc'.tr,
-              controller: rpcCtrl,
-              enabled: !readonly,
-              selectable: readonly,
-            ),
-            Field(
-              label: 'chainId'.tr,
-              placeholder: 'chainId'.tr,
-              controller: chainCtrl,
-              enabled: !readonly,
-              selectable: readonly,
-            ),
-            Field(
-              label: 'symbol'.tr,
-              placeholder: 'curNetToken'.tr,
-              controller: symbolCtrl,
-              enabled: !readonly,
-              selectable: readonly,
-            ),
-            Field(
-              label: 'browser'.tr,
-              placeholder: 'browserOptional'.tr,
-              controller: browserCtrl,
-              enabled: !readonly,
-              selectable: readonly,
-            ),
-          ],
-        ),
-      ),
+                : null,
+            body: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+                child: buildChild()
+            )
+        )
     );
   }
 }

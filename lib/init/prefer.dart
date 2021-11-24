@@ -11,8 +11,9 @@ Future<String> initSharedPreferences() async {
   } else {
     Global.langCode = 'en';
   }
-
-  var box = OpenedBox.walletInstance;
+  Box box = OpenedBox.get<ChainWallet>();
+  Box walletBox = OpenedBox.get<Wallet>();
+  Box AddressBox =  OpenedBox.get<ContactAddress>();
   var activeWalletAddr = instance.getString('currentWalletAddress');
   var activeNetwork = instance.getString('activeNetwork');
   var wcSession = instance.getString('wcSession');
@@ -22,8 +23,8 @@ Future<String> initSharedPreferences() async {
     Global.wcSession = wcSession;
   }
   // migrate v1.0.0
-  var filList = OpenedBox.addressInsance.values;
-  var keys = OpenedBox.addressInsance.keys;
+  var filList = walletBox.values;
+  var keys = walletBox.keys;
   if (filList.isNotEmpty) {
     var net = Network.filecoinMainNet;
     for (var wal in filList) {
@@ -43,7 +44,7 @@ Future<String> initSharedPreferences() async {
         Global.store.setString('currentWalletAddress', activeWalletAddr);
       }
     }
-    OpenedBox.addressInsance.deleteAll(keys);
+    AddressBox.deleteAll(keys);
     $store.setNet(net);
   }
 
@@ -55,8 +56,8 @@ Future<String> initSharedPreferences() async {
     if (list.isNotEmpty) {
       $store.setNet(list[0]);
     } else {
-      if (OpenedBox.netInstance.containsKey(activeNetwork)) {
-        $store.setNet(OpenedBox.netInstance.get(activeNetwork));
+      if (OpenedBox.get<Network>().containsKey(activeNetwork)) {
+        $store.setNet(OpenedBox.get<Network>().get(activeNetwork));
       } else {
         $store.setNet(Network.filecoinMainNet);
       }
