@@ -51,4 +51,7 @@ class CustomColor {
   static Color get red {
     return Color(0xffE85C5C);
   }
+  static Color get black{
+    return Color(0xff000000);
+  }
 }

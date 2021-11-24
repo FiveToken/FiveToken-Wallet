@@ -52,6 +52,10 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   bool checkValid(net) {
     var addr = addrCtrl.text.trim();
     var name = nameCtrl.text.trim();
+    if(addr==''){
+      showCustomError('validAddress'.tr);
+      return false;
+    }
     if (!isValidChainAddress(addr, net)) {
       showCustomError('enterValidAddr'.tr);
       return false;

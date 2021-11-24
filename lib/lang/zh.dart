@@ -46,6 +46,7 @@ const Map<String, String> ZH_LANG = {
   'tip2': '一旦丢失助记词，将无法找回。请务必备份好助记词。',
   'tip3': '如果您的设备丢失，可以使用助记词恢复，在开始之前，请准备好笔和纸',
   'enterValidAddr': '请输入有效的地址',
+  'validAddress': '请输入联系人地址',
   'enterTag': '请输入联系人备注，不超过20个字符',
   'addAddrSucc': '添加地址成功',
   'changeAddrSucc': '修改地址成功',
