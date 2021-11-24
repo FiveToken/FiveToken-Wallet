@@ -210,6 +210,7 @@ class NetAddPageState extends State<NetAddPage> {
               controller: nameCtrl,
               enabled: !readonly,
               selectable: readonly,
+              maxLength: 20,
             ),
             Field(
               label: 'RPC URL',

@@ -223,6 +223,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
                      ),
                      Field(
                        controller: nameCtrl,
+                       maxLength: 20,
                        label: 'remark'.tr,
                      ),
                    ],

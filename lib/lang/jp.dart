@@ -83,6 +83,8 @@ const Map<String, String> JP_LANG = {
   "diffPass": "２回のパスワード入力は一致していません",
   "oldPass": "旧支払パスワード",
   "enterOldPass": "旧支払パスワードを入力してください",
+  'enterNewPass': '新しい支払パスワードを入力してください',
+  'enterConfirmPass': '確認パスワードを入力してください',
   "wrongOldPass": "旧支払パスワードは正しくありません",
   "changePassSucc": "パスワード変更に成功しました",
   "change": "変更",

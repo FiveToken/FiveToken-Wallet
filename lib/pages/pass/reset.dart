@@ -40,17 +40,20 @@ class PassResetPageState extends State<PassResetPage> {
   }
 
   void handleConfrim() async {
-    if (loading) {
-      return;
-    }
-    this.loading = true;
-    showCustomLoading('Loading');
     try {
       var pass = passCtrl.text.trim();
       var newPass = newCtrl.text.trim();
       var confirmPass = confirmCtrl.text.trim();
       if (pass == '') {
         showCustomError('enterOldPass'.tr);
+        return;
+      }
+      if(newPass==''){
+        showCustomError('enterNewPass'.tr);
+        return;
+      }
+      if(confirmPass==''){
+        showCustomError('enterConfirmPass'.tr);
         return;
       }
       if (!isValidPass(pass)) {
@@ -65,6 +68,8 @@ class PassResetPageState extends State<PassResetPage> {
         showCustomError('diffPass'.tr);
         return;
       }
+      this.loading = true;
+      showCustomLoading('Loading');
       var private = await wallet.getPrivateKey(pass);
       var net = Network.getNetByRpc(wallet.rpc);
       var isId = wallet.type == 0;
@@ -112,19 +117,26 @@ class PassResetPageState extends State<PassResetPage> {
       body: Padding(
         child: Column(
           children: [
-            PassField(label: 'oldPass'.tr, controller: passCtrl),
+            PassField(
+                label: 'oldPass'.tr,
+                controller: passCtrl,
+                hintText: 'placeholderValidPass'.tr,
+            ),
             SizedBox(
               height: 15,
             ),
             PassField(
                 label: 'newPass'.tr,
                 hintText: 'placeholderValidPass'.tr,
-                controller: newCtrl),
+                controller: newCtrl
+            ),
             SizedBox(
               height: 15,
             ),
             PassField(
-                hintText: 'enterPassAgain'.tr, controller: confirmCtrl),
+                hintText: 'enterPassAgain'.tr,
+                controller: confirmCtrl
+            ),
           ],
         ),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
