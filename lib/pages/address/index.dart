@@ -50,7 +50,7 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
             GestureDetector(
               child: Padding(
                 padding: EdgeInsets.only(right: 12),
-                child: Icon(Icons.add_circle_outline),
+                child: Icon(Icons.add_circle_outline, color: CustomColor.black ),
               ),
               onTap: () {
                 Get.toNamed(addressAddPage);

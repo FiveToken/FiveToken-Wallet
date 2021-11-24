@@ -48,7 +48,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
   }
 
   void deleteImprotWallet(context, state, ChainWallet wal, Network net) async {
-    BlocProvider.of<SelectBloc>(context).add(ImportDeleteEvent(wal: wal, net: net));
+   await BlocProvider.of<SelectBloc>(context).add(ImportDeleteEvent(wal: wal, net: net));
     if (box.values.isEmpty) {
       goInit();
     } else {
@@ -97,7 +97,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                    GestureDetector(
                      child: Padding(
                        padding: EdgeInsets.only(right: 12),
-                       child: Icon(Icons.add_circle_outline),
+                       child: Icon(Icons.add_circle_outline,color: CustomColor.black ),
                      ),
                      onTap: () {
                        showModalBottomSheet(
@@ -256,6 +256,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                        Get.toNamed(walletMangePage,
                                            arguments: {'net': net, 'wallet': wal})
                                            .then((value) {
+
                                        });
                                      },
                                      onTap: () {

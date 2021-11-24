@@ -36,6 +36,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
     on<WalletDeleteEvent>((event, emit){
       var box = OpenedBox.walletInstance;
       List<ChainWallet> list = [];
+      if(event.wallet==null){return;}
       if (event.wallet.type != WalletType.privateKey) {
         list = OpenedBox.walletInstance.values
             .where((wal) => wal.groupHash == event.wallet.groupHash)

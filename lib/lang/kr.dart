@@ -45,6 +45,7 @@ const Map<String, String> KR_LANG = {
   "tip2": "도움말을 잃어버리면,되찾을 수 없다.반드시 도움말을 잘 예비해 두세요.",
   "tip3": "장비를 잃어버리면 도움말을 사용하여 복구할 수 있습니다.시작하기 전에 펜과 메모지를 준비하십시오",
   "enterValidAddr": "유효한 주소를 입력해 주세요",
+  'validAddress': '연락처 주소를 입력하십시오',
   "enterTag": "연락처를 입력하세요. 비고: 20문자를 초과 하지 마십시오",
   "addAddrSucc": "주소 추가 성공",
   "changeAddrSucc": "주소 수정 성공",

@@ -48,6 +48,7 @@ const Map<String, String> EN_LANG = {
   "tip3":
       "If your device is missing, you can use mnemonics to recover, please have your pen and paper ready before you begin",
   "enterValidAddr": "Please enter a valid address",
+  "validAddress": "Please enter contact address",
   "enterTag": "Please enter contact remark, no more than 20 characters",
   "addAddrSucc": "Address added successfully",
   "changeAddrSucc": "Address changed successfully",

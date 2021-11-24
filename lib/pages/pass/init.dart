@@ -137,7 +137,7 @@ class PassInitPageState extends State<PassInitPage> {
 
     this.loading = true;
     showCustomLoading('Loading');
-    if (type == WalletType.id || (type == WalletType.mne && net == null)) {
+    if (type == WalletType.id) {
       try {
         EncryptKey ethKey = await getKey('eth', pass, mne, 't');
         var key = ethKey.address + '_' + Network.ethMainNet.rpc + '_0';
@@ -170,7 +170,7 @@ class PassInitPageState extends State<PassInitPage> {
         this.loading = false;
         dismissAllToast();
       }
-    } else if (type == WalletType.mne && net != null) {
+    } else if (type == WalletType.mne) {
       try {
         EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
         var wal = getWallet(type, key, net);
