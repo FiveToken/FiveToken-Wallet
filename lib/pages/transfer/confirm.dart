@@ -52,7 +52,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
     var res = (BigInt.parse(fee)/unit).toString();
-    return res;
+    var _handlingFee = stringCutOut(res,8);
+    return _handlingFee;
   }
 
   @override
@@ -71,6 +72,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if (Get.arguments['isSpeedUp'] != null) {
         isSpeedUp = Get.arguments['isSpeedUp'];
       }
+
     }
   }
   @override
@@ -144,7 +146,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                         CommonText.grey('amount'.tr),
                         CommonText(
                           token == null
-                              ? formatCoin($store.wal.balance)
+                              ? formatCoin($store.wal.balance) + $store.net.coin
                               : token.formatBalance,
                           color: CustomColor.grey,
                         ),
@@ -170,43 +172,26 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     );
   }
 
-  void increaseGas(last){
-    try{
-      var lastNonce = last.nonce;
-      var key = '$from\_$lastNonce\_$rpc';
-      var cacheGas = OpenedBox.gasInsance.get(key);
-      var realMaxFeePerGas = $store.gas.maxFeePerGas;
-      var realGasFeeCap = $store.gas.gasFeeCap;
-      var realGasPrice = $store.gas.gasPrice;
+  bool checkGas(){
+    var handlingFee = BigInt.parse($store.gas.handlingFee);
+    var bigIntBalance =  BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+    var bigIntAmount = BigInt.from((double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
 
-      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
-        var increaseMaxFeePerGas = (int.parse(cacheGas.maxFeePerGas) * 1.3).truncate();
-        realMaxFeePerGas = (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
-      }else if( $store.net.chain == 'filecoin'){
-        var increaseGasFeeCap = (int.parse(cacheGas.gasFeeCap) * 1.3).truncate();
-        realGasFeeCap = (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
-      }else{
-        var increaseGasPrice = (int.parse(cacheGas.gasPrice) * 1.3).truncate();
-        realGasPrice = (max(int.parse(realGasPrice), increaseGasPrice)).toString();
+    if (isToken) {
+      var mainBigIntBalance = BigInt.parse($store.wal.balance);
+      if ((bigIntAmount > bigIntBalance) || (handlingFee > mainBigIntBalance)) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
       }
-
-      var _gas = {
-        "gasLimit":$store.gas.gasLimit,
-        "gasPremium":$store.gas.gasPremium,
-        "gasPrice":realGasPrice,
-        "rpcType":$store.gas.rpcType,
-        "gasFeeCap":realGasFeeCap,
-        "maxPriorityFee":$store.gas.maxPriorityFee,
-        "maxFeePerGas":realMaxFeePerGas
-      };
-      ChainGas transferGas = ChainGas.fromJson(_gas);
-      $store.setGas(transferGas);
-      print('success');
-    }catch(error){
-      print('error');
+    } else {
+      if (bigIntBalance < handlingFee + bigIntAmount) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
     }
-
+    return true;
   }
+
 
   void pushMsg(int nonce,String ck,context) async {
     if (loading) {
@@ -218,49 +203,55 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     }
     try {
       if(isSpeedUp){
-        pendingList.sort((a, b) {
-          if (a.nonce != null && b.nonce != null) {
-            return b.nonce.compareTo(a.nonce);
-          } else {
-            return -1;
-          }
-        });
-        var last = pendingList.last;
-        increaseGas(last);
-        bool _isToken = last.token != null;
-        BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
-            rpc,
-            chainType,
-            from,
-            last.to,
-            last.value,
-            ck,
-            last.nonce,
-            $store.gas,
-            _isToken,
-            last.token
-        ));
-      }else{
-        var value = getChainValue(amount, precision: token?.precision ?? 18);
-        this.loading = true;
-        showCustomLoading('Loading');
-        var realNonce = nonce;
-        var nonceKey = '$from\_${$store.net.rpc}';
-        if(nonceBoxInstance.get(nonceKey) != null){
-          realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
+        bool valid = checkGas();
+        if(valid){
+          showCustomLoading('Loading');
+          pendingList.sort((a, b) {
+            if (a.nonce != null && b.nonce != null) {
+              return b.nonce.compareTo(a.nonce);
+            } else {
+              return -1;
+            }
+          });
+          var lastMessage = pendingList.last;
+          bool _isToken = lastMessage.token != null;
+          BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
+              rpc,
+              chainType,
+              from,
+              lastMessage.to,
+              lastMessage.value,
+              ck,
+              lastMessage.nonce,
+              $store.gas,
+              _isToken,
+              lastMessage.token
+          ));
         }
-        BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
-            rpc,
-            chainType,
-            from,
-            to,
-            value,
-            ck,
-            realNonce,
-            $store.gas,
-            isToken,
-            token
-        ));
+      }else{
+        bool valid = checkGas();
+        if(valid){
+          var value = getChainValue(amount, precision: token?.precision ?? 18);
+          this.loading = true;
+          showCustomLoading('Loading');
+          var realNonce = nonce;
+          var nonceKey = '$from\_${$store.net.rpc}';
+          if(nonceBoxInstance.get(nonceKey) != null){
+            realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
+          }
+          BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
+              rpc,
+              chainType,
+              from,
+              to,
+              value,
+              ck,
+              realNonce,
+              $store.gas,
+              isToken,
+              token
+          ));
+        }
       }
 
     } catch (e) {

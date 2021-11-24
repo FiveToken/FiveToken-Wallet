@@ -227,6 +227,7 @@ const Map<String, String> JP_LANG = {
   "confirmDeleteId": "IDウォレット削除成功",
   "noMore": "これ以上記録なし",
   'wrongNet': 'ネットワークタイプエラー',
+  'lockScreenSetting':'画面設定をロックする',
   'wrongBrowser': 'ブラウザURLフォーマットエラー',
   'confimrDeleteNet': 'ネットワークの削除を確認しますか？'
 };

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
+import 'package:fil/common/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -34,7 +35,8 @@ class ChainGasPageState extends State<ChainGasPage> {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
     var res = (BigInt.parse(fee)/unit).toString();
-    return res;
+    var _handlingFee = stringCutOut(res,8);
+    return _handlingFee;
   }
 
   @override

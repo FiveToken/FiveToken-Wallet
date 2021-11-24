@@ -57,6 +57,12 @@ class SetPageState extends State<SetPage> {
                     Get.toNamed(netIndexPage);
                   },
                 ),
+                CardItem(
+                  label: 'lockScreenSetting'.tr,
+                  onTap: () {
+                    Get.toNamed(lockPage);
+                  },
+                ),
               ],
             ),
             SizedBox(

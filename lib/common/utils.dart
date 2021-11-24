@@ -140,11 +140,25 @@ String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
 
+String stringCutOut(String amount,int ){
+  var amountArr = amount.split(".");
+  if(amountArr.length > 0){
+    var integer = amountArr[0];
+    var decimal = amountArr[1];
+    if(decimal.length>8){
+      decimal = decimal.substring(0,8);
+    }
+    return integer + "." + decimal;
+  }else{
+    return amount;
+  }
+}
+
 String formatCoin(String amount,
     {num size = 4, bool fixed = false,double min, Network net}) {
   net = net ?? $store.net;
   if (amount == '0') {
-    return '0 ${net.coin}';
+    return '0';
   }
   var isFil = net.addressType == AddressType.filecoin.type;
   try {
