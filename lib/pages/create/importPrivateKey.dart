@@ -152,6 +152,7 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
               ),
               Field(
                 label: 'walletName'.tr,
+                maxLength: 20,
                 controller: nameControl,
               )
             ],

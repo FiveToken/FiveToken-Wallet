@@ -42,6 +42,7 @@ import 'package:fil/pages/wallet/main.dart';
 import 'package:fil/pages/other/scan.dart';
 import 'package:fil/widgets/index.dart';
 import 'package:http/http.dart';
+import 'package:fil/chain/wallet.dart';
 
 
 typedef WCCallback = List<JsonRpc Function(WCSession, JsonRpc)> Function(
@@ -56,11 +57,11 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   final TextEditingController controller = TextEditingController();
-  var box = OpenedBox.walletInstance;
+  var box = OpenedBox.get<ChainWallet>();
   Timer timer;
   WCSession connectedSession;
   WCMeta meta;
-  Box<Nonce> nonceBoxInstance = OpenedBox.nonceInsance;
+  Box<Nonce> nonceBoxInstance = OpenedBox.get<Nonce>();
   final Web3Client client = Web3Client($store.net.url, Client());
   ChainProvider provider;
 
@@ -331,10 +332,10 @@ class MainPageState extends State<MainPage> {
           gasPrice: $store.gas.gasPrice,
           gasLimit: $store.gas.gasLimit,
           gasPremium: $store.gas.gasPremium);
-      OpenedBox.gasInsance
+      OpenedBox.get<ChainGas>()
           .put('$from\_$realNonce\_${$store.net.rpc}', cacheGas);
       $store.setGas(ChainGas());
-      OpenedBox.mesInstance.put(
+      OpenedBox.get<CacheMessage>().put(
           res,
           CacheMessage(
               pending: 1,

@@ -23,7 +23,7 @@ class AddressBookSelectPage extends StatefulWidget {
 }
 
 class AddressBookSelectPageState extends State<AddressBookSelectPage> {
-  var box = OpenedBox.addressBookInsance;
+  var box = OpenedBox.get<ContactAddress>();
   List<ContactAddress> list = [];
 
   void setList(BuildContext context) {

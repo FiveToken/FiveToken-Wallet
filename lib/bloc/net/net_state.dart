@@ -21,7 +21,7 @@ class NetState extends Equatable {
   List<List<Network>> get getNetwork {
     final list = [];
     list.addAll(network);
-    list.addAll(OpenedBox.netInstance.values);
+    list.addAll(OpenedBox.get<Network>().values);
     return list;
   }
 }

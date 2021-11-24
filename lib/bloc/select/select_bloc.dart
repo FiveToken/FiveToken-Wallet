@@ -18,7 +18,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
       emit(state.copy(label:event.label));
     });
     on<IdDeleteEvent>((event, emit){
-      var box = OpenedBox.walletInstance;
+      var box = OpenedBox.get<ChainWallet>();
       var keys = box.values
           .where((wal) => wal.groupHash == event.hash && wal.type == WalletType.id)
           .map((wal) => wal.key);
@@ -26,7 +26,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
       emit(SelectState.idle());
     });
     on<ImportDeleteEvent>((event, emit) async {
-        var box = OpenedBox.walletInstance;
+        var box = OpenedBox.get<ChainWallet>();
         if(event.wal!=null&&event.wal.key!=null){
           await  box.delete(event.wal.key);
         }
@@ -34,11 +34,11 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
     });
 
     on<WalletDeleteEvent>((event, emit){
-      var box = OpenedBox.walletInstance;
+      var box = OpenedBox.get<ChainWallet>();
       List<ChainWallet> list = [];
       if(event.wallet==null){return;}
       if (event.wallet.type != WalletType.privateKey) {
-        list = OpenedBox.walletInstance.values
+        list = OpenedBox.get<ChainWallet>().values
             .where((wal) => wal.groupHash == event.wallet.groupHash)
             .toList();
       } else {

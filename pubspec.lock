@@ -15,6 +15,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.7.0"
+  argon2:
+    dependency: "direct main"
+    description:
+      name: argon2
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.1"
   args:
     dependency: transitive
     description:
@@ -60,10 +67,12 @@ packages:
   bls:
     dependency: "direct main"
     description:
-      name: bls
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: b91b2ee1faab8f676923c81e58b62c465aeb8ad8
+      url: "https://gitlab.com/abu0306/bls.git"
+    source: git
+    version: "0.0.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -354,10 +363,12 @@ packages:
   flotus:
     dependency: "direct main"
     description:
-      name: flotus
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: e023a3f84273df41fcf00f5e7024bc8ee15ccd06
+      url: "https://gitlab.com/abu0306/flotus.git"
+    source: git
+    version: "0.0.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -431,6 +442,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.5.7"
+  flutter_sodium:
+    dependency: "direct main"
+    description:
+      name: flutter_sodium
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.0"
   flutter_swipe_action_cell:
     dependency: "direct main"
     description:
@@ -595,6 +613,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.1"
+  libsodium:
+    dependency: "direct main"
+    description:
+      name: libsodium
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.0"
   logger:
     dependency: "direct main"
     description:

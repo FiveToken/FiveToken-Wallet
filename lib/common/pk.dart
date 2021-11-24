@@ -4,19 +4,14 @@ import 'package:cryptography/cryptography.dart';
 
 // import 'package:fil/index.dart' hide Nonce;
 
-Future<List<int>> genSalt(String addr, String pass) async {
-  var str = '${addr}filwalllet$pass';
+Future<List<int>> genSalt(String str) async {
   final message = utf8.encode(str);
-  final hash = await new Sha256().hash(
-    message,
-  );
+  final hash = await new Sha256().hash(message);
   return hash.bytes;
 }
 
 Future<String> genPrivateKeyDigest(String privateKey) async {
-  final hash = await new Sha256().hash(
-    base64Decode(privateKey),
-  );
+  final hash = await new Sha256().hash(base64Decode(privateKey));
   return base64Encode(hash.bytes.sublist(0, 16));
 }
 
@@ -29,7 +24,9 @@ Future<Uint8List> genKek(String addr, String pass, {int size = 32}) async {
     bits: size * 8,
   );
 
-  final nonce = await genSalt(addr, pass);
+  var str = '${addr}filwalllet$pass';
+
+  final nonce = await genSalt(str);
   
   final newSecretKey = await pbkdf2.deriveKey(
       secretKey: SecretKey(utf8.encode(pass)),

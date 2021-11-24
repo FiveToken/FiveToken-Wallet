@@ -89,6 +89,8 @@ const Map<String, String> EN_LANG = {
   "diffPass": "Entered passwords differ",
   "oldPass": "Old payment password",
   "enterOldPass": "Please enter old payment password",
+  'enterNewPass': 'Please enter a new payment password',
+  'enterConfirmPass': 'Please enter the confirmation password',
   "wrongOldPass": "Old payment password error",
   "changePassSucc": "Password changed successfully",
   "change": "Change",

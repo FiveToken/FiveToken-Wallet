@@ -23,7 +23,7 @@ class MainState extends Equatable {
     return MainState(
       language: Locale('en'),
       currency: 'USD',
-      chainWallet: null,
+      chainWallet: ChainWallet(),
       hideTestnet: bol,
       filterNets: nets,
       balance:'0',

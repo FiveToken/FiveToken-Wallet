@@ -23,7 +23,7 @@ class TransferConfirmPage extends StatefulWidget {
 }
 
 class TransferConfirmPageState extends State<TransferConfirmPage> {
-  var nonceBoxInstance = OpenedBox.nonceInsance;
+  var nonceBoxInstance = OpenedBox.get<Nonce>();
   Token token = Global.cacheToken;
   bool get isToken => token != null;
   String get title => token != null ? token.symbol : $store.net.coin;
@@ -38,7 +38,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String prePage;
   bool isSpeedUp = false;
   List<CacheMessage> get pendingList {
-    return OpenedBox.mesInstance.values
+    return OpenedBox.get<CacheMessage>().values
         .where((mes) =>
     mes.pending == 1 && mes.from == from && mes.rpc == rpc)
         .toList();
@@ -171,7 +171,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         )
     );
   }
-
   bool checkGas(){
     var handlingFee = BigInt.parse($store.gas.handlingFee);
     var bigIntBalance =  BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
@@ -190,6 +189,43 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       }
     }
     return true;
+  }
+
+  void increaseGas(last){
+    try{
+      var lastNonce = last.nonce;
+      var key = '$from\_$lastNonce\_$rpc';
+      var cacheGas = OpenedBox.get<ChainGas>().get(key);
+      var realMaxFeePerGas = $store.gas.maxFeePerGas;
+      var realGasFeeCap = $store.gas.gasFeeCap;
+      var realGasPrice = $store.gas.gasPrice;
+
+      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
+        var increaseMaxFeePerGas = (int.parse(cacheGas.maxFeePerGas) * 1.3).truncate();
+        realMaxFeePerGas = (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
+      }else if( $store.net.chain == 'filecoin'){
+        var increaseGasFeeCap = (int.parse(cacheGas.gasFeeCap) * 1.3).truncate();
+        realGasFeeCap = (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
+      }else{
+        var increaseGasPrice = (int.parse(cacheGas.gasPrice) * 1.3).truncate();
+        realGasPrice = (max(int.parse(realGasPrice), increaseGasPrice)).toString();
+      }
+
+      var _gas = {
+        "gasLimit":$store.gas.gasLimit,
+        "gasPremium":$store.gas.gasPremium,
+        "gasPrice":realGasPrice,
+        "rpcType":$store.gas.rpcType,
+        "gasFeeCap":realGasFeeCap,
+        "maxPriorityFee":$store.gas.maxPriorityFee,
+        "maxFeePerGas":realMaxFeePerGas
+      };
+      ChainGas transferGas = ChainGas.fromJson(_gas);
+      $store.setGas(transferGas);
+      print('success');
+    }catch(error){
+      print('error');
+    }
   }
 
 
@@ -281,7 +317,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
-      OpenedBox.gasInsance.put(gasKey, ChainGas(
+      OpenedBox.get<ChainGas>().put(gasKey, ChainGas(
           gasLimit:$store.gas.gasLimit,
           gasPremium:$store.gas.gasPremium,
           gasPrice:$store.gas.gasPrice,
@@ -290,7 +326,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
           maxPriorityFee:$store.gas.maxPriorityFee,
           maxFeePerGas:$store.gas.maxFeePerGas
       ));
-      OpenedBox.mesInstance.put(
+      OpenedBox.get<CacheMessage>().put(
           hash,
           CacheMessage(
               pending: 1,

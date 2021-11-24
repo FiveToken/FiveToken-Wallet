@@ -146,6 +146,7 @@ class ImportMnePageState extends State<ImportMnePage> {
               Field(
                 label: 'walletName'.tr,
                 placeholder: 'placeholderWalletName'.tr,
+                maxLength: 20,
                 controller: nameControl,
               )
             ],

@@ -84,6 +84,8 @@ const Map<String, String> KR_LANG = {
   "diffPass": "두 번의 비밀번호 입력이 일치하지 않습니다.",
   "oldPass": "구식 결제 비밀번호",
   "enterOldPass": "구식 결제 비밀번호를 입력하여 주십시요",
+  'enterNewPass': '새 결제 암호를 입력하십시오',
+  'enterConfirmPass': '확인 암호를 입력하십시오',
   "wrongOldPass": "구식 결제 비밀본호 입력이 잘못되었습니다.",
   "changePassSucc": "비밀번호 변경 성공",
   "change": "수정",

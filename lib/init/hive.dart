@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
@@ -10,16 +11,8 @@ import 'package:fil/models/wallet.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fil/utils/enum.dart';
 
-const messageBox = 'message';
-const addressBox = 'address';
-const addressBookBox = 'addressBookBox';
-const nonceBox = 'nonceBox';
-const gasBox = 'gasBox';
-const netBox = 'netBox';
-const tokenBox = 'tokenBox';
-const walletBox = 'walletBox';
-const cacheMessageBox = 'cacheMessageBox';
 Future initHive() async {
   await Hive.initFlutter();
   Hive.registerAdapter(WalletAdapter());
@@ -32,47 +25,46 @@ Future initHive() async {
   Hive.registerAdapter(CacheMessageAdapter());
   Hive.registerAdapter(ChainGasAdapter());
 
-
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  final String hiveKey = Global.uuid;
-  var containsEncryptionKey =  await secureStorage.containsKey(key: hiveKey);
-  if(!containsEncryptionKey){
+  final String key1 = HiveKey.key;
+  final String secret = HiveKey.secret;
+  var containsEncryptionKey = await secureStorage.containsKey(key: 'key');
+  if (!containsEncryptionKey) {
     var key = Hive.generateSecureKey();
-    await secureStorage.write(key: hiveKey, value: base64UrlEncode(key));
+    await secureStorage.write(key: 'key', value: base64UrlEncode(key));
   }
-  var encryptionKey = base64Url.decode(await secureStorage.read(key: hiveKey));
-  await Hive.openBox<Wallet>(addressBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<ContactAddress>(addressBookBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<Nonce>(nonceBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<ChainGas>(gasBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<Network>(netBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<Token>(tokenBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<ChainWallet>(walletBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  await Hive.openBox<CacheMessage>(cacheMessageBox, encryptionCipher: HiveAesCipher(encryptionKey));
-  // await OpenedBox.walletInstance.deleteFromDisk();
-  // await OpenedBox.mesInstance.deleteFromDisk();
-  // await OpenedBox.tokenInstance.deleteFromDisk();
-  OpenedBox.initBox();
+  var encryptionKey = base64Url.decode(await secureStorage.read(key: 'key'));
+
+  Map<String, Box<dynamic>> map = {};
+  var keys = HiveBoxType.getMap().keys.toList();
+  final one = await Future.wait(HiveBoxType.getMap().keys.map(
+      (value) => Hive.openBox(value, encryptionCipher: HiveAesCipher(encryptionKey))
+    )
+  );
+  for(var i = 0 ; i < one.length; i++){
+    var itemBox = one[i];
+    map[keys[i]] = itemBox;
+  }
+  OpenedBox.initBox(map);
 }
 
 class OpenedBox {
-  static Box<Wallet> addressInsance;
-  static Box<ContactAddress> addressBookInsance;
-  static Box<Nonce> nonceInsance;
-  static Box<ChainGas> gasInsance;
-  static Box<Network> netInstance;
-  static Box<Token> tokenInstance;
-  static Box<ChainWallet> walletInstance;
-  static Box<CacheMessage> mesInstance;
+  static Map<String, Box<dynamic>> _mmap={};
+  static Box<dynamic> get<T>() {
+    Box box;
+    var types = HiveBoxType.getType();
+    _mmap.forEach((key, value) {
+      if (types[key] == T.toString()) {
+        box = value;
+        return;
+      }
+    });
+    return box;
+  }
 
-  static void initBox() {
-    OpenedBox.addressInsance = Hive.box<Wallet>(addressBox);
-    OpenedBox.addressBookInsance = Hive.box<ContactAddress>(addressBookBox);
-    OpenedBox.nonceInsance = Hive.box<Nonce>(nonceBox);
-    OpenedBox.gasInsance = Hive.box<ChainGas>(gasBox);
-    OpenedBox.netInstance = Hive.box<Network>(netBox);
-    OpenedBox.tokenInstance = Hive.box<Token>(tokenBox);
-    OpenedBox.walletInstance = Hive.box<ChainWallet>(walletBox);
-    OpenedBox.mesInstance = Hive.box<CacheMessage>(cacheMessageBox);
+  static void initBox(Map<String, dynamic> map) {
+     map.forEach((key, value) {
+       _mmap[key] = value;
+     });
   }
 }
