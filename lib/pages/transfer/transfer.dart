@@ -188,6 +188,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     var to = addressCtrl.text.trim();
     try{
       if(mounted){
+        BlocProvider.of<GasBloc>(context).add(ResetGetGasStateEvent());
         BlocProvider.of<GasBloc>(context).add(GetGasEvent(
             $store.net.rpc,
             $store.net.chain,

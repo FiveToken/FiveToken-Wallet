@@ -42,7 +42,6 @@ class ChainGasPageState extends State<ChainGasPage> {
   @override
   void initState() {
     super.initState();
-
     if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
       rpcType = 'ethMain';
     }else if( $store.net.chain == 'filecoin'){
@@ -50,59 +49,67 @@ class ChainGasPageState extends State<ChainGasPage> {
     }else{
       rpcType = 'ethOthers';
     }
-
-    initGas();
+    initGas(rpcType);
   }
-
-
-  void handleSubmit(BuildContext context) {
-    final maxPriorityFee = maxPriorityFeeCtrl.text.trim();
-    final maxFeePerGas = gasLimitCtrl.text.trim();
-    final gasFeeCap = gasFeeCapCtrl.text.trim();
-    final gasPrice = gasPriceCtrl.text.trim();
-    final gasPremium = gasPremiumCtrl.text.trim();
-    final gasLimit = gasLimitCtrl.text.trim();
-
-    if(rpcType == 'ethMain'){
-      if(maxPriorityFee == '' || maxFeePerGas == '' || gasLimit == ''){
-        showCustomError('errorSetGas'.tr);
-        return;
-      }
-    }else if(rpcType == 'filecoin'){
-      if(gasFeeCap == '' || gasPremium == '' || gasLimit == ''){
-        showCustomError('errorSetGas'.tr);
-        return;
-      }
-    }else{
-      if(gasPrice == '' || gasLimit == ''){
-        showCustomError('errorSetGas'.tr);
-        return;
-      }
-    }
-    var unit = BigInt.from(pow(10, 9));
-    var _gas = {
-      "maxPriorityFee":maxPriorityFee,
-      "maxFeePerGas":(BigInt.parse(maxFeePerGas)*unit).toString(),
-      "gasLimit":int.parse(gasLimit),
-      "gasPremium":gasPremium,
-      "gasPrice":(BigInt.parse(gasPrice)*unit).toString(),
-      "rpcType":rpcType,
-      "gasFeeCap":gasFeeCap,
-    };
-    ChainGas gas = ChainGas.fromJson(_gas);
-    $store.setGas(gas);
-    Get.back();
-  }
-
-  void initGas() {
+  void initGas(rpcType) {
     var unit = BigInt.from(pow(10, 9));
     maxPriorityFeeCtrl.text = storeGas.maxPriorityFee;
-    maxFeePerGasCtrl.text = (BigInt.parse(storeGas.maxFeePerGas)/unit).toString();//storeGas.maxFeePerGas;
-    gasFeeCapCtrl.text = storeGas.gasFeeCap;
-    gasPriceCtrl.text = (BigInt.parse(storeGas.gasPrice)/unit).toString();//storeGas.gasPrice;
+    maxFeePerGasCtrl.text = (BigInt.parse(storeGas.maxFeePerGas)/unit).toString();
     gasPremiumCtrl.text = storeGas.gasPremium;
+    gasFeeCapCtrl.text = storeGas.gasFeeCap;
+    gasPriceCtrl.text = (BigInt.parse(storeGas.gasPrice)/unit).toString();
     gasLimitCtrl.text = storeGas.gasLimit.toString();
   }
+
+  void handleSubmit(BuildContext context) {
+    try{
+      var maxPriorityFee = maxPriorityFeeCtrl.text.trim();
+      var maxFeePerGas = maxFeePerGasCtrl.text.trim();
+      var gasFeeCap = gasFeeCapCtrl.text.trim();
+      var gasPrice = gasPriceCtrl.text.trim();
+      var gasPremium = gasPremiumCtrl.text.trim();
+      var gasLimit = gasLimitCtrl.text.trim();
+
+      if(rpcType == 'ethMain'){
+        if(maxPriorityFee == '' || maxFeePerGas == '' || gasLimit == ''){
+          showCustomError('errorSetGas'.tr);
+          return;
+        }
+      }else if(rpcType == 'filecoin'){
+        if(gasFeeCap == '' || gasPremium == '' || gasLimit == ''){
+          showCustomError('errorSetGas'.tr);
+          return;
+        }
+      }else{
+        if(gasPrice == '' || gasLimit == ''){
+          showCustomError('errorSetGas'.tr);
+          return;
+        }
+      }
+      var unit = BigInt.from(pow(10, 9));
+      var doubleMaxFee = double.parse(maxFeePerGas);
+      var bigInTMaxFee = BigInt.from(doubleMaxFee);
+      var doubleGasPrice = double.parse(gasPrice);
+      var bigIngGasPrice = BigInt.from(doubleGasPrice);
+      var _gas = {
+        "maxPriorityFee":maxPriorityFee,
+        "maxFeePerGas":(bigInTMaxFee*unit).toString(),
+        "gasLimit":int.parse(gasLimit),
+        "gasPremium":gasPremium,
+        "gasPrice":(bigIngGasPrice*unit).toString(),
+        "rpcType":rpcType,
+        "gasFeeCap":gasFeeCap,
+      };
+      ChainGas gas = ChainGas.fromJson(_gas);
+      $store.setGas(gas);
+      Get.back();
+    }catch(error){
+      print('error');
+    }
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -54,9 +54,9 @@ class ChainGas {
         this.gasPrice = '0',
         this.level = 0,
         this.rpcType = '',
-        this.maxPriorityFee = '',
-        this.maxFeePerGas = '',
-        this.gasFeeCap = ''
+        this.maxPriorityFee = '0',
+        this.maxFeePerGas = '0',
+        this.gasFeeCap = '0'
       });
   ChainGas.fromJson(Map<String, dynamic> json) {
     gasPrice = json['gasPrice'] ?? '0';
@@ -65,7 +65,7 @@ class ChainGas {
     level = json['level'] ?? 0;
     rpcType = json['rpcType'] ?? 0;
     maxPriorityFee = json['maxPriorityFee'] ?? '0';
-    maxFeePerGas = json['maxFeePerGas'];
-    gasFeeCap = json['gasFeeCap'];
+    maxFeePerGas = json['maxFeePerGas'] ?? '0';
+    gasFeeCap = json['gasFeeCap'] ?? '0';
   }
 }

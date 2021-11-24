@@ -13,6 +13,6 @@ class GetGasEvent extends GasEvent {
   GetGasEvent(this.rpc,this.chainType,this.to,this.isToken,this.token,this.rpcType);
 }
 
-class ResetChainGasEvent extends GasEvent{
-  ResetChainGasEvent();
+class ResetGetGasStateEvent extends GasEvent{
+  ResetGetGasStateEvent();
 }
