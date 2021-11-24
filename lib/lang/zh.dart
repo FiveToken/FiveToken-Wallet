@@ -74,6 +74,7 @@ const Map<String, String> ZH_LANG = {
   'service': '隐私政策',
   'clause': '服务条款',
   'version': "版本号",
+  'lockScreenSetting':'锁屏设置',
   'pass': '支付密码',
   'setPass': '设置支付密码',
   'enterPass': '请输入密码',

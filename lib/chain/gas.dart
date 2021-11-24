@@ -48,12 +48,6 @@ class ChainGas {
     }
   }
 
-  String get handlingFeeMinUnit{
-    var unit = BigInt.from(pow(10, 18));
-    var num = double.parse(this.handlingFee);
-    return this.handlingFee;
-  }
-
   ChainGas(
       {this.gasLimit = 0,
         this.gasPremium = '0',

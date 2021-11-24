@@ -5,6 +5,7 @@ const String scanPage = '/scan';
 const String setPage = '/set';
 const String langPage = '/lang';
 const String servicePage = '/service';
+const String lockPage = '/lock';
 
 const String passwordSetPage = "/pass/init";
 const String passwordResetPage = "/pass/reset";

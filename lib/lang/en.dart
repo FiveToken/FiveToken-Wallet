@@ -56,6 +56,7 @@ const Map<String, String> EN_LANG = {
   "manageAddr": "Manage address",
   "add": "Add",
   "save": "Save",
+  'lockScreenSetting':'Lock screen settings',
   "contactAddr": "Contact address",
   "copyAddr": "Address copied successfully",
   'changePass': "Change password",

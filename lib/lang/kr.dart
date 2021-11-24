@@ -31,6 +31,7 @@ const Map<String, String> KR_LANG = {
   "checkMne": "도움말 검증",
   "clickMne": "차례대로 도움말을 클릭하세요",
   "cut": "캡처하지 마세요",
+  'lockScreenSetting':'잠금 화면 설정',
   "shareCut":
       "화면을 캡처하여 공유하고 저장하지 마십시오, 제3자의 악성 소프트웨어에 의해 수집될 수 있어 재산 손실이 발생할 수 있습니다.",
   "know": "이미 알고 있음",

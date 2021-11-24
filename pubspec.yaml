@@ -24,6 +24,8 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  # git: https://gitlab.com/abu0306/flotus.git
+  # git: https://gitlab.com/abu0306/bls.git
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.7
   hive: any
@@ -35,10 +37,8 @@ dependencies:
   dio: any
   crypto: any
   encrypt: any
-  flotus:
-    git: https://gitlab.com/abu0306/flotus.git
-  bls:
-    git: https://gitlab.com/abu0306/bls.git
+  flotus: ^2.0.1
+  bls: ^2.0.1
   permission_handler: 8.2.5
   image_gallery_saver: any
   get:

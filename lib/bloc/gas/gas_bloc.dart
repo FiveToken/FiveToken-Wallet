@@ -15,7 +15,7 @@ part 'gas_state.dart';
 
 class GasBloc extends Bloc<GasEvent, GasState> {
   GasBloc() : super(GasState.idle()) {
-    on<ResetChainGas>((event,emit){
+    on<ResetChainGasEvent>((event,emit){
       var _gas = {
         "gasPrice":'0',
         "gasPremium":'0',
@@ -28,7 +28,7 @@ class GasBloc extends Bloc<GasEvent, GasState> {
       };
       ChainGas gas = ChainGas.fromJson(_gas);
       $store.setGas(gas);
-      emit(state.copyWithGasState(gas:gas));
+      emit(state.copyWithGasState(getGasState:''));
     });
     on<GetGasEvent>((event,emit) async{
       try{
@@ -54,11 +54,13 @@ class GasBloc extends Bloc<GasEvent, GasState> {
           };
           ChainGas gas = ChainGas.fromJson(_gas);
           $store.setGas(gas);
-          emit(state.copyWithGasState(gas:gas));
+          emit(state.copyWithGasState(getGasState:'success'));
         }else{
+          emit(state.copyWithGasState(getGasState:''));
           showCustomError('gasFail'.tr);
         }
       }catch(error){
+        add(ResetChainGasEvent());
         showCustomError('gasFail'.tr);
         dismissAllToast();
         print(error);

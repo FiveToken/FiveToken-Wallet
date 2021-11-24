@@ -1,20 +1,20 @@
 part of 'gas_bloc.dart';
 
 class GasState extends Equatable {
-  final ChainGas gas;
+  final String getGasState;
   @override
   // TODO: implement props
-  List<Object> get props => [this.gas];
+  List<Object> get props => [this.getGasState];
 
-  const GasState({ this.gas});
+  const GasState({ this.getGasState});
 
   factory GasState.idle() {
-    return GasState(gas: ChainGas());
+    return GasState(getGasState: '');
   }
 
-  GasState copyWithGasState({ChainGas gas}){
+  GasState copyWithGasState({String getGasState}){
     return GasState(
-      gas: gas ??  this.gas
+        getGasState: getGasState ?? this.getGasState
     );
   }
 
