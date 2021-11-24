@@ -76,7 +76,7 @@ class PassResetPageState extends State<PassResetPage> {
       var net = Network.getNetByRpc(wallet.rpc);
       var isId = wallet.type == 0;
       if (isId) {
-        var list = OpenedBox.walletInstance.values
+        var list = OpenedBox.get<ChainWallet>().values
             .where((wal) => wal.groupHash == wallet.groupHash)
             .toList();
         for (var i = 0; i < list.length; i++) {
