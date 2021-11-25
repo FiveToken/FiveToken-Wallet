@@ -29,8 +29,6 @@ abstract class ChainProvider {
 
   Future<int> getNonce(String address);
 
-  ChainGas replaceGas(ChainGas gas, {String chainPremium});
-
   Future<ChainInfo> getBlockByNumber(int number);
 
   Future getTransactionReceipt(String hash);
@@ -46,6 +44,8 @@ abstract class ChainProvider {
   Future<String> getMaxFeePerGas();
 
   Future<List> getTokenPrice(List param);
+
+  Future<bool> addressCheck(String address);
 
   void dispose();
 }
