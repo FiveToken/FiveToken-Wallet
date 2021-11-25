@@ -57,7 +57,7 @@ class PassInitPageState extends State<PassInitPage> {
   }
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     box  = OpenedBox.addressInsance;
     var arg = Get.arguments ?? {'type': WalletType.id};

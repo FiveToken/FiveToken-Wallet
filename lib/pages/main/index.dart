@@ -66,7 +66,7 @@ class MainPageState extends State<MainPage>  {
   ChainProvider provider;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     box = OpenedBox.walletInstance;
     nonceBoxInstance = OpenedBox.nonceInsance;
