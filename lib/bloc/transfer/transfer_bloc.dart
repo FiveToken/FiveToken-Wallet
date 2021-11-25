@@ -11,6 +11,7 @@ import 'package:fil/models/nonce.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:meta/meta.dart';
+import 'package:oktoast/oktoast.dart';
 
 part 'transfer_event.dart';
 part 'transfer_state.dart';
@@ -45,6 +46,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
 
     on<SendTransactionEvent>((event,emit) async{
       try{
+        showCustomLoading('Loading');
         Chain.setRpcNetwork(event.rpc, event.chainType);
         var result = '';
         if(event.isToken){
@@ -69,8 +71,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         if(result == ''){
           showCustomError('sendFail'.tr);
         }
+        dismissAllToast();
         emit(state.copyWithTransferState(transactionHash:result));
       }catch(error){
+        dismissAllToast();
         print("================AppOpenEvent=========");
       }
     });

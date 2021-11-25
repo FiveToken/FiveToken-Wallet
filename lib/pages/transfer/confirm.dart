@@ -280,7 +280,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if(isSpeedUp){
         bool valid = checkGas();
         if(valid){
-          showCustomLoading('Loading');
           pendingList.sort((a, b) {
             if (a.nonce != null && b.nonce != null) {
               return b.nonce.compareTo(a.nonce);
@@ -341,7 +340,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     try{
       this.loading = false;
       var value = getChainValue(amount, precision: token?.precision ?? 18);
-      dismissAllToast();
       showCustomToast('sended'.tr);
       var nonceKey = '$from\_${rpc}';
       var gasKey = '$from\_$nonce\_${rpc}';
