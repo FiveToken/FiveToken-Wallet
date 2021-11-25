@@ -40,7 +40,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           direction: event.direction,
           mid: mid
       );
-      var box = OpenedBox.get<CacheMessage>();
+      var box = OpenedBox.mesInstance;
       List<CacheMessage> messages = [];
       result.forEach((map) {
         var mes = CacheMessage(
@@ -69,7 +69,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       try{
         List pendingList = state.storeMessageList;
         if(pendingList.length > 0){
-          var box = OpenedBox.get<CacheMessage>();
+          var box = OpenedBox.mesInstance;
           Chain.setRpcNetwork(event.rpc, event.chainType);
           List param = [];
           state.storeMessageList.forEach((n) async {
@@ -125,7 +125,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         List pendingList = state.storeMessageList;
         if(pendingList.length > 0){
           Chain.setRpcNetwork(event.rpc, event.chainType);
-          var box = OpenedBox.get<CacheMessage>();
+          var box = OpenedBox.mesInstance;
 
           var list = await Future.wait(
               pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)));
@@ -179,7 +179,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 List getStoreMsgList(){
   var list = <CacheMessage>[];
   var address = $store.wal.addr;
-  var box = OpenedBox.get<CacheMessage>();
+  var box = OpenedBox.mesInstance;
   box.values.forEach((message) {
     if (
       (message.from == address || message.to == address)

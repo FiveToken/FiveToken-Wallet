@@ -55,20 +55,21 @@ class MainPage extends StatefulWidget {
   }
 }
 
-class MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage>  {
   final TextEditingController controller = TextEditingController();
-  var box = OpenedBox.get<ChainWallet>();
+  var box;
   Timer timer;
   WCSession connectedSession;
   WCMeta meta;
-  Box<Nonce> nonceBoxInstance = OpenedBox.get<Nonce>();
+  Box<Nonce> nonceBoxInstance;
   final Web3Client client = Web3Client($store.net.url, Client());
   ChainProvider provider;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
-
+    box = OpenedBox.walletInstance;
+    nonceBoxInstance = OpenedBox.nonceInsance;
     // var isCreate = false;
     // if (Get.arguments != null && Get.arguments['create'] != null) {
     //   isCreate = Get.arguments['create'] as bool;
@@ -332,10 +333,9 @@ class MainPageState extends State<MainPage> {
           gasPrice: $store.gas.gasPrice,
           gasLimit: $store.gas.gasLimit,
           gasPremium: $store.gas.gasPremium);
-      OpenedBox.get<ChainGas>()
-          .put('$from\_$realNonce\_${$store.net.rpc}', cacheGas);
+      OpenedBox.gasInsance.put('$from\_$realNonce\_${$store.net.rpc}', cacheGas);
       $store.setGas(ChainGas());
-      OpenedBox.get<CacheMessage>().put(
+      OpenedBox.mesInstance..put(
           res,
           CacheMessage(
               pending: 1,

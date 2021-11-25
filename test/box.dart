@@ -5,7 +5,7 @@ class MockBox<T> extends Mock implements Box<T> {}
 
 MockBox<Network> mockNetbox() {
   var box = MockBox<Network>();
-  // OpenedBox.get<Network>() = box;
+  // OpenedBox.netInstance = box;
   return box;
 }
 
@@ -17,12 +17,12 @@ MockBox<ContactAddress> mockAddressBookBox() {
 
 MockBox<ChainWallet> mockChainWalletBox() {
   var box = MockBox<ChainWallet>();
-  // OpenedBox.get<ChainWallet>() = box;
+  // OpenedBox.walletInstance = box;
   return box;
 }
 
 MockBox<Token> mockTokenBox() {
   var box = MockBox<Token>();
-  // OpenedBox.get<Token>() = box;
+  // OpenedBox.tokenInstance = box;
   return box;
 }

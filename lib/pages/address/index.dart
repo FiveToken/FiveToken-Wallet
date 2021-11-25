@@ -26,7 +26,7 @@ class AddressBookIndexPage extends StatefulWidget {
 }
 
 class AddressBookIndexPageState extends State<AddressBookIndexPage> {
-  var box = OpenedBox.get<ContactAddress>();
+  var box = OpenedBox.addressBookInsance;
 
   void onChanges(context,  net){
     BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: net));

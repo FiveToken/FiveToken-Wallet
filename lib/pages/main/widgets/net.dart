@@ -56,7 +56,7 @@ class NetSelect extends StatelessWidget {
                                   var active = $store.net.rpc == net.rpc;
                                   return GestureDetector(
                                     onTap: () {
-                                      var l = OpenedBox.get<ChainWallet>().values
+                                      var l = OpenedBox.walletInstance.values
                                           .where((wal) =>
                                               wal.rpc == net.rpc &&
                                               wal.groupHash ==

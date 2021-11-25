@@ -23,7 +23,7 @@ class TransferConfirmPage extends StatefulWidget {
 }
 
 class TransferConfirmPageState extends State<TransferConfirmPage> {
-  var nonceBoxInstance = OpenedBox.get<Nonce>();
+  var nonceBoxInstance = OpenedBox.nonceInsance;
   Token token = Global.cacheToken;
   bool get isToken => token != null;
   String get title => token != null ? token.symbol : $store.net.coin;
@@ -38,7 +38,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String prePage;
   bool isSpeedUp = false;
   List<CacheMessage> get pendingList {
-    return OpenedBox.get<CacheMessage>().values
+    return OpenedBox.mesInstance.values
         .where((mes) =>
     mes.pending == 1 && mes.from == from && mes.rpc == rpc)
         .toList();
@@ -195,7 +195,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     try{
       var lastNonce = last.nonce;
       var key = '$from\_$lastNonce\_$rpc';
-      var cacheGas = OpenedBox.get<ChainGas>().get(key);
+      var cacheGas = OpenedBox.gasInsance.get(key);
       var realMaxFeePerGas = $store.gas.maxFeePerGas;
       var realGasFeeCap = $store.gas.gasFeeCap;
       var realGasPrice = $store.gas.gasPrice;
@@ -317,7 +317,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
-      OpenedBox.get<ChainGas>().put(gasKey, ChainGas(
+      OpenedBox.gasInsance.put(gasKey, ChainGas(
           gasLimit:$store.gas.gasLimit,
           gasPremium:$store.gas.gasPremium,
           gasPrice:$store.gas.gasPrice,
@@ -326,7 +326,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
           maxPriorityFee:$store.gas.maxPriorityFee,
           maxFeePerGas:$store.gas.maxFeePerGas
       ));
-      OpenedBox.get<CacheMessage>().put(
+      OpenedBox.mesInstance.put(
           hash,
           CacheMessage(
               pending: 1,

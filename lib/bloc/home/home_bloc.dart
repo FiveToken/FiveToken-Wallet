@@ -26,7 +26,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     on<GetTokenListEvent>((event, emit) async {
       try {
-        var tokenList = OpenedBox.get<Token>().values
+        var tokenList = OpenedBox.tokenInstance.values
             .where((token) => token.rpc == event.rpc)
             .toList();
         List<Token> list = [];
@@ -50,7 +50,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               "balance": balance
             };
             list.add(Token.fromJson(item));
-            OpenedBox.get<Token>().put(
+            OpenedBox.tokenInstance.put(
                 token.address + token.rpc,
                 Token.fromJson(item)
             );

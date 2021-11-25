@@ -110,7 +110,7 @@ class AppState extends State<App> with WidgetsBindingObserver {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (ctx) => MainBloc()..add(AppOpenEvent()),
+            create: (ctx) => MainBloc()..add(AppOpenEvent(count: 0)),
           )
         ],
         child: BlocBuilder<MainBloc, MainState>(builder: (ctx, state) {

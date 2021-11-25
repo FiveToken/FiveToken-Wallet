@@ -38,7 +38,7 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
-  var box = OpenedBox.get<Wallet>();
+  var box;
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
@@ -57,8 +57,9 @@ class PassInitPageState extends State<PassInitPage> {
   }
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
+    box  = OpenedBox.addressInsance;
     var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
     mne = arg['mne'];
@@ -121,8 +122,8 @@ class PassInitPageState extends State<PassInitPage> {
     );
   }
 
-  void AddWallet(ChainWallet wallet){
-    var box = OpenedBox.get<ChainWallet>();
+  void AddWallet(ChainWallet wallet) async{
+    var box = OpenedBox.walletInstance;
 
     box.put(wallet.key, wallet);
   }

@@ -30,7 +30,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   TextEditingController addrCtrl = TextEditingController();
   TextEditingController nameCtrl = TextEditingController();
   ContactAddress addr;
-  var box = OpenedBox.get<ContactAddress>();
+  var box = OpenedBox.addressBookInsance;
   int mode = 0;
   // Network net = $store.net;
   @override

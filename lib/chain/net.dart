@@ -228,7 +228,7 @@ class Network {
         Network.binanceTestnet
       ],
     ];
-    var netBox = OpenedBox.get<Network>();
+    var netBox = OpenedBox.netInstance;
     var custom = netBox.values.toList();
     if(custom.length>0){
       List<Network> arr1 = [];
@@ -240,12 +240,12 @@ class Network {
     return arr;
   }
 
-  static Network getNetByRpc(String rpc) {
+  static Network getNetByRpc(String rpc)  {
     var nets = Network.supportNets.where((net) => net.rpc == rpc).toList();
     if (nets.isNotEmpty) {
       return nets[0];
     } else {
-      var custom = OpenedBox.get<Network>().get(rpc);
+      var custom = OpenedBox.netInstance.get(rpc);
       return custom ?? Network();
     }
   }

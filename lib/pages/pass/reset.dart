@@ -24,7 +24,7 @@ class PassResetPageState extends State<PassResetPage> {
   final TextEditingController passCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
   final TextEditingController confirmCtrl = TextEditingController();
-  var box = OpenedBox.get<ChainWallet>();
+  var box = OpenedBox.walletInstance;
   bool loading = false;
   ChainWallet wallet = Get.arguments['wallet'];
 
@@ -76,7 +76,7 @@ class PassResetPageState extends State<PassResetPage> {
       var net = Network.getNetByRpc(wallet.rpc);
       var isId = wallet.type == 0;
       if (isId) {
-        var list = OpenedBox.get<ChainWallet>().values
+        var list = OpenedBox.walletInstance.values
             .where((wal) => wal.groupHash == wallet.groupHash)
             .toList();
         for (var i = 0; i < list.length; i++) {
@@ -108,6 +108,8 @@ class PassResetPageState extends State<PassResetPage> {
       dismissAllToast();
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -37,7 +37,7 @@ class NetAddPageState extends State<NetAddPage> {
   Web3Client client;
   bool readonly = false;
   bool loading = false;
-  var box = OpenedBox.get<Network>();
+  var box = OpenedBox.netInstance;
   final formList = [
     {
       "label": 'netName'.tr,
@@ -89,7 +89,7 @@ class NetAddPageState extends State<NetAddPage> {
 
     // rpc in supportNet or in netInstance but not edit
     if ((Network.supportNets.map((net) => net.rpc).contains(rpc) ||
-        OpenedBox.get<Network>().containsKey(rpc)) &&
+        OpenedBox.netInstance.containsKey(rpc)) &&
         !edit) {
       showCustomError('netExist'.tr);
       return;
@@ -120,7 +120,7 @@ class NetAddPageState extends State<NetAddPage> {
         showCustomError('errorChainId'.tr);
         return;
       }
-      var walletBox = OpenedBox.get<ChainWallet>();
+      var walletBox = OpenedBox.walletInstance;
 
       // edit and rpc not in net
 

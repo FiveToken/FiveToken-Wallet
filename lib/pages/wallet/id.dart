@@ -33,7 +33,7 @@ class IdWalletPageState extends State<IdWalletPage> {
   }
 
   void setList() {
-    currentMneWallets = OpenedBox.get<ChainWallet>().values.where((wal) {
+    currentMneWallets = OpenedBox.walletInstance.values.where((wal) {
       return wal.groupHash == groupHash;
     }).toList();
   }

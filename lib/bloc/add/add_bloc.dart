@@ -14,12 +14,12 @@ class AddBloc extends Bloc<AddEvent, AddState> {
     on<AddEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<AddListEvent>((event, emit){
-      var box = OpenedBox.get<Network>();
+    on<AddListEvent>((event, emit) async{
+      var box = OpenedBox.netInstance;
       box.put(event.rpc, event.network);
     });
-    on<DeleteListEvent>((event, emit){
-      var box = OpenedBox.get<Network>();
+    on<DeleteListEvent>((event, emit) async{
+      var box = OpenedBox.netInstance;
       box.delete({event.rpc});
     });
   }

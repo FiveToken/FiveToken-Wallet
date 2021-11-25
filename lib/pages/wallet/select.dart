@@ -30,7 +30,7 @@ class WalletSelectPage extends StatefulWidget {
 class WalletSelectPageState extends State<WalletSelectPage> {
   final ScrollController controller = ScrollController();
   List<ChainWallet> list = [];
-  var box = OpenedBox.get<ChainWallet>();
+  var box = OpenedBox.walletInstance;
 
   @override
   void initState() {
@@ -201,7 +201,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                        },
                                        onTap: () {
                                          if (hash != $store.wal.groupHash) {
-                                           var wallets = OpenedBox.get<ChainWallet>().values
+                                           var wallets = OpenedBox.walletInstance.values
                                                .where((wal) =>
                                            wal.groupHash == hash &&
                                                wal.rpc == $store.net.rpc)
