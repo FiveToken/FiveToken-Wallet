@@ -219,7 +219,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         var amount = amountCtrl.text.trim();
         var toAddress = addressCtrl.text.trim();
         List<CacheMessage> pendingList = OpenedBox.mesInstance.values
-            .values
             .where(
                 (mes) => mes.pending == 1 && mes.from == from && mes.rpc == rpc)
             .toList();
