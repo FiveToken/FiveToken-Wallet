@@ -225,5 +225,10 @@ class Filecoin extends ChainProvider {
   }
 
   @override
+  Future<String> getNetworkId() async{
+    return '';
+  }
+
+  @override
   void dispose() {}
 }

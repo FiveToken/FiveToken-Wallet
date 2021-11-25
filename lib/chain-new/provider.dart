@@ -47,5 +47,7 @@ abstract class ChainProvider {
 
   Future<bool> addressCheck(String address);
 
+  Future<String> getNetworkId();
+
   void dispose();
 }

@@ -220,6 +220,16 @@ class Ether extends ChainProvider {
   }
 
   @override
+  Future<String> getNetworkId() async{
+    try{
+      var id = await client.getNetworkId();
+      return id.toString();
+    }catch(error){
+      print('error');
+    }
+  }
+
+  @override
   Future getTransactionReceipt(String hash) async{
     try{
         var res = await client.getTransactionReceipt(hash);

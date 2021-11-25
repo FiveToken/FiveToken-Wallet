@@ -1,4 +1,6 @@
 import 'package:fil/bloc/add/add_bloc.dart';
+import 'package:fil/chain-new/global.dart';
+import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -111,12 +113,16 @@ class NetAddPageState extends State<NetAddPage> {
     this.loading = true;
     try {
       showCustomLoading('Loading');
-      var id = await client.getNetworkId();
+      Chain.setRpcNetwork($store.net.rpc, $store.net.chain);
+      var id = await Chain.chainProvider.getNetworkId();
       this.loading = false;
       dismissAllToast();
 
       // chain
-      if (id.toString() != chain) {
+      print(chain);
+      print(id);
+      print(id!=chain);
+      if (id != chain) {
         showCustomError('errorChainId'.tr);
         return;
       }
