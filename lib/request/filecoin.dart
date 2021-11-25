@@ -10,7 +10,7 @@ import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/config/config.dart';
-import 'package:fil/models-new/chain_info.dart';
+import 'package:fil/models/chain_info.dart';
 
 class Filecoin extends ChainProvider {
   Dio client;

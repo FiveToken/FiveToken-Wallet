@@ -8,7 +8,7 @@ import 'package:fil/request/provider.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
-import 'package:fil/models-new/chain_info.dart';
+import 'package:fil/models/chain_info.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
