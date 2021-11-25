@@ -5,10 +5,10 @@ import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/filMessage.dart';
+import 'package:fil/request/provider.dart';
 import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/http/http.dart';
-import 'package:fil/chain-new/provider.dart';
 import 'package:fil/config/config.dart';
 import 'package:fil/models-new/chain_info.dart';
 

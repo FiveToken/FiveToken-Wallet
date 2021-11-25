@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fil/chain-new/global.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/walletConnect.dart';
 import 'package:fil/init/hive.dart'; // OpenedBox
+import 'package:fil/request/global.dart';
 import 'package:fil/store/store.dart'; // $store
 
 part 'home_event.dart';
@@ -35,7 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           final balances = await Future.wait([
             ...tokenList
                 .map((e) => Chain.chainProvider
-                    .getBalanceOfToken(event.mainAddress, e.address))
+                .getBalanceOfToken(event.mainAddress, e.address))
                 .toList()
           ]);
           for (int i = 0; i < tokenList.length;i ++){

@@ -10,7 +10,6 @@ import 'package:fil/common/utils.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/common/time.dart';
 import 'package:fil/widgets/style.dart';
-import 'package:fil/chain/provider.dart';
 
 class FilDetailPage extends StatefulWidget {
   @override
@@ -19,7 +18,6 @@ class FilDetailPage extends StatefulWidget {
 
 class FilDetailPageState extends State<FilDetailPage> {
   CacheMessage mes = Get.arguments;
-  ChainProvider provider;
 
   @override
   void initState() {
@@ -28,14 +26,6 @@ class FilDetailPageState extends State<FilDetailPage> {
 
   void goBrowser(CacheMessage m) {
     openInBrowser($store.net.getDetailLink(m.hash));
-  }
-
-  ChainProvider initProvider() {
-    if ($store.net.addressType == 'eth') {
-      return EthProvider($store.net);
-    } else {
-      return FilecoinProvider($store.net);
-    }
   }
 
   @override

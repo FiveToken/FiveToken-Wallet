@@ -63,7 +63,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
                   size: 30,
                   weight: FontWeight.w800,
                 ),
-                visible: $store.net.hasPrice,
+                visible: state.usdPrice > 0,
               )
           );
         })

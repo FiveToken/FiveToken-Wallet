@@ -1,5 +1,5 @@
 import 'package:fil/bloc/add/add_bloc.dart';
-import 'package:fil/chain-new/global.dart';
+import 'package:fil/request/global.dart';
 import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

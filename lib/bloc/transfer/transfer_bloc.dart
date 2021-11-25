@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fil/chain-new/global.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/models/nonce.dart';
+import 'package:fil/request/global.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:meta/meta.dart';
