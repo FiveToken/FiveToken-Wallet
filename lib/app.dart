@@ -5,6 +5,8 @@ import 'package:fil/i10n/localization.dart';
 // import 'package:fil/index.dart';
 import 'package:fil/lang/index.dart';
 import 'package:fil/pages/main/index.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' hide Transition;
 import 'package:oktoast/oktoast.dart';
@@ -77,6 +79,7 @@ class AppState extends State<App> with WidgetsBindingObserver {
   }
 
   void initDevice() async {
+    $store.setEncryptionType(EncryptType.sha);
     await initDeviceInfo();
     await listenNetwork();
   }

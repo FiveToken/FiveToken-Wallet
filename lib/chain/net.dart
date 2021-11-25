@@ -203,12 +203,12 @@ class Network {
       Network.filecoinMainNet,
       Network.ethMainNet,
       Network.binanceMainNet,
-      // Network.filecoinTestNet,
-      // Network.ethKovanNet,
-      // Network.ethRinkebyNet,
-      // Network.ethRopstenNet,
-      // Network.ethGoerliNet,
-      // Network.binanceTestnet
+      Network.filecoinTestNet,
+      Network.ethKovanNet,
+      Network.ethRinkebyNet,
+      Network.ethRopstenNet,
+      Network.ethGoerliNet,
+      Network.binanceTestnet
     ];
   }
 

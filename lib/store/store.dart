@@ -11,6 +11,7 @@ class StoreController extends GetxController {
   var scanResult = ''.obs;
   var network = Network().obs;
   var tok = Token().obs;
+  var encryptionType = ''.obs;
   ChainWallet get wal {
     return wallet.value;
   }
@@ -53,6 +54,10 @@ class StoreController extends GetxController {
 
   void setGas(ChainGas gas) {
     g.value = gas;
+  }
+
+  void setEncryptionType(String type){
+    encryptionType.value = type;
   }
 }
 
