@@ -21,7 +21,6 @@ class Ether extends ChainProvider {
     this.rpc = rpc;
     final web3Rpc = web3.Web3(rpc);
     client = web3Rpc.client;
-    // client = web3client ?? Web3Client(net.url, http.Client());
     rpcJson = web3Rpc.rpcJson;
   }
 
@@ -163,13 +162,6 @@ class Ether extends ChainProvider {
   }
 
   @override
-  ChainGas replaceGas(ChainGas gas, {String chainPremium}) {
-    return ChainGas(
-        gasLimit: gas.gasLimit,
-        gasPrice: (int.parse(gas.gasPrice) * 1.2).truncate().toString());
-  }
-
-  @override
   Future<String> sendTransaction(
       String from,
       String to,
@@ -238,16 +230,6 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{
-    return [];
-  }
-
-  @override
-  Future<List> getMessagePendingState(List param) async{
-    return [];
-  }
-
-  @override
   Future<List> getTokenPrice(param) async{
     try{
       String baseApi = 'https://api.fivetoken.io' + '/api' + Config.clientID;
@@ -261,6 +243,21 @@ class Ether extends ChainProvider {
     }catch(error){
       return [];
     }
+  }
+
+  @override
+  Future<bool> addressCheck(String address) async{
+    return false;
+  }
+
+  @override
+  Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{
+    return [];
+  }
+
+  @override
+  Future<List> getMessagePendingState(List param) async{
+    return [];
   }
 
   @override

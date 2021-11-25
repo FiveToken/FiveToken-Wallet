@@ -21,6 +21,7 @@ class Filecoin extends ChainProvider {
   static String clientId = Config.clientID;
   static String messagePending = '/message/pending';
   static String tokenPrice = '/token/prices';
+  static String addrCheck = '/address/check';
 
   Filecoin(String rpc, {Dio httpClient}) {
     this.rpc = rpc;
@@ -181,17 +182,15 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  ChainGas replaceGas(ChainGas gas, {String chainPremium}) {
-    var caculatePremium = (int.parse(gas.gasPremium) * 1.3).truncate();
-    var realPremium = int.parse(chainPremium) > caculatePremium ? int.parse(chainPremium): caculatePremium;
-    var oldPrice = int.parse(gas.gasPrice);
-    var realPrice = oldPrice <= realPremium ? realPremium + 100 : oldPrice;
-    return ChainGas(
-        gasLimit: gas.gasLimit,
-        gasPremium: realPremium.toString(),
-        gasPrice: realPrice.toString());
+  Future<bool> addressCheck(String address) async{
+    try {
+      var res = await client.get(addrCheck, queryParameters: {'address': address});
+      return res.data["nonce"] ?? -1;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
-
 
   @override
   Future getTransactionReceipt(String hash) async{
