@@ -14,7 +14,7 @@ class GasState extends Equatable {
 
   GasState copyWithGasState({String getGasState}){
     return GasState(
-        getGasState: getGasState ?? this.getGasState
+        getGasState: getGasState ??  this.getGasState
     );
   }
 

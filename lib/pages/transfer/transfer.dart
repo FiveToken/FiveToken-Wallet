@@ -22,6 +22,7 @@ import 'package:fil/chain/token.dart';
 import 'package:fil/chain/net.dart';
 import 'package:flutter/services.dart';
 import 'package:fil/init/hive.dart';
+
 class FilTransferNewPage extends StatefulWidget {
   @override
   State createState() => FilTransferNewPageState();
@@ -58,11 +59,11 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         prePage = Get.arguments['page'];
       }
 
-      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
+      if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
         rpcType = 'ethMain';
-      }else if( $store.net.chain == 'filecoin'){
+      } else if ($store.net.chain == 'filecoin') {
         rpcType = 'filecoin';
-      }else{
+      } else {
         rpcType = 'ethOthers';
       }
 
@@ -76,7 +77,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     //     getGas();
     //   }
     // });
-
   }
 
   @override
@@ -94,43 +94,37 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context)=> GasBloc())
-        ],
-        child: BlocBuilder<GasBloc,GasState>(
-            builder:(ctx,data){
-              return BlocListener<GasBloc,GasState>(
-                  listener: (context,state){
-                      if(state.getGasState == 'success'){
-                        getGasCallback();
-                      }
-                  },
-                  child: CommonScaffold(
-                    grey: true,
-                    title: 'send'.tr + title,
-                    footerText: 'next'.tr,
-                    actions: [
-                      Padding(
-                        child: GestureDetector(
-                            onTap: handleScan,
-                            child: Image(
-                              width: 20,
-                              image: AssetImage('icons/scan.png'),
-                            )),
-                        padding: EdgeInsets.only(right: 10),
-                      )
-                    ],
-                    onPressed: ()=> nextStep(ctx),
-                    body: _body(),
-                  )
-              );
-            }
-        ),
+      providers: [BlocProvider(create: (context) => GasBloc())],
+      child: BlocBuilder<GasBloc, GasState>(builder: (ctx, data) {
+        return BlocListener<GasBloc, GasState>(
+            listener: (context, state) {
+              if (state.getGasState == 'success') {
+                getGasCallback();
+              }
+            },
+            child: CommonScaffold(
+              grey: true,
+              title: 'send'.tr + title,
+              footerText: 'next'.tr,
+              actions: [
+                Padding(
+                  child: GestureDetector(
+                      onTap: handleScan,
+                      child: Image(
+                        width: 20,
+                        image: AssetImage('icons/scan.png'),
+                      )),
+                  padding: EdgeInsets.only(right: 10),
+                )
+              ],
+              onPressed: () => nextStep(ctx),
+              body: _body(),
+            ));
+      }),
     );
-
   }
 
-  Widget _body(){
+  Widget _body() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12),
       child: Column(
@@ -184,81 +178,76 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     });
   }
 
-  void getGas(context){
+  void getGas(context) {
     var to = addressCtrl.text.trim();
-    try{
-      if(mounted){
+    try {
+      if (mounted) {
         BlocProvider.of<GasBloc>(context).add(ResetGetGasStateEvent());
         BlocProvider.of<GasBloc>(context).add(GetGasEvent(
-            $store.net.rpc,
-            $store.net.chain,
-            to,
-            isToken,
-            token,
-            rpcType
-        ));
+            $store.net.rpc, $store.net.chain, to, isToken, token, rpcType));
       }
-    }catch(error){
+    } catch (error) {
       print('error');
     }
   }
 
-  void getGasCallback(){
-    try{
-      if(isSpeedUp){
+  void getGasCallback() {
+    try {
+      if (isSpeedUp) {
         increaseGas();
       }
       var toAddress = addressCtrl.text.trim();
       var amount = amountCtrl.text.trim();
       bool valid = checkGas();
-      if(valid){
+      if (valid) {
         Get.toNamed(transferConfrimPage, arguments: {
           "to": toAddress,
-          "amount":amount,
-          "prePage":prePage,
-          "isSpeedUp":isSpeedUp
+          "amount": amount,
+          "prePage": prePage,
+          "isSpeedUp": isSpeedUp
         });
       }
-    }catch(error){
+    } catch (error) {
       print('error');
     }
   }
 
-  nextStep(context){
-    try{
+  nextStep(context) {
+    try {
       bool valid = checkInputValid();
       if (valid) {
         var amount = amountCtrl.text.trim();
         var toAddress = addressCtrl.text.trim();
-        List<CacheMessage> pendingList = OpenedBox.get<CacheMessage>().values
-            .where((mes) =>
-        mes.pending == 1 && mes.from == from && mes.rpc == rpc)
+        List<CacheMessage> pendingList = OpenedBox.get<CacheMessage>()
+            .values
+            .where(
+                (mes) => mes.pending == 1 && mes.from == from && mes.rpc == rpc)
             .toList();
         bool showSpeed = pendingList.isNotEmpty;
 
-        if (showSpeed){
+        if (showSpeed) {
           showCustomModalBottomSheet(
               shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
               context: context,
               builder: (BuildContext ctx) {
-                return _speedUpSheet(toAddress,amount,context);
-              }
-          );
-        }else{
+                return _speedUpSheet(toAddress, amount, context);
+              });
+        } else {
           getGas(context);
         }
       }
-    }catch(error){
+    } catch (error) {
       print('error');
     }
-
   }
 
-  bool checkGas(){
+  bool checkGas() {
     var amount = amountCtrl.text.trim();
     var handlingFee = BigInt.parse($store.gas.handlingFee);
-    var bigIntBalance =  BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
-    var bigIntAmount = BigInt.from((double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
+    var bigIntBalance =
+        BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+    var bigIntAmount = BigInt.from(
+        (double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
 
     if (isToken) {
       var mainBigIntBalance = BigInt.parse($store.wal.balance);
@@ -276,7 +265,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   }
 
   bool checkInputValid() {
-    try{
+    try {
       var amount = amountCtrl.text.trim();
       var toAddress = addressCtrl.text.trim();
       if (toAddress == "") {
@@ -301,8 +290,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         return false;
       }
 
-      var bigIntBalance =  BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
-      var bigIntAmount = BigInt.from((double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
+      var bigIntBalance =
+          BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+      var bigIntAmount = BigInt.from(
+          (double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
 
       if (bigIntAmount > bigIntBalance) {
         showCustomError('errorLowBalance'.tr);
@@ -310,54 +301,62 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       }
 
       return true;
-    }catch(error){
+    } catch (error) {
       print('err');
       return false;
     }
-
   }
 
-  void speedUpMessages(context){
+  void speedUpMessages(context) {
     isSpeedUp = true;
     getGas(context);
   }
 
-  void increaseGas(){
-    try{
+  void increaseGas() {
+    try {
       var cacheGas = $store.gas;
       var realMaxFeePerGas = $store.gas.maxFeePerGas;
       var realGasFeeCap = $store.gas.gasFeeCap;
       var realGasPrice = $store.gas.gasPrice;
 
-      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
-        var increaseMaxFeePerGas = (int.parse(cacheGas.maxFeePerGas) * Config.increaseGasCoefficient).truncate();
-        realMaxFeePerGas = (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
-      }else if( $store.net.chain == 'filecoin'){
-        var increaseGasFeeCap = (int.parse(cacheGas.gasFeeCap) * Config.increaseGasCoefficient).truncate();
-        realGasFeeCap = (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
-      }else{
-        var increaseGasPrice = (int.parse(cacheGas.gasPrice) * Config.increaseGasCoefficient).truncate();
-        realGasPrice = (max(int.parse(realGasPrice), increaseGasPrice)).toString();
+      if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
+        var increaseMaxFeePerGas =
+            (int.parse(cacheGas.maxFeePerGas) * Config.increaseGasCoefficient)
+                .truncate();
+        realMaxFeePerGas =
+            (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
+      } else if ($store.net.chain == 'filecoin') {
+        var increaseGasFeeCap =
+            (int.parse(cacheGas.gasFeeCap) * Config.increaseGasCoefficient)
+                .truncate();
+        realGasFeeCap =
+            (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
+      } else {
+        var increaseGasPrice =
+            (int.parse(cacheGas.gasPrice) * Config.increaseGasCoefficient)
+                .truncate();
+        realGasPrice =
+            (max(int.parse(realGasPrice), increaseGasPrice)).toString();
       }
 
       var _gas = {
-        "gasLimit":$store.gas.gasLimit,
-        "gasPremium":$store.gas.gasPremium,
-        "gasPrice":realGasPrice,
-        "rpcType":$store.gas.rpcType,
-        "gasFeeCap":realGasFeeCap,
-        "maxPriorityFee":$store.gas.maxPriorityFee,
-        "maxFeePerGas":realMaxFeePerGas
+        "gasLimit": $store.gas.gasLimit,
+        "gasPremium": $store.gas.gasPremium,
+        "gasPrice": realGasPrice,
+        "rpcType": $store.gas.rpcType,
+        "gasFeeCap": realGasFeeCap,
+        "maxPriorityFee": $store.gas.maxPriorityFee,
+        "maxFeePerGas": realMaxFeePerGas
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
       print('success');
-    }catch(error){
+    } catch (error) {
       print('error');
     }
   }
 
-  Widget _speedUpSheet(toAddress,amount,context){
+  Widget _speedUpSheet(toAddress, amount, context) {
     return Column(
       children: [
         CommonTitle(
@@ -377,7 +376,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                   items: [
                     CardItem(
                       label: 'speedup'.tr,
-                      onTap: ()=> speedUpMessages(context),
+                      onTap: () => speedUpMessages(context),
                     )
                   ],
                 ),
@@ -391,9 +390,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                       onTap: () {
                         Get.toNamed(transferConfrimPage, arguments: {
                           "to": toAddress,
-                          "amount":amount,
-                          "prePage":prePage,
-                          "isSpeedUp":false
+                          "amount": amount,
+                          "prePage": prePage,
+                          "isSpeedUp": false
                         });
                       },
                     )
@@ -404,6 +403,4 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       ],
     );
   }
-
 }
-
