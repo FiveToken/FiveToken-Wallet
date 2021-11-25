@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/chain/gas.dart';
@@ -51,7 +52,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String get handlingFee {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
-    var res = (BigInt.parse(fee)/unit).toString();
+    var res = (BigInt.parse(fee)/unit).toStringAsFixed(9);
     var _handlingFee = stringCutOut(res,8);
     return _handlingFee;
   }
@@ -80,7 +81,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     return MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) => WalletBloc()
+              create: (context) => PriceBloc()..add(GetPriceEvent($store.net.chain))
           ),
           BlocProvider(
               create: (context) => TransferBloc()..add(
@@ -96,29 +97,34 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                       pushMsgCallBack(state.nonce,state.transactionHash);
                     }
                   },
-                  child: CommonScaffold(
-                      grey: true,
-                      title: 'send'.tr + title,
-                      footerText: 'next'.tr,
-                      onPressed:(){
-                        showPassDialog(context, (String pass) async {
-                          try{
-                            var wal = $store.wal;
-                            var ck = await wal.getPrivateKey(pass);
-                            pushMsg(data.nonce,ck,ctx);
-                          }catch(error){
-                            print('error');
-                          }
-                        });
-                      },
-                      body:_body()
+                  child: BlocBuilder<PriceBloc,PriceState>(
+                      builder:(context,state){
+                        return CommonScaffold(
+                          grey: true,
+                          title: 'send'.tr + title,
+                          footerText: 'next'.tr,
+                          onPressed:(){
+                            showPassDialog(context, (String pass) async {
+                              try{
+                                var wal = $store.wal;
+                                var ck = await wal.getPrivateKey(pass);
+                                pushMsg(data.nonce,ck,ctx);
+                              }catch(error){
+                                print('error');
+                              }
+                            });
+                          },
+                          body:_body(state)
+                        );
+                      }
                   )
+
               );
             }
         )
     );
   }
-  Widget _body(){
+  Widget _body(state){
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 12),
         child:Column(
@@ -143,12 +149,13 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CommonText.grey('amount'.tr),
-                        CommonText(
-                          token == null
-                              ? formatCoin($store.wal.balance) + $store.net.coin
-                              : token.formatBalance,
-                          color: CustomColor.grey,
+                        CommonText.main('amount'.tr),
+                        Visibility(
+                            child: CommonText(
+                              getAmountUsdPrice(state.usdPrice),
+                              color: CustomColor.grey,
+                            ),
+                          visible: state.usdPrice > 0,
                         ),
                       ],
                     ),
@@ -162,15 +169,85 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                       ),
                     ),
                     Obx(() => SetGas(
-                          maxFee: handlingFee + $store.net.coin,
+                          maxFee: handlingFee,
                           gas: gas,
-                        )),
+                          usdPrice:state.usdPrice
+                        )
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CommonText.main('totalPay'.tr),
+                        CommonText(
+                            getUsdTotalPrice(state.usdPrice),
+                          color: CustomColor.grey,
+                        )
+                      ],
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: padding,
+                      margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CommonText(
+                            getTotal()
+                          ),
+                          CommonText.grey(
+                            "Amount + Gas Fee"
+                          )
+                        ],
+                      ),
+                      decoration: BoxDecoration(
+                          color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8
+                      ),
+                    ),
                   ]
               )
             ]
         )
     );
   }
+
+  String getAmountUsdPrice(usd){
+    bool isToken = token != null;
+    if(isToken){
+      return '';
+    }else{
+      var _amount = double.parse(amount);
+      var usdPrice = formatDouble((usd * _amount).toStringAsFixed(2));
+      String unit = '\$ ';
+      return unit + usdPrice;
+    }
+  }
+
+  String getUsdTotalPrice(usd){
+    try{
+      var _amount = double.parse(amount);
+      var _fee = double.parse(handlingFee);
+      String unit = '\$ ';
+      var res = ((_amount + _fee)*usd).toStringAsFixed(8);
+      return unit + res;
+    }catch(error){
+      return '';
+    }
+  }
+
+  String getTotal(){
+    try{
+      var _amount = double.parse(amount);
+      var _fee = double.parse(handlingFee);
+      var total = (_amount + _fee).toString();
+      return total + $store.net.coin;
+    }catch(error){
+      return '';
+    }
+  }
+
   bool checkGas(){
     var handlingFee = BigInt.parse($store.gas.handlingFee);
     var bigIntBalance =  BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
@@ -191,44 +268,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     return true;
   }
 
-  void increaseGas(last){
-    try{
-      var lastNonce = last.nonce;
-      var key = '$from\_$lastNonce\_$rpc';
-      var cacheGas = OpenedBox.gasInsance.get(key);
-      var realMaxFeePerGas = $store.gas.maxFeePerGas;
-      var realGasFeeCap = $store.gas.gasFeeCap;
-      var realGasPrice = $store.gas.gasPrice;
-
-      if(($store.net.chain == 'eth') && ($store.net.net == 'main')){
-        var increaseMaxFeePerGas = (int.parse(cacheGas.maxFeePerGas) * 1.3).truncate();
-        realMaxFeePerGas = (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
-      }else if( $store.net.chain == 'filecoin'){
-        var increaseGasFeeCap = (int.parse(cacheGas.gasFeeCap) * 1.3).truncate();
-        realGasFeeCap = (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
-      }else{
-        var increaseGasPrice = (int.parse(cacheGas.gasPrice) * 1.3).truncate();
-        realGasPrice = (max(int.parse(realGasPrice), increaseGasPrice)).toString();
-      }
-
-      var _gas = {
-        "gasLimit":$store.gas.gasLimit,
-        "gasPremium":$store.gas.gasPremium,
-        "gasPrice":realGasPrice,
-        "rpcType":$store.gas.rpcType,
-        "gasFeeCap":realGasFeeCap,
-        "maxPriorityFee":$store.gas.maxPriorityFee,
-        "maxFeePerGas":realMaxFeePerGas
-      };
-      ChainGas transferGas = ChainGas.fromJson(_gas);
-      $store.setGas(transferGas);
-      print('success');
-    }catch(error){
-      print('error');
-    }
-  }
-
-
   void pushMsg(int nonce,String ck,context) async {
     if (loading) {
       return;
@@ -241,7 +280,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if(isSpeedUp){
         bool valid = checkGas();
         if(valid){
-          showCustomLoading('Loading');
           pendingList.sort((a, b) {
             if (a.nonce != null && b.nonce != null) {
               return b.nonce.compareTo(a.nonce);
@@ -302,7 +340,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     try{
       this.loading = false;
       var value = getChainValue(amount, precision: token?.precision ?? 18);
-      dismissAllToast();
       showCustomToast('sended'.tr);
       var nonceKey = '$from\_${rpc}';
       var gasKey = '$from\_$nonce\_${rpc}';
@@ -375,7 +412,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 class SetGas extends StatelessWidget {
   final String maxFee;
   final ChainGas gas;
-  SetGas({@required this.maxFee, this.gas});
+  final double usdPrice;
+  SetGas({@required this.maxFee, this.gas,this.usdPrice});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -383,7 +421,16 @@ class SetGas extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            child: CommonText.main('fee'.tr),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CommonText.main('fee'.tr),
+                CommonText(
+                  getUsdPrice(),
+                  color: CustomColor.grey,
+                )
+              ],
+            ),
             padding: EdgeInsets.symmetric(vertical: 12),
           ),
           Container(
@@ -393,7 +440,7 @@ class SetGas extends StatelessWidget {
             child: Row(
               children: [
                 CommonText(
-                  maxFee,
+                  maxFee+$store.net.coin,
                   size: 14,
                   color: Colors.white,
                 ),
@@ -413,6 +460,17 @@ class SetGas extends StatelessWidget {
         Get.toNamed(filGasPage);
       },
     );
+  }
+
+  String getUsdPrice(){
+    try{
+      var _amount = double.parse(maxFee);
+      var _usdPrice = (usdPrice * _amount).toStringAsFixed(8);
+      String unit = '\$ ';
+      return unit + _usdPrice;
+    }catch(error){
+      return '';
+    }
   }
 }
 

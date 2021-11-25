@@ -53,13 +53,13 @@ class CoinPriceState extends State<CoinPriceWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (context) => PriceBloc()..add(GetPriceEvent($store.net.chain)),
+        create: (context) => PriceBloc()..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain)),
         child: BlocBuilder<PriceBloc, PriceState>(builder: (ctx, state){
           _context = ctx;
           return Obx(
               () => Visibility(
                 child: CommonText(
-                  state.priceMarket,
+                  getUsdPrce($store.wal.balance,state.usdPrice),
                   size: 30,
                   weight: FontWeight.w800,
                 ),
@@ -69,18 +69,16 @@ class CoinPriceState extends State<CoinPriceWidget> {
         })
     );
   }
-}
 
-String getMarketPrice(String balance, double rate) {
-  try {
-    var b = double.parse(balance) / pow(10, 18);
-    //var code=Global.langCode;
-    var code = 'en';
-    var unit = code == 'en' ? '\$' : '¥';
-    return rate == 0
-        ? ''
-        : ' $unit ${formatDouble((rate * b).toStringAsFixed(2))}';
-  } catch (e) {
-    return '';
+  String getUsdPrce(String balance,double usd){
+    String unit = '\$';
+    try{
+      var _balance = double.parse(balance) / pow(10, 18);
+      var usdPrice = formatDouble((usd * _balance).toStringAsFixed(2));
+      return ' $unit ${usdPrice}';
+    }catch(error){
+      return unit + '0';
+    }
   }
+
 }

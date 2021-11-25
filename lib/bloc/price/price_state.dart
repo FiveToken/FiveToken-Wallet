@@ -1,25 +1,25 @@
 // import 'package:equatable/equatable.dart';
 part of 'price_bloc.dart';
 class PriceState extends Equatable {
-  String priceMarket;
+  final double usdPrice;
   PriceState({
-     this.priceMarket
+     this.usdPrice
   });
   factory PriceState.idle() {
     return PriceState(
-        priceMarket: ''
+        usdPrice: 0
     );
   }
 
-  PriceState copy({String priceMarket}){
+  PriceState copy({double usdPrice}){
     return PriceState(
-      priceMarket: priceMarket??this.priceMarket
+        usdPrice: usdPrice??this.usdPrice
     );
   }
 
 
   @override
   // TODO: implement props
-  List<Object> get props => [this.priceMarket];
+  List<Object> get props => [this.usdPrice];
 
 }

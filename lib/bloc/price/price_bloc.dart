@@ -18,8 +18,8 @@ part 'price_state.dart';
 class PriceBloc extends Bloc<PriceEvent, PriceState> {
   CoinPrice price = CoinPrice();
   PriceBloc() : super(PriceState.idle()) {
-    on<SetPriceEvent>((event, emit) {
-      emit(state.copy(priceMarket:event.marketPrice));
+    on<ResetUsdPriceEvent>((event, emit) {
+      emit(state.copy(usdPrice:0));
     });
     on<GetPriceEvent>((event, emit) async{
       try{
@@ -55,33 +55,11 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
             "usd":usd,
             "cny":cny
           });
-          String priceTmp = getMarketPrice($store.wal.balance, usd);
-          emit(state.copy(priceMarket: priceTmp));
+          emit(state.copy(usdPrice: usd));
         }
       }catch(error){
         print('error');
       }
     });
   }
-
-  double get rate {
-    var lang = Global.langCode;
-    lang = 'en';
-    return lang == 'en' ? price.usd : price.cny;
-  }
-
-  String getMarketPrice(String balance, double rate) {
-    try {
-      var b = double.parse(balance) / pow(10, 18);
-      //var code=Global.langCode;
-      var code = 'en';
-      var unit = code == 'en' ? '\$' : '¥';
-      return rate == 0
-          ? ''
-          : ' $unit ${formatDouble((rate * b).toStringAsFixed(2))}';
-    } catch (e) {
-      return '';
-    }
-  }
-
 }

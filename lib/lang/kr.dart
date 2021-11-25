@@ -24,6 +24,14 @@ const Map<String, String> KR_LANG = {
   "wrongMne": "보조 기사 가 존재 하지 않 으 니 보조 기사 가 정확 한 지 확인 하 세 요",
   "importPk": "비밀 키 가져오기",
   "pk": "비밀 키",
+  'totalPay':'총 지불',
+
+  'lockScreen':'잠금 화면',
+  'lockingScreen':'잠금',
+  'lockScreenPassword':'잠금 화면 비밀번호',
+  'setLockPassword':'비밀번호를 설정해주세요',
+  'confirmLockPassword':'비밀번호를 다시 입력해주세요',
+
   "copyPk": "비밀 키 복제에 성공",
   "wrongPk": "현재 비밀키가 존재하지 않습니다. 비밀키가 정확한지 확인 바랍니다.",
   "enterPk": "비밀키를 입력해 주세요",
