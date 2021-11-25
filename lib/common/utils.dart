@@ -142,7 +142,7 @@ String truncate(double value, {int size = 4}) {
 
 String stringCutOut(String amount,int ){
   var amountArr = amount.split(".");
-  if(amountArr.length > 0){
+  if(amountArr.length > 1){
     var integer = amountArr[0];
     var decimal = amountArr[1];
     if(decimal.length>8){

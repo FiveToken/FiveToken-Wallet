@@ -4,9 +4,8 @@ class PriceEvent {
   const PriceEvent();
 }
 
-class SetPriceEvent  extends PriceEvent {
-     final String marketPrice;
-     SetPriceEvent({this.marketPrice});
+class ResetUsdPriceEvent  extends PriceEvent {
+     ResetUsdPriceEvent();
 }
 
 class GetPriceEvent extends PriceEvent{
