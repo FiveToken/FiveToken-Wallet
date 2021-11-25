@@ -67,7 +67,7 @@ class NetAddPageState extends State<NetAddPage> {
       "controller": TextEditingController()
     },
   ];
-  void submit() async {
+  void submit(BuildContext context) async {
     // get controller text
     var name = nameCtrl.text.trim();
     var rpc = rpcCtrl.text.trim();
@@ -117,11 +117,7 @@ class NetAddPageState extends State<NetAddPage> {
       var id = await Chain.chainProvider.getNetworkId();
       this.loading = false;
       dismissAllToast();
-
       // chain
-      print(chain);
-      print(id);
-      print(id!=chain);
       if (id != chain) {
         showCustomError('errorChainId'.tr);
         return;
@@ -160,7 +156,7 @@ class NetAddPageState extends State<NetAddPage> {
         });
       }
 
-      BlocProvider.of<AddBloc>(context).add(AddListEvent(
+      BlocProvider.of<AddBloc>(context)..add(AddListEvent(
           rpc:rpc,
           network: Network(
           name: name,
@@ -171,16 +167,6 @@ class NetAddPageState extends State<NetAddPage> {
           chainId: chain,
           coin: symbol)
       ));
-      // box.put(
-      //     rpc,
-      //     Network(
-      //         name: name,
-      //         addressType: 'eth',
-      //         rpc: rpc,
-      //         netType: 2,
-      //         browser: browser,
-      //         chainId: chain,
-      //         coin: symbol));
       Get.back();
     } catch (e) {
       this.loading = false;
@@ -248,59 +234,62 @@ class NetAddPageState extends State<NetAddPage> {
     var kH = MediaQuery.of(context).viewInsets.bottom;
     return BlocProvider(
         create: (context) => AddBloc()..add(AddListEvent())..add(DeleteListEvent()),
-        child: CommonScaffold(
-            grey: true,
-            title: edit ? 'editNet'.tr : 'net'.tr,
-            footerText: 'add'.tr,
-            onPressed: submit,
-            hasFooter: kH == 0 && (net == null || net.netType == 2),
-            resizeToAvoidBottomInset: kH != 0,
-            footer: edit
-                ? Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: FButton(
-                        height: 45,
-                        strokeColor: Colors.grey[200],
-                        corner: FCorner.all(6),
-                        alignment: Alignment.center,
-                        text: 'deleteNet'.tr,
-                        color: Colors.white,
-                        style: TextStyle(color: Colors.black),
-                        onPressed:() {
-                        showDeleteDialog(
-                            context,
-                          title: 'deleteNet'.tr,
-                          content: 'confimrDeleteNet'.tr, onDelete: () {
-                          // OpenedBox.netInstance.delete(net.rpc);
-                            BlocProvider.of<AddBloc>(context).add(DeleteListEvent(rpc: net.rpc));
-                            Get.back();
-                          });
-                      },
-                      )),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Expanded(
-                      child: FButton(
-                        height: 45,
-                        corner: FCorner.all(6),
-                        alignment: Alignment.center,
-                        color: CustomColor.primary,
-                        style: TextStyle(color: Colors.white),
-                        text: 'changeNet'.tr,
-                        onPressed: submit,
-                      )),
-                ],
-              ),
-            )
-                : null,
-            body: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                child: buildChild()
-            )
+        child: BlocBuilder<AddBloc, AddState>(builder: (context, data) {
+          return CommonScaffold(
+              grey: true,
+              title: edit ? 'editNet'.tr : 'net'.tr,
+              footerText: 'add'.tr,
+              onPressed: ()=>{submit(context)},
+              hasFooter: kH == 0 && (net == null || net.netType == 2),
+              resizeToAvoidBottomInset: kH != 0,
+              footer: edit
+                  ? Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: FButton(
+                          height: 45,
+                          strokeColor: Colors.grey[200],
+                          corner: FCorner.all(6),
+                          alignment: Alignment.center,
+                          text: 'deleteNet'.tr,
+                          color: Colors.white,
+                          style: TextStyle(color: Colors.black),
+                          onPressed:() {
+                            showDeleteDialog(
+                                context,
+                                title: 'deleteNet'.tr,
+                                content: 'confimrDeleteNet'.tr, onDelete: () {
+                              // OpenedBox.netInstance.delete(net.rpc);
+                              BlocProvider.of<AddBloc>(context)..add(DeleteListEvent(rpc: net.rpc));
+                              Get.back();
+                            });
+                          },
+                        )),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                        child: FButton(
+                          height: 45,
+                          corner: FCorner.all(6),
+                          alignment: Alignment.center,
+                          color: CustomColor.primary,
+                          style: TextStyle(color: Colors.white),
+                          text: 'changeNet'.tr,
+                          onPressed: ()=>{submit(context)},
+                        )),
+                  ],
+                ),
+              )
+                  : null,
+              body: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+                  child: buildChild()
+              )
+          );
+        }
         )
     );
   }

@@ -7,6 +7,7 @@ import 'package:fil/init/hive.dart';
 import 'package:meta/meta.dart';
 
 part 'add_event.dart';
+
 part 'add_state.dart';
 
 class AddBloc extends Bloc<AddEvent, AddState> {
@@ -14,13 +15,13 @@ class AddBloc extends Bloc<AddEvent, AddState> {
     on<AddEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<AddListEvent>((event, emit) async{
+    on<AddListEvent>((event, emit) async {
       var box = OpenedBox.netInstance;
-      box.put(event.rpc, event.network);
+      if (event.rpc != null) box.put(event.rpc, event.network);
     });
-    on<DeleteListEvent>((event, emit) async{
+    on<DeleteListEvent>((event, emit) async {
       var box = OpenedBox.netInstance;
-      box.delete({event.rpc});
+      if (event.rpc != null) box.delete(event.rpc);
     });
   }
 }
