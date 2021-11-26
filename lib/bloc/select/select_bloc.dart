@@ -33,6 +33,13 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
         emit(SelectState.idle());
     });
 
+    on<IdUpdateEvent>((event, emit) async{
+      emit(state.copy(importList: state.importList.map((e) => ChainWallet.fromJson(e.toJson())).toList()));
+    });
+
+    on<ImportUpdateEvent>((event, emit){
+      emit(state.copy(importList: state.importList.map((e) => ChainWallet.fromJson(e.toJson())).toList()));
+    });
     on<WalletDeleteEvent>((event, emit){
       var box = OpenedBox.walletInstance;
       List<ChainWallet> list = [];
@@ -48,8 +55,7 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
         wal.label = event.newLabel;
         box.put(wal.key, wal);
       });
-      emit(state.copy(label: event.wallet.label));
+      emit(state.copy(importList:state.importList,label: event.wallet.label));
     });
-
   }
 }

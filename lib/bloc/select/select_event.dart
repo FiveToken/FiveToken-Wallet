@@ -14,10 +14,17 @@ class IdDeleteEvent extends SelectEvent{
    IdDeleteEvent({this.hash});
 }
 
+class IdUpdateEvent extends SelectEvent{
+
+}
+
 class ImportDeleteEvent extends SelectEvent{
    final ChainWallet wal;
    final Network net;
    ImportDeleteEvent({this.wal, this.net});
+}
+
+class ImportUpdateEvent extends SelectEvent{
 }
 
 class WalletDeleteEvent extends SelectEvent{
