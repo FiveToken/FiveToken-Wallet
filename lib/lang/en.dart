@@ -16,6 +16,10 @@ const Map<String, String> EN_LANG = {
   "pkImport": "Private key import",
   "mneImport": "Mnemonics import",
   "importMne": "Import mnemonics",
+
+  'rootTitle':'Jailbreak warning',
+  'rootTips':'The phone you are currently using has been jailbroken. It is recommended to use this application under the standard system to avoid unnecessary losses to you!',
+
   "import": "Import",
   "mne": "mnemonics",
   "copyMne": "Mnemonics copied successfully",

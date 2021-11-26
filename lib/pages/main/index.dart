@@ -5,6 +5,7 @@ import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_root_jailbreak/flutter_root_jailbreak.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/index.dart';
 import 'package:hive/hive.dart';
@@ -94,7 +95,61 @@ class MainPageState extends State<MainPage>  {
     });
   }
 
+  void rootDialog(){
+    showCustomDialog(
+        context,
+        Column(
+          children: [
+            CommonTitle(
+              'rootTitle'.tr,
+              showDelete: true,
+            ),
+            Container(
+              child: Text(
+                'rootTips'.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 57, vertical: 28),
+            ),
+            Divider(
+              height: 1,
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: CommonText(
+                  'know'.tr,
+                  color: CustomColor.primary,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 8),
+              ),
+              onTap: () {
+                Get.back();
+              },
+            ),
+          ],
+        ));
+  }
+
+  Future<bool> isRooted() async {
+    try {
+      bool result = Global.platform == 'android' ? await FlutterRootJailbreak.isRooted : await FlutterRootJailbreak.isJailBroken;
+      return result;
+    }catch (e){
+      return false;
+    }
+  }
+
+
+
   Future onRefresh(context) async {
+    bool isRoot = await isRooted();
+    if(isRoot){
+      rootDialog();
+    }
     Global.eventBus.fire(RefreshEvent());
     BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
       $store.net.rpc,
@@ -116,9 +171,7 @@ class MainPageState extends State<MainPage>  {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers:[
-          BlocProvider(create: (context)=> WalletBloc()..add(
-              GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down')
-          )),
+          BlocProvider(create: (context)=> WalletBloc()),
           BlocProvider(create: (context)=>HomeBloc())
         ],
         child:BlocBuilder<WalletBloc,WalletState>(

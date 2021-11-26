@@ -110,10 +110,11 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
               });
             }
           });
-
           add(GetFileCoinMessageListEvent(event.rpc,event.chainType,event.actor,event.direction));
           List storeList = getStoreMsgList();
           emit(state.copyWithWalletState(storeMessageList: storeList ));
+        }else{
+          add(GetFileCoinMessageListEvent(event.rpc,event.chainType,event.actor,event.direction));
         }
       }catch(error){
         debugPrint("error");

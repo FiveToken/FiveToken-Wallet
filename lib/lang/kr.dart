@@ -26,6 +26,9 @@ const Map<String, String> KR_LANG = {
   "pk": "비밀 키",
   'totalPay':'총 지불',
 
+  'rootTitle':'탈옥 경고',
+  'rootTips':'현재 사용 중인 전화가 탈옥되었습니다. 불필요한 손실을 피하기 위해 표준 시스템에서 이 응용 프로그램을 사용하는 것이 좋습니다!',
+
   'lockScreen':'잠금 화면',
   'lockingScreen':'잠금',
   'lockScreenPassword':'잠금 화면 비밀번호',

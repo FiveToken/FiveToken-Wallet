@@ -176,6 +176,9 @@ const Map<String, String> ZH_LANG = {
   'next': '下一步',
   'gasFail':'获取手续费失败',
 
+  'rootTitle':'越狱警告',
+  'rootTips':'您当前使用的手机已越狱，建议请在标准系统下使用本应用，避免给您带来不必要的损失！',
+
   'filecoinmain': 'Filecoin主网',
   'ethmain': '以太坊主网',
   'binancemain': '币安智能链主网',

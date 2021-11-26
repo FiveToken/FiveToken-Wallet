@@ -389,6 +389,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.5"
+  flutter_root_jailbreak:
+    dependency: "direct main"
+    description:
+      name: flutter_root_jailbreak
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.2"
   flutter_secure_storage:
     dependency: "direct main"
     description:
