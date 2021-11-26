@@ -92,6 +92,16 @@ class PassInitPageState extends State<PassInitPage> {
     return key;
   }
 
+  Future<Map<String, EncryptKey>> getKeyMap(String mne, String pass) async{
+    Map<String, EncryptKey> keyMap = {};
+    var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
+    var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
+    keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
+    keyMap['filecoin'] = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
+    keyMap['calibration'] = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: 't');
+    return keyMap;
+  }
+
   Future<EncryptKey> getKey2(String addressType, String privateKey,  String pass) async{
     EncryptKey key;
     switch(addressType){
@@ -136,12 +146,12 @@ class PassInitPageState extends State<PassInitPage> {
     if (loading) {
       return;
     }
-
     this.loading = true;
     showCustomLoading('Loading');
     if (type == WalletType.id) {
       try {
-        EncryptKey ethKey = await getKey('eth', pass, mne, 't');
+        Map<String, EncryptKey> keyMap = await getKeyMap(mne, pass);
+        EncryptKey ethKey = keyMap['eth'];
         var key = ethKey.address + '_' + Network.ethMainNet.rpc + '_0';
         if (box.containsKey(key)) {
           showCustomError('errorExist'.tr);
@@ -153,7 +163,7 @@ class PassInitPageState extends State<PassInitPage> {
             var addrType = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
             var wal;
             try {
-              EncryptKey key = await getKey(addrType, pass, mne, 't');
+              EncryptKey key = keyMap[addrType];
               wal = getWallet(type, key, net);
               AddWallet(wal);
             }catch(e){
