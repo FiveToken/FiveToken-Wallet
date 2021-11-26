@@ -20,10 +20,10 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     on<GetMessageListEvent>((event, emit) async {
       if(event.chainType == 'filecoin'){
         add(GetStoreMessageListEvent(event.rpc, event.chainType));
-        // add(UpdateFileCoinPendingStateEvent(event.rpc,event.chainType,event.actor,event.direction));
+        add(UpdateFileCoinPendingStateEvent(event.rpc,event.chainType,event.actor,event.direction));
       }else{
         add(GetStoreMessageListEvent(event.rpc, event.chainType));
-        // add(UpdateEthMessageListStateEvent(event.rpc, event.chainType));
+        add(UpdateEthMessageListStateEvent(event.rpc, event.chainType));
       }
     });
 
