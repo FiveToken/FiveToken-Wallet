@@ -19,16 +19,16 @@ class NetIndexPage extends StatefulWidget {
 
 class NetIndexStatePage extends State<NetIndexPage> {
 
-  void onPressed(){
+  void onPressed(context){
     Get.toNamed(netAddPage).then((value) {
-        BlocProvider.of<NetBloc>(context).add(SetNetEvent(Network.netList));
+        BlocProvider.of<NetBloc>(context)..add(SetNetEvent(Network.netList));
     });
   }
 
-  void onTap(n){
+  void onTap(context, n){
     Get.toNamed(netAddPage, arguments: {'net': n})
         .then((value) {
-          BlocProvider.of<NetBloc>(context).add(SetNetEvent(Network.netList));
+          BlocProvider.of<NetBloc>(context)..add(SetNetEvent(Network.netList));
     });
   }
 
@@ -43,11 +43,11 @@ class NetIndexStatePage extends State<NetIndexPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
         create:(context)=> NetBloc()..add(SetNetEvent(Network.netList)),
-        child: BlocBuilder<NetBloc, NetState>(builder: (ctx, state){
+        child: BlocBuilder<NetBloc, NetState>(builder: (context, state){
               return CommonScaffold(
                 title: 'net'.tr,
                 footerText: 'add'.tr,
-                onPressed: onPressed,
+                onPressed: ()=>{ onPressed(context) },
                 body: Column(
                   children: [
                     Expanded(
@@ -70,7 +70,7 @@ class NetIndexStatePage extends State<NetIndexPage> {
                                      var n = net[i];
                                      bool custom = n.netType == 2;
                                      return GestureDetector(
-                                       onTap: ()=>{onTap(n)},
+                                       onTap: ()=>{onTap(context, n)},
                                        child: Container(
                                          height: 70,
                                          margin: EdgeInsets.only(bottom: 12),

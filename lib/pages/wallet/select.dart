@@ -87,7 +87,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => SelectBloc()..add(IdDeleteEvent())..add(ImportDeleteEvent()),
-        child: BlocBuilder<SelectBloc, SelectState>(builder: (ctx, state){
+        child: BlocBuilder<SelectBloc, SelectState>(builder: (context, state){
                var entry = state.idWalletMap.entries.toList();
                return  CommonScaffold(
                  title: 'selectWallet'.tr,
@@ -193,11 +193,12 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                          showDeleteDialog(context,
                                              title: 'deleteIdWallet'.tr,
                                              content: 'confirmDeleteId'.tr, onDelete: () {
-                                               deleteIdWallet(ctx, state, hash);
+                                               deleteIdWallet(context, state, hash);
                                              });
                                        },
-                                       onSet: () {
-                                         Get.toNamed(walletIdPage, arguments: {'groupHash': hash});
+                                       onSet: () async {
+                                         await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});
+                                         BlocProvider.of<SelectBloc>(context)..add(IdUpdateEvent());
                                        },
                                        onTap: () {
                                          if (hash != $store.wal.groupHash) {
@@ -249,15 +250,13 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                        showDeleteDialog(context,
                                            title: 'deleteAddr'.tr,
                                            content: 'confirmDelete'.tr, onDelete: () {
-                                             deleteImprotWallet(ctx, state, wal, net);
+                                             deleteImprotWallet(context, state, wal, net);
                                            });
                                      },
-                                     onSet: () {
-                                       Get.toNamed(walletMangePage,
-                                           arguments: {'net': net, 'wallet': wal})
-                                           .then((value) {
-
-                                       });
+                                     onSet: () async{
+                                     await Get.toNamed(walletMangePage,
+                                           arguments: {'net': net, 'wallet': wal});
+                                     BlocProvider.of<SelectBloc>(context).add(ImportUpdateEvent());
                                      },
                                      onTap: () {
                                        $store.setWallet(wal);

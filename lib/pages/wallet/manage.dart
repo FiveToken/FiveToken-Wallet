@@ -1,6 +1,7 @@
 import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/utils/enum.dart';
 // import 'package:fil/index.dart';
 
 import 'package:flutter/material.dart';
@@ -107,7 +108,7 @@ class WalletManagePageState extends State<WalletManagePage> {
                               return;
                             }
                             wallet.label = newLabel;
-                            if (wallet.type == 0) {
+                            if (wallet.type == WalletType.id) {
                               if (wallet.groupHash == $store.wal.groupHash) {
                                 $store.changeWalletName(newLabel);
                               }
