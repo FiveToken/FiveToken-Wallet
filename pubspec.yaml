@@ -37,10 +37,8 @@ dependencies:
   dio: any
   crypto: any
   encrypt: any
-  flotus:
-    git: https://gitlab.com/abu0306/flotus.git
-  bls:
-    git: https://gitlab.com/abu0306/bls.git
+  flotus: ^2.0.1
+  bls: ^2.0.1
   argon2: any
   libsodium: ^0.2.0
   flutter_sodium: ^0.2.0

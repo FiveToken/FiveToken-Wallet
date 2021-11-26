@@ -46,14 +46,14 @@ void main() {
     var fil0 = 'f01220';
     var filNet = Network.filecoinMainNet;
     var ethNet = Network.ethMainNet;
-    test('check eth addr', () {
-      expect(isValidEthAddress(eth), true);
-    });
-    test('check fil addr', () {
-      expect(isValidFilecoinAddress(fil1, filNet), true);
-      expect(isValidFilecoinAddress(fil3, filNet), true);
-      expect(isValidFilecoinAddress(fil0, filNet), true);
-    });
+    // test('check eth addr', () {
+    //   expect(isValidEthAddress(eth), true);
+    // });
+    // test('check fil addr', () {
+    //   expect(isValidFilecoinAddress(fil1, filNet), true);
+    //   expect(isValidFilecoinAddress(fil3, filNet), true);
+    //   expect(isValidFilecoinAddress(fil0, filNet), true);
+    // });
     test('check addr by net', () {
       expect(isValidChainAddress(eth, ethNet), true);
       expect(isValidChainAddress(fil1, filNet), true);

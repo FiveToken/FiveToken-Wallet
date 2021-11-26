@@ -212,9 +212,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  nextStep(context) {
+  nextStep(context) async {
     try {
-      bool valid = checkInputValid();
+      bool valid = await checkInputValid();
       if (valid) {
         var amount = amountCtrl.text.trim();
         var toAddress = addressCtrl.text.trim();
@@ -263,7 +263,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     return true;
   }
 
-  bool checkInputValid() {
+  Future<bool> checkInputValid() async {
     try {
       var amount = amountCtrl.text.trim();
       var toAddress = addressCtrl.text.trim();
@@ -271,7 +271,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         showCustomError('enterAddr'.tr);
         return false;
       }
-      if (!isValidChainAddress(toAddress, net)) {
+      bool valid = await isValidChainAddress(toAddress, net);
+      if (!valid) {
         showCustomError('errorAddr'.tr);
         return false;
       }

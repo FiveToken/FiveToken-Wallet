@@ -29,11 +29,11 @@ class ScanPageState extends State<ScanPage> {
     scene = Get.arguments['scene'];
   }
 
-  bool checkScanResultBySene(String result) {
+  Future<bool> checkScanResultBySene(String result) async {
     var valid = false;
     switch (scene) {
       case ScanScene.Address:
-        valid = isValidChainAddress(result, $store.net);
+        valid = await isValidChainAddress(result, $store.net);
         if (!valid) {
           showCustomError('wrongAddr'.tr);
         }
@@ -52,9 +52,10 @@ class ScanPageState extends State<ScanPage> {
   }
 
   void onCapture(data){
-    setState(() {
+    setState(() async {
       controller.pause();
-      if (checkScanResultBySene(data)) {
+      bool valid = await checkScanResultBySene(data);
+      if (valid) {
         Get.back(result: data);
       } else {
         controller.resume();

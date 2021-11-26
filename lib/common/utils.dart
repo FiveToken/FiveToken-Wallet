@@ -1,9 +1,12 @@
 import 'package:fil/chain/net.dart';
+import 'package:fil/config/config.dart';
 import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
+import 'package:fil/repository/http/http.dart';
+import 'package:fil/request/global.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -79,41 +82,22 @@ bool isDecimal(String input) {
   return false;
 }
 
-bool isValidChainAddress(String addr, Network net) {
-  return net.addressType == 'eth'
-      ? isValidEthAddress(addr)
-      : isValidFilecoinAddress(addr, net);
-}
-
-bool isValidEthAddress(String addr) {
-  return addr.length == 42 && addr.substring(0, 2) == '0x';
-}
-
-bool isValidFilecoinAddress(String address, Network net) {
-  var prefix = net.prefix;
-  if (address[0] != prefix) {
-    return false;
-  }
-  var addr = address.trim().toLowerCase();
-  if (addr == '') {
-    return false;
-  }
-  var protocol = addr[1];
-  if (!RegExp(r"^0|1|3$").hasMatch(protocol)) {
-    return false;
-  }
-  var raw = addr.substring(2);
-  if (protocol == "0") {
-    if (raw.length > 20) {
-      return false;
+Future<bool> isValidChainAddress(String address, Network network) async {
+  bool res = false;
+  try{
+    if(network.addressType == 'filecoin'){
+      Chain.setRpcNetwork(network.rpc, network.chain);
+      res = await Chain.chainProvider.addressCheck(address);
+    }else{
+      var start = address.startsWith('0x');
+      var reg = RegExp(r"(^[A-Fa-f0-9]$)");
+      var valid = reg.hasMatch(address);
+      res = start && valid;
     }
+    return false;
+  }catch(error){
+    return false;
   }
-  if (protocol == "3") {
-    if (raw.length < 30 || raw.length > 120) {
-      return false;
-    }
-  }
-  return true;
 }
 
 String genCKBase64(String mne, {String path}) {
