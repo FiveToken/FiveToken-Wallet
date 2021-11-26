@@ -1,9 +1,12 @@
 
-import 'package:fil/chain-new/provider.dart';
-import 'package:fil/chain-new/ether.dart';
-import 'package:fil/chain-new/filecoin.dart';
+
+
 import 'package:fil/common/global.dart';
 import 'package:fil/config/config.dart';
+import 'package:fil/request/provider.dart';
+
+import 'ether.dart';
+import 'filecoin.dart';
 
 class Chain {
   static ChainProvider get chainProvider =>

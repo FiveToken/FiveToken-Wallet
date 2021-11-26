@@ -1,6 +1,6 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
-import 'package:fil/models-new/chain_info.dart';
+import 'package:fil/models/chain_info.dart';
 
 abstract class ChainProvider {
   String rpc;

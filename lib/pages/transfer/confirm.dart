@@ -340,7 +340,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     try{
       this.loading = false;
       var value = getChainValue(amount, precision: token?.precision ?? 18);
-      showCustomToast('sended'.tr);
       var nonceKey = '$from\_${rpc}';
       var gasKey = '$from\_$nonce\_${rpc}';
       var _gas = {

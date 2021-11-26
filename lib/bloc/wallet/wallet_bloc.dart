@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fil/chain-new/global.dart';
+import 'package:fil/request/global.dart';
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart'; // $store
 import 'package:fil/init/hive.dart'; // OpenedBox

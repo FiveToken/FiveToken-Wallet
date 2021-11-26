@@ -3,14 +3,9 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fil/api/third.dart';
-import 'package:fil/chain-new/global.dart';
-import 'package:fil/chain/net.dart';
+import 'package:fil/request/global.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/common/utils.dart';
 import 'package:fil/models/wallet.dart';
-import 'package:fil/store/store.dart';
-import 'package:meta/meta.dart';
 
 part 'price_event.dart';
 part 'price_state.dart';
