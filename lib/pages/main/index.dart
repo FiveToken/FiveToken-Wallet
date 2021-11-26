@@ -84,7 +84,8 @@ class MainPageState extends State<MainPage>  {
   void handleScan() async {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((value) async {
-      if (value != null && isValidChainAddress(value, $store.net)) {
+          bool valid = await isValidChainAddress(value, $store.net);
+      if (value != null && valid) {
         Get.toNamed(filTransferPage, arguments: {'to': value});
       }
       // else if (getValidWCLink(value) != '') {

@@ -35,10 +35,11 @@ class TokenAddPageState extends State<TokenAddPage> {
   void initState() {
     super.initState();
     client = widget.defaultClient ?? Web3Client($store.net.url, http.Client());
-    node.addListener(() {
+    node.addListener(() async {
       if (!node.hasFocus) {
         var addr = addrCtrl.text.trim();
-        if (isValidEthAddress(addr)) {
+        bool valid = await isValidChainAddress(addr,$store.net);
+        if (valid) {
           getMetaInfo(addr);
         } else {
           showCustomError('invalidTokenAddr'.tr);
@@ -134,7 +135,8 @@ class TokenAddPageState extends State<TokenAddPage> {
                 onTap: () async {
                   var data = await Clipboard.getData(Clipboard.kTextPlain);
                   var addr = data.text;
-                  if (addr != null && isValidChainAddress(addr, $store.net)) {
+                  bool valid = await isValidChainAddress(addr, $store.net);
+                  if (addr != null && valid) {
                     addrCtrl.text = addr;
                     getMetaInfo(addr);
                   }

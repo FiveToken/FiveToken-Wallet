@@ -67,12 +67,10 @@ packages:
   bls:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: b91b2ee1faab8f676923c81e58b62c465aeb8ad8
-      url: "https://gitlab.com/abu0306/bls.git"
-    source: git
-    version: "0.0.1"
+      name: bls
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -363,12 +361,10 @@ packages:
   flotus:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: e023a3f84273df41fcf00f5e7024bc8ee15ccd06
-      url: "https://gitlab.com/abu0306/flotus.git"
-    source: git
-    version: "0.0.1"
+      name: flotus
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.1"
   flutter:
     dependency: "direct main"
     description: flutter

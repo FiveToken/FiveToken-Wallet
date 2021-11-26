@@ -49,14 +49,15 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     }
   }
 
-  bool checkValid(net) {
+  Future<bool> checkValid(net) async {
     var addr = addrCtrl.text.trim();
     var name = nameCtrl.text.trim();
     if(addr==''){
       showCustomError('validAddress'.tr);
       return false;
     }
-    if (!isValidChainAddress(addr, net)) {
+    bool valid = await isValidChainAddress(addr, net);
+    if (!valid) {
       showCustomError('enterValidAddr'.tr);
       return false;
     }
@@ -71,8 +72,9 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return true;
   }
 
-  void handleConfirm(net) {
-    if (!checkValid(net)) {
+  Future<void> handleConfirm(net) async {
+    bool valid = await checkValid(net);
+    if (!valid) {
       return;
     }
     if (net.rpc != $store.net.rpc) {
@@ -162,9 +164,10 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
 
   void handleScan(net) {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
-        .then((scanResult) {
+        .then((scanResult) async {
       if (scanResult != '') {
-        if (isValidChainAddress(scanResult, net)) {
+        bool valid = await isValidChainAddress(scanResult, net);
+        if (valid) {
           addrCtrl.text = scanResult;
         } else {
           showCustomError('wrongAddr'.tr);
