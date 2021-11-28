@@ -79,7 +79,7 @@ class AppState extends State<App> with WidgetsBindingObserver {
   }
 
   void initDevice() async {
-    $store.setEncryptionType(EncryptType.sha);
+    $store.setEncryptionType(EncryptType.argon2);
     await initDeviceInfo();
     await listenNetwork();
   }

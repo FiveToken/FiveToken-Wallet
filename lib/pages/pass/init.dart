@@ -1,7 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:fil/bloc/pass/pass_bloc.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/encryptKey.dart';
+import 'package:fil/index.dart';
+import 'package:fil/widgets/field.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
@@ -30,6 +35,7 @@ class PassInitPage extends StatefulWidget {
 }
 
 class PassInitPageState extends State<PassInitPage> {
+  TextEditingController nameCtrl = TextEditingController();
   TextEditingController passCtrl = TextEditingController();
   TextEditingController passConfirmCtrl = TextEditingController();
   int type; //0 id 1 mne 2 privatekey
@@ -42,6 +48,12 @@ class PassInitPageState extends State<PassInitPage> {
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
+    var walletName = nameCtrl.text.trim();
+    bool flag = type == WalletType.id;
+    if(walletName==''&&flag){
+      showCustomError('enterName'.tr);
+      return false;
+    }
     if (!isValidPass(pass)) {
       showCustomError('placeholderValidPass'.tr);
       return false;
@@ -62,61 +74,15 @@ class PassInitPageState extends State<PassInitPage> {
     box  = OpenedBox.addressInsance;
     var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
+    if(arg['type']==WalletType.id){
+      nameCtrl.text = arg['label'];
+    }
     mne = arg['mne'];
     label = arg['label'];
     privateKey = arg['privateKey'];
     net = arg['net'];
   }
 
-   Future<EncryptKey> getKey(String addressType, String pass, String mne, String prefix) async {
-    EncryptKey key;
-       switch(addressType){
-         case 'eth':
-          var ethPk =  await compute(EthWallet.genPrivateKeyByMne, mne);
-          key = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
-          break;
-         case 'filecoin':
-          var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-          break;
-         case 'calibration':
-          var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: prefix);
-           break;
-         default:
-           var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-           key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-           break;
-
-       }
-    return key;
-  }
-
-  Future<Map<String, EncryptKey>> getKeyMap(String mne, String pass) async{
-    Map<String, EncryptKey> keyMap = {};
-    var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
-    var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-    keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
-    keyMap['filecoin'] = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-    keyMap['calibration'] = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: 't');
-    return keyMap;
-  }
-
-  Future<EncryptKey> getKey2(String addressType, String privateKey,  String pass) async{
-    EncryptKey key;
-    switch(addressType){
-      case 'eth':
-        key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
-        break;
-      default:
-        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
-        var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
-        var pk = filPk.privateKey;
-        key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass, type: type, prefix: net.prefix);
-        break;
-    }
-    return key;
-  }
 
   ChainWallet getWallet(type, EncryptKey key,Network net){
     return ChainWallet(
@@ -132,14 +98,25 @@ class PassInitPageState extends State<PassInitPage> {
     );
   }
 
+  void updateName(String newLabel) async{
+    var box = OpenedBox.walletInstance;
+    var wallet = $store.wal;
+    var list = box.values.where((wal)=> wal.groupHash == wallet.groupHash);
+    list.forEach((wal)=>{
+      wal.label = newLabel,
+      box.put(wal.key, wal)
+    });
+    $store.changeWalletName(newLabel);
+  }
+
   void AddWallet(ChainWallet wallet) async{
     var box = OpenedBox.walletInstance;
-
     box.put(wallet.key, wallet);
   }
 
   void handleSubmit() async {
     String pass = passCtrl.text.trim();
+    String walletName = nameCtrl.text.trim();
     if (!checkPass()) {
       return;
     }
@@ -177,6 +154,7 @@ class PassInitPageState extends State<PassInitPage> {
             }
           }
         }
+        updateName(walletName);
       } catch (e) {
         print(e);
         this.loading = false;
@@ -185,6 +163,7 @@ class PassInitPageState extends State<PassInitPage> {
     } else if (type == WalletType.mne) {
       try {
         EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
+        print(key);
         var wal = getWallet(type, key, net);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
@@ -203,7 +182,7 @@ class PassInitPageState extends State<PassInitPage> {
       }
     } else {
       try {
-        EncryptKey key = await getKey2(net.addressType, privateKey, pass);
+        EncryptKey key = await getKey2(net.addressType, privateKey, pass, net);
         if (net.addressType == 'eth' && privateKey.length > 64) {
           showCustomError('wrongPk'.tr);
           this.loading = false;
@@ -244,6 +223,15 @@ class PassInitPageState extends State<PassInitPage> {
       body: Padding(
         child: Column(
           children: [
+            Visibility(child: Field(
+              label:  'walletName'.tr,
+              controller: nameCtrl,
+              placeholder: 'placeholderWalletName'.tr,
+              maxLength: 20,
+            ),
+              visible: type == WalletType.id,
+            ),
+
             SizedBox(
               height: 15,
             ),

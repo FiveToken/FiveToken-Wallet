@@ -3,6 +3,7 @@ import 'package:bip32/bip32.dart' as bip32;
 import 'package:fil/chain/key.dart';
 import 'package:fil/index.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:fil/common/argon2.dart';
 part 'wallet.g.dart';
 
 @HiveType(typeId: 9)
@@ -174,12 +175,10 @@ class FilecoinWallet extends ChainWallet {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
-      var filkek = await genKek(filAddr, pass);
-      var filPkList = base64Decode(privateKey);
-      var filSkKek = xor(filkek, filPkList);
-      var filDigest = await genPrivateKeyDigest(privateKey);
+      var filKek = encryptSodium(privateKey,filAddr, pass);
+      var filDigest = await argon2Hash(privateKey);
       return EncryptKey(
-          kek: filSkKek,
+          kek: filKek,
           digest: filDigest,
           address: filAddr,   // publicKey
           private: privateKey);  // value
@@ -188,6 +187,12 @@ class FilecoinWallet extends ChainWallet {
     }
   }
 }
+
+// genPrivateKeyByMne
+// genAddrByMne
+// genAddrByPrivateKey
+// genEncryptKey
+// genEncryptKeyByPrivateKey
 
 class EthWallet extends ChainWallet {
   EthWallet.fromJson(Map<String, dynamic> map) : super.fromJson(map);
@@ -232,20 +237,19 @@ class EthWallet extends ChainWallet {
 
   static Future<EncryptKey> genEncryptKeyByPrivateKey(
       String privateKey, String pass) async {
-    try {
+    try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
-      var ethKek = await genKek(ethAddr, pass);
-      var ethPkList = hex.decode(privateKey);
-      var ethSkKek = xor(ethKek, ethPkList);
-      var ethDigest = await genPrivateKeyDigest(privateKey);
+      var kek = encryptSodium(privateKey, ethAddr, pass);
+      var ethDigest = await argon2Hash(privateKey);
       return EncryptKey(
-          kek: ethSkKek,
+          kek: kek,
           digest: ethDigest,
           address: ethAddr,
-          private: privateKey);
-    } catch (e) {
+          private: privateKey
+      );
+    }catch(e){
       print(e);
-      throw (e);
+      throw(e);
     }
   }
 }
