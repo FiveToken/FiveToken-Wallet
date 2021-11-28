@@ -3,6 +3,7 @@ import 'package:bip32/bip32.dart' as bip32;
 import 'package:fil/chain/key.dart';
 import 'package:fil/index.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:fil/common/argon2.dart';
 part 'wallet.g.dart';
 
 @HiveType(typeId: 9)
@@ -187,7 +188,33 @@ class FilecoinWallet extends ChainWallet {
       throw (e);
     }
   }
+
+  static Future<EncryptKey> genEncryptKeyByPrivateKeyByArgon2(
+      String privateKey, String pass,
+      {String type = SignSecp, String prefix = 'f'}) async {
+    try {
+      // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
+      var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
+          type: type, prefix: prefix);
+      var filKek = encryptSodium(privateKey,filAddr, pass);
+
+      var filDigest = await argon2Hash(privateKey);
+      return EncryptKey(
+          kek: filKek,
+          digest: filDigest,
+          address: filAddr,   // publicKey
+          private: privateKey);  // value
+    } catch (e) {
+      throw (e);
+    }
+  }
 }
+
+// genPrivateKeyByMne
+// genAddrByMne
+// genAddrByPrivateKey
+// genEncryptKey
+// genEncryptKeyByPrivateKey
 
 class EthWallet extends ChainWallet {
   EthWallet.fromJson(Map<String, dynamic> map) : super.fromJson(map);
@@ -246,6 +273,22 @@ class EthWallet extends ChainWallet {
     } catch (e) {
       print(e);
       throw (e);
+    }
+  }
+
+  static Future<EncryptKey> genEncryptKeyByArgon2(String privateKey, String pass) async{
+    try{
+      var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
+      var kek = encryptSodium(privateKey, ethAddr, pass);
+      var ethDigest = await argon2Hash(privateKey);
+       return EncryptKey(
+        kek: kek,
+        digest: ethDigest,
+        address: ethAddr,
+        private: privateKey
+       );
+    }catch(e){
+      print(e);
     }
   }
 }

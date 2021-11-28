@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:fil/common/argon2.dart';
 import 'package:cryptography/cryptography.dart';
 
 // import 'package:fil/index.dart' hide Nonce;
@@ -14,6 +15,14 @@ Future<String> genPrivateKeyDigest(String privateKey) async {
   final hash = await new Sha256().hash(base64Decode(privateKey));
   return base64Encode(hash.bytes.sublist(0, 16));
 }
+
+// Future<String> genPrivateKeyDigestByArgon2(String privateKey) async {
+//   final hash = argon2Crypt(privateKey);
+//   return base64Encode(hash.bytes.sublist(0, 16));
+// }
+
+
+
 
 /// use pbkdf2 to generate kek
 Future<Uint8List> genKek(String addr, String pass, {int size = 32}) async {
