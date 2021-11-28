@@ -175,29 +175,7 @@ class FilecoinWallet extends ChainWallet {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
-      var filkek = await genKek(filAddr, pass);
-      var filPkList = base64Decode(privateKey);
-      var filSkKek = xor(filkek, filPkList);
-      var filDigest = await genPrivateKeyDigest(privateKey);
-      return EncryptKey(
-          kek: filSkKek,
-          digest: filDigest,
-          address: filAddr,   // publicKey
-          private: privateKey);  // value
-    } catch (e) {
-      throw (e);
-    }
-  }
-
-  static Future<EncryptKey> genEncryptKeyByPrivateKeyByArgon2(
-      String privateKey, String pass,
-      {String type = SignSecp, String prefix = 'f'}) async {
-    try {
-      // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
-      var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
-          type: type, prefix: prefix);
       var filKek = encryptSodium(privateKey,filAddr, pass);
-
       var filDigest = await argon2Hash(privateKey);
       return EncryptKey(
           kek: filKek,
@@ -259,36 +237,19 @@ class EthWallet extends ChainWallet {
 
   static Future<EncryptKey> genEncryptKeyByPrivateKey(
       String privateKey, String pass) async {
-    try {
-      var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
-      var ethKek = await genKek(ethAddr, pass);
-      var ethPkList = hex.decode(privateKey);
-      var ethSkKek = xor(ethKek, ethPkList);
-      var ethDigest = await genPrivateKeyDigest(privateKey);
-      return EncryptKey(
-          kek: ethSkKek,
-          digest: ethDigest,
-          address: ethAddr,
-          private: privateKey);
-    } catch (e) {
-      print(e);
-      throw (e);
-    }
-  }
-
-  static Future<EncryptKey> genEncryptKeyByArgon2(String privateKey, String pass) async{
     try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
       var kek = encryptSodium(privateKey, ethAddr, pass);
       var ethDigest = await argon2Hash(privateKey);
-       return EncryptKey(
-        kek: kek,
-        digest: ethDigest,
-        address: ethAddr,
-        private: privateKey
-       );
+      return EncryptKey(
+          kek: kek,
+          digest: ethDigest,
+          address: ethAddr,
+          private: privateKey
+      );
     }catch(e){
       print(e);
+      throw(e);
     }
   }
 }

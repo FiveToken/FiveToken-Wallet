@@ -10,31 +10,17 @@ import 'global.dart';
 
 
 Future<EncryptKey> getKey(String addressType, String pass, String mne, String prefix) async{
-  EncryptKey key;
-  switch($store.encryptionType.value){
-    case 'argon2':
-      key = await getKeyByArgon2(addressType, pass, mne, prefix);
-      break;
-    default:
-      key = await getKeyBysha256(addressType, pass, mne, prefix);
-  }
+  EncryptKey key = await getKeyByArgon2(addressType, pass, mne, prefix);
   return key;
 }
 
 
 Future<EncryptKey> getKey2(String addressType, String privateKey,  String pass, Network net) async{
-  EncryptKey key;
-  switch($store.encryptionType.value){
-    case 'argon2':
-      key = await getKey2ByArgon2(addressType, privateKey,  pass, net);
-      break;
-    default:
-      key = await getKey2Bysha256(addressType, privateKey,  pass, net);
-  }
+  EncryptKey key = await getKey2ByArgon2(addressType, privateKey,  pass, net);
   return key;
 }
 
-Future<EncryptKey> getKey2Bysha256(String addressType, String privateKey,  String pass, Network net) async{
+Future<EncryptKey> getKey2ByArgon2(String addressType, String privateKey,  String pass, Network net) async{
   EncryptKey key;
   switch(addressType){
     case 'eth':
@@ -49,23 +35,9 @@ Future<EncryptKey> getKey2Bysha256(String addressType, String privateKey,  Strin
   }
   return key;
 }
-Future<EncryptKey> getKey2ByArgon2(String addressType, String privateKey,  String pass, Network net) async{
-  EncryptKey key;
-  switch(addressType){
-    case 'eth':
-      key = await EthWallet.genEncryptKeyByArgon2(privateKey, pass);
-      break;
-    default:
-      PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
-      var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
-      var pk = filPk.privateKey;
-      key = await FilecoinWallet.genEncryptKeyByPrivateKeyByArgon2(pk, pass, type: type, prefix: net.prefix);
-      break;
-  }
-  return key;
-}
 
-Future<EncryptKey> getKeyBysha256(String addressType, String pass, String mne, String prefix) async {
+
+Future<EncryptKey> getKeyByArgon2(String addressType, String pass, String mne, String prefix) async {
   EncryptKey key;
   switch(addressType){
     case 'eth':
@@ -74,22 +46,7 @@ Future<EncryptKey> getKeyBysha256(String addressType, String pass, String mne, S
       break;
     default:
       var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-      key = await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: prefix??'f');
-      break;
-  }
-  return key;
-}
-
-Future<EncryptKey> getKeyByArgon2(String addressType, String pass, String mne, String prefix) async {
-  EncryptKey key;
-  switch(addressType){
-    case 'eth':
-      var ethPk =  await compute(EthWallet.genPrivateKeyByMne, mne);
-      key = await EthWallet.genEncryptKeyByArgon2(ethPk, pass);
-      break;
-    default:
-      var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-      key =  await FilecoinWallet.genEncryptKeyByPrivateKeyByArgon2(filPk,pass, prefix: prefix);
+      key =  await FilecoinWallet.genEncryptKeyByPrivateKey(filPk,pass, prefix: prefix);
       break;
   }
   return key;
@@ -100,19 +57,11 @@ Future<Map<String, EncryptKey>> getKeyMap(String mne, String pass) async{
   Map<String, EncryptKey> keyMap = {};
   var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
   var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-  if($store.encryptionType.value=='sha256') {
-    keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
-    keyMap['filecoin'] =
-    await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-    keyMap['calibration'] =
-    await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: 't');
-  }else{
-    keyMap['eth'] = await EthWallet.genEncryptKeyByArgon2(ethPk, pass);
-    keyMap['filecoin'] =
-    await FilecoinWallet.genEncryptKeyByPrivateKeyByArgon2(filPk, pass);
-    keyMap['calibration'] =
-    await FilecoinWallet.genEncryptKeyByPrivateKeyByArgon2(filPk, pass, prefix: 't');
-  }
+  keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
+  keyMap['filecoin'] =
+  await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
+  keyMap['calibration'] =
+  await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass, prefix: 't');
   return keyMap;
 }
 

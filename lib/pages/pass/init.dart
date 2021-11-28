@@ -74,6 +74,9 @@ class PassInitPageState extends State<PassInitPage> {
     box  = OpenedBox.addressInsance;
     var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
+    if(arg['type']==WalletType.id){
+      nameCtrl.text = arg['label'];
+    }
     mne = arg['mne'];
     label = arg['label'];
     privateKey = arg['privateKey'];
