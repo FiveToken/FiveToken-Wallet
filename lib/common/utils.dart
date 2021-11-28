@@ -90,11 +90,11 @@ Future<bool> isValidChainAddress(String address, Network network) async {
       res = await Chain.chainProvider.addressCheck(address);
     }else{
       var start = address.startsWith('0x');
-      var reg = RegExp(r"(^[A-Fa-f0-9]$)");
+      var reg = RegExp(r"([A-Fa-f0-9]$)");
       var valid = reg.hasMatch(address);
       res = start && valid;
     }
-    return false;
+    return res;
   }catch(error){
     return false;
   }
