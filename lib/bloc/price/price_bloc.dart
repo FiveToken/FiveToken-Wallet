@@ -40,10 +40,10 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
           double cny = 0;
           res.forEach((n) {
             if(n["vs"] == 'usd'){
-              usd = n["price"];
+              usd = double.parse((n["price"]).toString());
             }
             if(n["vs"] == 'cny'){
-              cny = n["price"];
+              cny = double.parse((n["price"]).toString());
             }
           });
           Global.price = CoinPrice.fromJson({

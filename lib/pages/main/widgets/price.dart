@@ -32,7 +32,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
     if(mounted){
       worker = ever($store.wallet, (ChainWallet wal) {
         var chainType = $store.net.chain;
-        BlocProvider.of<PriceBloc>(_context)..add(GetPriceEvent(chainType));
+        BlocProvider.of<PriceBloc>(_context)..add(ResetUsdPriceEvent())..add(GetPriceEvent(chainType));
       });
     }
   }
@@ -54,17 +54,11 @@ class CoinPriceState extends State<CoinPriceWidget> {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => PriceBloc()..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain)),
-        child: BlocBuilder<PriceBloc, PriceState>(builder: (ctx, state){
-          _context = ctx;
-          return Obx(
-              () => Visibility(
-                child: CommonText(
-                  getUsdPrce($store.wal.balance,state.usdPrice),
-                  size: 30,
-                  weight: FontWeight.w800,
-                ),
-                visible: state.usdPrice > 0,
-              )
+        child: BlocBuilder<PriceBloc, PriceState>(builder: (context, state){
+          return CommonText(
+            getUsdPrce($store.wal.balance,state.usdPrice),
+            size: 30,
+            weight: FontWeight.w800,
           );
         })
     );
@@ -73,11 +67,15 @@ class CoinPriceState extends State<CoinPriceWidget> {
   String getUsdPrce(String balance,double usd){
     String unit = '\$';
     try{
-      var _balance = double.parse(balance) / pow(10, 18);
-      var usdPrice = formatDouble((usd * _balance).toStringAsFixed(2));
-      return ' $unit ${usdPrice}';
+      if(usd > 0){
+        var _balance = double.parse(balance) / pow(10, 18);
+        var usdPrice = formatDouble((usd * _balance).toStringAsFixed(2));
+        return '$unit ${usdPrice}';
+      }else{
+        return unit + ' 0';
+      }
     }catch(error){
-      return unit + '0';
+      return unit + ' 0';
     }
   }
 
