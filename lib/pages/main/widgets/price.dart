@@ -9,9 +9,7 @@ import 'dart:math';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/models/index.dart';
 import 'package:fil/store/store.dart';
-import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/api/third.dart';
 
 class CoinPriceWidget extends StatefulWidget {
   @override
@@ -24,15 +22,13 @@ class CoinPriceState extends State<CoinPriceWidget> {
   CoinPrice price = CoinPrice();
   Worker worker;
   String marketPrice = '';
-  BuildContext _context;
-  // StreamSubscription sub;
   @override
   void initState() {
     super.initState();
+    BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
     if(mounted){
       worker = ever($store.wallet, (ChainWallet wal) {
-        var chainType = $store.net.chain;
-        BlocProvider.of<PriceBloc>(_context)..add(ResetUsdPriceEvent())..add(GetPriceEvent(chainType));
+        BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
       });
     }
   }
@@ -41,7 +37,6 @@ class CoinPriceState extends State<CoinPriceWidget> {
   void dispose() {
     super.dispose();
     worker.dispose();
-    // sub.cancel();
   }
 
   double get rate {
@@ -52,16 +47,13 @@ class CoinPriceState extends State<CoinPriceWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => PriceBloc()..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain)),
-        child: BlocBuilder<PriceBloc, PriceState>(builder: (context, state){
-          return CommonText(
-            getUsdPrce($store.wal.balance,state.usdPrice),
-            size: 30,
-            weight: FontWeight.w800,
-          );
-        })
-    );
+    return BlocBuilder<PriceBloc, PriceState>(builder: (context, state){
+      return CommonText(
+        getUsdPrce($store.wal.balance,state.usdPrice),
+        size: 30,
+        weight: FontWeight.w800,
+      );
+    });
   }
 
   String getUsdPrce(String balance,double usd){

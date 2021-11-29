@@ -81,16 +81,13 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     return MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) => PriceBloc()..add(GetPriceEvent($store.net.chain))
-          ),
-          BlocProvider(
               create: (context) => TransferBloc()..add(
                   GetNonceEvent(rpc, chainType, from)
               )
           )
         ],
         child: BlocBuilder<TransferBloc,TransferState>(
-            builder:(ctx,data){
+            builder:(context,data){
               return BlocListener<TransferBloc,TransferState>(
                   listener: (context,state){
                     if(state.transactionHash!=''){
@@ -108,7 +105,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                               try{
                                 var wal = $store.wal;
                                 var ck = await wal.getPrivateKey(pass);
-                                pushMsg(data.nonce,ck,ctx);
+                                pushMsg(data.nonce,ck,context);
                               }catch(error){
                                 print('error');
                               }

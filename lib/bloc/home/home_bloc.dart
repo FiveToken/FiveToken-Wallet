@@ -16,14 +16,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeState.idle()) {
     on<HomeEvent>((event, emit) {});
 
-    on<SetConnectedSessionEvent>((event, emit) {
-      emit(state.copyWithHomeState(connectedSession: event.connectedSession));
-    });
-
-    on<SetMetaEvent>((event, emit) {
-      emit(state.copyWithHomeState(meta: event.meta));
-    });
-
     on<GetTokenListEvent>((event, emit) async {
       try {
         var tokenList = OpenedBox.tokenInstance.values

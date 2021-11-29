@@ -1,4 +1,5 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:fil/bloc/connect/connect_bloc.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/navigation.dart';
 import 'package:fil/i10n/localization.dart';
@@ -23,6 +24,8 @@ import 'package:fil/init/device.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:fil/actions/event.dart';
+
+import 'bloc/price/price_bloc.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -113,7 +116,13 @@ class AppState extends State<App> with WidgetsBindingObserver {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (ctx) => MainBloc()..add(AppOpenEvent(count: 0)),
+            create: (ctx) => MainBloc(),
+          ),
+          BlocProvider(
+              create: (ctx) => ConnectBloc(),
+          ),
+          BlocProvider(
+              create: (ctx) => PriceBloc(),
           )
         ],
         child: BlocBuilder<MainBloc, MainState>(builder: (ctx, state) {
