@@ -47,8 +47,9 @@ class MainPageState extends State<MainPage>  {
   final TextEditingController controller = TextEditingController();
   var box;
   Timer timer;
-  WCSession connectedSession;
-  WCMeta meta;
+  // wcc
+  // WCSession connectedSession;
+  // WCMeta meta;
   Box<Nonce> nonceBoxInstance;
 
   @override
@@ -295,7 +296,7 @@ class MainPageState extends State<MainPage>  {
                   context: context,
                   builder: (BuildContext context) {
                     return ConnectWallet(
-                      meta: meta,
+                      meta: state.meta,
                       footer: Container(
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         margin: EdgeInsets.only(bottom: 40),
@@ -318,7 +319,7 @@ class MainPageState extends State<MainPage>  {
                   });
             }),
       ),
-      visible: connectedSession != null,
+      visible: state.connectedSession != null,
     );
   }
 
@@ -406,49 +407,58 @@ class MainPageState extends State<MainPage>  {
   }
 
   void handleConnect(WCSession session, JsonRpc rpc, String uri) {
-    var rawMeta = session.theirMeta;
-    var handle = (bool approved) {
-      session
-          .sendSessionRequestResponse(
-          rpc,
-          'FiveToken',
-          {
-            'description': '',
-            'name': 'FiveToken',
-            'url': 'https://fivetoken.io/',
-            'icons': ['https://fivetoken.io/image/ft-logo.png']
-          },
-          [$store.wal.addr],
-          approved,
-          chainId: int.tryParse($store.net.chainId))
-          .then((value) {
-        if (approved) {
-          var s = session.toString();
-          setState(() {
-            connectedSession = session;
-            this.meta = WCMeta.fromJson(rawMeta);
-          });
-          Global.store.setString('wcSession', s);
-        }
-      });
-    };
-    if (rawMeta != null) {
-      var meta = WCMeta.fromJson(rawMeta);
-      showCustomModalBottomSheet(
-          shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
-          context: context,
-          builder: (BuildContext context) {
-            return ConnectWallet(
-              meta: meta,
-              onCancel: () {
-                handle(false);
-              },
-              onConnect: () {
-                handle(true);
-              },
-            );
-          });
+    try{
+      var rawMeta = session.theirMeta;
+      var handle = (bool approved) {
+        session
+            .sendSessionRequestResponse(
+            rpc,
+            'FiveToken',
+            {
+              'description': '',
+              'name': 'FiveToken',
+              'url': 'https://fivetoken.io/',
+              'icons': ['https://fivetoken.io/image/ft-logo.png']
+            },
+            [$store.wal.addr],
+            approved,
+            chainId: int.tryParse($store.net.chainId))
+            .then((value) {
+          if (approved) {
+            var s = session.toString();
+            // wcc
+            // setState(() {
+            //   connectedSession = session;
+            //   this.meta = WCMeta.fromJson(rawMeta);
+            // });
+
+            BlocProvider.of<HomeBloc>(context).add(SetMetaEvent(meta:WCMeta.fromJson(rawMeta)));
+            BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: session));
+            Global.store.setString('wcSession', s);
+          }
+        });
+      };
+      if (rawMeta != null) {
+        var meta = WCMeta.fromJson(rawMeta);
+        showCustomModalBottomSheet(
+            shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
+            context: context,
+            builder: (BuildContext context) {
+              return ConnectWallet(
+                meta: meta,
+                onCancel: () {
+                  handle(false);
+                },
+                onConnect: () {
+                  handle(true);
+                },
+              );
+            });
+      }
+    }catch(error){
+      print('12312');
     }
+
   }
 
   List<JsonRpc Function(WCSession, JsonRpc)> genCallback(String type) {
@@ -518,13 +528,18 @@ class MainPageState extends State<MainPage>  {
         wc.theirPeerId = m['theirPeerId'];
         var meta = m['theirMeta'];
         if (meta is Map) {
-          this.meta = WCMeta.fromJson(meta);
+          // wcc
+          // this.meta = WCMeta.fromJson(meta);
+
+          BlocProvider.of<HomeBloc>(context).add(SetMetaEvent(meta:WCMeta.fromJson(meta)));
         }
         print(m['theirMeta']);
         wc.connect().then((value) {
-          setState(() {
-            connectedSession = wc;
-          });
+          // wcc
+          // setState(() {
+          //   connectedSession = wc;
+          // });
+          BlocProvider.of<HomeBloc>(context).add(SetConnectedSessionEvent(connectedSession: wc));
         });
       } catch (e) {}
     }
