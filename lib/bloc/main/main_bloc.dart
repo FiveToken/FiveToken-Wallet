@@ -19,6 +19,7 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     });
 
     on<TestNetIsShowEvent>((event, emit){
+      if(event.hideTestnet==null){return;}
       bool hideTestnet = event.hideTestnet;
       List<List<Network>> nets = !hideTestnet ? [Network.netList[0]] : Network.netList;
       Global.store.setBool('hideTestnet', !hideTestnet);
