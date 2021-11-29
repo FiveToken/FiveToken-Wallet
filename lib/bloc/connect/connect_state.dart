@@ -4,6 +4,9 @@ class ConnectState extends Equatable {
   final WCSession connectedSession;
   final WCMeta meta;
 
+  @override
+  List<Object> get props => [this.connectedSession,this.meta];
+
   ConnectState({
     this.connectedSession,
     this.meta,
@@ -15,9 +18,6 @@ class ConnectState extends Equatable {
       meta:null
     );
   }
-
-  @override
-  List<Object> get props => [this.connectedSession,this.meta];
 
   ConnectState copyWithConnectState({
     WCSession connectedSession,

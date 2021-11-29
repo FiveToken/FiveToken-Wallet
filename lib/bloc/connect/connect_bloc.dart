@@ -9,12 +9,15 @@ part 'connect_state.dart';
 
 class ConnectBloc extends Bloc<ConnectEvent, ConnectState> {
   ConnectBloc() : super(ConnectState.idle()) {
-    on<ConnectEvent>((event, emit) {
-      // TODO: implement event handler
-    });
 
     on<SetConnectedSessionEvent>((event,emit){
-      emit(state.copyWithConnectState(connectedSession:event.connectedSession));
+      print("+================");
+      try {
+        emit(state.copyWithConnectState(connectedSession:event.connectedSession));
+      }
+      catch (e){
+        print(e);
+      }
     });
 
     on<SetMetaEvent>((event,emit){
