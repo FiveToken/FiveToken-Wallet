@@ -13,3 +13,9 @@ class SetMetaEvent extends ConnectEvent{
   final WCMeta meta;
   SetMetaEvent({ this.meta });
 }
+
+class ResetConnectEvent extends ConnectEvent{
+  final WCMeta meta;
+  final WCSession connectedSession;
+  ResetConnectEvent({ this.meta,this.connectedSession });
+}

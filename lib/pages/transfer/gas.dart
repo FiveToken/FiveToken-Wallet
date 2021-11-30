@@ -35,7 +35,7 @@ class ChainGasPageState extends State<ChainGasPage> {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
     var res = (BigInt.parse(fee)/unit).toStringAsFixed(9);
-    var _handlingFee = stringCutOut(res,8);
+    var _handlingFee = res;//stringCutOut(res,8);
     return _handlingFee;
   }
 

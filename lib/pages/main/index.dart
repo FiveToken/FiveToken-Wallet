@@ -312,7 +312,7 @@ class MainPageState extends State<MainPage>  {
                             try{
                               Get.back();
                               Global.store.remove('wcSession');
-                              BlocProvider.of<ConnectBloc>(context).add(SetConnectedSessionEvent(connectedSession: null));
+                              BlocProvider.of<ConnectBloc>(context).add(ResetConnectEvent(connectedSession: null,meta: null));
                             }catch(error){
                               print('error');
                             }
@@ -516,11 +516,6 @@ class MainPageState extends State<MainPage>  {
   }
 
 
-  void handleTransaction({WCSession session, JsonRpc rpc, String to, BigInt value, String type}) {
-
-  }
-
-
   void reConnect() {
     var wcSession = Global.store.getString('wcSession');
     if (wcSession != null && wcSession != "") {
@@ -542,7 +537,6 @@ class MainPageState extends State<MainPage>  {
         if (meta is Map) {
           BlocProvider.of<ConnectBloc>(context).add(SetMetaEvent(meta:WCMeta.fromJson(meta)));
         }
-        print(m['theirMeta']);
         wc.connect().then((value) {
           BlocProvider.of<ConnectBloc>(context).add(SetConnectedSessionEvent(connectedSession: wc));
         });
@@ -552,5 +546,142 @@ class MainPageState extends State<MainPage>  {
     }
   }
 
+
+  void handleTransaction({WCSession session, JsonRpc rpc, String to, BigInt value, String type}) {
+    showCustomModalBottomSheet(
+        shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
+        context: context,
+        builder: (BuildContext context){
+          return SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: 30),
+              child:_confirmBody()
+          );
+        }
+    );
+  }
+
+  Widget  _confirmBody(){
+    final EdgeInsets padding = EdgeInsets.symmetric(horizontal: 12, vertical: 14);
+    return Column(
+      children: [
+        CommonTitle(
+          'sendConfirm'.tr,
+          showDelete: true,
+        ),
+        Container(
+            padding: EdgeInsets.fromLTRB(12, 15, 12, 20),
+            color: CustomColor.bgGrey,
+            child: Column(
+                children:[
+                  Container(
+                    padding: padding,
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CommonText.grey('from'.tr),
+                            Container(
+                              width: 50,
+                            ),
+                            Expanded(
+                                child: Text(
+                                  "from",
+                                  textAlign: TextAlign.right,
+                                )),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CommonText.grey('to'.tr),
+                            Container(
+                              width: 50,
+                            ),
+                            Expanded(
+                                child: Text(
+                                  "to",
+                                  textAlign: TextAlign.right,
+                                )),
+                          ],
+                        )
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.white, borderRadius: CustomRadius.b8),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: padding,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CommonText.grey('amount'.tr),
+                        CommonText(
+                          'value symbol',
+                          size: 18,
+                          color: CustomColor.primary,
+                          weight: FontWeight.w500,
+                        )
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.white, borderRadius: CustomRadius.b8),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    padding: padding,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CommonText.grey('fee'.tr),
+                        CommonText.main('gas')
+                      ],
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.white, borderRadius: CustomRadius.b8),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(const Radius.circular(8)),
+                      color: CustomColor.primary,
+                    ),
+                    child: FlatButton(
+                      child: Text(
+                        'send'.tr,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        Get.back();
+                        showPassDialog(context, (String pass) async {
+                          var wal = $store.wal;
+                          var ck = await wal.getPrivateKey(pass);
+                          confirmPushMessage(ck);
+                        });
+                      },
+                      //color: Colors.blue,
+                    ),
+                  )
+                ]
+            )
+        )
+      ],
+    );
+  }
+
+
+  confirmPushMessage(pk){}
 
 }

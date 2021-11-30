@@ -29,6 +29,15 @@ class ConnectState extends Equatable {
     );
   }
 
+  ConnectState resetConnectState({
+    WCSession connectedSession,
+    WCMeta meta
+  }){
+    return ConnectState(
+      connectedSession: connectedSession ,
+      meta: meta,
+    );
+  }
 
 
 }

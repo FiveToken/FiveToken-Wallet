@@ -294,7 +294,7 @@ class WCSession {
       if (approved) {
         isConnected = true;
         isActive = true;
-        var wcRequestSub = wcPubSub(ourPeerId, {}, 'sub', true);
+        var wcRequestSub = wcPubSub(ourPeerId, null, 'sub', true);
         webSocketChannel.sink.add(jsonEncode(wcRequestSub));
       }
       return response;
@@ -361,18 +361,23 @@ class WCSession {
     return jsonEncode(obj);
   }
 
+
+
   Future<WCSession> connect(
       {String topic,
       void Function(WCSession, JsonRpc) sessionRequestHandler}) async {
     try {
       var wsUrl = bridgeUrl.replaceFirst(RegExp(r'^http'), 'ws');
       var subTopic = topic ?? ourPeerId;
-      var wcSessionSub = wcPubSub(subTopic, {}, 'sub', true);
+      var wcSessionSub = wcPubSub(subTopic, null, 'sub', true);
       var channel = WebSocketChannel.connect(Uri.parse(wsUrl));
       logger.d('session $this $wcSessionSub');
-      var ss = channel.stream.listen((message) {
+      final _stream = channel.stream;
+      // StreamSubscription<dynamic> _s = _stream.listen((event) { });
+
+      streamSubscription = _stream.listen((message) {
         try {
-          var jsonRpc = wcDecodePubSubMessage(message, keyHex);
+          final jsonRpc = wcDecodePubSubMessage(message, keyHex);
           var method = jsonRpc.method;
 
           if (method == 'wc_sessionRequest') {
@@ -415,7 +420,7 @@ class WCSession {
         isConnected = false;
         logger.d('$this socket done, session active: $isActive');
       }, cancelOnError: true);
-      streamSubscription = ss;
+
       webSocketChannel = channel;
       channel.sink.add(jsonEncode(wcSessionSub));
       return Future.value(this);

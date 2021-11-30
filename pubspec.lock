@@ -267,6 +267,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.4"
+  decimal:
+    dependency: "direct main"
+    description:
+      name: decimal
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.5.0"
   device_info:
     dependency: "direct main"
     description:
@@ -533,7 +540,7 @@ packages:
     source: hosted
     version: "1.1.1"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.flutter-io.cn"
@@ -854,6 +861,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.5"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.1"
   scan:
     dependency: "direct main"
     description:

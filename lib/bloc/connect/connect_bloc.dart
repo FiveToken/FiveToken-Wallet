@@ -11,17 +11,15 @@ class ConnectBloc extends Bloc<ConnectEvent, ConnectState> {
   ConnectBloc() : super(ConnectState.idle()) {
 
     on<SetConnectedSessionEvent>((event,emit){
-      print("+================");
-      try {
-        emit(state.copyWithConnectState(connectedSession:event.connectedSession));
-      }
-      catch (e){
-        print(e);
-      }
+      emit(state.copyWithConnectState(connectedSession:event.connectedSession));
     });
 
     on<SetMetaEvent>((event,emit){
       emit(state.copyWithConnectState(meta:event.meta));
+    });
+
+    on<ResetConnectEvent>((event,emit){
+      emit(state.resetConnectState( meta:null, connectedSession:null ));
     });
 
   }
