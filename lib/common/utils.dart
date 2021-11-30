@@ -88,6 +88,7 @@ Future<bool> isValidChainAddress(String address, Network network) async {
     if(network.addressType == 'filecoin'){
       Chain.setRpcNetwork(network.rpc, network.chain);
       res = await Chain.chainProvider.addressCheck(address);
+      print('res');
     }else{
       var start = address.startsWith('0x');
       var reg = RegExp(r"([A-Fa-f0-9]$)");
@@ -96,6 +97,7 @@ Future<bool> isValidChainAddress(String address, Network network) async {
     }
     return res;
   }catch(error){
+    print('error');
     return false;
   }
 }
@@ -130,7 +132,7 @@ String stringCutOut(String amount,int ){
     var integer = amountArr[0];
     var decimal = amountArr[1];
     if(decimal.length>8){
-      decimal = decimal.substring(0,8);
+      decimal = decimal.substring(0,int);
     }
     return integer + "." + decimal;
   }else{

@@ -185,7 +185,7 @@ class Filecoin extends ChainProvider {
   Future<bool> addressCheck(String address) async{
     try {
       var res = await client.get(addrCheck, queryParameters: {'address': address});
-      if(res == 'ok'){
+      if(res.data == 'ok'){
         return true;
       }else{
         return false;

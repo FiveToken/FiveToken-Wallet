@@ -34,6 +34,7 @@ dependencies:
   path_provider: any
   bip39: any
   bip32: ^1.0.5
+  decimal: ^1.5.0
   dio: any
   crypto: any
   encrypt: any
@@ -75,7 +76,6 @@ dependencies:
   bloc: any
   flutter_bloc: any
   equatable: any
-  http: any
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:

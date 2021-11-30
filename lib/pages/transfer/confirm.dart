@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
@@ -215,8 +216,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     if(isToken){
       return '';
     }else{
-      var _amount = double.parse(amount);
-      var usdPrice = formatDouble((usd * _amount).toStringAsFixed(2));
+      var _amount =  Decimal.parse(amount)*Decimal.parse(usd.toString());
+      var usdPrice = stringCutOut(_amount.toString(),8);
       String unit = '\$ ';
       return unit + usdPrice;
     }
@@ -224,10 +225,10 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 
   String getUsdTotalPrice(usd){
     try{
-      var _amount = double.parse(amount);
-      var _fee = double.parse(handlingFee);
+      var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
+      var totalUsd = Decimal.parse(total.toString()) * Decimal.parse(usd.toString());
       String unit = '\$ ';
-      var res = ((_amount + _fee)*usd).toStringAsFixed(8);
+      var res = stringCutOut(totalUsd.toString(),8);
       return unit + res;
     }catch(error){
       return '';
@@ -236,10 +237,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 
   String getTotal(){
     try{
-      var _amount = double.parse(amount);
-      var _fee = double.parse(handlingFee);
-      var total = (_amount + _fee).toString();
-      return total + $store.net.coin;
+      var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
+      return stringCutOut(total.toString(),8) + $store.net.coin;
     }catch(error){
       return '';
     }
@@ -304,7 +303,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         if(valid){
           var value = getChainValue(amount, precision: token?.precision ?? 18);
           this.loading = true;
-          showCustomLoading('Loading');
           var realNonce = nonce;
           var nonceKey = '$from\_${$store.net.rpc}';
           if(nonceBoxInstance.get(nonceKey) != null){
@@ -396,11 +394,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 
   void goBack() {
     Get.offAndToNamed(walletMainPage);
-    // if (prePage != walletMainPage) {
-    //   Get.offAndToNamed(walletMainPage);
-    // } else {
-    //   Get.back();
-    // }
   }
 
 }
@@ -422,7 +415,7 @@ class SetGas extends StatelessWidget {
               children: [
                 CommonText.main('fee'.tr),
                 CommonText(
-                  getUsdPrice(),
+                  getFeeUsdPrice(),
                   color: CustomColor.grey,
                 )
               ],
@@ -458,12 +451,12 @@ class SetGas extends StatelessWidget {
     );
   }
 
-  String getUsdPrice(){
+  String getFeeUsdPrice(){
     try{
-      var _amount = double.parse(maxFee);
-      var _usdPrice = (usdPrice * _amount).toStringAsFixed(8);
+      var usdFee = Decimal.parse(maxFee) * Decimal.parse(usdPrice.toString());
+      var res = stringCutOut(usdFee.toString(),8);
       String unit = '\$ ';
-      return unit + _usdPrice;
+      return unit + res;
     }catch(error){
       return '';
     }
