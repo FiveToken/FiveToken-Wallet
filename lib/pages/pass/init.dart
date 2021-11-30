@@ -163,7 +163,6 @@ class PassInitPageState extends State<PassInitPage> {
     } else if (type == WalletType.mne) {
       try {
         EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
-        print(key);
         var wal = getWallet(type, key, net);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
