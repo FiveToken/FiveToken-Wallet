@@ -484,6 +484,7 @@ class MainPageState extends State<MainPage>  {
       if (params != null && params is List && params.isNotEmpty) {
         try {
           var p = params[0] as Map<String, dynamic>;
+          var from = p['from'] as String;
           var to = p['to'] as String;
           var value = p['value'] as String;
           BigInt valueNum;
@@ -495,6 +496,7 @@ class MainPageState extends State<MainPage>  {
           if (to != null && value != null) {
             handleTransaction(
                 session: session,
+                from:from,
                 rpc: rpc,
                 to: to,
                 value: valueNum,
@@ -547,7 +549,7 @@ class MainPageState extends State<MainPage>  {
   }
 
 
-  void handleTransaction({WCSession session, JsonRpc rpc, String to, BigInt value, String type}) {
+  void handleTransaction({WCSession session, JsonRpc rpc,String from, String to, BigInt value, String type}) {
     showCustomModalBottomSheet(
         shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
         context: context,
