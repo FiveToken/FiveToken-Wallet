@@ -63,8 +63,8 @@ class DrawerBody extends StatelessWidget {
           ),
           Divider(thickness: .2),
           DrawerItem(
-            onTap: () {
-              Get.toNamed(walletSelectPage);
+            onTap: () async{
+            Get.toNamed(walletSelectPage);
             },
             label: 'wallet'.tr,
             iconPath: 'wal.png',

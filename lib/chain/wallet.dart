@@ -4,6 +4,7 @@ import 'package:fil/chain/key.dart';
 import 'package:fil/index.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/common/argon2.dart';
+import 'dart:typed_data';
 part 'wallet.g.dart';
 
 @HiveType(typeId: 9)
@@ -99,23 +100,34 @@ class ChainWallet {
   Future<bool> validatePrivateKey(
     String pass,
   ) async {
-    var sk = await this.getPrivateKey(pass);
-    var digest = await genPrivateKeyDigest(sk);
-    if (this.digest != digest) {
+    try {
+      var private = await decryptSodium(skKek, address, pass);
+      var str = base64Decode(private);
+      var str1 = utf8.decode(str);
+      var digest = await argon2Crypt(str1);
+      if (this.digest != digest) {
+        return false;
+      } else {
+        return true;
+      }
+    }catch(e){
+      print(e);
       return false;
-    } else {
-      return true;
     }
   }
 
   Future<String> getPrivateKey(
     String pass,
   ) async {
-    var skBytes = base64Decode(skKek);
-    var kek = await genKek(address, pass);
-    var sk = xor(skBytes, kek);
-    var res = addressType == 'eth' ? hex.encode(base64Decode(sk)) : sk;
-    return res;
+    try {
+      var private = decryptSodium(skKek, address, pass);
+      var str = base64Decode(private);
+      var sk = utf8.decode(str);
+      var res = addressType == 'eth' ? hex.encode(base64Decode(sk)) : sk;
+      return res;
+    }catch(e){
+      print(e);
+    }
   }
 }
 
@@ -154,12 +166,10 @@ class FilecoinWallet extends ChainWallet {
     try {
       var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(filPrivateKey);
-      var filkek = await genKek(filAddr, pass);
-      var filPkList = base64Decode(filPrivateKey);
-      var filSkKek = xor(filkek, filPkList);
-      var filDigest = await genPrivateKeyDigest(filPrivateKey);
+      var filKek = encryptSodium(filPrivateKey, filAddr, pass);
+      var filDigest = await argon2Crypt(filPrivateKey);
       return EncryptKey(
-          kek: filSkKek,
+          kek: filKek,
           digest: filDigest,
           address: filAddr,
           private: filPrivateKey);
@@ -176,7 +186,7 @@ class FilecoinWallet extends ChainWallet {
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
       var filKek = encryptSodium(privateKey,filAddr, pass);
-      var filDigest = await argon2Hash(privateKey);
+      var filDigest = await argon2Crypt(privateKey);
       return EncryptKey(
           kek: filKek,
           digest: filDigest,
@@ -221,12 +231,10 @@ class EthWallet extends ChainWallet {
     try {
       var ethPrivateKey = EthWallet.genPrivateKeyByMne(mne);
       var ethAddr = await EthWallet.genAddrByPrivateKey(ethPrivateKey);
-      var ethKek = await genKek(ethAddr, pass);
-      var ethPkList = hex.decode(ethPrivateKey);
-      var ethSkKek = xor(ethKek, ethPkList);
-      var ethDigest = await genPrivateKeyDigest(ethPrivateKey);
+      var ethKek = encryptSodium(ethPrivateKey, ethAddr, pass);
+      var ethDigest = await argon2Crypt(ethPrivateKey);
       return EncryptKey(
-          kek: ethSkKek,
+          kek: ethKek,
           digest: ethDigest,
           address: ethAddr,
           private: ethPrivateKey);
@@ -240,7 +248,7 @@ class EthWallet extends ChainWallet {
     try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
       var kek = encryptSodium(privateKey, ethAddr, pass);
-      var ethDigest = await argon2Hash(privateKey);
+      var ethDigest = await argon2Crypt(privateKey);
       return EncryptKey(
           kek: kek,
           digest: ethDigest,
