@@ -439,8 +439,9 @@ class MainPageState extends State<MainPage>  {
           if (approved) {
             try{
               var connectSession = session.toString();
-              BlocProvider.of<ConnectBloc>(context).add(SetMetaEvent(meta:WCMeta.fromJson(rawMeta)));
-              BlocProvider.of<ConnectBloc>(context).add(SetConnectedSessionEvent(connectedSession: session));
+              BlocProvider.of<ConnectBloc>(context)
+                ..add(SetMetaEvent(meta:WCMeta.fromJson(rawMeta)))
+                ..add(SetConnectedSessionEvent(connectedSession: session));
               Global.store.setString('wcSession', connectSession);
             }catch(error){
               print('error');
