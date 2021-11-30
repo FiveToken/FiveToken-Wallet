@@ -88,7 +88,7 @@ const Map<String, String> ZH_LANG = {
   'wrongPass': '密码错误',
   'enterPassAgain': '请输入确认密码',
   'enterValidPass': '请输入8～20位密码,包含数字及大小写字母',
-  'placeholderValidPass': '请输入至少8位字符串',
+  'placeholderValidPass': '请输入至少12位字符串',
   'diffPass': '两次密码输入不一致',
   'oldPass': '旧的支付密码',
   'enterOldPass': '请输入旧的支付密码',

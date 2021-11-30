@@ -22,7 +22,7 @@ class LockPageState extends State<LockPage> {
               children: [
                 _switch(),
                 SizedBox(
-                  height: 20,
+                  height: 15,
                 ),
                 _editAction()
               ],
@@ -33,6 +33,7 @@ class LockPageState extends State<LockPage> {
 
   Widget _switch(){
     return Container(
+        height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         child:Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,7 +45,7 @@ class LockPageState extends State<LockPage> {
           ],
         ),
         decoration: BoxDecoration(
-            border: new Border.all(width: 1, color: Colors.grey),
+            color: Colors.white,
             borderRadius: CustomRadius.b8
         )
     );
@@ -52,6 +53,7 @@ class LockPageState extends State<LockPage> {
   
   Widget _editAction(){
     return Container(
+         height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
         child:Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,13 +61,14 @@ class LockPageState extends State<LockPage> {
             CommonText.main('lockScreenPassword'.tr),
             Row(
               children: [
-                CommonText.main('')
+                CommonText.main('change'.tr)
               ],
             )
           ],
         ),
         decoration: BoxDecoration(
-            border: new Border.all(width: 1, color: Colors.grey),
+            color: Colors.white,
+            // border: new Border.all(width: 1, color: Colors.grey),
             borderRadius: CustomRadius.b8
         )
     );

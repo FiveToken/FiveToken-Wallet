@@ -98,7 +98,7 @@ const Map<String, String> EN_LANG = {
   "wrongPass": "Password error",
   "enterPassAgain": "Please enter password again",
   "enterValidPass": "8-20 digits,uppercase, lowercase, numbers",
-  'placeholderValidPass': 'Please enter a string of at least 8 bits',
+  'placeholderValidPass': 'Please enter a string of at least 12 bits',
   "diffPass": "Entered passwords differ",
   "oldPass": "Old payment password",
   "enterOldPass": "Please enter old payment password",

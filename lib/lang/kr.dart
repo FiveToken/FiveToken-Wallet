@@ -91,7 +91,7 @@ const Map<String, String> KR_LANG = {
   "wrongPass": "비밀번호가 틀렸습니다.",
   "enterPassAgain": "비밀번호를 다시 입력하여 주십시오",
   "enterValidPass": "대문자,소문자,숫자를 포함하여 8~20자리 유효 길이 비밀번호를 입력하세요",
-  'placeholderValidPass': '최소 8 자리 문자열 을 입력 하 십시오',
+  'placeholderValidPass': '최소 12 자리 문자열 을 입력 하 십시오',
   "diffPass": "두 번의 비밀번호 입력이 일치하지 않습니다.",
   "oldPass": "구식 결제 비밀번호",
   "enterOldPass": "구식 결제 비밀번호를 입력하여 주십시요",

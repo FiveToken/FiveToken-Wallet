@@ -226,7 +226,7 @@ bool isValidPassword(String pass) {
 
 bool isValidPass(String pass){
   pass = pass.trim();
-  return pass.length > 7;
+  return pass.length > 11;
 }
 
 bool isValidUrl(String url) {

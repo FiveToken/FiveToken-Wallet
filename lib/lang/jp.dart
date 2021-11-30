@@ -83,7 +83,7 @@ const Map<String, String> JP_LANG = {
   "wrongPass": "パスワードは間違っています",
   "enterPassAgain": "パスワードを再度入力してください",
   "enterValidPass": "大文字、小文字及び数字を含む有効な8～20桁のパスワードを入力してください",
-  'placeholderValidPass': '最低8ビットの文字列を入力してください',
+  'placeholderValidPass': '最低12ビットの文字列を入力してください',
   "diffPass": "２回のパスワード入力は一致していません",
   "oldPass": "旧支払パスワード",
   "enterOldPass": "旧支払パスワードを入力してください",

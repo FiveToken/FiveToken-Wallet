@@ -123,8 +123,7 @@ class ChainWallet {
       var private = decryptSodium(skKek, address, pass);
       var str = base64Decode(private);
       var sk = utf8.decode(str);
-      var res = addressType == 'eth' ? hex.encode(base64Decode(sk)) : sk;
-      return res;
+      return sk;
     }catch(e){
       print(e);
     }
