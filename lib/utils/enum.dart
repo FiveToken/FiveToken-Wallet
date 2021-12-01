@@ -25,6 +25,7 @@ class HiveBoxType{
   static final walletBox = 'walletBox';
   static final cacheMessageBox = 'cacheMessageBox';
   static final nonceUnitBox = 'nonceUnitBox';
+  static final lockBox = 'lockBox';
   static  Map<String, dynamic> getMap() {
     final map = <String, dynamic>{};
     map['messageBox'] = messageBox.toString();
@@ -37,6 +38,7 @@ class HiveBoxType{
     map['walletBox'] = walletBox.toString();
     map['cacheMessageBox'] = cacheMessageBox.toString();
     map['nonceUnitBox'] = nonceUnitBox.toString();
+    map['lockBox'] = lockBox.toString();
     return map;
   }
   static  Map<String, dynamic> getType() {
@@ -51,6 +53,7 @@ class HiveBoxType{
     map['walletBox'] = 'ChainWallet';
     map['cacheMessageBox'] = 'CacheMessage';
     map['nonceUnitBox'] = 'NonceUnitBox';
+    map['lockBox'] = 'Lock';
     return map;
   }
 }

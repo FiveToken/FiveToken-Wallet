@@ -104,7 +104,7 @@ class ChainWallet {
       var private = await decryptSodium(skKek, address, pass);
       var str = base64Decode(private);
       var str1 = utf8.decode(str);
-      var digest = await argon2Crypt(str1);
+      var digest = await genPrivateKeyDigest(str1);
       if (this.digest != digest) {
         return false;
       } else {
@@ -166,7 +166,7 @@ class FilecoinWallet extends ChainWallet {
       var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(filPrivateKey);
       var filKek = encryptSodium(filPrivateKey, filAddr, pass);
-      var filDigest = await argon2Crypt(filPrivateKey);
+      var filDigest = await genPrivateKeyDigest(filPrivateKey);
       return EncryptKey(
           kek: filKek,
           digest: filDigest,
@@ -185,7 +185,7 @@ class FilecoinWallet extends ChainWallet {
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
       var filKek = encryptSodium(privateKey,filAddr, pass);
-      var filDigest = await argon2Crypt(privateKey);
+      var filDigest = await genPrivateKeyDigest(privateKey);
       return EncryptKey(
           kek: filKek,
           digest: filDigest,
@@ -231,7 +231,7 @@ class EthWallet extends ChainWallet {
       var ethPrivateKey = EthWallet.genPrivateKeyByMne(mne);
       var ethAddr = await EthWallet.genAddrByPrivateKey(ethPrivateKey);
       var ethKek = encryptSodium(ethPrivateKey, ethAddr, pass);
-      var ethDigest = await argon2Crypt(ethPrivateKey);
+      var ethDigest = await genPrivateKeyDigest(ethPrivateKey);
       return EncryptKey(
           kek: ethKek,
           digest: ethDigest,
@@ -247,7 +247,7 @@ class EthWallet extends ChainWallet {
     try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
       var kek = encryptSodium(privateKey, ethAddr, pass);
-      var ethDigest = await argon2Crypt(privateKey);
+      var ethDigest = await genPrivateKeyDigest(privateKey);
       return EncryptKey(
           kek: kek,
           digest: ethDigest,
