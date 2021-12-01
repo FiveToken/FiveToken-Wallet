@@ -54,6 +54,15 @@ class WalletState extends Equatable {
     String formatStr = 'YYYY-MM-DD';
     list.addAll(storeMessageList);
     list.addAll(interfaceMessageList);
+
+    list.sort((a, b) {
+      if (a.blockTime != null && b.blockTime != null) {
+        return b.blockTime.compareTo(a.blockTime);
+      } else {
+        return 1;
+      }
+    });
+
     list.forEach((mes) {
       var time = formatTimeByStr(mes.blockTime, str: formatStr);
       var item = messageMap[time];
@@ -62,6 +71,7 @@ class WalletState extends Equatable {
       }
       messageMap[time].add(mes);
     });
+    print('res');
     return messageMap;
   }
 }

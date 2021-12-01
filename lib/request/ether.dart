@@ -29,7 +29,15 @@ class Ether extends ChainProvider {
     try {
       final res = await rpcJson.call(
           'eth_getBlockByNumber', ['0x${number.toRadixString(16)}', false]);
-      return ChainInfo.fromJson(res.result);
+      var result = res.result;
+      return ChainInfo(
+        gasUsed: hexToDartInt(result['gasUsed']),
+        gasLimit:hexToDartInt(result['gasLimit']),
+        number:hexToDartInt(result['number']),
+        timestamp: hexToDartInt(result['timestamp']),
+      );
+      print('res');
+      return result;
     } catch (error) {
       return ChainInfo(
         gasUsed: 0,
@@ -183,6 +191,7 @@ class Ether extends ChainProvider {
             value: EtherAmount.inWei(BigInt.parse(amount)),
           ),
           chainId: int.tryParse($store.net.chainId) ?? 1);
+      print('res');
       return res;
     } catch (e) {
       print(e);
@@ -192,17 +201,17 @@ class Ether extends ChainProvider {
 
   @override
   Future<String> sendToken(
-      String from,
-      String to,
-      String amount,
-      String private,
-      ChainGas gas,
-      int nonce
+      {String to,
+        String amount,
+        String private,
+        ChainGas gas,
+        String addr,
+        int nonce}
     ) async {
     try {
       var credentials = await client.credentialsFromPrivateKey(private);
       var abi = ContractAbi.fromJson(Contract.abi, '');
-      var con = DeployedContract(abi, EthereumAddress.fromHex(from));
+      var con = DeployedContract(abi, EthereumAddress.fromHex(addr));
       var transaction = Transaction.callContract(
           contract: con,
           function: con.function('transfer'),

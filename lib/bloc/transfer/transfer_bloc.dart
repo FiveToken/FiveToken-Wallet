@@ -50,13 +50,14 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         Chain.setRpcNetwork(event.rpc, event.chainType);
         var result = '';
         if(event.isToken){
+          String tokenAddress = event.token.address;
           result = await Chain.chainProvider.sendToken(
-              event.from,
-              event.to,
-              event.amount,
-              event.privateKey,
-              event.gas,
-              event.nonce
+              to:event.to,
+              amount:event.amount,
+              private:event.privateKey,
+              gas:event.gas,
+              addr:tokenAddress,
+              nonce:event.nonce
           );
         }else{
           result = await Chain.chainProvider.sendTransaction(

@@ -87,15 +87,15 @@ class Filecoin extends ChainProvider {
         sign = await Bls.cksign(num: "$private $cid");
       }
       var sm = SignedMessage(msg, Signature(signType, sign));
-      print(cid);
-      print(jsonEncode(sm.toLotusSignedMessage()));
       String res = '';
       var result = await client.post(
           pushPath,
           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}
       );
+      print(cid);
       return result.toString();
     } catch (e) {
+      print('error');
       return '';
     }
   }
@@ -218,12 +218,12 @@ class Filecoin extends ChainProvider {
 
   @override
   Future<String> sendToken(
-      String from,
-      String to,
-      String amount,
-      String private,
-      ChainGas gas,
-      int nonce
+      {String to,
+        String amount,
+        String private,
+        ChainGas gas,
+        String addr,
+        int nonce}
   ) async{
     return "0";
   }

@@ -67,12 +67,12 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
     on<UpdateFileCoinPendingStateEvent>((event,emit) async{
       try{
-        List pendingList = state.storeMessageList;
+        List pendingList = state.storeMessageList.where((mes) => mes.pending == 1).toList();
         if(pendingList.length > 0){
           var box = OpenedBox.mesInstance;
           Chain.setRpcNetwork(event.rpc, event.chainType);
           List param = [];
-          state.storeMessageList.forEach((n) async {
+          pendingList.forEach((n) async {
             param.add({"from":n.from,"nonce":n.nonce});
           });
           // Get the status of the local store pending message
@@ -80,7 +80,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           result.forEach((n) {
             var message = n['message'];
             if(message.isNotEmpty){
-              state.storeMessageList.forEach((m) {
+              pendingList.forEach((m) {
                 // Filter the same message returned by local store and interface
                 if((message["from"] == m.from) && (message["nonce"] == m.nonce)){
                   // If the hash is the same, judge whether the message is successfully chained according to the code，
@@ -123,7 +123,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
     on<UpdateEthMessageListStateEvent>((event, emit) async{
       try{
-        List pendingList = state.storeMessageList;
+        List pendingList = state.storeMessageList.where((mes) => mes.pending == 1).toList();
         if(pendingList.length > 0){
           Chain.setRpcNetwork(event.rpc, event.chainType);
           var box = OpenedBox.mesInstance;
@@ -148,6 +148,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
                 Chain.chainProvider.getBlockByNumber(t.blockNumber.blockNum))
                 .toList();
             var mesList = map.keys.toList();
+
             var blocks = await Future.wait(futures);
             for (var i = 0; i < mesList.length; i++) {
               var block = blocks[i];
@@ -189,12 +190,6 @@ List getStoreMsgList(){
       list.add(message);
     }
   });
-  list.sort((a, b) {
-    if (a.blockTime != null && b.blockTime != null) {
-      return b.blockTime.compareTo(a.blockTime);
-    } else {
-      return 1;
-    }
-  });
+
   return list ?? [];
 }
