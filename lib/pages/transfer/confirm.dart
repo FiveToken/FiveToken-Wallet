@@ -93,6 +93,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                   listener: (context,state){
                     if(state.transactionHash!=''){
                       pushMsgCallBack(state.nonce,state.transactionHash);
+                    }else{
+                      loading = false;
                     }
                   },
                   child: BlocBuilder<PriceBloc,PriceState>(
@@ -276,6 +278,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if(isSpeedUp){
         bool valid = checkGas();
         if(valid){
+          loading = true;
           pendingList.sort((a, b) {
             if (a.nonce != null && b.nonce != null) {
               return b.nonce.compareTo(a.nonce);
@@ -297,12 +300,14 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               _isToken,
               lastMessage.token
           ));
+        }else{
+          loading = false;
         }
       }else{
         bool valid = checkGas();
         if(valid){
           var value = getChainValue(amount, precision: token?.precision ?? 18);
-          this.loading = true;
+          loading = true;
           var realNonce = nonce;
           var nonceKey = '$from\_${$store.net.rpc}';
           if(nonceBoxInstance.get(nonceKey) != null){
@@ -320,11 +325,13 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               isToken,
               token
           ));
+        }else{
+          loading = false;
         }
       }
 
     } catch (e) {
-      this.loading = false;
+      loading = false;
       dismissAllToast();
       showCustomError('sendFail'.tr);
       print(e);

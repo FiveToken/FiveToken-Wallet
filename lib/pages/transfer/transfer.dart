@@ -1,6 +1,4 @@
 import 'package:fil/bloc/gas/gas_bloc.dart';
-import 'package:fil/bloc/transfer/transfer_bloc.dart';
-import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/config/config.dart';
 import 'package:flutter/material.dart';
@@ -71,12 +69,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         this.token = Get.arguments['token'];
       }
     }
-
-    // focusNode.addListener(() {
-    //   if (!focusNode.hasFocus) {
-    //     getGas();
-    //   }
-    // });
   }
 
   @override

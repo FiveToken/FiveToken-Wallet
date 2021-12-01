@@ -98,7 +98,7 @@ class Network {
       netType: 0,
       rpc: 'https://api.fivetoken.io',
       coin: 'FIL',
-      browser: 'https://filscan.io',
+      browser: 'https://m.filscan.io',
       prefix: 'f',
       color: '0xff5CC1CB',
       path: "m/44'/461'/0'/0",

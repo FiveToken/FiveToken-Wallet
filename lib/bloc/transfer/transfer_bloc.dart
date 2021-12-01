@@ -74,9 +74,11 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
           emit(state.copyWithTransferState(transactionHash:result));
         }else{
           showCustomError('sendFail'.tr);
+          emit(state.copyWithTransferState(transactionHash:''));
         }
         dismissAllToast();
       }catch(error){
+        emit(state.copyWithTransferState(transactionHash:''));
         showCustomError('sendFail'.tr);
         dismissAllToast();
         print("================AppOpenEvent=========");

@@ -54,7 +54,7 @@ class WalletState extends Equatable {
     String formatStr = 'YYYY-MM-DD';
     list.addAll(storeMessageList);
     list.addAll(interfaceMessageList);
-
+    print('list');
     list.sort((a, b) {
       if (a.blockTime != null && b.blockTime != null) {
         return b.blockTime.compareTo(a.blockTime);
