@@ -17,12 +17,12 @@ abstract class ChainProvider {
   );
 
   Future<String> sendToken(
-      String from,
-      String to,
-      String amount,
-      String private,
-      ChainGas gas,
-      int nonce
+      {String to,
+        String amount,
+        String private,
+        ChainGas gas,
+        String addr,
+        int nonce}
   );
 
   Future<ChainGas> getGas({String to, bool isToken = false, Token token});

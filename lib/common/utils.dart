@@ -152,14 +152,13 @@ String formatCoin(String amount,
     var v = BigInt.parse(amount);
     num length = str.length;
     var unit = BigInt.from(pow(10, 18));
-    var res = v / unit;
+    var res = (v / unit);
+    var result = stringCutOut(res.toString(),8);
     String esc = '';
     if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (res < min)){
       esc = '...';
     }
-    return fixed
-        ? '${res.toStringAsFixed(size)} $esc'
-        : '${truncate(res, size: size)}';
+    return result + esc;
   } catch (e) {
     return amount;
   }

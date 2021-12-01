@@ -74,14 +74,24 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   String get title => showToken ? token.symbol : $store.net.coin;
 
-  Future onRefresh() async {
-    BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
-      $store.net.rpc,
-      $store.net.chain,
-      $store.wal.addr,
-    ));
+  Future onRefresh(BuildContext context) async {
+    try{
+      BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
+        $store.net.rpc,
+        $store.net.chain,
+        $store.wal.addr,
+      ));
+      BlocProvider.of<WalletBloc>(context)..add(
+          SetEnablePullUpEvent(isFil)
+      )..add(
+          GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down')
+      );
+    }catch(error){
+      print('error');
+    }
 
-    Global.eventBus.fire(RefreshEvent(token: token));
+
+
   }
 
   Future onLoading(BuildContext context) async {
@@ -108,13 +118,11 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     var yesterdayStr = yesterday.format(formatStr);
 
     return BlocProvider(
-      create: (ctx) => WalletBloc()
-        ..add(SetEnablePullUpEvent(isFil))
-        ..add(GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down')),
+      create: (ctx) => WalletBloc(),
       child: BlocBuilder<WalletBloc, WalletState>(
-        builder: (ctx, walletState) {
+        builder: (context, walletState) {
           return BlocBuilder<MainBloc, MainState>(
-            builder: (ctx, state) {
+            builder: (context, state) {
               List messageKeys = walletState.formatMessageList.keys.toList();
               int count = messageKeys.length;
               return CommonScaffold(
@@ -126,8 +134,8 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                 hasFooter: false,
                 body: CustomRefreshWidget(
                     enablePullUp: isFil && walletState.enablePullUp,
-                    onLoading: ()=> onLoading(ctx),
-                    onRefresh: onRefresh,
+                    onLoading: ()=> onLoading(context),
+                    onRefresh: ()=> onRefresh(context),
                     child: CustomScrollView(
                       slivers: [
                         SliverPersistentHeader(

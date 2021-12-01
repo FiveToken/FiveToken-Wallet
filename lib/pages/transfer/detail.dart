@@ -1,4 +1,6 @@
 // import 'package:fil/index.dart';
+import 'dart:math';
+
 import 'package:fil/store/store.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,7 +47,12 @@ class FilDetailPageState extends State<FilDetailPage> {
             SizedBox(
               height: 25,
             ),
-            CommonCard(MessageRow(label: 'amount'.tr, value: mes.formatValue)),
+            CommonCard(
+                MessageRow(
+                    label: 'amount'.tr,
+                    value: formatValue()
+                )
+            ),
             SizedBox(
               height: 7,
             ),
@@ -114,6 +121,21 @@ class FilDetailPageState extends State<FilDetailPage> {
         ),
       ),
     );
+  }
+
+  String formatValue(){
+    bool _isToken = mes.token != null;
+    if(_isToken){
+      var unit = BigInt.from(pow(10, mes.token.precision));
+      var amount = BigInt.parse(mes.value);
+      var res = (amount / unit).toString();
+      return res + mes.token.symbol;
+    }else{
+      var unit = BigInt.from(pow(10, 18));
+      var amount = BigInt.parse(mes.value);
+      var res = (amount / unit).toString();
+      return res + $store.net.coin;
+    }
   }
 }
 

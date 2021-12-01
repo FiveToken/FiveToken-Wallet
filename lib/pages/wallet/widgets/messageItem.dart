@@ -1,4 +1,6 @@
 // import 'package:fil/index.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/text.dart';
@@ -34,13 +36,16 @@ class MessageItem extends StatelessWidget {
 
   bool get isToken => mes.token != null;
   String get value {
-    var v =
-        isToken ? mes.token.getFormatBalance(mes.value) : formatCoin(mes.value,fixed:true,min:0.0001);
-    var unit = isToken ? $store.net.coin : mes.token?.symbol;
-    if (v == '0') {
-      return '0 $unit';
-    } else {
-      return '${pending || fail ? '' : (isSend ? '-' : '+')} $v';
+    if(isToken){
+      var unit = BigInt.from(pow(10, mes.token.precision));
+      var amount = BigInt.parse(mes.value);
+      var res = (amount / unit).toString();
+      var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
+      return _isSend + res + mes.token.symbol;
+    }else{
+      var _value = formatCoin(mes.value,size:8,fixed:true,min:0.00000001) + $store.net.coin;
+      var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
+      return _isSend + _value;
     }
   }
 

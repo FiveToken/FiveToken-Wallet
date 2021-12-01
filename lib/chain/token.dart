@@ -21,7 +21,8 @@ class Token {
     try {
       var unit = BigInt.from(pow(10, precision));
       var balanceNum = BigInt.parse(b);
-      return '${truncate(balanceNum / unit)} $symbol';
+      String res = (balanceNum / unit).toString();
+      return res + symbol;
     } catch (e) {
       return '';
     }

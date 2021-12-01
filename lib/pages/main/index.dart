@@ -395,9 +395,6 @@ class MainPageState extends State<MainPage>  {
   void connectWallet(String uri, {bool newConnect = true}) {
     if (newConnect) {
       showCustomLoading('connecting'.tr);
-      // Future.delayed(Duration(seconds: 20)).then((value) {
-      //   dismissAllToast();
-      // });
     }
     WCSession.connectSession(uri, jsonRpcHandler: {
       'wc_sessionRequest': [
@@ -556,13 +553,13 @@ class MainPageState extends State<MainPage>  {
         builder: (BuildContext context){
           return SingleChildScrollView(
               padding: EdgeInsets.only(bottom: 30),
-              child:_confirmBody()
+              child:_confirmBody(from,to)
           );
         }
     );
   }
 
-  Widget  _confirmBody(){
+  Widget  _confirmBody(from,to){
     final EdgeInsets padding = EdgeInsets.symmetric(horizontal: 12, vertical: 14);
     return Column(
       children: [
@@ -588,7 +585,7 @@ class MainPageState extends State<MainPage>  {
                             ),
                             Expanded(
                                 child: Text(
-                                  "from",
+                                  from,
                                   textAlign: TextAlign.right,
                                 )),
                           ],
@@ -605,7 +602,7 @@ class MainPageState extends State<MainPage>  {
                             ),
                             Expanded(
                                 child: Text(
-                                  "to",
+                                  to,
                                   textAlign: TextAlign.right,
                                 )),
                           ],
