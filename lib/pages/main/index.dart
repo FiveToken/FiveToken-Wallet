@@ -44,7 +44,7 @@ class MainPage extends StatefulWidget {
   }
 }
 
-class MainPageState extends State<MainPage>  {
+class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final TextEditingController controller = TextEditingController();
   var box;
   Timer timer;
@@ -53,9 +53,29 @@ class MainPageState extends State<MainPage>  {
   // WCMeta meta;
   Box<Nonce> nonceBoxInstance;
 
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    print(state);
+    switch(state){
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.resumed:
+        print(AppLifecycleState.resumed);
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case  AppLifecycleState.detached:
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     box = OpenedBox.walletInstance;
     nonceBoxInstance = OpenedBox.nonceInsance;
     if (Get.arguments != null && Get.arguments['url'] != null) {
@@ -69,6 +89,7 @@ class MainPageState extends State<MainPage>  {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

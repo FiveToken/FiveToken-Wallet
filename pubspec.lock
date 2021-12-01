@@ -700,6 +700,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.4.3+4"
+  passcode_screen:
+    dependency: "direct main"
+    description:
+      name: passcode_screen
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.2+1"
   path:
     dependency: transitive
     description:

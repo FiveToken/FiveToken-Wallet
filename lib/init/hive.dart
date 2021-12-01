@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'package:fil/chain/gas.dart';
+import 'package:fil/chain/lock.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
@@ -7,6 +8,7 @@ import 'package:fil/index.dart';
 import 'package:fil/models/address.dart';
 import 'package:fil/models/cacheMessage.dart';
 import 'package:fil/models/nonce.dart';
+import 'package:fil/chain/lock.dart';
 import 'package:fil/models/nonce_unit.dart';
 import 'package:fil/models/wallet.dart';
 import 'package:hive/hive.dart';
@@ -28,6 +30,7 @@ Future initHive() async {
   Hive.registerAdapter(CacheMessageAdapter());
   Hive.registerAdapter(ChainGasAdapter());
   Hive.registerAdapter(NonceUnitAdapter());
+  Hive.registerAdapter(LockBoxAdapter());
 
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   // final String key1 = HiveKey.key;
@@ -51,6 +54,7 @@ class OpenedBox {
   static Box<ChainWallet> walletInstance;
   static Box<CacheMessage> mesInstance;
   static Box<NonceUnit> nonceUnitInstance;
+  static Box<LockBox> lockInstance;
 
   static Future initBox() async{
      addressInsance  = await Hive.openBox<Wallet>(HiveBoxType.addressBox, encryptionCipher: HiveAesCipher(encryptionKey));
@@ -62,5 +66,6 @@ class OpenedBox {
      walletInstance = await Hive.openBox<ChainWallet>(HiveBoxType.walletBox, encryptionCipher: HiveAesCipher(encryptionKey));
      mesInstance = await Hive.openBox<CacheMessage>(HiveBoxType.cacheMessageBox, encryptionCipher: HiveAesCipher(encryptionKey));
      nonceUnitInstance = await Hive.openBox<NonceUnit>(HiveBoxType.nonceUnitBox, encryptionCipher: HiveAesCipher(encryptionKey));
+     lockInstance  = await Hive.openBox<LockBox>(HiveBoxType.lockBox, encryptionCipher: HiveAesCipher(encryptionKey));
   }
 }

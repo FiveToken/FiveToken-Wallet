@@ -32,4 +32,5 @@ class Global {
   static String get netPrefix => NetPrefix;
   static String wcSession;
   static Token cacheToken;
+  static bool lockscreen = false;
 }
