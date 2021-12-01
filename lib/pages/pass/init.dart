@@ -44,7 +44,7 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
-  var box;
+  var box  = OpenedBox.walletInstance;
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
@@ -71,7 +71,6 @@ class PassInitPageState extends State<PassInitPage> {
   @override
   void initState() {
     super.initState();
-    box  = OpenedBox.addressInsance;
     var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
     if(arg['type']==WalletType.id){
@@ -111,7 +110,7 @@ class PassInitPageState extends State<PassInitPage> {
 
   void AddWallet(ChainWallet wallet) async{
     var box = OpenedBox.walletInstance;
-    box.put(wallet.key, wallet);
+    await box.put(wallet.key, wallet);
   }
 
   void handleSubmit() async {
@@ -169,7 +168,7 @@ class PassInitPageState extends State<PassInitPage> {
           this.loading = false;
           return;
         }
-        AddWallet(wal);
+        await AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
@@ -188,12 +187,12 @@ class PassInitPageState extends State<PassInitPage> {
           return;
         }
         var wal = getWallet(type, key, net);
-        if (box.containsKey(wal.key)) {
+        if (box.get(wal.key)!=null) {
           showCustomError('errorExist'.tr);
           this.loading = false;
           return;
         }
-        AddWallet(wal);
+        await AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
@@ -215,7 +214,7 @@ class PassInitPageState extends State<PassInitPage> {
     return CommonScaffold(
       grey: true,
       title: 'pass'.tr,
-      footerText: 'next'.tr,
+      footerText: 'sure'.tr,
       onPressed: () {
         handleSubmit();
       },
