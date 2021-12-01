@@ -67,7 +67,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
     on<UpdateFileCoinPendingStateEvent>((event,emit) async{
       try{
-        List pendingList = state.storeMessageList.map((mes) => mes.pending == 1).toList();
+        List pendingList = state.storeMessageList.where((mes) => mes.pending == 1).toList();
         if(pendingList.length > 0){
           var box = OpenedBox.mesInstance;
           Chain.setRpcNetwork(event.rpc, event.chainType);
