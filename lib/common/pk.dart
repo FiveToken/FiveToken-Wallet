@@ -16,14 +16,6 @@ Future<String> genPrivateKeyDigest(String privateKey) async {
   return base64Encode(hash.bytes.sublist(0, 16));
 }
 
-// Future<String> genPrivateKeyDigestByArgon2(String privateKey) async {
-//   final hash = argon2Crypt(privateKey);
-//   return base64Encode(hash.bytes.sublist(0, 16));
-// }
-
-
-
-
 /// use pbkdf2 to generate kek
 Future<Uint8List> genKek(String addr, String pass, {int size = 32}) async {
 
