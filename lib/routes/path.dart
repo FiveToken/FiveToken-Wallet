@@ -6,6 +6,7 @@ const String setPage = '/set';
 const String langPage = '/lang';
 const String servicePage = '/service';
 const String lockPage = '/lock';
+const String lockScreen = '/lock/screen';
 
 const String passwordSetPage = "/pass/init";
 const String passwordResetPage = "/pass/reset";
