@@ -102,39 +102,42 @@ class LockPageState extends State<LockPage> {
     super.dispose();
   }
 
-  void passwordEnteredCallback(context, state, String enterPassCode){
+  void passwordEnteredCallback(ctx, state, String enterPassCode) {
     bool isValid = true;
     _verificationNotifier.add(isValid);
-    openLockSencondScreen(context, state, enterPassCode);
+    // Navigator.pop(ctx);
+    Future.delayed(Duration.zero).then((value) =>openLockSencondScreen(ctx, state, enterPassCode));
   }
 
   Widget title(label){
     return Text(label,style: TextStyle(color: Colors.white));
   }
 
-  void openLockScreen(context, state){
-    Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
-      return PasscodeScreen(
-          title: title('setLockPassword'.tr),
-          passwordEnteredCallback: (String pass)=>{ passwordEnteredCallback(context, state,pass)},
-          cancelButton: title('cancel'.tr),
-          deleteButton: title('delete'.tr),
-          shouldTriggerVerification: _verificationNotifier.stream,
-      );
-    }));
+  void openLockScreen(ctx, state) {
+    Navigator.push(ctx,
+        PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
+          return PasscodeScreen(
+            title: title('setLockPassword'.tr),
+            passwordEnteredCallback: (String pass) =>
+            {passwordEnteredCallback(ctx, state, pass)},
+            cancelButton: title('cancel'.tr),
+            deleteButton: title('delete'.tr),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            isValidCallback: () {},
+          );
+        }));
   }
 
   void passwordEnteredCallback2(String secondPass, String firstPass){
     bool isValid = secondPass == firstPass;
+    _verificationNotifier2.add(isValid);
     var lockBox = OpenedBox.lockInstance;
     LockBox lock = LockBox.fromJson({'lockscreen': true, 'password':secondPass});
     lockBox.put('lock', lock);
-    _verificationNotifier2.add(isValid);
     BlocProvider.of<LockBloc>(context).add(setLockEvent(password: secondPass, lock: true));
   }
 
   void openLockSencondScreen(context, state, String firstPass){
-    Navigator.pop(context);
     Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
       return PasscodeScreen(
         title: title('confirmLockPassword'.tr),
