@@ -1,5 +1,9 @@
+import 'package:fil/bloc/lock/lock_bloc.dart';
+import 'package:fil/bloc/select/select_bloc.dart';
+import 'package:fil/chain/lock.dart';
 import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:passcode_screen/passcode_screen.dart';
 import 'package:passcode_screen/circle.dart';//如需要自定义密码圆点UI时需引入
 import 'package:passcode_screen/keyboard.dart';//如需要自定义键盘UI时需引入
@@ -13,34 +17,37 @@ class LockPage extends StatefulWidget {
 
 class LockPageState extends State<LockPage> {
   bool flag = false;
-  @override
+
   var _context;
   int count = 0;
+  @override
   Widget build(BuildContext context) {
     _context = context;
-    return CommonScaffold(
-        title: 'lockScreenSetting'.tr,
-        hasFooter: false,
-        grey: true,
-        body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-            child: Column(
-              children: [
-                _switch(),
-                SizedBox(
-                  height: 15,
-                ),
-                Visibility(
-                  visible: flag,
-                  child: _editAction(),
+    return BlocBuilder<LockBloc, LockState>(builder: (context, state){
+      return CommonScaffold(
+            title: 'lockScreenSetting'.tr,
+            hasFooter: false,
+            grey: true,
+            body: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+                child: Column(
+                  children: [
+                    _switch(context, state),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Visibility(
+                      visible: state.lock,
+                      child: _editAction(context, state),
+                    )
+                  ],
                 )
-              ],
             )
-        )
-    );
+      );
+    });
   }
 
-  Widget _switch(){
+  Widget _switch(context, state){
     return Container(
         height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -48,8 +55,8 @@ class LockPageState extends State<LockPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             CommonText.main('lockScreen'.tr),
-            Switch(value: flag, onChanged: (value){
-              onSwitchChanged(value);
+            Switch(value: state.lock, onChanged: (value){
+              onSwitchChanged(context,state, value);
             }),
           ],
         ),
@@ -60,7 +67,7 @@ class LockPageState extends State<LockPage> {
     );
   }
   
-  Widget _editAction(){
+  Widget _editAction(context, state){
     return Container(
         height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -72,7 +79,7 @@ class LockPageState extends State<LockPage> {
               children:[ CardItem(
                 label: 'change'.tr,
                 onTap: ()=>{
-                  openLockScreen(_context)
+                  openLockScreen(context, state)
                 },
               ),
               ]
@@ -88,7 +95,6 @@ class LockPageState extends State<LockPage> {
   }
   final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
   final StreamController<bool> _verificationNotifier2 = StreamController<bool>.broadcast();
-  bool secondFlag = true;
   @override
   void dispose() {
     _verificationNotifier.close();
@@ -96,40 +102,46 @@ class LockPageState extends State<LockPage> {
     super.dispose();
   }
 
-  void passwordEnteredCallback(String enterPassCode){
-    bool isValid = '123456' == enterPassCode;
+  void passwordEnteredCallback(ctx, state, String enterPassCode) {
+    bool isValid = true;
     _verificationNotifier.add(isValid);
-    openLockSencondScreen(_context);
+    // Navigator.pop(ctx);
+    Future.delayed(Duration.zero).then((value) =>openLockSencondScreen(ctx, state, enterPassCode));
   }
 
   Widget title(label){
     return Text(label,style: TextStyle(color: Colors.white));
   }
 
-  void openLockScreen(context){
-    Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
-      return PasscodeScreen(
-          title: title('cancel'.tr),
-          passwordEnteredCallback: passwordEnteredCallback,
-          cancelButton: title('cancel'.tr),
-          deleteButton: title('delete'.tr),
-          shouldTriggerVerification: _verificationNotifier.stream,
-      );
-    }));
+  void openLockScreen(ctx, state) {
+    Navigator.push(ctx,
+        PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
+          return PasscodeScreen(
+            title: title('setLockPassword'.tr),
+            passwordEnteredCallback: (String pass) =>
+            {passwordEnteredCallback(ctx, state, pass)},
+            cancelButton: title('cancel'.tr),
+            deleteButton: title('delete'.tr),
+            shouldTriggerVerification: _verificationNotifier.stream,
+            isValidCallback: () {},
+          );
+        }));
   }
 
-  void passwordEnteredCallback2(String enterPassCode){
-    print(enterPassCode);
-    bool isValid = '123456' == enterPassCode;
+  void passwordEnteredCallback2(String secondPass, String firstPass){
+    bool isValid = secondPass == firstPass;
     _verificationNotifier2.add(isValid);
+    var lockBox = OpenedBox.lockInstance;
+    LockBox lock = LockBox.fromJson({'lockscreen': true, 'password':secondPass});
+    lockBox.put('lock', lock);
+    BlocProvider.of<LockBloc>(context).add(setLockEvent(password: secondPass, lock: true));
   }
 
-  void openLockSencondScreen(context){
-    Navigator.pop(context);
+  void openLockSencondScreen(context, state, String firstPass){
     Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
       return PasscodeScreen(
-        title: title('delete'.tr),
-        passwordEnteredCallback: passwordEnteredCallback2,
+        title: title('confirmLockPassword'.tr),
+        passwordEnteredCallback: (value)=>{passwordEnteredCallback2(value, firstPass)},
         cancelButton: title('cancel'.tr),
         deleteButton: title('delete'.tr),
         shouldTriggerVerification: _verificationNotifier2.stream,
@@ -137,13 +149,10 @@ class LockPageState extends State<LockPage> {
     }));
   }
 
-  onSwitchChanged(value){
-     setState(() {
-       this.flag = value;
-     });
-     if(this.flag){
-       openLockScreen(_context);
+  onSwitchChanged(ctx,  state, value){
+    BlocProvider.of<LockBloc>(context).add(setLockEvent(lock: value));
+     if(value){
+       openLockScreen(ctx, state);
      }
   }
-
 }

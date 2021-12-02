@@ -65,4 +65,12 @@ Future<Map<String, EncryptKey>> getKeyMap(String mne, String pass) async{
   return keyMap;
 }
 
+Future<Map<String, EncryptKey>> getKeyMapToReset(String private, String pass) async{
+  Map<String, EncryptKey> keyMap = {};
+  keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(private, pass);
+  keyMap['filecoin'] =  await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass);
+  keyMap['calibration'] =  await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass, prefix: 't');
+  return keyMap;
+}
+
 

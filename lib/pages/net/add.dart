@@ -40,33 +40,7 @@ class NetAddPageState extends State<NetAddPage> {
   bool readonly = false;
   bool loading = false;
   var box = OpenedBox.netInstance;
-  final formList = [
-    {
-      "label": 'netName'.tr,
-      "placeholder": 'netName'.tr,
-      "controller": TextEditingController()
-    },
-    {
-      "label": 'RPC URL',
-      " placeholder ": 'newRpc'.tr,
-      "controller": TextEditingController()
-    },
-    {
-      "label": 'chainId'.tr,
-      " placeholder ": 'chainId'.tr,
-      "controller": TextEditingController()
-    },
-    {
-      "label": 'symbol'.tr,
-      " placeholder ": 'curNetToken'.tr,
-      "controller": TextEditingController()
-    },
-    {
-      "label": 'browser'.tr,
-      " placeholder ": 'browserOptional'.tr,
-      "controller": TextEditingController()
-    },
-  ];
+
   void submit(BuildContext context) async {
     // get controller text
     var name = nameCtrl.text.trim();
@@ -183,7 +157,6 @@ class NetAddPageState extends State<NetAddPage> {
     if (Get.arguments != null && Get.arguments['net'] != null) {
       net = Get.arguments['net'] as Network;
       readonly = net.netType != 2;
-      debugPrint("text" + formList.toString());
       nameCtrl.text = net.label;
       browserCtrl.text = net.browser;
       symbolCtrl.text = net.coin;
@@ -196,36 +169,6 @@ class NetAddPageState extends State<NetAddPage> {
   void dispose() {
     super.dispose();
     client?.dispose();
-  }
-
-  Widget buildChild(){
-    List<Widget> titles = [];
-    final l = [nameCtrl,rpcCtrl,chainCtrl,symbolCtrl, browserCtrl];
-    final List len = Iterable<int>.generate(l.length).toList();
-    len.map((index)=>{
-      formList[index]['controller'] = l[index],
-      formList[index]['enabled'] = !readonly,
-      formList[index]['selectable'] = readonly
-    });
-    titles.add(CommonText('newRpc'.tr));
-    titles.add(CommonText('byRpc'.tr));
-    Widget content;
-    print(formList);
-    for(var index in len){
-      var item = formList[index];
-      titles.add(Field(
-          label: item['label'],
-          placeholder: item['placeholder'],
-          controller: l[index],
-          enabled: item['enabled'],
-          selectable: item['selectable']
-      ));
-    }
-    content = new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: titles
-    );
-    return content;
   }
 
 
@@ -286,7 +229,49 @@ class NetAddPageState extends State<NetAddPage> {
                   : null,
               body: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-                  child: buildChild()
+                  child:
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    CommonText('newRpc'.tr),
+                    CommonText('byRpc'.tr),
+                    Field(
+                      label: 'netName'.tr,
+                      placeholder: 'netName'.tr,
+                      controller: nameCtrl,
+                      enabled: !readonly,
+                      selectable: readonly,
+                    ),
+                    Field(
+                      label: 'RPC URL',
+                      placeholder: 'newRpc'.tr,
+                      controller: rpcCtrl,
+                      enabled: !readonly,
+                      selectable: readonly,
+                    ),
+                    Field(
+                      label: 'chainId'.tr,
+                      placeholder: 'chainId'.tr,
+                      controller: chainCtrl,
+                      enabled: !readonly,
+                      selectable: readonly,
+                    ),
+                    Field(
+                      label: 'symbol'.tr,
+                      placeholder: 'curNetToken'.tr,
+                      controller: symbolCtrl,
+                      enabled: !readonly,
+                      selectable: readonly,
+                    ),
+                    Field(
+                      label: 'browser'.tr,
+                      placeholder: 'browserOptional'.tr,
+                      controller: browserCtrl,
+                      enabled: !readonly,
+                      selectable: readonly,
+                    ),
+                  ]
+                  )
               )
           );
         }

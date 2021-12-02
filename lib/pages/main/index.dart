@@ -17,6 +17,7 @@ import 'package:fil/pages/main/widgets/price.dart';
 import 'package:fil/pages/main/widgets/token.dart';
 import 'package:logger/logger.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:passcode_screen/passcode_screen.dart';
 import 'package:web3dart/crypto.dart';
 import './walletConnect.dart';
 import 'package:fil/store/store.dart';
@@ -53,17 +54,48 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   // WCMeta meta;
   Box<Nonce> nonceBoxInstance;
 
+  Widget title(label){
+    return Text(label,style: TextStyle(color: Colors.white));
+  }
+
+  final StreamController<bool> _verificationNotifier = StreamController<bool>.broadcast();
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _verificationNotifier.close();
+    super.dispose();
+  }
+
+  void passwordEnteredCallback(String pass, String enterPassCode){
+    bool isValid = enterPassCode == pass;
+    _verificationNotifier.add(isValid);
+  }
+
+  void openLockScreen(pass){
+    Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
+      return PasscodeScreen(
+        title: title('setLockPassword'.tr),
+        passwordEnteredCallback: (value)=>{ passwordEnteredCallback(pass,value)},
+        cancelButton: title('cancel'.tr),
+        deleteButton: title('delete'.tr),
+        shouldTriggerVerification: _verificationNotifier.stream,
+      );
+    }));
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
     super.didChangeAppLifecycleState(state);
-    print(state);
+    var lockBox = OpenedBox.lockInstance;
+    var lock = lockBox.get('lock');
     switch(state){
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.resumed:
-        print(AppLifecycleState.resumed);
+        if(lock!=null&&lock.lockscreen==true){
+          openLockScreen(lock.password);
+        }
         break;
       case AppLifecycleState.paused:
         break;
@@ -71,6 +103,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         break;
     }
   }
+
+
 
   @override
   void initState() {
@@ -87,11 +121,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     reConnect();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
 
 
   List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
