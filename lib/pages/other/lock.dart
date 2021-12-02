@@ -129,11 +129,12 @@ class LockPageState extends State<LockPage> {
     var lockBox = OpenedBox.lockInstance;
     LockBox lock = LockBox.fromJson({'lockscreen': true, 'password':secondPass});
     lockBox.put('lock', lock);
-    BlocProvider.of<LockBloc>(context).add(setLockEvent(password: secondPass, lock: true));
     _verificationNotifier2.add(isValid);
+    BlocProvider.of<LockBloc>(context).add(setLockEvent(password: secondPass, lock: true));
   }
 
   void openLockSencondScreen(context, state, String firstPass){
+    Navigator.pop(context);
     Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
       return PasscodeScreen(
         title: title('confirmLockPassword'.tr),
