@@ -120,7 +120,7 @@ const Map<String, String> JP_LANG = {
   "enterValidAmount": "振込金額を正しく入力してください",
   "sendConfirm": "送信情報確認",
   "enterAddr": "受信アドレスを入力してください",
-  "scan": "QRコードをスキャンしてFILに転送してください",
+  "scan": "QRコードをスキャンしてに転送してください",
   "copy": "コピー",
   "copySucc": "コピーに成功しました",
   "share": "共有",

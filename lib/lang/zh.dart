@@ -124,7 +124,7 @@ const Map<String, String> ZH_LANG = {
   'enterValidAmount': "请输入正确的转账数额",
   'sendConfirm': '发送信息确认',
   'enterAddr': "请输入地址",
-  'scan': "扫二维码，转入FIL",
+  'scan': "扫二维码，转入",
   'copy': "复制",
   'copySucc': "复制成功",
   'share': '分享',

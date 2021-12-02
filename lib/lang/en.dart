@@ -135,7 +135,7 @@ const Map<String, String> EN_LANG = {
   "enterValidAmount": "Please enter a valid transfer amount",
   "sendConfirm": "Send message confirmation",
   "enterAddr": "Please enter receiving address",
-  "scan": "Scan QR code, go to FIL",
+  "scan": "Scan QR code, go to",
   "copy": "Copy",
   "copySucc": "Copy successfully",
   "share": "Share",

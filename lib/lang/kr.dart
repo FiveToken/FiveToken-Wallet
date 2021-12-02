@@ -128,7 +128,7 @@ const Map<String, String> KR_LANG = {
   "enterValidAmount": "정확한 계좌이체 액수를 입력해주세요",
   "sendConfirm": "메시지 보내기 확인",
   "enterAddr": "접수 주소를 입력해주세요",
-  "scan": "QR코드를 스캐닝하면,FIL로 넘어갑니다.",
+  "scan": "QR코드를 스캐닝하면,로 넘어갑니다.",
   "copy": "복사",
   "copySucc": "복사 성공",
   "share": "공유",
