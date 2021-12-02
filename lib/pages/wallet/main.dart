@@ -35,7 +35,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   Token token = Global.cacheToken;
   bool get showToken => token != null;
   Network net = $store.net;
-
+  String symbol = '';
   bool get isFil {
     return this.net.addressType == AddressType.filecoin.type;
   }
@@ -43,6 +43,12 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   @override
   void initState() {
     super.initState();
+    if (Get.arguments != null) {
+      if (Get.arguments['symbol'] != null) {
+        symbol = Get.arguments['symbol'];
+      }
+
+    }
   }
 
   @override
@@ -81,11 +87,16 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
         $store.net.chain,
         $store.wal.addr,
       ));
-      BlocProvider.of<WalletBloc>(context)..add(
-          SetEnablePullUpEvent(isFil)
-      )..add(
-          GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down')
-      );
+      BlocProvider.of<WalletBloc>(context)
+        ..add(
+            ResetMessageListEvent()
+        )
+        ..add(
+          SetEnablePullUpEvent(false)
+        )
+        ..add(
+          GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down',symbol)
+        );
     }catch(error){
       print('error');
     }
@@ -94,7 +105,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   Future onLoading(BuildContext context) async {
     BlocProvider.of<WalletBloc>(context).add(GetFileCoinMessageListEvent(
-        $store.net.rpc, $store.net.chain, $store.wal.addr,'up',
+        $store.net.rpc, $store.net.chain, $store.wal.addr,'up',symbol
       )
     );
   }
@@ -122,14 +133,19 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
             builder: (context, state) {
               List messageKeys = walletState.formatMessageList.keys.toList();
               int count = messageKeys.length;
-              return CommonScaffold(
-                title: title,
-                backFn:(){
+              return WillPopScope(
+                onWillPop: () async {
                   Get.toNamed(mainPage);
-                  // walletMainPage   Get.toNamed
+                  return false;
                 },
-                hasFooter: false,
-                body: CustomRefreshWidget(
+                child: CommonScaffold(
+                  title: title,
+                  backFn:(){
+                    Get.toNamed(mainPage);
+                    // walletMainPage   Get.toNamed
+                  },
+                  hasFooter: false,
+                  body: CustomRefreshWidget(
                     enablePullUp: isFil && walletState.enablePullUp,
                     onLoading: ()=> onLoading(context),
                     onRefresh: ()=> onRefresh(context),
@@ -142,47 +158,47 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                                   color: Colors.white,
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    CrossAxisAlignment.center,
                                     children: [
                                       Container(
                                         padding:
-                                            EdgeInsets.fromLTRB(0, 25, 0, 17),
+                                        EdgeInsets.fromLTRB(0, 25, 0, 17),
                                         child: showToken
                                             ? RandomIcon(
-                                                token.address,
-                                                size: 70,
-                                              )
+                                          token.address,
+                                          size: 70,
+                                        )
                                             : Container(
-                                                width: 70,
-                                                height: 70,
-                                                padding: EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        width: coinIcon.border
-                                                            ? .5
-                                                            : 0,
-                                                        color:
-                                                            Colors.grey[400]),
-                                                    color: coinIcon.bg,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            35)),
-                                                child: coinIcon.icon,
-                                              ),
+                                          width: 70,
+                                          height: 70,
+                                          padding: EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  width: coinIcon.border
+                                                      ? .5
+                                                      : 0,
+                                                  color:
+                                                  Colors.grey[400]),
+                                              color: coinIcon.bg,
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  35)),
+                                          child: coinIcon.icon,
+                                        ),
                                         alignment: Alignment.center,
                                         width: double.infinity,
                                       ),
                                       !showToken
                                           ? CommonText(
-                                              formatCoin(state.balance) + $store.net.coin,
-                                              size: 30,
-                                              weight: FontWeight.w800,
-                                            )
+                                        formatCoin(state.balance) + $store.net.coin,
+                                        size: 30,
+                                        weight: FontWeight.w800,
+                                      )
                                           : CommonText(
-                                              token.formatBalance,
-                                              size: 30,
-                                              weight: FontWeight.w800,
-                                            ),
+                                        token.formatBalance,
+                                        size: 30,
+                                        weight: FontWeight.w800,
+                                      ),
                                       SizedBox(
                                         height: 17,
                                       ),
@@ -197,74 +213,75 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                                 minHeight: 250)),
                         walletState.formatMessageList.isEmpty
                             ? SliverToBoxAdapter(
-                                child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: (Get.height - 500) / 2,
-                                  ),
-                                  Image(
-                                      width: 65,
-                                      image: AssetImage('icons/record.png')),
-                                  SizedBox(
-                                    height: 25,
-                                  ),
-                                  CommonText(
-                                    isFil ? 'noData'.tr : 'noActivity'.tr,
-                                    color: CustomColor.grey,
-                                  ),
-                                  SizedBox(
-                                    height: 170,
-                                  ),
-                                ],
-                              ))
-                            : SliverList(
-                                delegate: SliverChildListDelegate(
-                                      // [
-                                      //   Container(
-                                      //     child: Text(walletState.interfaceMessageList.length.toString()),
-                                      //   )
-                                      // ]
-                                  messageKeys.map((item) {
-                                    String date = '';
-                                    if (item == yesterdayStr) {
-                                      date = 'yesterday'.tr;
-                                    } else if (item == todayStr) {
-                                      date = 'today'.tr;
-                                    }else{
-                                      date = item;
-                                    }
-                                    var massageList =
-                                        walletState.formatMessageList[item];
-                                    return Container(
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 20,
-                                              padding: EdgeInsets.only(left: 12),
-                                              width: double.infinity,
-                                              alignment: Alignment.centerLeft,
-                                              child: CommonText(
-                                                date,
-                                                size: 10,
-                                                color: CustomColor.grey,
-                                              ),
-                                              color: CustomColor.bgGrey,
-                                            ),
-                                            Column(
-                                              children: List.generate(massageList.length, (i) {
-                                                var message = massageList[i];
-                                                return MessageItem(message);
-                                              }),
-                                            )
-                                          ],
-                                        )
-                                    );
-                                  }).toList(),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: (Get.height - 500) / 2,
                                 ),
-                              ),
+                                Image(
+                                    width: 65,
+                                    image: AssetImage('icons/record.png')),
+                                SizedBox(
+                                  height: 25,
+                                ),
+                                CommonText(
+                                  isFil ? 'noData'.tr : 'noActivity'.tr,
+                                  color: CustomColor.grey,
+                                ),
+                                SizedBox(
+                                  height: 170,
+                                ),
+                              ],
+                            ))
+                            : SliverList(
+                          delegate: SliverChildListDelegate(
+                            // [
+                            //   Container(
+                            //     child: Text(walletState.interfaceMessageList.length.toString()),
+                            //   )
+                            // ]
+                            messageKeys.map((item) {
+                              String date = '';
+                              if (item == yesterdayStr) {
+                                date = 'yesterday'.tr;
+                              } else if (item == todayStr) {
+                                date = 'today'.tr;
+                              }else{
+                                date = item;
+                              }
+                              var massageList =
+                              walletState.formatMessageList[item];
+                              return Container(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        padding: EdgeInsets.only(left: 12),
+                                        width: double.infinity,
+                                        alignment: Alignment.centerLeft,
+                                        child: CommonText(
+                                          date,
+                                          size: 10,
+                                          color: CustomColor.grey,
+                                        ),
+                                        color: CustomColor.bgGrey,
+                                      ),
+                                      Column(
+                                        children: List.generate(massageList.length, (i) {
+                                          var message = massageList[i];
+                                          return MessageItem(message);
+                                        }),
+                                      )
+                                    ],
+                                  )
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ],
                     ),
-                    ),
+                  ),
+                ),
               );
             },
           );

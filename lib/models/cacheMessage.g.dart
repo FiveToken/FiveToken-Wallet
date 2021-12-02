@@ -32,13 +32,14 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       height: fields[13] as int,
       mid: fields[14] as String,
       exitCode: fields[6] as num,
+        symbol: fields[15] as String
     );
   }
 
   @override
   void write(BinaryWriter writer, CacheMessage obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.from)
       ..writeByte(1)
@@ -68,7 +69,9 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       ..writeByte(13)
       ..write(obj.height)
       ..writeByte(14)
-      ..write(obj.mid);
+      ..write(obj.mid)
+      ..writeByte(15)
+      ..write(obj.symbol);
   }
 
   @override

@@ -35,6 +35,8 @@ class CacheMessage {
   int height;
   @HiveField(14)
   String mid; //only for filecoin
+  @HiveField(15)
+  String symbol;
   CacheMessage(
       {this.from = '',
       this.to = '',
@@ -50,6 +52,7 @@ class CacheMessage {
       this.fee = '',
       this.height = 0,
       this.mid = '',
+        this.symbol='',
       this.exitCode});
   String get formatValue {
     if (token != null) {
