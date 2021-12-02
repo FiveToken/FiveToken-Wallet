@@ -9,7 +9,12 @@ class GetMessageListEvent extends WalletEvent {
   String chainType;
   String actor;
   String direction;
-  GetMessageListEvent(this.rpc,this.chainType,this.actor,this.direction);
+  String symbol;
+  GetMessageListEvent(this.rpc,this.chainType,this.actor,this.direction,this.symbol);
+}
+
+class ResetMessageListEvent extends WalletEvent {
+  ResetMessageListEvent();
 }
 
 class GetFileCoinMessageListEvent extends WalletEvent {
@@ -17,7 +22,8 @@ class GetFileCoinMessageListEvent extends WalletEvent {
   String chainType;
   String actor;
   String direction;
-  GetFileCoinMessageListEvent(this.rpc,this.chainType,this.actor,this.direction);
+  String symbol;
+  GetFileCoinMessageListEvent(this.rpc,this.chainType,this.actor,this.direction,this.symbol);
 }
 
 class SetEnablePullUpEvent extends WalletEvent{

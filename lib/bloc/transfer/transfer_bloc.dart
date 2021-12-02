@@ -12,7 +12,6 @@ import 'package:fil/widgets/toast.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:meta/meta.dart';
 import 'package:oktoast/oktoast.dart';
-
 part 'transfer_event.dart';
 part 'transfer_state.dart';
 
@@ -39,17 +38,21 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
             nonceBoxInstance.put(key, Nonce(time: now, value: result));
           }
         }
-        var kkk = nonceBoxInstance.get(key);
       }
       emit(state.copyWithTransferState(nonce: result));
     });
 
     on<SendTransactionEvent>((event,emit) async{
+      bool isFetch = false;
       try{
+        if(isFetch){
+          return;
+        }
         showCustomLoading('Loading');
         Chain.setRpcNetwork(event.rpc, event.chainType);
         var result = '';
         if(event.isToken){
+          isFetch = true;
           String tokenAddress = event.token.address;
           result = await Chain.chainProvider.sendToken(
               to:event.to,
@@ -60,6 +63,7 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
               nonce:event.nonce
           );
         }else{
+          isFetch = true;
           result = await Chain.chainProvider.sendTransaction(
             event.from,
             event.to,
@@ -69,36 +73,25 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
             event.nonce,
           );
         }
+        isFetch = false;
         if(result != ''){
-          showCustomToast('sended'.tr);
-          emit(state.copyWithTransferState(transactionHash:result));
+          emit(state.copyWithTransferState(transactionHash:result,messageState:'success'));
         }else{
-          showCustomError('sendFail'.tr);
-          emit(state.copyWithTransferState(transactionHash:''));
+          emit(state.copyWithTransferState(transactionHash:'',messageState:'error'));
         }
         dismissAllToast();
       }catch(error){
-        emit(state.copyWithTransferState(transactionHash:''));
+        isFetch = false;
+        emit(state.copyWithTransferState(transactionHash:'',messageState:''));
         showCustomError('sendFail'.tr);
         dismissAllToast();
         print("================AppOpenEvent=========");
       }
     });
 
-    on<GetOldMessageState>((event,emit) async{
-      Chain.setRpcNetwork(event.rpc, event.chainType);
-      List param = [];
-      param.add({"from":event.from,"nonce":event.nonce});
-      var result = await Chain.chainProvider.getMessagePendingState(param);
-      String lastMegState = '';
-      if(result != null){
-
-      }else{
-
-      }
-      emit(state.copyWithTransferState(lastMessageState: lastMegState));
+    on<ResetSendMessageEvent>((event,emit){
+      emit(state.copyWithTransferState(transactionHash:'',messageState:''));
     });
-
 
 
 

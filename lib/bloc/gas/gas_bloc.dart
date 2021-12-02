@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/request/global.dart';
@@ -44,14 +45,39 @@ class GasBloc extends Bloc<GasEvent, GasState> {
           $store.setGas(gas);
           emit(state.copyWithGasState(getGasState:'success'));
         }else{
-          emit(state.copyWithGasState(getGasState:''));
-          showCustomError('gasFail'.tr);
+          emit(state.copyWithGasState(getGasState:'error'));
         }
       }catch(error){
-        add(ResetGetGasStateEvent());
         showCustomError('gasFail'.tr);
+        add(ResetGetGasStateEvent());
         dismissAllToast();
         print(error);
+      }
+    });
+
+
+    on<UpdateMessListStateEvent>((event,emit) async {
+      try{
+        List storeMessageList = getStoreMsgList(event.symbol).map((e) => e).toList();
+        final pendingList = storeMessageList.where((mes) => mes.pending == 1).toList();
+        if(pendingList.length > 0){
+          if(event.chainType == 'filecoin'){
+            Chain.setRpcNetwork(event.rpc, event.chainType);
+            List param = [];
+            pendingList.forEach((n) async {
+              param.add({"from":n.from,"nonce":n.nonce});
+            });
+            await upDateFileCoinMessageState(event.rpc,event.chainType,pendingList,param);
+          }else{
+            await updateEthMessageListState(event.rpc,event.chainType,pendingList);
+          }
+          List _list = getStoreMsgList(event.symbol).map((e) => e).toList();
+          emit(state.copyWithGasState(
+              timestamp:DateTime.now().microsecondsSinceEpoch
+          ));
+        }
+      }catch(error){
+        print('error');
       }
     });
 

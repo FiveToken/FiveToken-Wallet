@@ -6,7 +6,6 @@ import 'package:fil/chain/token.dart';
 import 'package:fil/common/walletConnect.dart';
 import 'package:fil/init/hive.dart'; // OpenedBox
 import 'package:fil/request/global.dart';
-import 'package:fil/store/store.dart'; // $store
 
 part 'home_event.dart';
 

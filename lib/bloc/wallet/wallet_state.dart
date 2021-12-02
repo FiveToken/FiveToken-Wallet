@@ -4,28 +4,32 @@ class WalletState extends Equatable {
   final String accountName;
   final String mid;
   final List storeMessageList;
-  final List interfaceMessageList;
   final bool enablePullUp;
+
+  final int timestamp;
 
   @override
   // TODO: implement props
-  List<Object> get props =>
-      [this.accountName, this.storeMessageList, this.interfaceMessageList];
+  List<Object> get props => [
+    this.accountName,
+    this.storeMessageList,
+    this.timestamp
+  ];
 
   WalletState(
       {this.accountName,
-      this.mid,
-      this.storeMessageList,
-      this.interfaceMessageList,
-      this.enablePullUp});
+        this.mid,
+        this.storeMessageList,
+        this.enablePullUp,
+        this.timestamp});
 
   factory WalletState.idle() {
     return WalletState(
-      accountName: '',
-      mid: '',
-      storeMessageList: [],
-      interfaceMessageList: [],
-      enablePullUp: true,
+        accountName: '',
+        mid: '',
+        storeMessageList: [],
+        enablePullUp: true,
+        timestamp:0
     );
   }
 
@@ -33,19 +37,16 @@ class WalletState extends Equatable {
     String accountName,
     String mid,
     List storeMessageList,
-    List interfaceMessageList,
     bool enablePullUp,
+    int timestamp
   }) {
-    final one = [];
-    one.addAll(this.interfaceMessageList);
-    one.addAll(interfaceMessageList ?? []);
-
     return WalletState(
         accountName: accountName ?? this.accountName,
         mid: mid ?? this.mid,
         storeMessageList: storeMessageList ?? this.storeMessageList,
-        interfaceMessageList: one,
-        enablePullUp: enablePullUp ?? this.enablePullUp);
+        enablePullUp: enablePullUp ?? this.enablePullUp,
+        timestamp:timestamp
+    );
   }
 
   Map<String, List<CacheMessage>> get formatMessageList {
@@ -53,7 +54,6 @@ class WalletState extends Equatable {
     final list = [];
     String formatStr = 'YYYY-MM-DD';
     list.addAll(storeMessageList);
-    list.addAll(interfaceMessageList);
     print('list');
     list.sort((a, b) {
       if (a.blockTime != null && b.blockTime != null) {
@@ -81,3 +81,4 @@ class WalletState extends Equatable {
 //   @override
 //   List<Object> get props => [];
 // }
+

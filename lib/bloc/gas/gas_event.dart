@@ -16,3 +16,10 @@ class GetGasEvent extends GasEvent {
 class ResetGetGasStateEvent extends GasEvent{
   ResetGetGasStateEvent();
 }
+
+class UpdateMessListStateEvent extends GasEvent{
+  final String rpc;
+  final String chainType;
+  final String symbol;
+  UpdateMessListStateEvent(this.rpc,this.chainType,this.symbol);
+}

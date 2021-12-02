@@ -18,37 +18,58 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         When the current network is eth, the list data is local data
     */
     on<GetMessageListEvent>((event, emit) async {
-      List storeMessageList = getStoreMsgList();
-      List pendingList = storeMessageList.where((mes) => mes.pending == 1).toList();
-      if(event.chainType == 'filecoin'){
-        if(pendingList.length > 0){
-          Chain.setRpcNetwork(event.rpc, event.chainType);
-          List param = [];
-          pendingList.forEach((n) async {
-            param.add({"from":n.from,"nonce":n.nonce});
-          });
-          await upDateFileCoinMessageState(event.rpc,event.chainType,pendingList,param);
-        }
+      try{
+        List storeMessageList = getStoreMsgList(event.symbol).map((e) => e).toList();
+        final pendingList = storeMessageList.where((mes) => mes.pending == 1).toList();
+        if(event.chainType == 'filecoin'){
+          if(pendingList.length > 0){
+            Chain.setRpcNetwork(event.rpc, event.chainType);
+            List param = [];
+            pendingList.forEach((n) async {
+              param.add({"from":n.from,"nonce":n.nonce});
+            });
+            await upDateFileCoinMessageState(event.rpc,event.chainType,pendingList,param);
+          }
 
-        var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
-        var interfaceMessageList = result.list;
-        var _mid = result.mid;
-        var _enablePullUp = result.enablePullUp;
-        List _storeList = getStoreMsgList();
-        emit(state.copyWithWalletState(
-          storeMessageList: _storeList,
-          interfaceMessageList:interfaceMessageList,
-          mid:_mid,
-          enablePullUp:_enablePullUp,
-        ));
-      }else{
-        if(pendingList.length > 0){
-          await updateEthMessageListState(event.rpc,event.chainType,pendingList);
+          var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
+          var _mid = result["mid"];
+          var _enablePullUp = result["enablePullUp"];
+          List _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
+          emit(state.copyWithWalletState(
+              storeMessageList: _storeList,
+              mid:_mid,
+              enablePullUp:_enablePullUp,
+              timestamp:DateTime.now().microsecondsSinceEpoch
+          ));
+        }else{
+          if(pendingList.length > 0){
+            await updateEthMessageListState(event.rpc,event.chainType,pendingList);
+          }
+          final _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
+          emit(state.copyWithWalletState(
+            storeMessageList: _storeList,
+            timestamp:DateTime.now().microsecondsSinceEpoch
+          ));
         }
-        final _storeList = getStoreMsgList().map((e) => e).toList();
+      }catch(error){
+        print('error');
+      }
+    });
+
+    on<GetFileCoinMessageListEvent>((event,emit) async {
+      try{
+        var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
+        var _mid = result['mid'];
+        var _enablePullUp = result["enablePullUp"];
+        final _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
         emit(state.copyWithWalletState(
-          storeMessageList: _storeList,
+            storeMessageList:_storeList,
+            mid:_mid,
+            enablePullUp:_enablePullUp,
+            timestamp:DateTime.now().microsecondsSinceEpoch
         ));
+      }catch(error){
+        print('error');
       }
     });
 
@@ -56,47 +77,74 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       emit(state.copyWithWalletState(enablePullUp:event.enablePullUp));
     });
 
+    on<ResetMessageListEvent>((event,emit){
+      emit(state.copyWithWalletState(
+          storeMessageList: [],
+          mid:'',
+          enablePullUp:true,
+          timestamp:DateTime.now().microsecondsSinceEpoch
+      ));
+    });
+
   }
 }
 
-Future getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
-  String _mid = mid ?? '';
-  Chain.setRpcNetwork(rpc, chainType);
-  var result = await Chain.chainProvider.getFileCoinMessageList(
-      actor: actor,
-      direction: direction,
-      mid: _mid
-  );
-  var box = OpenedBox.mesInstance;
-  List<CacheMessage> messages = [];
-  result.forEach((map) {
-    var mes = CacheMessage(
-        hash: map['cid'],
-        to: map['to'],
-        from: map['from'],
-        value: map['value'],
-        blockTime: map['block_time'],
-        exitCode: map['exit_code'],
-        owner: $store.wal.addr,
-        pending: 0,
-        rpc: $store.net.rpc,
-        height: map['block_epoch'],
-        fee: map['gas_fee'],
-        mid: map['mid'],
-        nonce: map['nonce']);
-    messages.add(mes);
-  });
-  messages.toList();
-  List midList = messages.where((mes) => mes.mid != '').toList();
-  String lastMid = midList.last.mid;
-  return {
-    "list":messages,
-    "mid":lastMid,
-    "enablePullUp":result.length >= 10
-  };
+getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
+  try{
+    String _mid = mid ?? '';
+    Chain.setRpcNetwork(rpc, chainType);
+    var result = await Chain.chainProvider.getFileCoinMessageList(
+        actor: actor,
+        direction: direction,
+        mid: _mid
+    );
+    if(result.length > 0){
+      var box = OpenedBox.mesInstance;
+      List<CacheMessage> messages = [];
+      result.forEach((map) {
+        var mes = CacheMessage(
+          hash: map['cid'],
+          to: map['to'],
+          from: map['from'],
+          value: map['value'],
+          blockTime: map['block_time'],
+          exitCode: map['exit_code'],
+          owner: $store.wal.addr,
+          pending: 0,
+          rpc: $store.net.rpc,
+          height: map['block_epoch'],
+          fee: map['gas_fee'],
+          mid: map['mid'],
+          symbol: "FIL",
+          nonce: map['nonce'],
+        );
+        messages.add(mes);
+        box.put(map["cid"],mes);
+      });
+      messages = messages.toList();
+      List midList = messages.where((mes) => mes.mid != '').toList();
+      String lastMid = midList.last.mid;
+      return {
+        "mid":lastMid,
+        "enablePullUp":result.length >= 10
+      };
+    }else{
+      return {
+        "mid":'',
+        "enablePullUp":false
+      };
+    }
+  }catch(error){
+    print('error');
+    return {
+      "mid":'',
+      "enablePullUp":false
+    };
+  }
+
 }
 
-Future<void> upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
+upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
   var box = OpenedBox.mesInstance;
   Chain.setRpcNetwork(rpc, chainType);
   var result = await Chain.chainProvider.getMessagePendingState(param);
@@ -135,13 +183,13 @@ Future<void> upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
   });
 }
 
-Future<void> updateEthMessageListState(rpc,chainType,pendingList) async {
+updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
   try{
     Chain.setRpcNetwork(rpc, chainType);
     var box = OpenedBox.mesInstance;
 
     var list = await Future.wait(
-        pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)));
+        pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)).toList());
     list = list.where((r) => r != null).toList();
     Map<String, TransactionReceipt> map = {};
     for (var i = 0; i < list.length; i++) {
@@ -180,18 +228,24 @@ Future<void> updateEthMessageListState(rpc,chainType,pendingList) async {
   }
 }
 
-List<CacheMessage> getStoreMsgList(){
-  var list = <CacheMessage>[];
-  var address = $store.wal.addr;
-  var box = OpenedBox.mesInstance;
-  box.values.forEach((message) {
-    if (
+List getStoreMsgList(symbol){
+  try{
+    var list = <CacheMessage>[];
+    var address = $store.wal.addr;
+    var box = OpenedBox.mesInstance;
+    box.values.forEach((message) {
+      if (
       (message.from == address || message.to == address)
-      &&  message.rpc == $store.net.rpc
-    ) {
-      list.add(message);
-    }
-  });
+          &&  message.rpc == $store.net.rpc && message.symbol == symbol
 
-  return list ?? [];
+      ) {
+        list.add(message);
+      }
+    });
+    print('list');
+    return list ?? [];
+  }catch(error){
+    print('error');
+    return [];
+  }
 }

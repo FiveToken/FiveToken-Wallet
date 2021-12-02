@@ -37,11 +37,7 @@ class SendTransactionEvent extends TransferEvent{
   );
 }
 
-class GetOldMessageState extends TransferEvent{
-  final String rpc;
-  final String chainType;
-  final String from;
-  final int nonce;
-  GetOldMessageState(this.rpc,this.chainType,this.from,this.nonce);
+class ResetSendMessageEvent extends TransferEvent{
+  ResetSendMessageEvent();
 }
 
