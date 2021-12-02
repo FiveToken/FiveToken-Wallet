@@ -48,22 +48,22 @@ class NetAddPageState extends State<NetAddPage> {
     },
     {
       "label": 'RPC URL',
-      " placeholder ": 'newRpc'.tr,
+      "placeholder": 'newRpc'.tr,
       "controller": TextEditingController()
     },
     {
       "label": 'chainId'.tr,
-      " placeholder ": 'chainId'.tr,
+      "placeholder": 'chainId'.tr,
       "controller": TextEditingController()
     },
     {
       "label": 'symbol'.tr,
-      " placeholder ": 'curNetToken'.tr,
+      "placeholder": 'curNetToken'.tr,
       "controller": TextEditingController()
     },
     {
       "label": 'browser'.tr,
-      " placeholder ": 'browserOptional'.tr,
+      "placeholder": 'browserOptional'.tr,
       "controller": TextEditingController()
     },
   ];

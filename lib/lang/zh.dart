@@ -34,7 +34,7 @@ const Map<String, String> ZH_LANG = {
   'checkMne': '验证助记词',
   'clickMne': '请按顺序点击助记词',
   'cut': '请勿截图',
-  'shareCut': '请勿截屏分享和存储，着将可能被第三方恶意软件收集，造成资产损失',
+  'shareCut': '请勿截屏分享和存储，这将可能被第三方恶意软件收集，造成资产损失',
   'know': '已知晓',
   'writeMne': '请按顺序抄写助记词',
   'backupMne': '备份助记词',
