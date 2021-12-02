@@ -1,14 +1,14 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/config/config.dart';
 import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
-import 'package:fil/repository/http/http.dart';
 import 'package:fil/request/global.dart';
+import 'package:fil/utils/decimal_extension.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fil/utils/num_extension.dart';
 
 const psalt = "vFIzIawYOU";
 
@@ -126,51 +126,36 @@ String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
 
-String stringCutOut(String amount,int ){
-  var amountArr = amount.split(".");
-  if(amountArr.length > 1){
-    var integer = amountArr[0];
-    var decimal = amountArr[1];
-    if(decimal.length>8){
-      decimal = decimal.substring(0,int);
-    }
-    return integer + "." + decimal;
-  }else{
-    return amount;
-  }
-}
-
-String formatCoin(String amount,
-    {num size = 4, bool fixed = false,double min, Network net}) {
+String formatCoin(String amount, {num size = 4, double min, Network net}) {
   net = net ?? $store.net;
   if (amount == '0') {
     return '0';
   }
-  var isFil = net.addressType == AddressType.filecoin.type;
   try {
-    var str = amount;
-    var v = BigInt.parse(amount);
-    num length = str.length;
-    var unit = BigInt.from(pow(10, 18));
-    var res = (v / unit);
-    var result = stringCutOut(res.toString(),8);
+    var _amount = double.parse(amount)/pow(10, 18);
+    var _decimal = _amount.toDecimal;
+    var res = _decimal.fmtDown(size);
     String esc = '';
-    if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (res < min)){
-      esc = '...';
+    if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (_amount < min)){
+      return  min.toStringAsFixed(7) + '0...';
+    }else{
+      return  res ;
     }
-    return result + esc;
+
   } catch (e) {
     return amount;
   }
 }
 
 String getChainValue(String fil, {int precision = 18}) {
-  if (precision < 10) {
-    return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
+  try{
+    var _int = double.parse(fil) * pow(10, 18);
+    var amount = BigInt.from(_int) * BigInt.from(pow(10,precision))/BigInt.from(pow(10,18));
+    var res = amount.toInt().toString();
+    return res;
+  }catch(error){
+    print('error');
   }
-  return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, precision - 9)))
-      .toString();
 }
 
 int getSecondSinceEpoch() {

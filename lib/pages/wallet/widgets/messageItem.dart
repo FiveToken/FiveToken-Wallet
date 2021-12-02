@@ -41,11 +41,11 @@ class MessageItem extends StatelessWidget {
       var amount = BigInt.parse(mes.value);
       var res = (amount / unit).toString();
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
-      return _isSend + res + mes.token.symbol;
+      return _isSend + res + ' ' + mes.token.symbol;
     }else{
-      var _value = formatCoin(mes.value,size:8,fixed:true,min:0.00000001) + $store.net.coin;
+      var _value = formatCoin(mes.value,size:8,min:0.00000001) + $store.net.coin;
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
-      return _isSend + _value;
+      return _isSend + ' ' + _value;
     }
   }
 
