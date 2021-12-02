@@ -90,8 +90,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       print('error');
     }
 
-
-
   }
 
   Future onLoading(BuildContext context) async {
@@ -116,7 +114,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     var todayStr = today.format(formatStr);
     var yesterday = today.subtract(1, 'd') as Day;
     var yesterdayStr = yesterday.format(formatStr);
-
     return BlocProvider(
       create: (ctx) => WalletBloc(),
       child: BlocBuilder<WalletBloc, WalletState>(
@@ -239,7 +236,29 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                                     var massageList =
                                         walletState.formatMessageList[item];
                                     return Container(
-                                        child: _item(date, massageList));
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 20,
+                                              padding: EdgeInsets.only(left: 12),
+                                              width: double.infinity,
+                                              alignment: Alignment.centerLeft,
+                                              child: CommonText(
+                                                date,
+                                                size: 10,
+                                                color: CustomColor.grey,
+                                              ),
+                                              color: CustomColor.bgGrey,
+                                            ),
+                                            Column(
+                                              children: List.generate(massageList.length, (i) {
+                                                var message = massageList[i];
+                                                return MessageItem(message);
+                                              }),
+                                            )
+                                          ],
+                                        )
+                                    );
                                   }).toList(),
                                 ),
                               ),
@@ -251,31 +270,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
           );
         },
       ),
-    );
-  }
-
-  Widget _item(date, massageList) {
-    return Column(
-      children: [
-        Container(
-          height: 20,
-          padding: EdgeInsets.only(left: 12),
-          width: double.infinity,
-          alignment: Alignment.centerLeft,
-          child: CommonText(
-            date,
-            size: 10,
-            color: CustomColor.grey,
-          ),
-          color: CustomColor.bgGrey,
-        ),
-        Column(
-          children: List.generate(massageList.length, (i) {
-            var message = massageList[i];
-            return MessageItem(message);
-          }),
-        )
-      ],
     );
   }
 }
