@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
-import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
@@ -36,7 +35,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String chainType = $store.net.chain;
   String to = '';
   String amount = '';
-  bool loading = false;
   String prePage;
   bool isSpeedUp = false;
   List<CacheMessage> get pendingList {
@@ -53,9 +51,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String get handlingFee {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
-    var res = (BigInt.parse(fee)/unit).toStringAsFixed(9);
-    var _handlingFee = stringCutOut(res,8);
-    return _handlingFee;
+    var res = (BigInt.parse(fee)/unit).toStringAsFixed(8);
+    return res;
   }
 
   @override
@@ -91,10 +88,12 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
             builder:(context,data){
               return BlocListener<TransferBloc,TransferState>(
                   listener: (context,state){
-                    if(state.transactionHash!=''){
+                    if(state.messageState == 'success'){
+                      showCustomToast('sended'.tr);
                       pushMsgCallBack(state.nonce,state.transactionHash);
-                    }else{
-                      loading = false;
+                    }
+                    if(state.messageState == 'error'){
+                      showCustomError('sendFail'.tr);
                     }
                   },
                   child: BlocBuilder<PriceBloc,PriceState>(
@@ -181,10 +180,11 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CommonText.main('totalPay'.tr),
-                        CommonText(
-                            getUsdTotalPrice(state.usdPrice),
-                          color: CustomColor.grey,
-                        )
+                        Obx(()=> TotalUsd(
+                            amount:amount,
+                          handlingFee:handlingFee,
+                          usd:state.usdPrice
+                        ))
                       ],
                     ),
                     Container(
@@ -219,28 +219,16 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       return '';
     }else{
       var _amount =  Decimal.parse(amount)*Decimal.parse(usd.toString());
-      var usdPrice = stringCutOut(_amount.toString(),8);
+      var usdPrice = _amount.toStringAsFixed(8);
       String unit = '\$ ';
       return unit + usdPrice;
-    }
-  }
-
-  String getUsdTotalPrice(usd){
-    try{
-      var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
-      var totalUsd = Decimal.parse(total.toString()) * Decimal.parse(usd.toString());
-      String unit = '\$ ';
-      var res = stringCutOut(totalUsd.toString(),8);
-      return unit + res;
-    }catch(error){
-      return '';
     }
   }
 
   String getTotal(){
     try{
       var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
-      return stringCutOut(total.toString(),8) + $store.net.coin;
+      return total.toStringAsFixed(8) + $store.net.coin;
     }catch(error){
       return '';
     }
@@ -267,9 +255,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   }
 
   void pushMsg(int nonce,String ck,context) async {
-    if (loading) {
-      return;
-    }
     if (!Global.online) {
       showCustomError('errorNet'.tr);
       return;
@@ -278,7 +263,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       if(isSpeedUp){
         bool valid = checkGas();
         if(valid){
-          loading = true;
           pendingList.sort((a, b) {
             if (a.nonce != null && b.nonce != null) {
               return b.nonce.compareTo(a.nonce);
@@ -288,6 +272,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
           });
           var lastMessage = pendingList.last;
           bool _isToken = lastMessage.token != null;
+          BlocProvider.of<TransferBloc>(context).add(ResetSendMessageEvent());
           BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
               rpc,
               chainType,
@@ -300,19 +285,17 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               _isToken,
               lastMessage.token
           ));
-        }else{
-          loading = false;
         }
       }else{
         bool valid = checkGas();
         if(valid){
           var value = getChainValue(amount, precision: token?.precision ?? 18);
-          loading = true;
           var realNonce = nonce;
           var nonceKey = '$from\_${$store.net.rpc}';
           if(nonceBoxInstance.get(nonceKey) != null){
             realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
           }
+          BlocProvider.of<TransferBloc>(context).add(ResetSendMessageEvent());
           BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
               rpc,
               chainType,
@@ -325,13 +308,9 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               isToken,
               token
           ));
-        }else{
-          loading = false;
         }
       }
-
     } catch (e) {
-      loading = false;
       dismissAllToast();
       showCustomError('sendFail'.tr);
       print(e);
@@ -340,7 +319,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 
   void pushMsgCallBack(nonce,hash){
     try{
-      this.loading = false;
       var value = getChainValue(amount, precision: token?.precision ?? 18);
       var nonceKey = '$from\_${rpc}';
       var gasKey = '$from\_$nonce\_${rpc}';
@@ -364,6 +342,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
           maxPriorityFee:$store.gas.maxPriorityFee,
           maxFeePerGas:$store.gas.maxFeePerGas
       ));
+      String _symbol = token != null ? token.symbol : $store.net.coin;
       OpenedBox.mesInstance.put(
           hash,
           CacheMessage(
@@ -379,6 +358,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               gas: $store.gas,
               exitCode:-1,
               fee: $store.gas.handlingFee ?? 0,
+              symbol:_symbol,
               blockTime:
               (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
       var realNonce = nonce;
@@ -392,17 +372,37 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       }
 
       if (mounted) {
-        goBack();
+        goBack(_symbol);
       }
     }catch(error){
       print('error');
     }
   }
 
-  void goBack() {
-    Get.offAndToNamed(walletMainPage);
+  void goBack(symbol) {
+    Get.offAndToNamed(walletMainPage,arguments: {"symbol":symbol});
+  }
+}
+class TotalUsd extends StatelessWidget{
+  final String amount;
+  final String handlingFee;
+  final double usd;
+  TotalUsd({this.amount,this.handlingFee,this.usd});
+
+  String get total {
+    var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
+    var totalUsd = Decimal.parse(total.toString()) * Decimal.parse(usd.toString());
+    String unit = '\$ ';
+    var res = totalUsd.toStringAsFixed(8);
+    return unit + res;
   }
 
+  Widget build(BuildContext context){
+    return CommonText(
+      total,
+      color: CustomColor.grey,
+    );
+  }
 }
 
 class SetGas extends StatelessWidget {
@@ -461,7 +461,7 @@ class SetGas extends StatelessWidget {
   String getFeeUsdPrice(){
     try{
       var usdFee = Decimal.parse(maxFee) * Decimal.parse(usdPrice.toString());
-      var res = stringCutOut(usdFee.toString(),8);
+      var res = usdFee.toStringAsFixed(8);
       String unit = '\$ ';
       return unit + res;
     }catch(error){

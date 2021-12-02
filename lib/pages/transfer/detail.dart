@@ -2,6 +2,8 @@
 import 'dart:math';
 
 import 'package:fil/store/store.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/num_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/models/index.dart';
@@ -60,7 +62,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: formatCoin(mes.fee, size: 5),
+                  value: formatCoin(mes.fee, size: 18) + $store.net.coin,
                 ))),
             SizedBox(
               height: 7,
@@ -126,14 +128,13 @@ class FilDetailPageState extends State<FilDetailPage> {
   String formatValue(){
     bool _isToken = mes.token != null;
     if(_isToken){
-      var unit = BigInt.from(pow(10, mes.token.precision));
-      var amount = BigInt.parse(mes.value);
-      var res = (amount / unit).toString();
+      var unit = pow(10, mes.token.precision);
+      var _value = double.parse(mes.value);
+      var _amount = (_value/unit).toDecimal;
+      var res = _amount.fmtDown(18);
       return res + mes.token.symbol;
     }else{
-      var unit = BigInt.from(pow(10, 18));
-      var amount = BigInt.parse(mes.value);
-      var res = (amount / unit).toString();
+      var res = formatCoin(mes.value, size: 18);
       return res + $store.net.coin;
     }
   }

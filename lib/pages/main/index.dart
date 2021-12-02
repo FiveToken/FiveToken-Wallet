@@ -119,11 +119,12 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       $store.wal.addr,
     ));
     try {
-      BlocProvider.of<HomeBloc>(context).add(GetTokenListEvent(
+      BlocProvider.of<HomeBloc>(context)
+        .add(GetTokenListEvent(
           $store.net.rpc,
           $store.net.chain,
           $store.wal.addr
-      ));
+        ));
     }catch (e){
       debugPrint('================');
     }

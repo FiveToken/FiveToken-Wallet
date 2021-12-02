@@ -75,14 +75,16 @@ class MainTokenWidget extends StatelessWidget {
             )),
             Spacer(),
             Obx(() => CommonText(
-              $store.wal.formatBalance + $store.net.coin,
+              $store.wal.formatBalance + ' ' + $store.net.coin,
               color: CustomColor.primary,
             )),
           ],
         ),
       ),
       onTap: () {
-        Get.toNamed(walletMainPage);
+        Get.toNamed(walletMainPage,arguments:{
+          "symbol":$store.net.coin
+        });
       },
     );
   }
@@ -143,6 +145,9 @@ class TokenWidgetState extends State<TokenWidget> {
         Global.cacheToken = token;
         Get.toNamed(
           walletMainPage,
+            arguments:{
+              "symbol":token.symbol
+            }
         );
       },
     );

@@ -86,12 +86,21 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => GasBloc())],
+      providers: [
+        BlocProvider(
+            create: (context) => GasBloc()..add(
+                UpdateMessListStateEvent($store.net.rpc,$store.net.chain,title)
+            )
+        ),
+      ],
       child: BlocBuilder<GasBloc, GasState>(builder: (ctx, data) {
         return BlocListener<GasBloc, GasState>(
             listener: (context, state) {
               if (state.getGasState == 'success') {
                 getGasCallback();
+              }
+              if(state.getGasState == 'error'){
+                showCustomError('gasFail'.tr);
               }
             },
             child: CommonScaffold(
@@ -147,7 +156,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
           Field(
             controller: amountCtrl,
             type: TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [PrecisionLimitFormatter(8)],
+            inputFormatters: [PrecisionLimitFormatter(18)],
             label: 'amount'.tr,
             append: CommonText(
               token == null
@@ -299,8 +308,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  void speedUpMessages(context) {
-    isSpeedUp = true;
+  void skipConfirmMessages(context,bool) {
+    isSpeedUp = bool;
     getGas(context);
   }
 
@@ -368,7 +377,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                   items: [
                     CardItem(
                       label: 'speedup'.tr,
-                      onTap: () => speedUpMessages(context),
+                      onTap: () => skipConfirmMessages(context,true),
                     )
                   ],
                 ),
@@ -379,14 +388,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                   items: [
                     CardItem(
                       label: 'continueNew'.tr,
-                      onTap: () {
-                        Get.toNamed(transferConfrimPage, arguments: {
-                          "to": toAddress,
-                          "amount": amount,
-                          "prePage": prePage,
-                          "isSpeedUp": false
-                        });
-                      },
+                      onTap: () => skipConfirmMessages(context,false),
                     )
                   ],
                 ),

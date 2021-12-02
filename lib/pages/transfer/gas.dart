@@ -34,9 +34,8 @@ class ChainGasPageState extends State<ChainGasPage> {
   String get handlingFee {
     var fee = $store.gas.handlingFee;
     var unit = BigInt.from(pow(10, 18));
-    var res = (BigInt.parse(fee)/unit).toStringAsFixed(9);
-    var _handlingFee = res;//stringCutOut(res,8);
-    return _handlingFee;
+    var res = (BigInt.parse(fee)/unit).toStringAsFixed(8);
+    return res;
   }
 
   @override
@@ -206,6 +205,10 @@ class ChainGasPageState extends State<ChainGasPage> {
             label: '',
             controller: gasPremiumCtrl,
             type: TextInputType.number,
+            extra: Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: CommonText('attoFIL'),
+            ),
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly
             ],

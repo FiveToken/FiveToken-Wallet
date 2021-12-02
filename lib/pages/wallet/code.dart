@@ -41,7 +41,7 @@ class WalletCodePage extends StatelessWidget {
                 children: [
                   Container(
                     child: Text(
-                      'scan'.tr,
+                      'scan'.tr + $store.net.coin,
                       style: TextStyle(color: CustomColor.grey),
                       textAlign: TextAlign.center,
                     ),

@@ -98,11 +98,11 @@ class TokenAddPageState extends State<TokenAddPage> {
       return;
     }
     if (symbol == '') {
-      showCustomError('enterTokenSymbol'.tr);
+      showCustomError('invalidTokenAddr'.tr);
       return;
     }
     if (pre == '') {
-      showCustomError('enterTokenPre'.tr);
+      showCustomError('invalidTokenAddr'.tr);
       return;
     }
     OpenedBox.tokenInstance.put(
