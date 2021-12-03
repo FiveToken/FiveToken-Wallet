@@ -53,7 +53,9 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
                 child: Icon(Icons.add_circle_outline, color: CustomColor.black ),
               ),
               onTap: () {
-                Get.toNamed(addressAddPage);
+                Get.toNamed(addressAddPage).then((value){
+                  BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: $store.net));
+                });
               },
             )
           ],
