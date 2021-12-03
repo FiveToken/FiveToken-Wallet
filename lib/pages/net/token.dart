@@ -1,9 +1,8 @@
+import 'package:fil/request/global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/contract.dart';
-// import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/widgets/toast.dart';
@@ -16,8 +15,7 @@ import 'package:fil/init/hive.dart';
 import 'package:fil/common/formatter.dart';
 
 class TokenAddPage extends StatefulWidget {
-  final Web3Client defaultClient;
-  TokenAddPage({this.defaultClient});
+  TokenAddPage();
   @override
   State<StatefulWidget> createState() {
     return TokenAddPageState();
@@ -28,17 +26,15 @@ class TokenAddPageState extends State<TokenAddPage> {
   TextEditingController addrCtrl = TextEditingController();
   TextEditingController symbolCtrl = TextEditingController();
   TextEditingController preCtrl = TextEditingController();
-  Web3Client client;
   FocusNode node = FocusNode();
   bool loading = false;
   @override
   void initState() {
     super.initState();
-    client = widget.defaultClient ?? Web3Client($store.net.url, http.Client());
     node.addListener(() async {
       if (!node.hasFocus) {
         var addr = addrCtrl.text.trim();
-        bool valid = await isValidChainAddress(addr,$store.net);
+        bool valid = isValidContractAddress(addr);
         if (valid) {
           getMetaInfo(addr);
         } else {
@@ -51,41 +47,29 @@ class TokenAddPageState extends State<TokenAddPage> {
   @override
   void dispose() {
     super.dispose();
-    client.dispose();
   }
 
-  Future getMetaInfo(String addr) async {
+  Future getMetaInfo(String address) async {
     if (this.loading) {
       return;
     }
     this.loading = true;
     showCustomLoading('Loading');
-    var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
-    var con = DeployedContract(abi, EthereumAddress.fromHex(addr));
     try {
-      var lists = await Future.wait([
-        client
-            .call(contract: con, function: con.function('symbol'), params: []),
-        client
-            .call(contract: con, function: con.function('decimals'), params: [])
-      ]);
+      Chain.setRpcNetwork($store.net.rpc, $store.net.chain);
+      var res = await Chain.chainProvider.getTokenInfo(address);
       dismissAllToast();
       this.loading = false;
-      if (lists.isNotEmpty) {
-        var symbol = lists[0];
-        var decimals = lists[1];
-        if (symbol.isNotEmpty && decimals.isNotEmpty) {
-          symbolCtrl.text = symbol[0].toString();
-          preCtrl.text = decimals[0].toString();
-        } else {
-          showCustomError('invalidTokenAddr'.tr);
-        }
+      if(res.symbol.isNotEmpty && res.precision != '0'){
+        symbolCtrl.text = res.symbol;
+        preCtrl.text = res.precision;
+      }else{
+        showCustomError('searchTokenFail'.tr);
       }
     } catch (e) {
-      print(e);
+      showCustomError('searchTokenFail'.tr);
       this.loading = false;
       dismissAllToast();
-      showCustomError('searchTokenFail'.tr);
     }
   }
 

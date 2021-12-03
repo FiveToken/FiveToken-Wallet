@@ -21,9 +21,7 @@ void main() {
         .thenAnswer((realInvocation) async => ['18']);
     await tester.pumpWidget(OKToast(
         child: GetMaterialApp(
-            home: TokenAddPage(
-      defaultClient: client,
-    ))));
+            home: TokenAddPage())));
 
     await tester.enterText(find.byType(TextField).first, EthAddr);
     TokenAddPageState state =

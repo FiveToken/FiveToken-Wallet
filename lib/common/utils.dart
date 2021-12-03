@@ -82,6 +82,13 @@ bool isDecimal(String input) {
   return false;
 }
 
+bool isValidContractAddress(address){
+  var start = address.startsWith('0x');
+  var reg = RegExp(r"([A-Fa-f0-9]$)");
+  var valid = reg.hasMatch(address);
+  return start && valid;
+}
+
 Future<bool> isValidChainAddress(String address, Network network) async {
   bool res = false;
   try{
@@ -91,7 +98,7 @@ Future<bool> isValidChainAddress(String address, Network network) async {
       print('res');
     }else{
       var start = address.startsWith('0x');
-      var reg = RegExp(r"([A-Fa-f0-9]$)");
+      var reg = RegExp(r"([A-Fa-f0-9]{40}$)");
       var valid = reg.hasMatch(address);
       res = start && valid;
     }

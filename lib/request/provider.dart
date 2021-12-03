@@ -1,6 +1,7 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/models/chain_info.dart';
+import 'package:fil/models/token_info.dart';
 
 abstract class ChainProvider {
   String rpc;
@@ -48,6 +49,8 @@ abstract class ChainProvider {
   Future<bool> addressCheck(String address);
 
   Future<String> getNetworkId();
+
+  Future<TokenInfo> getTokenInfo(String address);
 
   void dispose();
 }

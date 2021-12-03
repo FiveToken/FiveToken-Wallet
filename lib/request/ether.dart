@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/models/token_info.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/request/provider.dart';
 import 'package:fil/store/store.dart';
@@ -227,6 +228,38 @@ class Ether extends ChainProvider {
     } catch (e) {
       print(e);
       return '';
+    }
+  }
+
+  @override
+  Future<TokenInfo> getTokenInfo(String address) async{
+    var empty = TokenInfo(
+        symbol: '',
+        precision:"0"
+    );
+    try{
+      var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
+      var con = DeployedContract(abi, EthereumAddress.fromHex(address));
+
+      var lists = await Future.wait([
+        client.call(contract: con, function: con.function('symbol'), params: []),
+        client.call(contract: con, function: con.function('decimals'), params: [])
+      ]);
+      if (lists.isNotEmpty) {
+        var symbol = lists[0];
+        var decimals = lists[1];
+        if (symbol.isNotEmpty && decimals.isNotEmpty) {
+          return TokenInfo(
+              symbol: symbol[0].toString(),
+              precision: decimals[0].toString()
+          );
+        } else {
+          return empty;
+        }
+      }
+    }catch(error){
+      print('error');
+      return empty;
     }
   }
 

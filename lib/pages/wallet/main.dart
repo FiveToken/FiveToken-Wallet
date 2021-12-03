@@ -141,8 +141,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                 child: CommonScaffold(
                   title: title,
                   backFn:(){
-                    Get.toNamed(mainPage);
-                    // walletMainPage   Get.toNamed
+                    Get.offNamedUntil(mainPage, (route) => route.settings.name == mainPage);
                   },
                   hasFooter: false,
                   body: CustomRefreshWidget(

@@ -5,6 +5,7 @@ import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/filMessage.dart';
+import 'package:fil/models/token_info.dart';
 import 'package:fil/request/provider.dart';
 import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
@@ -231,6 +232,14 @@ class Filecoin extends ChainProvider {
   @override
   Future<String> getNetworkId() async{
     return '';
+  }
+
+  @override
+  Future<TokenInfo> getTokenInfo(String address) async{
+    return TokenInfo(
+        symbol: '',
+        precision:"0"
+    );
   }
 
   @override

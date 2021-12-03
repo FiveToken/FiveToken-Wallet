@@ -4,7 +4,6 @@ import 'package:fil/bloc/lock/lock_bloc.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/navigation.dart';
 import 'package:fil/i10n/localization.dart';
-// import 'package:fil/index.dart';
 import 'package:fil/lang/index.dart';
 import 'package:fil/pages/main/index.dart';
 import 'package:fil/store/store.dart';

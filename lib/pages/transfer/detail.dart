@@ -62,7 +62,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: formatCoin(mes.fee, size: 18) + $store.net.coin,
+                  value: formatCoin(mes.fee, size: 18) + " " + $store.net.coin,
                 ))),
             SizedBox(
               height: 7,
@@ -132,10 +132,10 @@ class FilDetailPageState extends State<FilDetailPage> {
       var _value = double.parse(mes.value);
       var _amount = (_value/unit).toDecimal;
       var res = _amount.fmtDown(18);
-      return res + mes.token.symbol;
+      return res + " " + mes.token.symbol;
     }else{
       var res = formatCoin(mes.value, size: 18);
-      return res + $store.net.coin;
+      return res + " " + $store.net.coin;
     }
   }
 }
