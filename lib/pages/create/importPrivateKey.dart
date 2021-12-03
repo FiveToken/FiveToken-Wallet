@@ -51,6 +51,10 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       }
     } else {
       try {
+        if(!ethPrivate(inputStr)){
+          showCustomError('wrongPk'.tr);
+          return;
+        }
         await EthWallet.genAddrByPrivateKey(inputStr);
       } catch (e) {
         showCustomError('wrongPk'.tr);
