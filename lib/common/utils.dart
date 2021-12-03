@@ -166,7 +166,7 @@ String getChainValue(String fil, {int precision = 18}) {
 }
 
 bool ethPrivate(str){
-  RegExp eth = new RegExp(r"Ox[A-Za-z0-9]\d{64}$");
+  RegExp eth = RegExp(r'^(0x)?[0-9A-Za-f]{64}');
   return eth.hasMatch(str);
 }
 
