@@ -35,6 +35,7 @@ dependencies:
   bip39: any
   bip32: ^1.0.5
   decimal: ^1.5.0
+  validators: ^3.0.0
   dio: any
   crypto: any
   encrypt: any

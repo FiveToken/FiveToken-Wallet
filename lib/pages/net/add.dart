@@ -20,6 +20,7 @@ import 'package:fil/init/hive.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/utils/enum.dart';
+import 'package:validators/validators.dart';
 
 class NetAddPage extends StatefulWidget {
   @override
@@ -58,6 +59,10 @@ class NetAddPageState extends State<NetAddPage> {
       showCustomError('enterRpc'.tr);
       return;
     }
+    if(!isValidUrl(rpc)){
+      showCustomError('invalidRpc'.tr);
+      return;
+    }
     if (symbol == '') {
       showCustomError('enterTokenName'.tr);
       return;
@@ -92,7 +97,7 @@ class NetAddPageState extends State<NetAddPage> {
       this.loading = false;
       dismissAllToast();
       // chain
-      if (id != chain) {
+      if (id != chain && chain.trim()!='') {
         showCustomError('errorChainId'.tr);
         return;
       }

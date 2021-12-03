@@ -1097,6 +1097,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.5"
+  validators:
+    dependency: "direct main"
+    description:
+      name: validators
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.0"
   vector_math:
     dependency: transitive
     description:

@@ -165,6 +165,11 @@ String getChainValue(String fil, {int precision = 18}) {
   }
 }
 
+bool ethPrivate(str){
+  RegExp eth = new RegExp(r"Ox[A-Za-z0-9]\d{64}$");
+  return eth.hasMatch(str);
+}
+
 int getSecondSinceEpoch() {
   return (DateTime.now().millisecondsSinceEpoch / 1000).truncate();
 }
