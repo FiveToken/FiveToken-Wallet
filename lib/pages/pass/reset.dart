@@ -30,13 +30,16 @@ class PassResetPageState extends State<PassResetPage> {
 
   Future<EncryptKey> getKey(String addressType, String privateKey,  String pass, String prefix) async{
     EncryptKey key;
-    switch(addressType){
-      case 'eth':
+    if(addressType=='eth') {
+      try {
         key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
-        break;
-      default:
-        key = await FilecoinWallet.genEncryptKeyByPrivateKey(privateKey, pass,  prefix: prefix);
-        break;
+      }
+      catch (e) {
+        print(e);
+      }
+    }else{
+      try{ key = await FilecoinWallet.genEncryptKeyByPrivateKey(privateKey, pass,  prefix: prefix); }
+      catch(e){print(e);}
     }
     return key;
   }
@@ -63,7 +66,7 @@ class PassResetPageState extends State<PassResetPage> {
         return;
       }
       if (!isValidPass(newPass)) {
-        showCustomError('enterValidPass'.tr);
+        showCustomError('placeholderValidPass'.tr);
         return;
       }
       if (newPass != confirmPass) {
@@ -73,18 +76,49 @@ class PassResetPageState extends State<PassResetPage> {
       this.loading = true;
       showCustomLoading('Loading');
       var private = await wallet.getPrivateKey(pass);
+      if(private==null){
+        showCustomError('wrongOldPass'.tr);
+        return;
+      }
       var net = Network.getNetByRpc(wallet.rpc);
       var isId = wallet.type == 0;
       if (isId) {
         var list = OpenedBox.walletInstance.values
             .where((wal) => wal.groupHash == wallet.groupHash)
             .toList();
+        Map<String, EncryptKey> keyMap = {};
         for (var i = 0; i < list.length; i++) {
           var wal = list[i];
           var same = wal.addressType == wallet.addressType;
-          var p = same? private : await wal.getPrivateKey(pass);
+          var p = private;
+          if(!same){
+            try {
+              p = await wal.getPrivateKey(pass);
+            }catch(e){
+              print(e);
+            }
+          }
           var prefix = wal.rpc == Network.filecoinMainNet.rpc? 'f': 't';
-          EncryptKey key = await getKey(wal.addressType, p, newPass, prefix);
+          // var addr = wal.addressType;
+          EncryptKey key;
+          if(wal.addressType == 'eth'){
+            var str = '$p\_$newPass';
+            if(!keyMap.containsKey(str)){
+              key = await EthWallet.genEncryptKeyByPrivateKey(p, newPass);
+              keyMap[str] = key;
+            }else{
+              key = keyMap[str];
+            }
+          }else{
+            var str = '$p\_$newPass\_$prefix';
+            if(!keyMap.containsKey(str)){
+              key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newPass,
+                  prefix: prefix);
+              keyMap[str] = key;
+            }else{
+              key = keyMap[str];
+            }
+          }
           wal.skKek = key.kek;
           box.put(wal.key, wal);
           if (net.rpc == $store.net.rpc) {
@@ -122,9 +156,9 @@ class PassResetPageState extends State<PassResetPage> {
         child: Column(
           children: [
             PassField(
-                label: 'oldPass'.tr,
-                controller: passCtrl,
-                hintText: 'placeholderValidPass'.tr,
+              label: 'oldPass'.tr,
+              controller: passCtrl,
+              hintText: 'placeholderValidPass'.tr,
             ),
             SizedBox(
               height: 15,
