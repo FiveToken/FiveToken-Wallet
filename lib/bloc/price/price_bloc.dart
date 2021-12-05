@@ -6,6 +6,8 @@ import 'package:equatable/equatable.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/wallet.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:oktoast/oktoast.dart';
 
 part 'price_event.dart';
 part 'price_state.dart';
@@ -18,6 +20,7 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
     });
     on<GetPriceEvent>((event, emit) async{
       try{
+        showCustomLoading('Loading');
         var map = {
           'eth': 'ethereum',
           'binance': 'binancecoin',
@@ -35,6 +38,7 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
         ];
         Chain.setRpcNetwork('filecoin', 'https://api.fivetoken.io');
         var res = await Chain.chainProvider.getTokenPrice(param);
+        dismissAllToast();
         if(res.length > 0){
           double usd = 0;
           double cny = 0;
@@ -53,6 +57,7 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
           emit(state.copy(usdPrice: usd));
         }
       }catch(error){
+        dismissAllToast();
         print('error');
       }
     });
