@@ -267,7 +267,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   Future<bool> checkInputValid() async {
     try {
       var amount = amountCtrl.text.trim();
-      var toAddress = addressCtrl.text.trim();
+      var toAddress = addressCtrl.text.trim().toLowerCase();
       if (toAddress == "") {
         showCustomError('enterAddr'.tr);
         return false;

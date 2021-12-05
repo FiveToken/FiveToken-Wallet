@@ -1,4 +1,6 @@
 // import 'package:fil/index.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/common/global.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,8 @@ import 'package:fil/store/store.dart';
 import 'package:fil/common/utils.dart';
 
 class WalletCodePage extends StatelessWidget {
+  Token token = Global.cacheToken;
+  String get _symbol => token != null ? token.symbol : $store.net.coin;
   @override
   Widget build(BuildContext context) {
     var addr = $store.wal.addr;
@@ -41,7 +45,7 @@ class WalletCodePage extends StatelessWidget {
                 children: [
                   Container(
                     child: Text(
-                      'scan'.tr + $store.net.coin,
+                      'scan'.tr + _symbol,
                       style: TextStyle(color: CustomColor.grey),
                       textAlign: TextAlign.center,
                     ),

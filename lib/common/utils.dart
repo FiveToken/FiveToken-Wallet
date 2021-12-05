@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -6,6 +7,7 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
 import 'package:fil/request/global.dart';
 import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fil/utils/num_extension.dart';
@@ -156,9 +158,10 @@ String formatCoin(String amount, {num size = 4, double min, Network net}) {
 
 String getChainValue(String fil, {int precision = 18}) {
   try{
-    var _int = double.parse(fil) * pow(10, 18);
-    var amount = BigInt.from(_int) * BigInt.from(pow(10,precision))/BigInt.from(pow(10,18));
-    var res = amount.toInt().toString();
+    var _value = Decimal.parse(fil) * Decimal.fromInt(pow(10, 18));
+    var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision))/Decimal.fromInt(pow(10,18));
+    var _decimal = _amount.toString().toDecimal;
+    var res = _decimal.fmtDown(0);
     return res;
   }catch(error){
     print('error');

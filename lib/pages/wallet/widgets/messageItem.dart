@@ -1,6 +1,9 @@
 // import 'package:fil/index.dart';
 import 'dart:math';
 
+import 'package:decimal/decimal.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/text.dart';
@@ -37,13 +40,14 @@ class MessageItem extends StatelessWidget {
   bool get isToken => mes.token != null;
   String get value {
     if(isToken){
-      var unit = BigInt.from(pow(10, mes.token.precision));
-      var amount = BigInt.parse(mes.value);
-      var res = (amount / unit).toString();
+      var amount = Decimal.parse(mes.value);
+      var unit = Decimal.fromInt(pow(10, mes.token.precision));
+      var _decimal = (amount / unit).toString().toDecimal;
+      var res = _decimal.fmtDown(8);
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
       return _isSend + res + ' ' + mes.token.symbol;
     }else{
-      var _value = formatCoin(mes.value,size:8,min:0.00000001) + $store.net.coin;
+      var _value = formatCoin(mes.value,size:8,min:0.00000001) + ' ' + $store.net.coin;
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
       return _isSend + ' ' + _value;
     }

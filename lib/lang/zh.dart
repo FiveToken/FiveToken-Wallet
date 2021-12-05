@@ -26,7 +26,7 @@ const Map<String, String> ZH_LANG = {
   'wrongMne': '助记词不存在，请检查助记词是否正确',
   'importPk': '导入私钥',
   'pk': '私钥',
-
+  'existTokenAddr':'代币已存在',
   'copyPk': '复制私钥成功',
   'wrongPk': '当前私钥不存在，请检查私钥是否正确',
   'enterPk': '请输入私钥',

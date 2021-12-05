@@ -18,6 +18,7 @@ const Map<String, String> KR_LANG = {
   "importMne": "도움말 가져오기",
   "import": "가져오기",
   "mne": "도움말",
+  'existTokenAddr':'토큰이 이미 존재합니다.',
   "copyMne": "도움말 복사 성고",
   "enterMne": "보조 기 사 를 입력 하 세 요",
   "placeholderMne": "12비트 도움말을 입력하고 단어마다 빈칸으로 구분하여 주십시요.",
