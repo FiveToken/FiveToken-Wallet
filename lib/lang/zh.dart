@@ -212,6 +212,7 @@ const Map<String, String> ZH_LANG = {
   'netName': '网络名称',
   'byRpc': '通过URL使用支持自定义RPC的网络，而不是所提供的网络之一',
   'chainId': '链ID',
+  'placeholderChainId': '链ID(可选)',
   'symbol': '符号',
   'curNetToken': '当前网络的代币',
   'browser': '区块链浏览器URL',

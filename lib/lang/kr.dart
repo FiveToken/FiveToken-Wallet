@@ -215,6 +215,7 @@ const Map<String, String> KR_LANG = {
   "netName": "네트워크 이름",
   "byRpc": "URL을 통해 제공되는 네트워크가 아닌 사용자 정의 RPC를지원하는 네트워크를 사용합니다.",
   "chainId": "체인 ID",
+  'placeholderChainId': '체인 ID (선택 사항)',
   "symbol": "기호",
   "curNetToken": "현재 네트워크의 토큰",
   "browser": "블록체인 브라우저 URL",

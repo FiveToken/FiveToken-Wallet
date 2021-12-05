@@ -228,6 +228,7 @@ const Map<String, String> EN_LANG = {
   "netName": "Network name",
   "byRpc": "Choose RPC network via URL instead of any other networks",
   "chainId": "Chain ID",
+  'placeholderChainId': 'Chain ID (Optional)',
   "symbol": "Symbol",
   "curNetToken": "Tokens of the current network",
   "browser": "URL of blockchain browser",
