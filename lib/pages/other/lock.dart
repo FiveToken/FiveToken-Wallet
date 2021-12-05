@@ -24,6 +24,7 @@ class LockPageState extends State<LockPage> {
   Widget build(BuildContext context) {
     _context = context;
     return BlocBuilder<LockBloc, LockState>(builder: (context, state){
+
       return CommonScaffold(
             title: 'lockScreenSetting'.tr,
             hasFooter: false,
@@ -113,6 +114,13 @@ class LockPageState extends State<LockPage> {
     return Text(label,style: TextStyle(color: Colors.white));
   }
 
+  Widget cancel(label){
+    return FButton(text: label, onPressed: ()=>{
+     _verificationNotifier.add(true),
+    _verificationNotifier2.add(true)
+    });
+  }
+
   void openLockScreen(ctx, state) {
     Navigator.push(ctx,
         PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
@@ -120,7 +128,7 @@ class LockPageState extends State<LockPage> {
             title: title('setLockPassword'.tr),
             passwordEnteredCallback: (String pass) =>
             {passwordEnteredCallback(ctx, state, pass)},
-            cancelButton: title('cancel'.tr),
+            cancelButton: cancel('cancel'.tr),
             deleteButton: title('delete'.tr),
             shouldTriggerVerification: _verificationNotifier.stream,
             isValidCallback: () {},
@@ -140,9 +148,10 @@ class LockPageState extends State<LockPage> {
   void openLockSencondScreen(context, state, String firstPass){
     Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
       return PasscodeScreen(
+        isValidCallback: () {},
         title: title('confirmLockPassword'.tr),
         passwordEnteredCallback: (value)=>{passwordEnteredCallback2(value, firstPass)},
-        cancelButton: title('cancel'.tr),
+        cancelButton: cancel('cancel'.tr),
         deleteButton: title('delete'.tr),
         shouldTriggerVerification: _verificationNotifier2.stream,
       );

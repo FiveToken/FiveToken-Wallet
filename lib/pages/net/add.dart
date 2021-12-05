@@ -256,7 +256,7 @@ class NetAddPageState extends State<NetAddPage> {
                     ),
                     Field(
                       label: 'chainId'.tr,
-                      placeholder: 'chainId'.tr,
+                      placeholder: 'placeholderChainId'.tr,
                       controller: chainCtrl,
                       enabled: !readonly,
                       selectable: readonly,
@@ -275,6 +275,9 @@ class NetAddPageState extends State<NetAddPage> {
                       enabled: !readonly,
                       selectable: readonly,
                     ),
+                    SizedBox(
+                      height: 70,
+                    )
                   ]
                   )
               )

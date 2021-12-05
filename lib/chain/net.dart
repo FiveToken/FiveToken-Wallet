@@ -220,7 +220,7 @@ class Network {
         Network.binanceMainNet,
       ],
       [
-        // Network.filecoinTestNet,
+        Network.filecoinTestNet,
         Network.ethKovanNet,
         Network.ethRinkebyNet,
         Network.ethRopstenNet,

@@ -19,6 +19,7 @@ class AddressState extends Equatable{
    AddressState setList(List<ContactAddress> list){
       return AddressState(
           list: list ?? this.list,
+          net: net ?? this.net
       );
    }
 

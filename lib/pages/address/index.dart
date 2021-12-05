@@ -1,5 +1,6 @@
 
 import 'package:fil/bloc/address/address_bloc.dart';
+import 'package:fil/widgets/icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -101,8 +102,9 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
                         showCustomToast('copyAddr'.tr);
                       },
                       onSet: () {
-                        Get.toNamed(addressAddPage,
-                            arguments: {'mode': 1, 'addr': addr});
+                        Get.toNamed(addressAddPage, arguments: {'mode': 1, 'addr': addr}).then((value) => {
+                        BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: $store.net))
+                        });
                       },
                     );
                   }),
@@ -122,6 +124,7 @@ class NetEntranceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBloc, AddressState>(builder: (context,state){
+      var coin = state.net!=null?state.net.coin:'FIL';
       return GestureDetector(
         onTap: () {
           Get.toNamed(addressNetPage).then((value) {
@@ -146,21 +149,22 @@ class NetEntranceWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: CustomColor.primary,
                     borderRadius: BorderRadius.circular(15)),
-                child: Image(
-                  image: AssetImage('icons/fil-w.png'),
-                ),
+                child: CoinIcon.icons[coin].icon,
+                // child: Image(
+                //   image: AssetImage('icons/fil-w.png'),
+                // ),
               ),
               SizedBox(
                 width: 15,
               ),
-              Layout.colStart([
+              Expanded(child: Layout.colStart([
                 CommonText(state.net == null ? "" : state.net.label),
                 CommonText.grey(
                   'showCurrentAddr'.tr,
                   size: 12,
                 )
-              ]),
-              Spacer(),
+              ])),
+              // Spacer(),
               Image(
                 width: 20,
                 image: AssetImage('icons/right.png'),

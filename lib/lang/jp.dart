@@ -206,6 +206,7 @@ const Map<String, String> JP_LANG = {
   "netName": "ネットネーム",
   "byRpc": "URL経由で提供されたネットの一つではないが、カスタムRPCを対応するネットを利用する",
   "chainId": "チェーンID",
+  'placeholderChainId': 'チェーンID (オプション)',
   "symbol": "シンボル",
   "curNetToken": "現在ネットのトークン",
   "browser": "ブロックチェーンブラウザURL",

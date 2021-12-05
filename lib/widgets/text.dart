@@ -14,6 +14,7 @@ class CommonText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
+      overflow: TextOverflow.ellipsis,
       textAlign: align ?? TextAlign.start,
       style: TextStyle(fontWeight: weight, color: color, fontSize: size),
     );
@@ -22,6 +23,7 @@ class CommonText extends StatelessWidget {
   static Widget main(String str, {double size = 14}) {
     return Text(
       str,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
           fontWeight: FontWeight.w500, fontSize: size, color: Colors.black),
     );
@@ -30,6 +32,7 @@ class CommonText extends StatelessWidget {
   static Widget grey(String str, {double size = 14}) {
     return Text(
       str,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
           fontWeight: FontWeight.w500, fontSize: size, color: CustomColor.grey),
     );

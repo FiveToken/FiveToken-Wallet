@@ -41,10 +41,10 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
-      if(mounted){
-        // net = Network.getNetByRpc(addr.rpc);
-        BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: Network.getNetByRpc(addr.rpc)));
-      }
+      // if(mounted){
+      //   // net = Network.getNetByRpc(addr.rpc);
+      //   BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: Network.getNetByRpc(addr.rpc)));
+      // }
 
     }
   }

@@ -10,8 +10,14 @@ class LockState extends Equatable {
   List<Object> get props => [this.lock, this.password];
 
   factory LockState.idle() {
+    var box = OpenedBox.lockInstance;
+    var lock = box.get('lock');
+    bool flag = false;
+    if(lock!=null && lock.lockscreen){
+      flag = true;
+    }
     return LockState(
-      lock: false,
+      lock: flag,
       password: ''
     );
   }
