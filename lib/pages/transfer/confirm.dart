@@ -16,6 +16,9 @@ import 'package:fil/widgets/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/routes/path.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:fil/utils/string_extension.dart';
+import 'package:fil/utils/num_extension.dart';
+import 'package:fil/utils/decimal_extension.dart';
 
 class TransferConfirmPage extends StatefulWidget {
   @override
@@ -152,7 +155,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               width: double.infinity,
               padding: padding,
               margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-              child: CommonText.grey(amount + $store.net.coin),
+              child: CommonText.grey(amount + ' ' + (isToken ? token.symbol : $store.net.coin)),
               decoration: BoxDecoration(
                   color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8),
             ),
@@ -192,7 +195,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   }
 
   String getAmountUsdPrice(usd) {
-    bool isToken = token != null;
     if (isToken) {
       return '';
     } else {
@@ -207,14 +209,25 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
     var totalUsd = Decimal.parse(total.toString()) * Decimal.parse(usd.toString());
     String unit = '\$ ';
-    var res = totalUsd.toStringAsFixed(8);
-    return unit + res;
+    var _decimal = totalUsd.toString().toDecimal;
+    var res = _decimal.fmtDown(8);
+    if(isToken){
+      return '';
+    }else{
+      return unit + res;
+    }
+
   }
 
   String getTotal() {
     try {
-      var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
-      return total.toStringAsFixed(8) + $store.net.coin;
+      if(isToken){
+        return amount + ' ' + token.symbol + ' + ' + handlingFee + ' ' + $store.net.coin;
+      }else{
+        var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
+        return total.toStringAsFixed(8) + $store.net.coin;
+      }
+
     } catch (error) {
       return '';
     }
@@ -406,7 +419,7 @@ class SetGas extends StatelessWidget {
             child: Row(
               children: [
                 CommonText(
-                  maxFee + $store.net.coin,
+                  maxFee + ' ' + $store.net.coin,
                   size: 14,
                   color: Colors.white,
                 ),
