@@ -137,6 +137,7 @@ const Map<String, String> EN_LANG = {
   "enterAddr": "Please enter receiving address",
   "scan": "Scan QR code, go to",
   "copy": "Copy",
+  'existTokenAddr':'Token already exists',
   "copySucc": "Copy successfully",
   "share": "Share",
   "fail": "failed",

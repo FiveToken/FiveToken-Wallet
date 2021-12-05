@@ -2,9 +2,7 @@ import 'package:fil/request/global.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/token.dart';
-import 'package:fil/chain/contract.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:web3dart/web3dart.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -89,6 +87,14 @@ class TokenAddPageState extends State<TokenAddPage> {
       showCustomError('invalidTokenAddr'.tr);
       return;
     }
+    var tokenList = OpenedBox.tokenInstance.values
+        .where((token) => token.rpc == $store.net.rpc)
+        .toList();
+    bool exist = tokenList.any((n)=> n.address == addr);
+    if(exist){
+      showCustomError('existTokenAddr'.tr);
+      return;
+    }
     OpenedBox.tokenInstance.put(
         addr + $store.net.rpc,
         Token(
@@ -118,7 +124,7 @@ class TokenAddPageState extends State<TokenAddPage> {
                 child: Image(width: 20, image: AssetImage('icons/cop.png')),
                 onTap: () async {
                   var data = await Clipboard.getData(Clipboard.kTextPlain);
-                  var addr = data.text;
+                  var addr = data.text.trim();
                   bool valid = await isValidChainAddress(addr, $store.net);
                   if (addr != null && valid) {
                     addrCtrl.text = addr;

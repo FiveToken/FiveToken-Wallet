@@ -17,6 +17,7 @@ const Map<String, String> JP_LANG = {
   "mneImport": "ニーモニック語インポート",
   "importMne": "ニーモニック語インポート",
   "import": "インポート",
+  'das':'トークンはすでに存在します',
   "mne": "ニーモニック語",
   "copyMne": "ニーモニック語のコピーに成功しました",
   "enterMne": "助詞が存在しません。助詞が正しいかどうか確認してください",
