@@ -33,20 +33,29 @@ class Ether extends ChainProvider {
       final res = await rpcJson.call(
           'eth_getBlockByNumber', ['0x${number.toRadixString(16)}', false]);
       var result = res.result;
-      return ChainInfo(
-        gasUsed: hexToDartInt(result['gasUsed']),
-        gasLimit:hexToDartInt(result['gasLimit']),
-        number:hexToDartInt(result['number']),
-        timestamp: hexToDartInt(result['timestamp']),
-      );
-      print('res');
-      return result;
+      if(result['baseFeePerGas'] != null){
+        return ChainInfo(
+            gasUsed: hexToDartInt(result['gasUsed']),
+            gasLimit:hexToDartInt(result['gasLimit']),
+            number:hexToDartInt(result['number']),
+            timestamp: hexToDartInt(result['timestamp']),
+            baseFeePerGas:hexToDartInt(result['baseFeePerGas'])
+        );
+      }else{
+        return ChainInfo(
+            gasUsed: hexToDartInt(result['gasUsed']),
+            gasLimit:hexToDartInt(result['gasLimit']),
+            number:hexToDartInt(result['number']),
+            timestamp: hexToDartInt(result['timestamp'])
+        );
+      }
     } catch (error) {
       return ChainInfo(
         gasUsed: 0,
         gasLimit:0,
         number:0,
         timestamp: 0,
+          baseFeePerGas:0
       );
     }
   }
