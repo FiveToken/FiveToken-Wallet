@@ -3,6 +3,7 @@ import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';
 import 'package:get/get.dart';
 import 'package:fil/pages/wallet/mne.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -19,13 +20,31 @@ class WalletPrivatekeyPage extends StatefulWidget {
 class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
   String private = Get.arguments['private'] as String;
   ChainWallet wallet = Get.arguments['wallet'] as ChainWallet;
-
+  String _message = "";
   void onTap(context, int idx){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(index:idx));
   }
 
   void onView(context){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(showCode: true));
+  }
+
+  void dispose() {
+    super.dispose();
+    FlutterScreenshotEvents.disableScreenshots(false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if(mounted){
+      FlutterScreenshotEvents.disableScreenshots(true);
+      FlutterScreenshotEvents.statusStream?.listen((event) {
+        setState(() {
+          _message = event.toString();
+        });
+      });
+    }
   }
 
 

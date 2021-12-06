@@ -43,6 +43,7 @@ dependencies:
   bls: ^2.0.1
   argon2: any
   libsodium: ^0.2.0
+  flutter_screenshot_events:  ^2.0.0
   flutter_sodium: ^0.2.0
   permission_handler: 8.2.5
   passcode_screen: ^1.0.2

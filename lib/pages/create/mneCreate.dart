@@ -13,6 +13,7 @@ import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/models/index.dart';
+import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';
 
 class MneCreatePage extends StatefulWidget {
   @override
@@ -23,6 +24,13 @@ class MneCreatePage extends StatefulWidget {
 
 class MneCreatePageState extends State<MneCreatePage> {
   String mne;
+  String _message = "";
+
+  void dispose() {
+    super.dispose();
+    FlutterScreenshotEvents.disableScreenshots(false);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +73,14 @@ class MneCreatePageState extends State<MneCreatePage> {
             ],
           ));
     });
+    if(mounted){
+      FlutterScreenshotEvents.disableScreenshots(true);
+      FlutterScreenshotEvents.statusStream?.listen((event) {
+        setState(() {
+          _message = event.toString();
+        });
+      });
+    }
   }
 
   @override
