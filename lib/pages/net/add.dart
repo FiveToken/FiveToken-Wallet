@@ -211,6 +211,13 @@ class NetAddPageState extends State<NetAddPage> {
                                 content: 'confimrDeleteNet'.tr, onDelete: () {
                               // OpenedBox.netInstance.delete(net.rpc);
                               BlocProvider.of<AddBloc>(context)..add(DeleteListEvent(rpc: net.rpc));
+                              Network network= Network.filecoinMainNet;
+                              Network currentNet = $store.network.value;
+                              if(currentNet!=null&&net!=null){
+                                if(currentNet.chain == net.chain && currentNet.rpc == net.rpc && currentNet.net==net.net ){
+                                  $store.setNet(network);
+                                }
+                              }
                               Get.back();
                             });
                           },
@@ -238,8 +245,14 @@ class NetAddPageState extends State<NetAddPage> {
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    CommonText('newRpc'.tr),
-                    CommonText('byRpc'.tr),
+                    Visibility(
+                        child: CommonText('newRpc'.tr),
+                        visible: !readonly,
+                    ),
+                    Visibility(
+                        child: CommonText('byRpc'.tr),
+                        visible: !readonly,
+                    ),
                     Field(
                       label: 'netName'.tr,
                       placeholder: 'netName'.tr,
