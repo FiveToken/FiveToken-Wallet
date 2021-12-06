@@ -69,12 +69,12 @@ class NetAddPageState extends State<NetAddPage> {
     }
 
     // rpc in supportNet or in netInstance but not edit
-    // if ((Network.supportNets.map((net) => net.rpc).contains(rpc) ||
-    //     OpenedBox.netInstance.containsKey(rpc)) &&
-    //     !edit) {
-    //   showCustomError('netExist'.tr);
-    //   return;
-    // }
+    if ((Network.supportNets.map((net) => net.rpc).contains(rpc) ||
+        OpenedBox.netInstance.containsKey(rpc)) &&
+        !edit) {
+      showCustomError('netExist'.tr);
+      return;
+    }
 
     client = Web3Client(rpc, http.Client());
     if (this.loading) {
