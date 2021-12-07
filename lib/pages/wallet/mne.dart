@@ -1,6 +1,7 @@
 // import 'package:fil/index.dart';
 import 'package:fil/bloc/mne/mne_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ class WalletMnePage extends StatefulWidget {
 }
 
 class WalletMnePageState extends State<WalletMnePage> {
+  String _message = "";
 
   void onTap(context, int idx){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(index:idx));
@@ -27,6 +29,23 @@ class WalletMnePageState extends State<WalletMnePage> {
 
   void onView(context){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(showCode: true));
+  }
+  void dispose() {
+    super.dispose();
+    FlutterScreenshotEvents.disableScreenshots(false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if(mounted){
+      FlutterScreenshotEvents.disableScreenshots(true);
+      FlutterScreenshotEvents.statusStream?.listen((event) {
+        setState(() {
+          _message = event.toString();
+        });
+      });
+    }
   }
 
   @override

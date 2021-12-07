@@ -18,18 +18,9 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
       emit(state.copy(label:event.label));
     });
     on<IdDeleteEvent>((event, emit){
-      var box = OpenedBox.walletInstance;
-      var keys = box.values
-          .where((wal) => wal.groupHash == event.hash && wal.type == WalletType.id)
-          .map((wal) => wal.key);
-      box.deleteAll(keys);
       emit(SelectState.idle());
     });
     on<ImportDeleteEvent>((event, emit) async {
-        var box = OpenedBox.walletInstance;
-        if(event.wal!=null&&event.wal.key!=null){
-          await  box.delete(event.wal.key);
-        }
         emit(SelectState.idle());
     });
 

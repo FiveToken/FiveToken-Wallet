@@ -124,7 +124,8 @@ class NetEntranceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBloc, AddressState>(builder: (context,state){
-      var coin = state.net!=null?state.net.coin:'FIL';
+      var coinType = state.net!=null&&CoinIcon.icons.containsKey(state.net)?state.net.coin:'FIL';
+      Widget childWidget = CoinIcon.icons[coinType].icon;
       return GestureDetector(
         onTap: () {
           Get.toNamed(addressNetPage).then((value) {
@@ -149,7 +150,7 @@ class NetEntranceWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: CustomColor.primary,
                     borderRadius: BorderRadius.circular(15)),
-                child: CoinIcon.icons[coin].icon,
+                child: childWidget,
                 // child: Image(
                 //   image: AssetImage('icons/fil-w.png'),
                 // ),

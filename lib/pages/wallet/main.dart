@@ -156,7 +156,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                 child: CommonScaffold(
                   title: title,
                   backFn:(){
-                    Get.offNamedUntil(mainPage, (route) => route.settings.name == mainPage);
+                    Navigator.popUntil(context, (route) =>route.settings.name == mainPage);
                   },
                   hasFooter: false,
                   body: CustomRefreshWidget(

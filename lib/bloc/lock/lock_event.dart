@@ -7,5 +7,6 @@ class LockEvent {
 class setLockEvent extends LockEvent{
   final bool lock;
   final String password;
-  setLockEvent({this.lock, this.password});
+  final String status;
+  setLockEvent({this.lock, this.password, this.status});
 }
