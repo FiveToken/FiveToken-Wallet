@@ -1,8 +1,11 @@
 import 'dart:math';
+import 'package:decimal/decimal.dart';
 import 'package:dio_log/dio_log.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/index.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -82,11 +85,23 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   Future onRefresh(BuildContext context) async {
     try{
-      BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
-        $store.net.rpc,
-        $store.net.chain,
-        $store.wal.addr,
-      ));
+      if(showToken){
+        BlocProvider.of<WalletBloc>(context).add(
+            GetTokenBalanceEvent(
+                $store.net.rpc,
+                $store.net.chain,
+                $store.wal.addr,
+                token.address
+            )
+        );
+      }else{
+        BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
+          $store.net.rpc,
+          $store.net.chain,
+          $store.wal.addr,
+        ));
+      }
+
       BlocProvider.of<WalletBloc>(context)
         ..add(
             ResetMessageListEvent()
@@ -189,12 +204,12 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                                       ),
                                       !showToken
                                           ? CommonText(
-                                        formatCoin(state.balance) + $store.net.coin,
+                                        formatCoin(state.balance) + " " + $store.net.coin,
                                         size: 30,
                                         weight: FontWeight.w800,
                                       )
                                           : CommonText(
-                                        token.formatBalance,
+                                        formatTokenBalance(walletState.tokenBalance),
                                         size: 30,
                                         weight: FontWeight.w800,
                                       ),
@@ -288,6 +303,20 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       ),
     );
   }
+
+  String formatTokenBalance(balance){
+    try{
+      var unit = Decimal.fromInt(pow(10, token.precision));
+      var balanceNum = Decimal.parse(balance);
+      var _value = (balanceNum / unit).toString();
+      var _decimal = _value.toDecimal;
+      return  _decimal.fmtDown(4) + " " + token.symbol;
+    }catch(error){
+      print('error');
+      return '0' + " " + token.symbol;
+    }
+  }
+
 }
 
 class WalletService extends StatelessWidget {

@@ -26,6 +26,14 @@ class GetFileCoinMessageListEvent extends WalletEvent {
   GetFileCoinMessageListEvent(this.rpc,this.chainType,this.actor,this.direction,this.symbol);
 }
 
+class GetTokenBalanceEvent extends WalletEvent {
+  final String rpc;
+  final String chainType;
+  final String mainAddress;
+  final String address;
+  GetTokenBalanceEvent(this.rpc,this.chainType,this.mainAddress,this.address);
+}
+
 class SetEnablePullUpEvent extends WalletEvent{
   bool enablePullUp;
   SetEnablePullUpEvent(this.enablePullUp);
