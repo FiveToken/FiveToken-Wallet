@@ -100,7 +100,11 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                 getGasCallback();
               }
               if(state.getGasState == 'error'){
-                showCustomError('gasFail'.tr);
+                if(state.errorMessage.isNotEmpty){
+                  showCustomError(state.errorMessage);
+                }else{
+                  showCustomError('gasFail'.tr);
+                }
               }
             },
             child: CommonScaffold(

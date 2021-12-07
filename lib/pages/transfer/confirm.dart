@@ -81,42 +81,62 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-        providers: [
-          BlocProvider(
-              create: (context) =>
-                  TransferBloc()..add(GetNonceEvent(rpc, chainType, from)))
-        ],
-        child:
-            BlocBuilder<TransferBloc, TransferState>(builder: (context, data) {
+      providers: [
+        BlocProvider(
+            create: (context) => TransferBloc()..add(GetNonceEvent(rpc, chainType, from)),
+        ),
+        BlocProvider(
+          create: (context) => PriceBloc()..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain)),
+        ),
+      ],
+      child:BlocBuilder<TransferBloc, TransferState>(builder: (context, data) {
           return BlocListener<TransferBloc, TransferState>(
-              listener: (context, state) {
-            if (state.messageState == 'success') {
-              showCustomToast('sended'.tr);
-              pushMsgCallBack(state.nonce, state.transactionHash);
-            }
-            if (state.messageState == 'error') {
-              showCustomError('sendFail'.tr);
-            }
-          }, child:
-                  BlocBuilder<PriceBloc, PriceState>(builder: (context, state) {
-            return CommonScaffold(
+            listener: (context, state) {
+              if (state.messageState == 'success') {
+                showCustomToast('sended'.tr);
+                pushMsgCallBack(state.nonce, state.response.cid);
+              }
+              if (state.messageState == 'error') {
+                try{
+                  String message = state.response.message;
+                  showCustomError(message);
+                  if(isSpeedUp){
+                    if(prePage == walletMainPage){
+                      String _symbol = token != null ? token.symbol : $store.net.coin;
+                      Get.offAndToNamed(walletMainPage, arguments: {"symbol": _symbol});
+                    }else{
+                      Get.offAndToNamed(mainPage);
+                    }
+                  }
+                }catch(error){
+                  showCustomError('sendFail'.tr);
+                }
+              }
+            },
+            child: BlocBuilder<PriceBloc, PriceState>(builder: (context, priceState) {
+              return CommonScaffold(
                 grey: true,
                 title: 'send'.tr + title,
                 footerText: 'next'.tr,
                 onPressed: () {
                   showPassDialog(context, (String pass) async {
                     try {
-                      var wal = $store.wal;
-                      var ck = await wal.getPrivateKey(pass);
-                      pushMsg(data.nonce, ck, context);
-                    } catch (error) {
-                      print('error');
+                        var wal = $store.wal;
+                        var ck = await wal.getPrivateKey(pass);
+                        pushMsg(data.nonce, ck, context);
+                      } catch (error) {
+                        print('error');
+                      }
                     }
-                  });
+                  );
                 },
-                body: _body(state));
-          }));
-        }));
+                body: _body(priceState)
+              );
+            })
+          );
+        }
+      )
+    );
   }
 
   Widget _body(state) {
@@ -164,32 +184,40 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
             SizedBox(
               height: 20,
             ),
-            Obx(() =>
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Visibility(
+                child: Column(
                   children: [
-                    CommonText.main('totalPay'.tr),
-                    CommonText(
-                      getTotalUsd(state.usdPrice),
-                      color: CustomColor.grey,
-                    )
+                    Obx(() =>
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CommonText.main('totalPay'.tr),
+                            CommonText(
+                              getTotalUsd(state.usdPrice),
+                              color: CustomColor.grey,
+                            )
+                          ],
+                        )
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: padding,
+                      margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Obx(() => CommonText(getTotal())),
+                          CommonText.grey("Amount + Gas Fee")
+                        ],
+                      ),
+                      decoration: BoxDecoration(
+                          color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8),
+                    ),
                   ],
-                )
+                ),
+                visible: !isToken,
             ),
-            Container(
-              width: double.infinity,
-              padding: padding,
-              margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Obx(() => CommonText(getTotal())),
-                  CommonText.grey("Amount + Gas Fee")
-                ],
-              ),
-              decoration: BoxDecoration(
-                  color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8),
-            ),
+
           ])
         ]));
   }
