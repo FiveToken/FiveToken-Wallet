@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/models/gas_response.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
@@ -23,9 +24,9 @@ class GasBloc extends Bloc<GasEvent, GasState> {
       try{
         showCustomLoading('Loading');
         Chain.setRpcNetwork(event.rpc, event.chainType);
-        ChainGas res = await Chain.chainProvider.getGas(to:event.to,isToken:event.isToken,token:event.token);
+        GasResponse res = await Chain.chainProvider.getGas(to:event.to,isToken:event.isToken,token:event.token);
         dismissAllToast();
-        if(res.gasLimit != 0){
+        if(res.gasState == "success"){
           String maxPriority = '0';
           String maxFeePerGas = '0';
           if(event.rpcType == 'ethMain'){
@@ -45,10 +46,9 @@ class GasBloc extends Bloc<GasEvent, GasState> {
           $store.setGas(gas);
           emit(state.copyWithGasState(getGasState:'success'));
         }else{
-          emit(state.copyWithGasState(getGasState:'error'));
+          emit(state.copyWithGasState(getGasState:'error',errorMessage:res.message));
         }
       }catch(error){
-        showCustomError('gasFail'.tr);
         add(ResetGetGasStateEvent());
         dismissAllToast();
         print(error);
