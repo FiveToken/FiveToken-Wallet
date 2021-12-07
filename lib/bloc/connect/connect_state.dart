@@ -1,8 +1,8 @@
 part of 'connect_bloc.dart';
 
 class ConnectState extends Equatable {
-  final WCSession connectedSession;
-  final WCMeta meta;
+  final WCPeerMeta connectedSession;
+  final WCPeerMeta meta;
 
   @override
   List<Object> get props => [this.connectedSession,this.meta];
@@ -20,8 +20,8 @@ class ConnectState extends Equatable {
   }
 
   ConnectState copyWithConnectState({
-    WCSession connectedSession,
-    WCMeta meta
+    WCPeerMeta connectedSession,
+    WCPeerMeta meta
   }) {
     return ConnectState(
         connectedSession: connectedSession ?? this.connectedSession,
@@ -30,8 +30,8 @@ class ConnectState extends Equatable {
   }
 
   ConnectState resetConnectState({
-    WCSession connectedSession,
-    WCMeta meta
+    WCPeerMeta connectedSession,
+    WCPeerMeta meta
   }){
     return ConnectState(
       connectedSession: connectedSession ,
