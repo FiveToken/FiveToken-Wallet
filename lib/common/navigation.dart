@@ -12,12 +12,14 @@ class PushObserver extends NavigatorObserver {
     if (route != null && route.settings.name == walletMainPage) {
       _clearCashToken();
     }
-    print('back');
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic> previousRoute) {
     super.didPop(route, previousRoute);
+    if (route != null && route.settings.name == walletMainPage) {
+      _clearCashToken();
+    }
   }
 
   void _clearCashToken(){

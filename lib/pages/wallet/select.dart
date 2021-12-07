@@ -1,5 +1,6 @@
 
 import 'package:fil/bloc/select/select_bloc.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -40,6 +41,11 @@ class WalletSelectPageState extends State<WalletSelectPage> {
   void deleteIdWallet(context, state,  String hash) async {
     BlocProvider.of<SelectBloc>(context).add(IdDeleteEvent(hash: hash));
     bool needSwitch = hash == $store.wal.groupHash;
+    var box = OpenedBox.walletInstance;
+    var keys = box.values
+        .where((wal) => wal.groupHash == hash && wal.type == WalletType.id)
+        .map((wal) => wal.key);
+    box.deleteAll(keys);
     if (box.values.isEmpty) {
       goInit();
     } else {
@@ -49,6 +55,10 @@ class WalletSelectPageState extends State<WalletSelectPage> {
 
   void deleteImprotWallet(context, state, ChainWallet wal, Network net) async {
    await BlocProvider.of<SelectBloc>(context).add(ImportDeleteEvent(wal: wal, net: net));
+   var box = OpenedBox.walletInstance;
+   if(wal!=null&&wal.key!=null){
+     await  box.delete(wal.key);
+   }
     if (box.values.isEmpty) {
       goInit();
     } else {
