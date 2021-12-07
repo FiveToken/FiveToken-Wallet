@@ -12,6 +12,12 @@ Future<String> initSharedPreferences() async {
     Global.langCode = 'en';
   }
 
+  var lockBox = OpenedBox.lockInstance;
+  var lock = lockBox.get('lock');
+  if (lock != null && lock.lockscreen == true) {
+    Global.lockscreen = true;
+  }
+
   var box = OpenedBox.walletInstance;
   var activeWalletAddr = instance.getString('currentWalletAddress');
   var activeNetwork = instance.getString('activeNetwork');

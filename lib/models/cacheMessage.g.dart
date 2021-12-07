@@ -31,8 +31,8 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       fee: fields[12] as String,
       height: fields[13] as int,
       mid: fields[14] as String,
+      symbol: fields[15] as String,
       exitCode: fields[6] as num,
-        symbol: fields[15] as String
     );
   }
 

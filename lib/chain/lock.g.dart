@@ -19,17 +19,20 @@ class LockBoxAdapter extends TypeAdapter<LockBox> {
     return LockBox(
       lockscreen: fields[0] as bool,
       password: fields[1] as String,
+      status: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, LockBox obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.lockscreen)
       ..writeByte(1)
-      ..write(obj.password);
+      ..write(obj.password)
+      ..writeByte(2)
+      ..write(obj.status);
   }
 
   @override

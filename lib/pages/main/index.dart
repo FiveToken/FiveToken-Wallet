@@ -116,13 +116,16 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.resumed:
+        print('resumed');
         if (lock != null && lock.lockscreen == true) {
           openLockScreen(lock.password);
         }
         break;
       case AppLifecycleState.paused:
+        print('paused');
         break;
       case AppLifecycleState.detached:
+        print('detached');
         break;
     }
   }
@@ -140,6 +143,13 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       });
     }
     reConnect();
+    if(mounted){
+      if(Global.lockscreen){
+        var lockBox = OpenedBox.lockInstance;
+        var lock = lockBox.get('lock');
+        Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
+      }
+    }
   }
 
   List<JsonRpc Function(WCSession, JsonRpc)> get sessionUpdateCallback {
