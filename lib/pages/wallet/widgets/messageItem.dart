@@ -40,12 +40,9 @@ class MessageItem extends StatelessWidget {
   bool get isToken => mes.token != null;
   String get value {
     if(isToken){
-      var amount = Decimal.parse(mes.value);
-      var unit = Decimal.fromInt(pow(10, mes.token.precision));
-      var _decimal = (amount / unit).toString().toDecimal;
-      var res = _decimal.fmtDown(8);
+      var _value = formatCoin(mes.value,size:8,min:0.00000001,precision:mes.token.precision) + ' ' + mes.token.symbol;
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
-      return _isSend + res + ' ' + mes.token.symbol;
+      return _isSend + ' ' + _value;
     }else{
       var _value = formatCoin(mes.value,size:8,min:0.00000001) + ' ' + $store.net.coin;
       var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
