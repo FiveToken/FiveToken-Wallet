@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fil/chain/token.dart';
-import 'package:fil/common/walletConnect.dart';
 import 'package:fil/init/hive.dart'; // OpenedBox
 import 'package:fil/request/global.dart';
 
