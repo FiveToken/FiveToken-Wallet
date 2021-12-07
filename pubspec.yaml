@@ -80,6 +80,7 @@ dependencies:
   flutter_bloc: any
   equatable: any
   intl: any
+  wallet_connect: ^1.0.2
 
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
