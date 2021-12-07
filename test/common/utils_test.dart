@@ -67,9 +67,9 @@ void main() {
   test('format coin', () {
     var amount = '1236000000000000000';
     var format =
-        formatCoin(amount, size: 2, net: Network.filecoinMainNet);
+        formatCoin(amount, size: 2);
     var formatFixed =
-        formatCoin(amount, size: 2, net: Network.filecoinMainNet);
+        formatCoin(amount, size: 2,);
     expect(format, '1.23 FIL');
     expect(formatFixed, '1.24 FIL');
   });
