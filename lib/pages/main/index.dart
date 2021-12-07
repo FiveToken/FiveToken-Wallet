@@ -61,8 +61,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final StreamController<bool> _verificationNotifier0 =
       StreamController<bool>.broadcast();
 
-
-   bool closeFlag = false;
+  bool closeFlag = false;
 
   @override
   void dispose() {
@@ -79,22 +78,26 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   void passwordEnteredCallback(String pass, String enterPassCode) {
     final bool isValid = enterPassCode == pass;
     _verificationNotifier0.add(isValid);
-    if(isValid){
+    if (isValid) {
       setState(() {
         this.closeFlag = true;
       });
     }
   }
 
-  void openLockScreen(pass) {
-    Navigator.push(context,
+  bool _openState = false;
+
+  void openLockScreen(pass) async {
+    if (_openState == true) return;
+    _openState = true;
+    await Navigator.push(context,
         PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
       return WillPopScope(
         onWillPop: () async {
           return closeFlag;
         },
         child: PasscodeScreen(
-          isValidCallback: (){},
+          isValidCallback: () {},
           title: title('enterPass'.tr),
           passwordEnteredCallback: (value) =>
               {passwordEnteredCallback(pass, value)},
@@ -104,6 +107,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         ),
       );
     }));
+    _openState = false;
   }
 
   @override
@@ -143,11 +147,12 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       });
     }
     reConnect();
-    if(mounted){
-      if(Global.lockscreen){
+    if (mounted) {
+      if (Global.lockscreen) {
         var lockBox = OpenedBox.lockInstance;
         var lock = lockBox.get('lock');
-        Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
+        Future.delayed(Duration.zero)
+            .then((value) => openLockScreen(lock.password));
       }
     }
   }
@@ -166,7 +171,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     ];
   }
 
-  Future onRefresh(context) async {
+  Future onRefresh(BuildContext context) async {
     bool isRoot = await isRooted();
     if (isRoot) {
       rootDialog();
