@@ -7,6 +7,7 @@ import 'package:fil/chain/token.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/models/nonce.dart';
+import 'package:fil/models/transaction_response.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
@@ -50,7 +51,10 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
         }
         showCustomLoading('Loading');
         Chain.setRpcNetwork(event.rpc, event.chainType);
-        var result = '';
+        var result = TransactionResponse(
+          cid: '',
+          message: ''
+        );
         if(event.isToken){
           isFetch = true;
           String tokenAddress = event.token.address;
@@ -74,23 +78,40 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
           );
         }
         isFetch = false;
-        if(result != ''){
-          emit(state.copyWithTransferState(transactionHash:result,messageState:'success'));
+        if(result.cid != ''){
+          emit(state.copyWithTransferState(
+              response:result,
+              messageState:'success'
+          ));
         }else{
-          emit(state.copyWithTransferState(transactionHash:'',messageState:'error'));
+          emit(state.copyWithTransferState(
+              response:TransactionResponse(
+                cid: '',
+                message: result.message
+              ),
+              messageState:'error')
+          );
         }
         dismissAllToast();
       }catch(error){
         isFetch = false;
-        emit(state.copyWithTransferState(transactionHash:'',messageState:''));
-        showCustomError('sendFail'.tr);
+        emit(state.copyWithTransferState(
+            response:TransactionResponse(
+                cid: '',
+                message: ''
+            ),
+            messageState:'error')
+        );
         dismissAllToast();
-        print("================AppOpenEvent=========");
       }
     });
 
     on<ResetSendMessageEvent>((event,emit){
-      emit(state.copyWithTransferState(transactionHash:'',messageState:''));
+      TransactionResponse res = TransactionResponse(
+          cid: '',
+          message: ''
+      );
+      emit(state.copyWithTransferState(response:res,messageState:''));
     });
 
 

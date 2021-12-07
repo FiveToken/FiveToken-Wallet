@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
+import 'package:fil/models/gas_response.dart';
 import 'package:fil/models/token_info.dart';
+import 'package:fil/models/transaction_response.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/request/provider.dart';
 import 'package:fil/store/store.dart';
@@ -123,8 +125,8 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<ChainGas> getGas({ String to, bool isToken = false, Token token }) async {
-    var empty = ChainGas();
+  Future<GasResponse> getGas({ String to, bool isToken = false, Token token }) async {
+    var empty = GasResponse();
     var toAddr = EthereumAddress.fromHex(to);
     try {
       List<dynamic> res = [];
@@ -142,6 +144,7 @@ class Ether extends ChainProvider {
               data: data,
               value: EtherAmount.fromUnitAndValue(EtherUnit.wei, 0))
         ]);
+        print('res');
       } else {
         res = await Future.wait([
           client.getGasPrice(),
@@ -158,16 +161,30 @@ class Ether extends ChainProvider {
         if (isToken) {
           realLimit = (gasLimit.toInt() * 2).truncate();
         }
-        return ChainGas(
-                gasLimit: realLimit,
-                gasPrice: (gasPrice.getInWei).toString()
+        return GasResponse(
+          gasState: "success",
+          gasLimit: realLimit,
+          gasPrice: (gasPrice.getInWei).toString()
         );
       } else {
-        return empty;
+        return GasResponse(
+            gasState: "error",
+            gasLimit: 0,
+            gasPrice: ''
+        );
       }
-    } catch (e) {
-      print(e);
-      return empty;
+    } catch (error) {
+      if(error.message.isNotEmpty){
+        return GasResponse(
+            gasState: "error",
+            message: error.message
+        );
+      }else{
+        return GasResponse(
+            gasState: "error",
+            message: ''
+        );
+      }
     }
   }
 
@@ -182,7 +199,7 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<String> sendTransaction(
+  Future<TransactionResponse> sendTransaction(
       String from,
       String to,
       String amount,
@@ -204,15 +221,20 @@ class Ether extends ChainProvider {
           ),
           chainId: int.tryParse($store.net.chainId) ?? 1);
       print('res');
-      return res;
+      return TransactionResponse(
+        cid: res,
+        message: ''
+      );
     } catch (e) {
       print(e);
-      return '';
+      return TransactionResponse(
+          cid:'', message:e.message
+      );
     }
   }
 
   @override
-  Future<String> sendToken(
+  Future<TransactionResponse> sendToken(
       {String to,
         String amount,
         String private,
@@ -233,10 +255,14 @@ class Ether extends ChainProvider {
           gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)));
       var res = await client.sendTransaction(credentials, transaction,
           chainId: int.tryParse($store.net.chainId) ?? 1);
-      return res;
+      return TransactionResponse(
+        cid: res, message: ''
+      );
     } catch (e) {
       print(e);
-      return '';
+      return TransactionResponse(
+        cid: '', message:e.message
+      );
     }
   }
 

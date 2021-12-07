@@ -1,14 +1,16 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/models/chain_info.dart';
+import 'package:fil/models/gas_response.dart';
 import 'package:fil/models/token_info.dart';
+import 'package:fil/models/transaction_response.dart';
 
 abstract class ChainProvider {
   String rpc;
 
   Future<String> getBalance(String address);
 
-  Future<String> sendTransaction(
+  Future<TransactionResponse> sendTransaction(
       String from,
       String to,
       String amount,
@@ -17,7 +19,7 @@ abstract class ChainProvider {
       int nonce,
   );
 
-  Future<String> sendToken(
+  Future<TransactionResponse> sendToken(
       {String to,
         String amount,
         String private,
@@ -26,7 +28,7 @@ abstract class ChainProvider {
         int nonce}
   );
 
-  Future<ChainGas> getGas({String to, bool isToken = false, Token token});
+  Future<GasResponse> getGas({String to, bool isToken = false, Token token});
 
   Future<int> getNonce(String address);
 
