@@ -85,9 +85,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         BlocProvider(
             create: (context) => TransferBloc()..add(GetNonceEvent(rpc, chainType, from)),
         ),
-        BlocProvider(
-          create: (context) => PriceBloc()..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain)),
-        ),
       ],
       child:BlocBuilder<TransferBloc, TransferState>(builder: (context, data) {
           return BlocListener<TransferBloc, TransferState>(
@@ -99,7 +96,12 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               if (state.messageState == 'error') {
                 try{
                   String message = state.response.message;
-                  showCustomError(message);
+                  if(message.isNotEmpty){
+                    showCustomError(message);
+                  }else{
+                    showCustomError('sendFail'.tr);
+                  }
+
                   if(isSpeedUp){
                     if(prePage == walletMainPage){
                       String _symbol = token != null ? token.symbol : $store.net.coin;
