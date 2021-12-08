@@ -51,7 +51,7 @@ class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
   @override
   Widget build(BuildContext context) {
     var ck = wallet.addressType == 'eth'
-        ? private
+        ?  '0x$private'
         : base64ToHex(private, wallet.address[1]);
     return BlocProvider(
         create: (context) => MneBloc()..add(SetMneEvent()),
