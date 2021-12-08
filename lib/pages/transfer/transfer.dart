@@ -88,7 +88,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) => GasBloc()..add(
+            create: (context) => GasBloc()
+              ..add(
                 UpdateMessListStateEvent($store.net.rpc,$store.net.chain,title)
             )
         ),
