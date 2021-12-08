@@ -14,6 +14,7 @@ Future<String> initSharedPreferences() async {
 
   var lockBox = OpenedBox.lockInstance;
   var lock = lockBox.get('lock');
+  Global.lockFromInit = true;
   if (lock != null && lock.lockscreen == true) {
     Global.lockscreen = true;
   }

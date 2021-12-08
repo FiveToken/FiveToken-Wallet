@@ -33,4 +33,5 @@ class Global {
   static String wcSession;
   static Token cacheToken;
   static bool lockscreen = false;
+  static bool lockFromInit = true;
 }
