@@ -43,7 +43,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           ));
         }else{
           if(pendingList.length > 0){
-            await updateEthMessageListState(event.rpc,event.chainType,pendingList);
+              await updateEthMessageListState(event.rpc,event.chainType,pendingList);
           }
           final _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
           emit(state.copyWithWalletState(
@@ -71,6 +71,35 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       }catch(error){
         print('error');
       }
+    });
+
+    on<GetTokenBalanceEvent>((event,emit) async {
+      try{
+        Chain.setRpcNetwork(event.rpc, event.chainType);
+        final _balance = await Chain.chainProvider.getBalanceOfToken(event.mainAddress, event.address);
+        String _key = event.address + event.rpc;
+        final token = OpenedBox.tokenInstance.get(_key);
+        var item = {
+          "symbol": token.symbol,
+          "precision": token.precision,
+          "address": token.address,
+          "rpc": token.rpc,
+          "chain": token.chain,
+          "balance": _balance
+        };
+        OpenedBox.tokenInstance.put(
+            event.address + event.rpc,
+            Token.fromJson(item)
+        );
+        Global.cacheToken = Token.fromJson(item);
+        emit(state.copyWithWalletState(
+            tokenBalance:_balance,
+            timestamp:DateTime.now().microsecondsSinceEpoch
+        ));
+      }catch(error){
+        print('error');
+      }
+
     });
 
     on<SetEnablePullUpEvent>((event,emit){

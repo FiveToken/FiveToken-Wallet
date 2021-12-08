@@ -62,9 +62,13 @@ class TokenAddPageState extends State<TokenAddPage> {
         symbolCtrl.text = res.symbol;
         preCtrl.text = res.precision;
       }else{
+        symbolCtrl.text = '';
+        preCtrl.text = '';
         showCustomError('searchTokenFail'.tr);
       }
     } catch (e) {
+      symbolCtrl.text = '';
+      preCtrl.text = '';
       showCustomError('searchTokenFail'.tr);
       this.loading = false;
       dismissAllToast();

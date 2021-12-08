@@ -25,7 +25,6 @@ class CoinPriceState extends State<CoinPriceWidget> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
     if(mounted){
       worker = ever($store.wallet, (ChainWallet wal) {
         BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));

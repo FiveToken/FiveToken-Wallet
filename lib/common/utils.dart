@@ -135,13 +135,12 @@ String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
 
-String formatCoin(String amount, {num size = 4, double min, Network net}) {
-  net = net ?? $store.net;
+String formatCoin(String amount, { num size = 4, double min, int precision = 18 }) {
   if (amount == '0') {
     return '0';
   }
   try {
-    var _amount = double.parse(amount)/pow(10, 18);
+    var _amount = double.parse(amount)/pow(10, precision);
     var _decimal = _amount.toDecimal;
     var res = _decimal.fmtDown(size);
     String esc = '';

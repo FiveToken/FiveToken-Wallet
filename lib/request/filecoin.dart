@@ -5,7 +5,9 @@ import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/filMessage.dart';
+import 'package:fil/models/gas_response.dart';
 import 'package:fil/models/token_info.dart';
+import 'package:fil/models/transaction_response.dart';
 import 'package:fil/request/provider.dart';
 import 'package:flotus/flotus.dart';
 import 'package:flutter/cupertino.dart';
@@ -57,7 +59,7 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<String> sendTransaction(
+  Future<TransactionResponse> sendTransaction(
       String from,
       String to,
       String amount,
@@ -94,10 +96,15 @@ class Filecoin extends ChainProvider {
           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}
       );
       print(cid);
-      return result.toString();
+      return TransactionResponse(
+        cid:result.toString(), message:''
+      );
     } catch (e) {
       print('error');
-      return '';
+      return TransactionResponse(
+        cid:'',
+        message: ''
+      );
     }
   }
 
@@ -122,29 +129,43 @@ class Filecoin extends ChainProvider {
 
 
   @override
-  Future<ChainGas> getGas(
-      {String to, bool isToken = false, Token token}) async {
-    var empty = ChainGas();
-    var result = await client
-        .get(feePath, queryParameters: {'method': 'Send', 'actor': to});
-    var res = result.data;
-    if (res != null) {
-      var limit = res['gas_limit'] ?? 0;
-      var premium = res['gas_premium'] ?? '100000';
-      var feeCap = res['gas_cap'] ?? '0';
-      try {
-        var limitNum = limit;
+  Future<GasResponse> getGas({String to, bool isToken = false, Token token}) async {
+    var empty = GasResponse();
+    try{
+      var result = await client
+          .get(feePath, queryParameters: {'method': 'Send', 'actor': to});
+      var res = result.data;
+      if (res != null){
+        var limit = res['gas_limit'] ?? 0;
+        var premium = res['gas_premium'] ?? '100000';
+        var feeCap = res['gas_cap'] ?? '0';
         var premiumNum = int.tryParse(premium) ?? 0;
         var feeCapNum = int.tryParse(feeCap) ?? 0;
-        return ChainGas(
+        return GasResponse(
+            gasState: "success",
+            message: '',
             gasFeeCap: feeCapNum.toString(),
             gasPremium: premiumNum.toString(),
-            gasLimit: limitNum);
-      } catch (e) {
-        return empty;
+            gasLimit: limit
+        );
+      }else{
+        return GasResponse(
+            gasState: "error",
+            message: ''
+        );
       }
-    } else {
-      return empty;
+    }catch(error){
+      if(error.message.isNotEmpty){
+        return GasResponse(
+            gasState: "error",
+            message: error.message
+        );
+      }else{
+        return GasResponse(
+            gasState: "error",
+            message: ''
+        );
+      }
     }
   }
 
@@ -218,7 +239,7 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<String> sendToken(
+  Future<TransactionResponse> sendToken(
       {String to,
         String amount,
         String private,
@@ -226,7 +247,10 @@ class Filecoin extends ChainProvider {
         String addr,
         int nonce}
   ) async{
-    return "0";
+    return TransactionResponse(
+      cid: '',
+      message: ''
+    );
   }
 
   @override

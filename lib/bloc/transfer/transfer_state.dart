@@ -3,19 +3,22 @@ part of 'transfer_bloc.dart';
 class TransferState extends Equatable{
   final String to;
   final int nonce;
-  final String transactionHash;
+  final TransactionResponse response;
   final String messageState;
-  TransferState({this.to,this.nonce,this.transactionHash,this.messageState});
+  TransferState({this.to,this.nonce,this.response,this.messageState});
 
   @override
   // TODO: implement props
-  List<Object> get props => [this.to,this.nonce,this.transactionHash,this.messageState];
+  List<Object> get props => [this.to,this.nonce,this.response,this.messageState];
 
   factory TransferState.idle() {
     return TransferState(
       to: '',
       nonce:-1,
-      transactionHash:'',
+      response:TransactionResponse(
+        cid: '',
+        message: ''
+      ),
       messageState:'',
     );
   }
@@ -23,13 +26,13 @@ class TransferState extends Equatable{
   TransferState copyWithTransferState({
     String to,
     int nonce,
-    String transactionHash,
+    TransactionResponse response,
     String messageState,
   }) {
     return TransferState(
         to: to ?? this.to,
         nonce: nonce ?? this.nonce,
-        transactionHash: transactionHash ?? this.transactionHash,
+        response: response ?? this.response,
         messageState: messageState ?? this.messageState,
     );
   }

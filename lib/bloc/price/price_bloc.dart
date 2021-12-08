@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fil/chain/net.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/wallet.dart';
@@ -30,13 +31,9 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
           {
             "id":map[event.chainType],
             "vs":"usd"
-          },
-          {
-            "id":map[event.chainType],
-            "vs":"cny"
           }
         ];
-        Chain.setRpcNetwork('filecoin', 'https://api.fivetoken.io');
+        Chain.setRpcNetwork(Network.filecoinMainNet.chain, Network.filecoinMainNet.rpc);
         var res = await Chain.chainProvider.getTokenPrice(param);
         dismissAllToast();
         if(res.length > 0){

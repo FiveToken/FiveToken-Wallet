@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fil/common/walletConnect.dart';
+import 'package:wallet_connect/models/wc_peer_meta.dart';
 
 part 'connect_event.dart';
 part 'connect_state.dart';

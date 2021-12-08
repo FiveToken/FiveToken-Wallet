@@ -5,6 +5,7 @@ class WalletState extends Equatable {
   final String mid;
   final List storeMessageList;
   final bool enablePullUp;
+  final String tokenBalance;
 
   final int timestamp;
 
@@ -13,12 +14,14 @@ class WalletState extends Equatable {
   List<Object> get props => [
     this.accountName,
     this.storeMessageList,
-    this.timestamp
+    this.timestamp,
+    this.tokenBalance
   ];
 
   WalletState(
       {this.accountName,
         this.mid,
+        this.tokenBalance,
         this.storeMessageList,
         this.enablePullUp,
         this.timestamp});
@@ -29,7 +32,8 @@ class WalletState extends Equatable {
         mid: '',
         storeMessageList: [],
         enablePullUp: true,
-        timestamp:0
+        timestamp:0,
+        tokenBalance:'0'
     );
   }
 
@@ -38,14 +42,16 @@ class WalletState extends Equatable {
     String mid,
     List storeMessageList,
     bool enablePullUp,
-    int timestamp
+    int timestamp,
+    String tokenBalance
   }) {
     return WalletState(
         accountName: accountName ?? this.accountName,
         mid: mid ?? this.mid,
         storeMessageList: storeMessageList ?? this.storeMessageList,
         enablePullUp: enablePullUp ?? this.enablePullUp,
-        timestamp:timestamp
+        timestamp:timestamp,
+        tokenBalance:tokenBalance ?? this.tokenBalance
     );
   }
 
