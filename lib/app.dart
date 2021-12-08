@@ -129,6 +129,7 @@ class AppState extends State<App> with WidgetsBindingObserver {
           )
         ],
         child: BlocBuilder<MainBloc, MainState>(builder: (ctx, state) {
+
           return GetMaterialApp(
               locale: Locale(Global.langCode),
               translations: Messages(),
