@@ -1,5 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/init/hive.dart';
 // import 'package:fil/index.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
   void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;
+    var box  = OpenedBox.walletInstance;
     if (inputStr == "") {
       showCustomError('enterPk'.tr);
       return;
@@ -44,7 +46,16 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
 
     if (net.chain == 'filecoin') {
       try {
-        PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+        var pk = filPk.privateKey;
+        var filAddr = await FilecoinWallet.genAddrByPrivateKey(pk);
+        var rpc = net.rpc;
+        var type = 2;
+        String key = '$filAddr\_$rpc\_$type';
+        if (box.get(key)!=null) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
       } catch (e) {
         showCustomError('wrongPk'.tr);
         return;
@@ -55,7 +66,15 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
           showCustomError('wrongPk'.tr);
           return;
         }
-        await EthWallet.genAddrByPrivateKey(inputStr);
+        var ethAddr = await EthWallet.genAddrByPrivateKey(inputStr);
+        var type = 2;
+        var rpc = net.rpc;
+        String key = '$ethAddr\_$rpc\_$type';
+        if (box.get(key)!=null) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
+
       } catch (e) {
         showCustomError('wrongPk'.tr);
         return;

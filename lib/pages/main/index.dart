@@ -89,7 +89,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   bool _openState = false;
 
   void openLockScreen(pass) async {
-    if (_openState == true) return;
+    if (_openState == true && Global.lockscreen) return;
     _openState = true;
     await Navigator.push(context,
         PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {

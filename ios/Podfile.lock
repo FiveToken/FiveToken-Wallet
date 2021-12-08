@@ -11,6 +11,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_root_jailbreak (0.0.1):
     - Flutter
+  - flutter_screenshot_events (0.0.1):
+    - Flutter
   - flutter_secure_storage (3.3.1):
     - Flutter
   - flutter_sodium (0.0.1):
@@ -46,6 +48,7 @@ DEPENDENCIES:
   - flotus (from `.symlinks/plugins/flotus/ios`)
   - Flutter (from `Flutter`)
   - flutter_root_jailbreak (from `.symlinks/plugins/flutter_root_jailbreak/ios`)
+  - flutter_screenshot_events (from `.symlinks/plugins/flutter_screenshot_events/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - flutter_sodium (from `.symlinks/plugins/flutter_sodium/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
@@ -77,6 +80,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_root_jailbreak:
     :path: ".symlinks/plugins/flutter_root_jailbreak/ios"
+  flutter_screenshot_events:
+    :path: ".symlinks/plugins/flutter_screenshot_events/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
   flutter_sodium:
@@ -111,6 +116,7 @@ SPEC CHECKSUMS:
   flotus: 8b8041a6daa21fb878b099fdd0979d29e0fd2d75
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   flutter_root_jailbreak: 0117e16bde16aa04a798c35f162b6fc2efd70e4f
+  flutter_screenshot_events: 52122d696879cff17cf72f672e9ca46ce1f00db7
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   flutter_sodium: c84426b4de738514b5b66cfdeb8a06634e72fe0b
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
@@ -128,4 +134,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.10.2
+COCOAPODS: 1.11.2
