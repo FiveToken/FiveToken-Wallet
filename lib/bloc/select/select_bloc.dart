@@ -21,6 +21,10 @@ class SelectBloc extends Bloc<SelectEvent, SelectState> {
       emit(SelectState.idle());
     });
     on<ImportDeleteEvent>((event, emit) async {
+        var box = OpenedBox.walletInstance;
+        if(event.wal!=null&&event.wal.key!=null){
+          await  box.delete(event.wal.key);
+        }
         emit(SelectState.idle());
     });
 

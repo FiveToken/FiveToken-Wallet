@@ -55,10 +55,6 @@ class WalletSelectPageState extends State<WalletSelectPage> {
 
   void deleteImprotWallet(context, state, ChainWallet wal, Network net) async {
    await BlocProvider.of<SelectBloc>(context).add(ImportDeleteEvent(wal: wal, net: net));
-   var box = OpenedBox.walletInstance;
-   if(wal!=null&&wal.key!=null){
-     await  box.delete(wal.key);
-   }
     if (box.values.isEmpty) {
       goInit();
     } else {

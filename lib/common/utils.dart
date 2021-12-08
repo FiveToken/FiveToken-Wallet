@@ -170,7 +170,7 @@ String getChainValue(String fil, {int precision = 18}) {
 
 bool ethPrivate(str){
   RegExp eth = RegExp(r'^(0x)?[0-9A-Za-f]{64}');
-  return eth.hasMatch(str);
+  return eth.hasMatch(str)&&str.length==64;
 }
 
 int getSecondSinceEpoch() {

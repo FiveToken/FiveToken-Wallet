@@ -206,7 +206,8 @@ class PassInitPageState extends State<PassInitPage> {
 
     this.loading = false;
     dismissAllToast();
-    Get.offAllNamed(mainPage);
+    Navigator.popUntil(context, (route) => route.settings.name == mainPage);
+    // Get.offAllNamed(mainPage);
   }
 
   @override
