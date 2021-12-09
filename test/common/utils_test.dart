@@ -44,19 +44,16 @@ void main() {
     var fil3 =
         'f3ru7s7lajvcdcagztyz6qfo5qnlu6h6xzazg4eqwfyyexff36tkeg2ce2raidffniq222qpr2rvtfjwvwikaa';
     var fil0 = 'f01220';
+    var contract = "0xdd42bcecbe746e8f9415138ef01a4d16d1553df8";
     var filNet = Network.filecoinMainNet;
     var ethNet = Network.ethMainNet;
-    // test('check eth addr', () {
-    //   expect(isValidEthAddress(eth), true);
-    // });
-    // test('check fil addr', () {
-    //   expect(isValidFilecoinAddress(fil1, filNet), true);
-    //   expect(isValidFilecoinAddress(fil3, filNet), true);
-    //   expect(isValidFilecoinAddress(fil0, filNet), true);
-    // });
-    test('check addr by net', () {
+    test('check contract addr', () {
+      expect(isValidContractAddress(contract), true);
+    });
+    test('check addr by net', () async {
+      var vaild = await isValidChainAddress(fil1, filNet);
       expect(isValidChainAddress(eth, ethNet), true);
-      expect(isValidChainAddress(fil1, filNet), true);
+      expect(vaild, true);
       expect(isValidChainAddress(eth, filNet), false);
     });
   });
@@ -69,7 +66,7 @@ void main() {
     var format =
         formatCoin(amount, size: 2);
     var formatFixed =
-        formatCoin(amount, size: 2,);
+        formatCoin(amount, size: 2,min: 0.00000000001);
     expect(format, '1.23 FIL');
     expect(formatFixed, '1.24 FIL');
   });
@@ -83,6 +80,12 @@ void main() {
     expect(formatDouble(str, size: 2, truncate: true), '1.23');
     expect(formatDouble(str, size: 2, truncate: false), '1.236');
   });
+
+  test('Valid Password',(){
+    var password = '1234567890';
+    expect(isValidPass(password),false);
+  });
+
   test('convert base64 to hex', () {
     var res = base64ToHex(raw, '1');
     var hex =
@@ -112,9 +115,17 @@ void main() {
         'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org&key=4ab952e5a7c8e37bcdbdbd8aafdd422b5d96fb139ecf0da2a4835386c2a7dea7';
     var wrongWc =
         'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org';
+    var filWc = 'filecoinwallet:uri=d44faf32-6a72-43d4-a193';
     expect(getValidWCLink(wc), wc);
-    expect(getValidWCLink(wrongWc), '');
+    expect(getValidWCLink(wrongWc), 'd44faf32-6a72-43d4-a193');
+    expect(getValidWCLink(filWc), wc);
   });
+
+  test('string trim',(){
+    var str = '  abcsdefg    ';
+    expect(StringTrim(str),'abcsdefg');
+  });
+
   test('format string with params', () {
     var str = 'hello @to';
     expect(trParams(str, {'to': 'world'}), 'hello world');

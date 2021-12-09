@@ -103,7 +103,7 @@ class Filecoin extends ChainProvider {
       print('error');
       return TransactionResponse(
         cid:'',
-        message: ''
+        message: e.message
       );
     }
   }

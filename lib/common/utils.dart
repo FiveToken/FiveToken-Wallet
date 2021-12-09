@@ -48,9 +48,9 @@ String tokenify(String str, {String salt = psalt}) {
   return digest.toString();
 }
 
-void unFocusOf(BuildContext context) {
-  FocusScope.of(context).requestFocus(FocusNode());
-}
+// void unFocusOf(BuildContext context) {
+//   FocusScope.of(context).requestFocus(FocusNode());
+// }
 
 void copyText(String text, {Function callback}) {
   var data = ClipboardData(text: text);
