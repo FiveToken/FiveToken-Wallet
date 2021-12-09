@@ -211,7 +211,7 @@ class PassInitPageState extends State<PassInitPage> {
     //   print( route.settings.name);
     //   return route.settings.name == mainPage;
     // });
-
+    Global.lockFromInit = false;
     Get.offAllNamed(mainPage);
   }
 

@@ -21,7 +21,7 @@ class LockBloc extends Bloc<LockEvent, LockState> {
       var lockBox = OpenedBox.lockInstance;
       LockBox lock = LockBox.fromJson({'lockscreen': event.lock, 'password':event.password, 'status': event.status});
       lockBox.put('lock', lock);
-
+      Global.lockscreen = event.lock;
     });
   }
 }

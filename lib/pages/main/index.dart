@@ -143,7 +143,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     box = OpenedBox.walletInstance;
     nonceBoxInstance = OpenedBox.nonceInsance;
     if (mounted) {
-      if (Global.lockscreen) {
+      if (Global.lockscreen&&Global.lockFromInit) {
         var lockBox = OpenedBox.lockInstance;
         var lock = lockBox.get('lock');
         Future.delayed(Duration.zero)
