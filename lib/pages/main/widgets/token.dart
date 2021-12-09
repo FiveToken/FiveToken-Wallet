@@ -82,6 +82,7 @@ class MainTokenWidget extends StatelessWidget {
         ),
       ),
       onTap: () {
+        Global.cacheToken = null;
         Get.toNamed(walletMainPage,arguments:{
           "symbol":$store.net.coin
         });
