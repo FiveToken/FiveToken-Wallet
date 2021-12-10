@@ -255,7 +255,7 @@ class ChainGasPageState extends State<ChainGasPage> {
             controller: maxFeePerGasCtrl,
             type: TextInputType.number,
             inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly
+              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
             ],
           ),
           SizedBox(
