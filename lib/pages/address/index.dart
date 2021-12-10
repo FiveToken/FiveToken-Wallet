@@ -1,4 +1,3 @@
-
 import 'package:fil/bloc/address/address_bloc.dart';
 import 'package:fil/widgets/icons.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import 'package:fil/init/hive.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/models/index.dart';
-// import 'package:fil/index.dart';
 
 class AddressBookIndexPage extends StatefulWidget {
   @override
@@ -29,7 +27,7 @@ class AddressBookIndexPage extends StatefulWidget {
 class AddressBookIndexPageState extends State<AddressBookIndexPage> {
   var box = OpenedBox.addressBookInsance;
 
-  void onChanges(context,  net){
+  void onChanges(BuildContext context, Network net){
     BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: net));
   }
 
@@ -66,9 +64,7 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
               children: [
                 Padding(
                   child: NetEntranceWidget(
-                      onChange: (net) =>
-                      {
-                        onChanges(context, net)}),
+                      onChange: (net) => onChanges(context, net)),
                   padding: EdgeInsets.symmetric(horizontal: 12),
                 ),
                 Column(
@@ -151,9 +147,6 @@ class NetEntranceWidget extends StatelessWidget {
                     color: CustomColor.primary,
                     borderRadius: BorderRadius.circular(15)),
                 child: childWidget,
-                // child: Image(
-                //   image: AssetImage('icons/fil-w.png'),
-                // ),
               ),
               SizedBox(
                 width: 15,

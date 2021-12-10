@@ -84,7 +84,7 @@ class LockPageState extends State<LockPage> {
               children:[ CardItem(
                 label: 'change'.tr,
                 onTap: ()=>{
-                  BlocProvider.of<LockBloc>(context).add(setLockEvent(status: 'update',lock: state.lock, password: state.password)),
+                  BlocProvider.of<LockBloc>(context).add(SetLockEvent(status: 'update',lock: state.lock, password: state.password)),
                   openLockScreen(context, state, 'update')
                 },
               ),
@@ -121,7 +121,7 @@ class LockPageState extends State<LockPage> {
 
   Widget cancel(label, state, status){
     if(status=='create'){
-      BlocProvider.of<LockBloc>(context).add(setLockEvent(lock: false));
+      BlocProvider.of<LockBloc>(context).add(SetLockEvent(lock: false));
     }
     return FButton(text: label, onPressed: ()=>{
      _verificationNotifier.add(true),
@@ -151,7 +151,7 @@ class LockPageState extends State<LockPage> {
     var lockBox = OpenedBox.lockInstance;
     LockBox lock = LockBox.fromJson({'lockscreen': true, 'password':secondPass});
     lockBox.put('lock', lock);
-    BlocProvider.of<LockBloc>(context).add(setLockEvent(password: secondPass, lock: true));
+    BlocProvider.of<LockBloc>(context).add(SetLockEvent(password: secondPass, lock: true));
   }
 
   void openLockSencondScreen(context, state, String firstPass, String status){
@@ -168,7 +168,7 @@ class LockPageState extends State<LockPage> {
   }
 
   onSwitchChanged(ctx,  state, value){
-    BlocProvider.of<LockBloc>(context).add(setLockEvent(lock: value, status: 'create'));
+    BlocProvider.of<LockBloc>(context).add(SetLockEvent(lock: value, status: 'create'));
      if(value){
        openLockScreen(ctx, state, 'create');
      }
