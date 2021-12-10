@@ -1,6 +1,10 @@
 import 'package:fil/chain/gas.dart';
+import 'package:fil/chain/net.dart';
 import 'package:fil/index.dart';
+import 'package:fil/store/store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 
 void main() {
   final gas = ChainGas.fromJson({'feeCap': '300', 'gasLimit': 1000});

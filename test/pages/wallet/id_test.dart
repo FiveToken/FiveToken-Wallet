@@ -1,6 +1,14 @@
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/global.dart';
 import 'package:fil/index.dart';
+import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/wallet/id.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/store/store.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/route_manager.dart';
 import 'package:mockito/mockito.dart';
 

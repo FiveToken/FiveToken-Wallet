@@ -1,7 +1,14 @@
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/chain/wallet.dart';
 import 'package:fil/index.dart';
-import 'package:fil/pages/main/widgets/token.dart';
+import 'package:fil/pages/home/widgets/token.dart';
+import 'package:fil/store/store.dart';
 import 'package:fil/widgets/random.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:mockito/mockito.dart';
 import 'package:web3dart/web3dart.dart';
 

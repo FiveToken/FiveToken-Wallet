@@ -1,6 +1,7 @@
 import 'package:fil/index.dart';
-import 'package:fil/pages/main/walletConnect.dart';
+import 'package:fil/pages/home/walletConnect.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import '../../constant.dart';
 

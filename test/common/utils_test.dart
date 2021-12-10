@@ -1,3 +1,4 @@
+import 'package:fil/chain/net.dart';
 import 'package:fil/common/index.dart';
 import 'package:fil/index.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,8 +53,8 @@ void main() {
     });
     test('check addr by net', () async {
       var vaild = await isValidChainAddress(fil1, filNet);
-      expect(isValidChainAddress(eth, ethNet), true);
       expect(vaild, true);
+      expect(isValidChainAddress(eth, ethNet), true);
       expect(isValidChainAddress(eth, filNet), false);
     });
   });
@@ -61,6 +62,16 @@ void main() {
     var pk = genCKBase64(Mne);
     expect(pk, raw);
   });
+
+  test('copyText', () {
+    var str = "";
+    fun(){
+      str = 'abcdefg';
+    }
+    copyText(str, callback:fun );
+    expect(str, 'abcdefg');
+  });
+
   test('format coin', () {
     var amount = '1236000000000000000';
     var format =
@@ -68,7 +79,7 @@ void main() {
     var formatFixed =
         formatCoin(amount, size: 2,min: 0.00000000001);
     expect(format, '1.23 FIL');
-    expect(formatFixed, '1.24 FIL');
+    expect(formatFixed, '0.00000000...');
   });
   test('convart a double string to  valid value in chain', () {
     var str = '1.23';

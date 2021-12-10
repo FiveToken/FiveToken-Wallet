@@ -1,3 +1,4 @@
+import 'package:fil/chain/token.dart';
 import 'package:fil/index.dart';
 import 'package:flutter_test/flutter_test.dart';
 

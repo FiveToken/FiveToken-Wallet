@@ -1,11 +1,20 @@
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/global.dart';
 import 'package:fil/index.dart';
+import 'package:fil/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant.dart';
 
-class MockSharedPreferences extends Mock implements SharedPreferences {}
+class MockSharedPreferences extends Mock implements SharedPreferences {
+  getBool(any) {}
+
+  setString(any, any2) {}
+}
 
 void main() {
   testWidgets("test delete dialog", (tester) async {
