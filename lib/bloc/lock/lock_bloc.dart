@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fil/chain/lock.dart';
+import 'package:fil/common/global.dart';
 import 'package:fil/index.dart';
 import 'package:fil/init/hive.dart';
 import 'package:meta/meta.dart';

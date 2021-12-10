@@ -1,4 +1,7 @@
-import 'package:fil/index.dart';
+
+
+import 'package:dio/dio.dart';
+import 'package:fil/models/wallet.dart';
 
 var defaultClient = Dio();
 const ThirdPath = 'http://8.209.219.115:8090/third/priceByType?coin=';

@@ -25,7 +25,6 @@ import 'package:fil/common/global.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/app.dart';
-import 'package:fil/actions/event.dart';
 
 class WalletMainPage extends StatefulWidget {
   @override

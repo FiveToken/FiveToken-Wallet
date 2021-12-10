@@ -5,7 +5,7 @@ import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/navigation.dart';
 import 'package:fil/i10n/localization.dart';
 import 'package:fil/lang/index.dart';
-import 'package:fil/pages/main/index.dart';
+import 'package:fil/pages/home/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/utils/enum.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,8 +24,8 @@ import 'package:fil/init/device.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:fil/actions/event.dart';
-
 import 'bloc/price/price_bloc.dart';
+import 'package:fil/common/navigation.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 

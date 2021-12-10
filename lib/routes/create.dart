@@ -1,6 +1,12 @@
 import 'package:fil/index.dart';
 import 'package:fil/pages/create/import.dart';
+import 'package:fil/pages/create/importMne.dart';
+import 'package:fil/pages/create/importPrivateKey.dart';
+import 'package:fil/pages/create/mneCheck.dart';
+import 'package:fil/pages/create/mneCreate.dart';
 import 'package:fil/pages/create/warn.dart';
+import 'package:fil/routes/path.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
 
 List<GetPage> getCreateRoutes() {
   var list = <GetPage>[];

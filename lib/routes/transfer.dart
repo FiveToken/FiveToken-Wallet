@@ -1,6 +1,10 @@
 import 'package:fil/index.dart';
 import 'package:fil/pages/transfer/confirm.dart';
+import 'package:fil/pages/transfer/detail.dart';
+import 'package:fil/pages/transfer/gas.dart';
 import 'package:fil/pages/transfer/transfer.dart';
+import 'package:fil/routes/path.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
 
 List<GetPage> getTransferRoutes() {
   List<GetPage> list = [];

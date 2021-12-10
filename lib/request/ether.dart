@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/gas.dart';
+import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/models/gas_response.dart';
 import 'package:fil/models/token_info.dart';
@@ -321,7 +322,7 @@ class Ether extends ChainProvider {
   @override
   Future<List> getTokenPrice(param) async{
     try{
-      String baseApi = 'https://api.fivetoken.io' + '/api' + Config.clientID;
+      String baseApi = Network.filecoinMainNet.rpc + '/api' + Config.clientID;
       String tokenPrice = '/token/prices';
       var res = [];
       final response = await http.post(baseApi+tokenPrice,data: param);
