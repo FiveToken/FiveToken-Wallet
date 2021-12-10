@@ -125,7 +125,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                     try {
                         var wal = $store.wal;
                         var ck = await wal.getPrivateKey(pass);
-                        pushMsg(data.nonce, ck, context);
+                        pushMessage(data.nonce, ck, context);
                       } catch (error) {
                         print('error');
                       }
@@ -285,7 +285,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     return true;
   }
 
-  void pushMsg(int nonce, String ck, context) async {
+  void pushMessage(int nonce, String ck, context) async {
     if (!Global.online) {
       showCustomError('errorNet'.tr);
       return;

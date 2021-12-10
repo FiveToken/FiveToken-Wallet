@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/time.dart';
+import 'package:fil/models/cacheMessage.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/index.dart';
 import 'package:fil/store/store.dart'; // $store
@@ -34,6 +38,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
           var _mid = result["mid"];
           var _enablePullUp = result["enablePullUp"];
+          deleteSpeedUpMessages(event.symbol);
           List _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
           emit(state.copyWithWalletState(
               storeMessageList: _storeList,
@@ -44,6 +49,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         }else{
           if(pendingList.length > 0){
               await updateEthMessageListState(event.rpc,event.chainType,pendingList);
+              deleteSpeedUpMessages(event.symbol);
           }
           final _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
           emit(state.copyWithWalletState(
@@ -253,7 +259,7 @@ updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
       }
     }
   }catch(error){
-    debugPrint("error");
+    print("error");
   }
 }
 
@@ -277,4 +283,36 @@ List getStoreMsgList(symbol){
     print('error');
     return [];
   }
+}
+
+deleteSpeedUpMessages(symbol){
+  var box = OpenedBox.mesInstance;
+  var _storeList = getStoreMsgList(symbol);
+  List<CacheMessage> pendingList = [];
+  List<CacheMessage> resolvedList = [];
+
+  _storeList.forEach((mes) {
+    if (mes.pending == 1) {
+      pendingList.add(mes);
+    } else {
+      resolvedList.add(mes);
+    }
+  });
+
+  if (resolvedList.isNotEmpty && pendingList.isNotEmpty) {
+    List<num> shouldDeleteNonce = [];
+    var pendingNonce = pendingList.map((mes) => mes.nonce);
+    resolvedList.forEach((mes) {
+      if (pendingNonce.contains(mes.nonce)) {
+        shouldDeleteNonce.add(mes.nonce);
+      }
+    });
+    if (shouldDeleteNonce.isNotEmpty) {
+      var deleteKeys = pendingList
+          .where((mes) => shouldDeleteNonce.contains(mes.nonce))
+          .map((mes) => mes.hash);
+      box.deleteAll(deleteKeys);
+    }
+  }
+
 }
