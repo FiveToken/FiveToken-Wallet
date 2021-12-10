@@ -30,6 +30,7 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     });
 
     on<GetBalanceEvent>((event, emit) async{
+      add(ResetBalanceEvent());
       Chain.setRpcNetwork(event.rpc,event.chainType);
       final balance = await Chain.chainProvider.getBalance(event.address);
       var wal = $store.wal;
@@ -39,6 +40,10 @@ class MainBloc extends Bloc<MainEvent, MainState> {
           OpenedBox.walletInstance.put(wal.key, wal);
       }
       emit(state.copyWithMainState(balance: balance));
+    });
+
+    on<ResetBalanceEvent>((event,emit){
+      emit(state.copyWithMainState(balance: '0'));
     });
   }
 }

@@ -1,16 +1,12 @@
 part of 'main_bloc.dart';
 
 class MainState extends Equatable {
-  final Locale language;
-  final String currency;
   final ChainWallet chainWallet;
   final bool hideTestnet;
   final List<List<Network>> filterNets;
   final String balance;
 
   MainState({
-    this.language,
-    this.currency,
     this.chainWallet,
     this.hideTestnet,
     this.filterNets,
@@ -21,8 +17,6 @@ class MainState extends Equatable {
     bool bol = Global.store.getBool('hideTestnet') ?? false;
     List<List<Network>> nets = bol ? [Network.netList[0]] : Network.netList;
     return MainState(
-      language: Locale('en'),
-      currency: 'USD',
       chainWallet: ChainWallet(),
       hideTestnet: bol,
       filterNets: nets,
@@ -31,17 +25,13 @@ class MainState extends Equatable {
   }
 
   MainState copyWithMainState({
-    Locale language,
     ChainWallet chainWallet,
-    String currency,
     bool hideTestnet,
     List<List<Network>> filterNets,
     String balance
   }) {
     return MainState(
       chainWallet: chainWallet ?? this.chainWallet,
-      language: language ?? this.language,
-      currency: currency ?? this.currency,
       hideTestnet:hideTestnet ?? this.hideTestnet,
       filterNets:filterNets ?? this.filterNets,
       balance:balance ?? this.balance,
@@ -53,9 +43,6 @@ class MainState extends Equatable {
     filterNets
   }) {
     return MainState(
-      chainWallet: chainWallet,
-      language: language,
-      currency: currency,
       filterNets:filterNets,
       hideTestnet:hideTestnet,
     );
@@ -63,5 +50,5 @@ class MainState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object> get props => [this.language, this.currency,this.chainWallet,this.filterNets,this.hideTestnet,this.balance];
+  List<Object> get props => [this.chainWallet,this.filterNets,this.hideTestnet,this.balance];
 }

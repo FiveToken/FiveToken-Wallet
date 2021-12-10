@@ -1,4 +1,5 @@
 // import 'package:fil/index.dart';
+import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,11 +26,11 @@ class CoinPriceState extends State<CoinPriceWidget> {
   @override
   void initState() {
     super.initState();
-    if(mounted){
-      worker = ever($store.wallet, (ChainWallet wal) {
-        BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
-      });
-    }
+    // if(mounted){
+    //   worker = ever($store.wallet, (ChainWallet wal) {
+    //     BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
+    //   });
+    // }
   }
 
   @override
@@ -46,13 +47,18 @@ class CoinPriceState extends State<CoinPriceWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PriceBloc, PriceState>(builder: (context, state){
-      return CommonText(
-        getUsdPrce($store.wal.balance,state.usdPrice),
-        size: 30,
-        weight: FontWeight.w800,
-      );
-    });
+    return BlocBuilder<MainBloc,MainState>(
+        builder: (context, mainState){
+          return BlocBuilder<PriceBloc, PriceState>(builder: (context, state){
+            return CommonText(
+              getUsdPrce(mainState.balance,state.usdPrice),
+              size: 30,
+              weight: FontWeight.w800,
+            );
+          });
+        }
+    );
+
   }
 
   String getUsdPrce(String balance,double usd){

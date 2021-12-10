@@ -1,4 +1,5 @@
 
+import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/utils/enum.dart';
 import 'package:flutter/material.dart';
@@ -93,219 +94,231 @@ class WalletSelectPageState extends State<WalletSelectPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (context) => SelectBloc()..add(IdDeleteEvent())..add(ImportDeleteEvent()),
-        child: BlocBuilder<SelectBloc, SelectState>(builder: (context, state){
+        child: BlocBuilder<SelectBloc, SelectState>(
+            builder: (context, state){
                var entry = state.idWalletMap.entries.toList();
-               return  CommonScaffold(
-                 title: 'selectWallet'.tr,
-                 grey: true,
-                 hasFooter: false,
-                 actions: [
-                   GestureDetector(
-                     child: Padding(
-                       padding: EdgeInsets.only(right: 12),
-                       child: Icon(Icons.add_circle_outline,color: CustomColor.black ),
-                     ),
-                     onTap: () {
-                       showModalBottomSheet(
-                           shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
-                           context: context,
-                           builder: (BuildContext context) {
-                             return Container(
-                               height: 300,
-                               child: Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: [
-                                   CommonTitle(
-                                     'addWallet'.tr,
-                                     showDelete: true,
-                                   ),
-                                   SizedBox(
-                                     height: 15,
-                                   ),
-                                   Container(
-                                     padding: EdgeInsets.symmetric(horizontal: 12),
-                                     child: Column(
-                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: [
-                                         TapItemCard(
-                                           items: [
-                                             CardItem(
-                                               label: 'createWallet'.tr,
-                                               onTap: () {
-                                                 Get.back();
-                                                 Get.toNamed(createWarnPage);
-                                               },
-                                             )
-                                           ],
-                                         ),
-                                         Container(
-                                           padding: EdgeInsets.fromLTRB(0, 20, 0, 15),
-                                           child: CommonText(
-                                             'importWallet'.tr,
-                                             color: CustomColor.primary,
+               return BlocBuilder<PriceBloc,PriceState>(
+                   builder:(context,priceState){
+                     return  CommonScaffold(
+                         title: 'selectWallet'.tr,
+                         grey: true,
+                         hasFooter: false,
+                         actions: [
+                           GestureDetector(
+                             child: Padding(
+                               padding: EdgeInsets.only(right: 12),
+                               child: Icon(Icons.add_circle_outline,color: CustomColor.black ),
+                             ),
+                             onTap: () {
+                               showModalBottomSheet(
+                                   shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
+                                   context: context,
+                                   builder: (BuildContext context) {
+                                     return Container(
+                                       height: 300,
+                                       child: Column(
+                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                         children: [
+                                           CommonTitle(
+                                             'addWallet'.tr,
+                                             showDelete: true,
                                            ),
-                                         ),
-                                         TapItemCard(
-                                           items: [
-                                             CardItem(
-                                               label: 'pkImport'.tr,
-                                               onTap: () {
-                                                 Get.back();
-                                                 Get.toNamed(importIndexPage,
-                                                     arguments: {'type': 2});
-                                               },
+                                           SizedBox(
+                                             height: 15,
+                                           ),
+                                           Container(
+                                             padding: EdgeInsets.symmetric(horizontal: 12),
+                                             child: Column(
+                                               crossAxisAlignment: CrossAxisAlignment.start,
+                                               children: [
+                                                 TapItemCard(
+                                                   items: [
+                                                     CardItem(
+                                                       label: 'createWallet'.tr,
+                                                       onTap: () {
+                                                         Get.back();
+                                                         Get.toNamed(createWarnPage);
+                                                       },
+                                                     )
+                                                   ],
+                                                 ),
+                                                 Container(
+                                                   padding: EdgeInsets.fromLTRB(0, 20, 0, 15),
+                                                   child: CommonText(
+                                                     'importWallet'.tr,
+                                                     color: CustomColor.primary,
+                                                   ),
+                                                 ),
+                                                 TapItemCard(
+                                                   items: [
+                                                     CardItem(
+                                                       label: 'pkImport'.tr,
+                                                       onTap: () {
+                                                         Get.back();
+                                                         Get.toNamed(importIndexPage,
+                                                             arguments: {'type': 2});
+                                                       },
+                                                     ),
+                                                     CardItem(
+                                                       label: 'mneImport'.tr,
+                                                       onTap: () {
+                                                         Get.back();
+                                                         Get.toNamed(importIndexPage,
+                                                             arguments: {'type': 1});
+                                                       },
+                                                     ),
+                                                   ],
+                                                 ),
+                                               ],
                                              ),
-                                             CardItem(
-                                               label: 'mneImport'.tr,
-                                               onTap: () {
-                                                 Get.back();
-                                                 Get.toNamed(importIndexPage,
-                                                     arguments: {'type': 1});
-                                               },
-                                             ),
-                                           ],
-                                         ),
-                                       ],
-                                     ),
-                                   )
-                                 ],
-                               ),
-                             );
-                           });
-                     },
-                   )
-                 ],
-                   body: SingleChildScrollView(
-                     padding: EdgeInsets.fromLTRB(0, 20, 0, 40),
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         Visibility(
-                             visible: entry.isNotEmpty,
-                             child: Column(
-                               crossAxisAlignment: CrossAxisAlignment.start,
-                               children: [
-                                 Container(
-                                   child: CommonText('idMulti'.tr),
-                                   padding: EdgeInsets.only(left: 12),
-                                 ),
-                                 Column(
-                                   children: List.generate(entry.length, (index) {
-                                     var hash = entry[index].key;
-                                     var wals = entry[index].value;
-                                     return SwiperWidget(
-                                       active: hash == $store.wal.groupHash,
-                                       onDelete: () {
-                                         showDeleteDialog(context,
-                                             title: 'deleteIdWallet'.tr,
-                                             content: 'confirmDeleteId'.tr, onDelete: () {
-                                               deleteIdWallet(context, state, hash);
-                                             });
-                                       },
-                                       onSet: () async {
-                                         await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});
-                                         BlocProvider.of<SelectBloc>(context)..add(IdUpdateEvent());
-                                       },
-                                       onTap: () {
-                                         if (hash != $store.wal.groupHash) {
-                                           var wallets = OpenedBox.walletInstance.values
-                                               .where((wal) =>
-                                           wal.groupHash == hash &&
-                                               wal.rpc == $store.net.rpc)
-                                               .toList();
-                                           if (wallets.isNotEmpty) {
-                                             $store.setWallet(wallets[0]);
-                                             Global.store.setString(
-                                                 'currentWalletAddress', wallets[0].key);
-                                           }
-                                         }
-                                         Global.eventBus.fire(WalletChangeEvent());
-                                         Navigator.of(context).popUntil(
-                                                 (route) => route.settings.name == mainPage);
-                                       },
-                                       id: hash,
-                                       child: Container(
-                                         height: 70,
-                                         alignment: Alignment.centerLeft,
-                                         child:
-                                         CommonText(wals[0].label, color: Colors.white),
+                                           )
+                                         ],
                                        ),
                                      );
-                                   }),
-                                 ),
-                                 SizedBox(
-                                   height: 12,
-                                 ),
-                               ],
-                             )),
-                         Visibility(
+                                   });
+                             },
+                           )
+                         ],
+                         body: SingleChildScrollView(
+                           padding: EdgeInsets.fromLTRB(0, 20, 0, 40),
                            child: Column(
                              crossAxisAlignment: CrossAxisAlignment.start,
                              children: [
-                               Container(
-                                 child: CommonText('import'.tr),
-                                 padding: EdgeInsets.only(left: 12),
-                               ),
-                               Column(
-                                 children: List.generate(state.importList.length, (index) {
-                                   var wal = state.importList[index];
-                                   var net = Network.getNetByRpc(wal.rpc);
-                                   return SwiperWidget(
-                                     active: $store.wal.key == wal.key,
-                                     onDelete: () {
-                                       showDeleteDialog(context,
-                                           title: 'deleteAddr'.tr,
-                                           content: 'confirmDelete'.tr, onDelete: () {
-                                             deleteImprotWallet(context, state, wal, net);
-                                           });
-                                     },
-                                     onSet: () async{
-                                     await Get.toNamed(walletMangePage,
-                                           arguments: {'net': net, 'wallet': wal});
-                                     BlocProvider.of<SelectBloc>(context).add(ImportUpdateEvent());
-                                     },
-                                     onTap: () {
-                                       $store.setWallet(wal);
-                                       $store.setNet(net);
-                                       Global.eventBus.fire(WalletChangeEvent());
-                                       Global.store
-                                           .setString('currentWalletAddress', wal.key);
-                                       Global.store.setString('activeNetwork', net.rpc);
-                                       Navigator.of(context).popUntil(
-                                               (route) => route.settings.name == mainPage);
-                                     },
-                                     id: wal.address,
-                                     child: Container(
-                                       child: Row(
-                                         crossAxisAlignment: CrossAxisAlignment.center,
-                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                         children: [
-                                           Column(
-                                             crossAxisAlignment: CrossAxisAlignment.start,
-                                             mainAxisAlignment: MainAxisAlignment.center,
-                                             children: [
-                                               CommonText.white(wal.label, size: 15),
-                                               SizedBox(
-                                                 height: 5,
-                                               ),
-                                               CommonText.white(dotString(str: wal.addr),
-                                                   size: 12)
-                                             ],
-                                           ),
-                                           CommonText.white(net.label),
-                                         ],
+                               Visibility(
+                                   visible: entry.isNotEmpty,
+                                   child: Column(
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                     children: [
+                                       Container(
+                                         child: CommonText('idMulti'.tr),
+                                         padding: EdgeInsets.only(left: 12),
                                        ),
+                                       Column(
+                                         children: List.generate(entry.length, (index) {
+                                           var hash = entry[index].key;
+                                           var wals = entry[index].value;
+                                           return SwiperWidget(
+                                             active: hash == $store.wal.groupHash,
+                                             onDelete: () {
+                                               showDeleteDialog(context,
+                                                   title: 'deleteIdWallet'.tr,
+                                                   content: 'confirmDeleteId'.tr, onDelete: () {
+                                                     deleteIdWallet(context, state, hash);
+                                                   });
+                                             },
+                                             onSet: () async {
+                                               await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});
+                                               BlocProvider.of<SelectBloc>(context)..add(IdUpdateEvent());
+                                             },
+                                             onTap: () {
+                                               if (hash != $store.wal.groupHash) {
+                                                 var wallets = OpenedBox.walletInstance.values
+                                                     .where((wal) =>
+                                                 wal.groupHash == hash &&
+                                                     wal.rpc == $store.net.rpc)
+                                                     .toList();
+                                                 if (wallets.isNotEmpty) {
+                                                   $store.setWallet(wallets[0]);
+                                                   Global.store.setString(
+                                                       'currentWalletAddress', wallets[0].key);
+                                                   BlocProvider.of<PriceBloc>(context)
+                                                     ..add(ResetUsdPriceEvent())
+                                                     ..add(GetPriceEvent($store.net.chain));
+                                                 }
+                                               }
+                                               Global.eventBus.fire(WalletChangeEvent());
+                                               Navigator.of(context).popUntil(
+                                                       (route) => route.settings.name == mainPage
+                                               );
+                                             },
+                                             id: hash,
+                                             child: Container(
+                                               height: 70,
+                                               alignment: Alignment.centerLeft,
+                                               child:
+                                               CommonText(wals[0].label, color: Colors.white),
+                                             ),
+                                           );
+                                         }),
+                                       ),
+                                       SizedBox(
+                                         height: 12,
+                                       ),
+                                     ],
+                                   )),
+                               Visibility(
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Container(
+                                       child: CommonText('import'.tr),
+                                       padding: EdgeInsets.only(left: 12),
                                      ),
-                                   );
-                                 }),
-                               )
+                                     Column(
+                                       children: List.generate(state.importList.length, (index) {
+                                         var wal = state.importList[index];
+                                         var net = Network.getNetByRpc(wal.rpc);
+                                         return SwiperWidget(
+                                           active: $store.wal.key == wal.key,
+                                           onDelete: () {
+                                             showDeleteDialog(context,
+                                                 title: 'deleteAddr'.tr,
+                                                 content: 'confirmDelete'.tr, onDelete: () {
+                                                   deleteImprotWallet(context, state, wal, net);
+                                                 });
+                                           },
+                                           onSet: () async{
+                                             await Get.toNamed(walletMangePage,
+                                                 arguments: {'net': net, 'wallet': wal});
+                                             BlocProvider.of<SelectBloc>(context).add(ImportUpdateEvent());
+                                           },
+                                           onTap: () {
+                                             $store.setWallet(wal);
+                                             $store.setNet(net);
+                                             Global.eventBus.fire(WalletChangeEvent());
+                                             Global.store
+                                                 .setString('currentWalletAddress', wal.key);
+                                             Global.store.setString('activeNetwork', net.rpc);
+                                             BlocProvider.of<PriceBloc>(context)
+                                               ..add(ResetUsdPriceEvent())
+                                               ..add(GetPriceEvent(net.chain));
+                                             Navigator.of(context).popUntil(
+                                                     (route) => route.settings.name == mainPage);
+                                           },
+                                           id: wal.address,
+                                           child: Container(
+                                             child: Row(
+                                               crossAxisAlignment: CrossAxisAlignment.center,
+                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                               children: [
+                                                 Column(
+                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                   mainAxisAlignment: MainAxisAlignment.center,
+                                                   children: [
+                                                     CommonText.white(wal.label, size: 15),
+                                                     SizedBox(
+                                                       height: 5,
+                                                     ),
+                                                     CommonText.white(dotString(str: wal.addr),
+                                                         size: 12)
+                                                   ],
+                                                 ),
+                                                 CommonText.white(net.label),
+                                               ],
+                                             ),
+                                           ),
+                                         );
+                                       }),
+                                     )
+                                   ],
+                                 ),
+                                 visible: state.importList.isNotEmpty,
+                               ),
                              ],
                            ),
-                           visible: state.importList.isNotEmpty,
-                         ),
-                       ],
-                     ),
-                   )
+                         )
+                     );
+                   }
                );
             }
         )

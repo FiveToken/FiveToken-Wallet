@@ -20,3 +20,7 @@ class GetBalanceEvent extends MainEvent {
   String address;
   GetBalanceEvent(this.rpc,this.chainType,this.address);
 }
+
+class ResetBalanceEvent extends MainEvent{
+
+}

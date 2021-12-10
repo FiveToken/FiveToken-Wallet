@@ -52,6 +52,8 @@ class PriceBloc extends Bloc<PriceEvent, PriceState> {
             "cny":cny
           });
           emit(state.copy(usdPrice: usd));
+        }else{
+          print('error');
         }
       }catch(error){
         dismissAllToast();
