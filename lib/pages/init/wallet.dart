@@ -1,5 +1,3 @@
-// import 'package:fil/index.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/style.dart';
@@ -69,9 +67,8 @@ class WalletInitPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: 'createWallet'.tr,
-                          onTap: () {
-                            Get.toNamed(createWarnPage);
-                          })
+                          onTap: () => Get.toNamed(createWarnPage)
+                      )
                     ],
                   ),
                   SizedBox(
@@ -89,16 +86,12 @@ class WalletInitPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: 'pkImport'.tr,
-                          onTap: () {
-                            Get.toNamed(importIndexPage,
-                                arguments: {'net': $store.net, 'type': 2});
-                          }),
+                          onTap: () => Get.toNamed(importIndexPage, arguments: {'net': $store.net, 'type': 2})
+                      ),
                       CardItem(
                           label: 'mneImport'.tr,
-                          onTap: () {
-                            Get.toNamed(importIndexPage,
-                                arguments: {'net': $store.net, 'type': 1});
-                          })
+                          onTap: () => Get.toNamed(importIndexPage, arguments: {'net': $store.net, 'type': 1})
+                          )
                     ],
                   ),
                 ],
