@@ -17,7 +17,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:fil/routes/path.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:fil/utils/string_extension.dart';
-import 'package:fil/utils/num_extension.dart';
 import 'package:fil/utils/decimal_extension.dart';
 
 class TransferConfirmPage extends StatefulWidget {

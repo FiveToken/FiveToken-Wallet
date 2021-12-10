@@ -36,8 +36,8 @@ Future initHive() async {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
   // final String key1 = HiveKey.key;
   // final String secret = HiveKey.secret;
-  var containsEncryptionKey = await secureStorage.containsKey(key: 'key');
-  if (!containsEncryptionKey) {
+  var containsEncryptionKey = await secureStorage.read(key: 'key');
+  if (containsEncryptionKey == null || containsEncryptionKey == '') {
     var key = Hive.generateSecureKey();
     await secureStorage.write(key: 'key', value: base64UrlEncode(key));
   }

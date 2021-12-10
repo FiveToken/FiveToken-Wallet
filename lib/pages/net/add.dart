@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/chain/net.dart';
-// import 'package:fil/index.dart';
 import 'dart:convert' as convert;
 import 'package:fbutton/fbutton.dart';
 import 'package:oktoast/oktoast.dart';
@@ -21,7 +20,6 @@ import 'package:fil/init/hive.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/utils/enum.dart';
-import 'package:validators/validators.dart';
 
 class NetAddPage extends StatefulWidget {
   @override

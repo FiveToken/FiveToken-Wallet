@@ -41,15 +41,10 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
-      // if(mounted){
-      //   // net = Network.getNetByRpc(addr.rpc);
-      //   BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: Network.getNetByRpc(addr.rpc)));
-      // }
-
     }
   }
 
-  Future<bool> checkValid(net) async {
+  Future<bool> checkValid(Network net) async {
     var addr = addrCtrl.text.trim();
     var name = nameCtrl.text.trim();
     if(addr==''){
@@ -72,7 +67,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return true;
   }
 
-  Future<void> handleConfirm(net) async {
+  Future<void> handleConfirm(Network net) async {
     bool valid = await checkValid(net);
     if (!valid) {
       return;
@@ -84,7 +79,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     }
   }
 
-  void confirmAdd(net) {
+  void confirmAdd(Network net) {
     var address = addrCtrl.text.trim();
     var label = nameCtrl.text.trim();
     if (edit) {
@@ -100,7 +95,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return addr != null;
   }
 
-  void showDialog(net) {
+  void showDialog(Network net) {
     showCustomDialog(
         context,
         Column(
@@ -162,7 +157,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
         ));
   }
 
-  void handleScan(net) {
+  void handleScan(Network net) {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((scanResult) async {
       if (scanResult != '') {
@@ -175,7 +170,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       }
     });
   }
-  void onChange(context, Network net){
+  void onChange(BuildContext context, Network net){
     BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: net));
   }
 

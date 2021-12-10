@@ -1,7 +1,5 @@
 import 'package:fil/bloc/main/main_bloc.dart';
-// import 'package:fil/index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/style.dart';
@@ -13,7 +11,7 @@ import 'package:fil/common/global.dart';
 
 
 class SelectLangPage extends StatelessWidget {
-  void selectLang(String lang,context) async {
+  void selectLang(String lang, BuildContext context) async {
     Locale l = Locale(lang);
     Get.updateLocale(l);
     Global.langCode = lang;
@@ -63,9 +61,8 @@ class SelectLangPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: 'English',
-                          onTap: () {
-                            selectLang('en',context);
-                          })
+                          onTap: () => selectLang('en',context)
+                      )
                     ],
                   ),
                   SizedBox(
@@ -75,9 +72,8 @@ class SelectLangPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: '한국어',
-                          onTap: () {
-                            selectLang('kr',context);
-                          })
+                          onTap: () => selectLang('kr',context)
+                      )
                     ],
                   ),
                   SizedBox(
@@ -87,9 +83,8 @@ class SelectLangPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: '日本語',
-                          onTap: () {
-                            selectLang('jp',context);
-                          })
+                          onTap: () => selectLang('jp',context),
+                      )
                     ],
                   ),
                   SizedBox(
@@ -99,9 +94,8 @@ class SelectLangPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: '中文',
-                          onTap: () {
-                            selectLang('zh',context);
-                          })
+                          onTap: () => selectLang('zh',context)
+                      )
                     ],
                   ),
                 ],

@@ -17,7 +17,7 @@ class LockBloc extends Bloc<LockEvent, LockState> {
     on<LockEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<setLockEvent>((event, emit){
+    on<SetLockEvent>((event, emit){
       emit(state.copyWithLockState(event.lock, event.password, event.status));
       var lockBox = OpenedBox.lockInstance;
       LockBox lock = LockBox.fromJson({'lockscreen': event.lock, 'password':event.password, 'status': event.status});

@@ -4,9 +4,9 @@ class LockEvent {
   const LockEvent();
 }
 
-class setLockEvent extends LockEvent{
+class SetLockEvent extends LockEvent{
   final bool lock;
   final String password;
   final String status;
-  setLockEvent({this.lock, this.password, this.status});
+  SetLockEvent({this.lock, this.password, this.status});
 }
