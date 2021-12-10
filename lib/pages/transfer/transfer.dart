@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/config/config.dart';
@@ -51,7 +52,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     if (Get.arguments != null) {
       if (Get.arguments['to'] != null) {
         addressCtrl.text = Get.arguments['to'];
-        // getGas();
       }
       if (Get.arguments['page'] != null) {
         prePage = Get.arguments['page'];
@@ -197,21 +197,44 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
+  List<CacheMessage> getPendingList(){
+    return OpenedBox.mesInstance.values
+        .where((mes) =>
+    mes.pending == 1 && mes.from == wallet.addr && mes.rpc == net.rpc)
+        .toList();
+  }
+
   void getGasCallback() {
     try {
       if (isSpeedUp) {
+        var pendingList = getPendingList();
+        var last = pendingList.last;
         increaseGas();
-      }
-      var toAddress = addressCtrl.text.trim();
-      var amount = amountCtrl.text.trim();
-      bool valid = checkGas();
-      if (valid) {
-        Get.toNamed(transferConfrimPage, arguments: {
-          "to": toAddress,
-          "amount": amount,
-          "prePage": prePage,
-          "isSpeedUp": isSpeedUp
-        });
+        var toAddress = last.to;
+        var unit = Decimal.fromInt(pow(10, isToken ? token.precision : 18));
+        var _value = Decimal.parse(last.value);
+        var amount =(_value / unit).toString();
+        bool valid = checkGas(amount);
+        if (valid){
+          Get.toNamed(transferConfrimPage, arguments: {
+            "to": toAddress,
+            "amount": amount,
+            "prePage": prePage,
+            "isSpeedUp": isSpeedUp
+          });
+        }
+      }else{
+        var toAddress = addressCtrl.text.trim();
+        var amount = amountCtrl.text.trim();
+        bool valid = checkGas(amount);
+        if (valid) {
+          Get.toNamed(transferConfrimPage, arguments: {
+            "to": toAddress,
+            "amount": amount,
+            "prePage": prePage,
+            "isSpeedUp": isSpeedUp
+          });
+        }
       }
     } catch (error) {
       print('error');
@@ -246,8 +269,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  bool checkGas() {
-    var amount = amountCtrl.text.trim();
+  bool checkGas(amount) {
     var handlingFee = BigInt.parse($store.gas.handlingFee);
     var bigIntBalance =
         BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
@@ -356,7 +378,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
-      print('success');
     } catch (error) {
       print('error');
     }
