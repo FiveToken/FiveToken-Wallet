@@ -6,9 +6,7 @@ import 'package:fil/chain/net.dart';
 import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/routes/path.dart';
-import 'package:fil/widgets/text.dart';
 import 'package:fil/widgets/style.dart';
-// import 'package:fil/index.dart';
 import 'package:fil/bloc/net/net_bloc.dart';
 class NetIndexPage extends StatefulWidget {
   @override
@@ -19,13 +17,13 @@ class NetIndexPage extends StatefulWidget {
 
 class NetIndexStatePage extends State<NetIndexPage> {
 
-  void onPressed(context){
+  void onPressed(BuildContext context){
     Get.toNamed(netAddPage).then((value) {
         BlocProvider.of<NetBloc>(context)..add(SetNetEvent(Network.netList));
     });
   }
 
-  void onTap(context, n){
+  void onTap(BuildContext context, Network n){
     Get.toNamed(netAddPage, arguments: {'net': n})
         .then((value) {
           BlocProvider.of<NetBloc>(context)..add(SetNetEvent(Network.netList));
@@ -118,28 +116,4 @@ class NetIndexStatePage extends State<NetIndexPage> {
     );
   }
 }
-
-// class NetchildWidget extends StatefulWidget {
-//   const NetchildWidget({Key key}): super(key: key);
-//
-//   @override
-//   State<NetchildWidget> createState() => _NechildState();
-// }
-//
-// class _NechildState extends State<NetchildWidget>{
-//
-//
-//
-//   @override
-//   Widget build(BuildContext context){
-//     return BlocBuilder<NetBloc, NetState>(builder: (ctx, state){
-//       return CommonScaffold(
-//         title: 'net'.tr,
-//         footerText: 'add'.tr,
-//         onPressed: onPressed,
-//       )
-//     })
-//   }
-// }
-
 
