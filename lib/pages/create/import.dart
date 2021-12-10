@@ -32,9 +32,7 @@ class ImportIndexPage extends StatelessWidget {
                   CommonText.white('idWallet'.tr),
                   Image(width: 18, image: AssetImage('icons/right-w.png'))
                 ]),
-                onTap: () {
-                  go(WalletType.id, null);
-                },
+                onTap: ()=> go(WalletType.id, null),
               ),
               visible: isMne,
             ),
@@ -61,9 +59,7 @@ class ImportIndexPage extends StatelessWidget {
                                   width: 18,
                                   image: AssetImage('icons/right-w.png'))
                             ]),
-                            onTap: () {
-                              go(type, net);
-                            },
+                            onTap: ()=>go(type, net),
                           ),
                           margin: EdgeInsets.only(bottom: 12),
                         );

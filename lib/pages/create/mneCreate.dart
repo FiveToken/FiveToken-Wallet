@@ -66,9 +66,7 @@ class MneCreatePageState extends State<MneCreatePage> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 8),
                 ),
-                onTap: () {
-                  Get.back();
-                },
+                onTap: () => Get.back(),
               ),
             ],
           ));

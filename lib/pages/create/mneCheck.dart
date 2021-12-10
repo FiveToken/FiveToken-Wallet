@@ -1,7 +1,5 @@
 import 'package:fil/bloc/create/create_bloc.dart';
 import 'package:fil/common/index.dart';
-// import 'package:fil/index.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -100,9 +98,7 @@ class MneCheckPageState extends State<MneCheckPage> {
                           return MneItem(
                             remove: true,
                             label: state.selectedList[index],
-                            onTap: () {
-                              handleRemove(ctx, state, index);
-                            },
+                            onTap: ()=> handleRemove(ctx, state, index),
                           );
                         }),
                       ),
@@ -122,9 +118,7 @@ class MneCheckPageState extends State<MneCheckPage> {
                       return MneItem(
                         label: state.unSelectedList[index],
                         bg: CustomColor.primary,
-                        onTap: () {
-                          handleSelect(ctx,state,index);
-                        },
+                        onTap: ()=> handleSelect(ctx,state,index),
                       );
                     }),
                   )
