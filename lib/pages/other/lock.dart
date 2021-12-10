@@ -52,7 +52,7 @@ class LockPageState extends State<LockPage> {
     });
   }
 
-  Widget _switch(context, state){
+  Widget _switch(BuildContext context, state){
     return Container(
         height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -72,7 +72,7 @@ class LockPageState extends State<LockPage> {
     );
   }
   
-  Widget _editAction(context, state){
+  Widget _editAction(BuildContext context, state){
     return Container(
         height: 40,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -94,7 +94,6 @@ class LockPageState extends State<LockPage> {
         ),
         decoration: BoxDecoration(
             color: Colors.white,
-            // border: new Border.all(width: 1, color: Colors.grey),
             borderRadius: CustomRadius.b8
         )
     );
@@ -108,7 +107,7 @@ class LockPageState extends State<LockPage> {
     super.dispose();
   }
 
-  void passwordEnteredCallback(ctx, state, String enterPassCode, String status) {
+  void passwordEnteredCallback(BuildContext ctx, state, String enterPassCode, String status) {
     bool isValid = true;
     _verificationNotifier.add(isValid);
     // Navigator.pop(ctx);
@@ -119,24 +118,22 @@ class LockPageState extends State<LockPage> {
     return Text(label,style: TextStyle(color: Colors.white));
   }
 
-  Widget cancel(label, state, status){
+  Widget cancel(String label, state, String status){
     if(status=='create'){
       BlocProvider.of<LockBloc>(context).add(SetLockEvent(lock: false));
     }
     return FButton(text: label, onPressed: ()=>{
-     _verificationNotifier.add(true),
-    _verificationNotifier2.add(true)
-
+       _verificationNotifier.add(true),
+      _verificationNotifier2.add(true)
     });
   }
 
-  void openLockScreen(ctx, state, status) {
+  void openLockScreen(BuildContext ctx, state, String status) {
     Navigator.push(ctx,
         PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) {
           return PasscodeScreen(
             title: title('setLockPassword'.tr),
-            passwordEnteredCallback: (String pass) =>
-            {passwordEnteredCallback(ctx, state, pass, status)},
+            passwordEnteredCallback: (String pass) => passwordEnteredCallback(ctx, state, pass, status),
             cancelButton: cancel('cancel'.tr, state, status),
             deleteButton: title('delete'.tr),
             shouldTriggerVerification: _verificationNotifier.stream,
@@ -154,7 +151,7 @@ class LockPageState extends State<LockPage> {
     BlocProvider.of<LockBloc>(context).add(SetLockEvent(password: secondPass, lock: true));
   }
 
-  void openLockSencondScreen(context, state, String firstPass, String status){
+  void openLockSencondScreen(BuildContext context, state, String firstPass, String status){
     Navigator.push(context, PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation){
       return PasscodeScreen(
         isValidCallback: () {},
@@ -167,7 +164,7 @@ class LockPageState extends State<LockPage> {
     }));
   }
 
-  onSwitchChanged(ctx,  state, value){
+  onSwitchChanged(BuildContext ctx, state, bool value){
     BlocProvider.of<LockBloc>(context).add(SetLockEvent(lock: value, status: 'create'));
      if(value){
        openLockScreen(ctx, state, 'create');

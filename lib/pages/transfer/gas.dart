@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
-import 'package:fil/common/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -50,7 +49,7 @@ class ChainGasPageState extends State<ChainGasPage> {
     }
     initGas(rpcType);
   }
-  void initGas(rpcType) {
+  void initGas(String rpcType) {
     var unit = BigInt.from(pow(10, 9));
     maxPriorityFeeCtrl.text = storeGas.maxPriorityFee;
     maxFeePerGasCtrl.text = (BigInt.parse(storeGas.maxFeePerGas)/unit).toString();

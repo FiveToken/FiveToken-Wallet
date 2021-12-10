@@ -184,7 +184,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     });
   }
 
-  void getGas(context) {
+  void getGas(BuildContext context) {
     var to = addressCtrl.text.trim();
     try {
       if (mounted) {
@@ -218,7 +218,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  nextStep(context) async {
+  nextStep(BuildContext context) async {
     try {
       bool valid = await checkInputValid();
       if (valid) {
@@ -313,7 +313,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  void skipConfirmMessages(context,bool) {
+  void skipConfirmMessages(BuildContext context,bool bool) {
     isSpeedUp = bool;
     getGas(context);
   }
