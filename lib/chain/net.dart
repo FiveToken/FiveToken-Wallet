@@ -1,4 +1,11 @@
+import 'dart:ui';
+
+import 'package:fil/conf/conf.dart';
 import 'package:fil/index.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:hive/hive.dart';
 part 'net.g.dart';
 
 @HiveType(typeId: 7)

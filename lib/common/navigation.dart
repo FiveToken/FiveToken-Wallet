@@ -1,4 +1,8 @@
 import 'package:fil/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'global.dart';
 
 class PushObserver extends NavigatorObserver {
   @override

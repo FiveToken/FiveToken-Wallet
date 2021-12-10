@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/lock.dart';

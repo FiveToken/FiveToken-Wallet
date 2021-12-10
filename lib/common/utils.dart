@@ -1,16 +1,26 @@
+import 'dart:convert';
+
 import 'package:decimal/decimal.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
+import 'package:fil/models/index.dart';
+import 'package:fil/models/private.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/utils/decimal_extension.dart';
 import 'package:fil/utils/string_extension.dart';
+import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fil/utils/num_extension.dart';
+import 'dart:async';
+import 'package:convert/convert.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+
 
 const psalt = "vFIzIawYOU";
 
@@ -161,7 +171,9 @@ String getChainValue(String fil, {int precision = 18}) {
     var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision))/Decimal.fromInt(pow(10,18));
     var _decimal = _amount.toString().toDecimal;
     var res = _decimal.fmtDown(0);
-    return res;
+    var val = num.parse(res).toStringAsFixed(0);
+    print('res');
+    return val;
   }catch(error){
     print('error');
   }

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:argon2/argon2.dart';
 import 'package:fil/index.dart';
+import 'package:fil/init/hive.dart';
 import 'package:fil/models/nonce_unit.dart';
 
 import 'package:libsodium/libsodium.dart';

@@ -1,5 +1,13 @@
 import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/global.dart';
 import 'package:fil/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/store/store.dart';
+import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'hive.dart';
 
 Future<String> initSharedPreferences() async {
   var initialRoute = mainPage;
