@@ -36,7 +36,6 @@ class NetAddPageState extends State<NetAddPage> {
   TextEditingController browserCtrl = TextEditingController();
 
   Network net;
-  Web3Client client;
   bool readonly = false;
   bool loading = false;
   var box = OpenedBox.netInstance;
@@ -74,8 +73,6 @@ class NetAddPageState extends State<NetAddPage> {
       showCustomError('netExist'.tr);
       return;
     }
-
-    client = Web3Client(rpc, http.Client());
     if (this.loading) {
       return;
     }
@@ -173,7 +170,6 @@ class NetAddPageState extends State<NetAddPage> {
   @override
   void dispose() {
     super.dispose();
-    client?.dispose();
   }
 
 

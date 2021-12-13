@@ -320,22 +320,6 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<List> getTokenPrice(param) async{
-    try{
-      String baseApi = Network.filecoinMainNet.rpc + '/api' + Config.clientID;
-      String tokenPrice = '/token/prices';
-      var res = [];
-      final response = await http.post(baseApi+tokenPrice,data: param);
-      if(response.statusCode == 200){
-        res = response.data;
-      }
-      return res;
-    }catch(error){
-      return [];
-    }
-  }
-
-  @override
   Future<bool> addressCheck(String address) async{
     return false;
   }

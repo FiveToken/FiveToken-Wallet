@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:fil/bloc/connect/connect_bloc.dart';
 import 'package:fil/bloc/home/home_bloc.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
-import 'package:fil/bloc/price/price_bloc.dart';
 import 'package:fil/common/back.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
@@ -184,7 +183,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         BlocProvider.of<ConnectBloc>(context)
           ..add(SetConnectedSessionEvent(connectedSession: _session ));
       }
-      BlocProvider.of<PriceBloc>(context)..add(ResetUsdPriceEvent())..add(GetPriceEvent($store.net.chain));
       BlocProvider.of<HomeBloc>(context).add(
           GetTokenListEvent($store.net.rpc, $store.net.chain, $store.wal.addr));
     } catch (e) {
@@ -200,185 +198,181 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         builder: (context, connectState) {
           return BlocBuilder<HomeBloc, HomeState>(
             builder: (context, homeState) {
-              return BlocBuilder<PriceBloc,PriceState>(
-                  builder: (context,priceState){
-                    return WillPopScope(
-                        child: Scaffold(
-                          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-                          floatingActionButton:Visibility(
-                            child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color: CustomColor.primary),
-                                child:IconButton(
-                                    icon: Image(
-                                      image: AssetImage('icons/wc.png'),
-                                    ),
-                                    onPressed:(){
-                                      _walletDisconnect(context,connectState);
-                                    }
-                                ),
+              return WillPopScope(
+                  child: Scaffold(
+                    floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+                    floatingActionButton:Visibility(
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: CustomColor.primary),
+                        child:IconButton(
+                            icon: Image(
+                              image: AssetImage('icons/wc.png'),
                             ),
-                            visible: connectState.connectedSession != null,
-                          ),
-                          appBar: PreferredSize(
-                              child: AppBar(
-                                actions: [
-                                  Padding(
-                                    child: GestureDetector(
-                                        onTap: _handleScan,
-                                        child: Image(
-                                          width: 20,
-                                          image: AssetImage('icons/scan.png'),
-                                        )),
-                                    padding: EdgeInsets.only(right: 10),
-                                  )
-                                ],
-                                backgroundColor: Colors.white,
-                                elevation: .5,
-                                leading: Builder(
-                                  builder: (BuildContext context) {
-                                    return IconButton(
-                                      onPressed: () {
-                                        Scaffold.of(context).openDrawer();
-                                      },
-                                      icon: IconList,
-                                      alignment: NavLeadingAlign,
-                                    );
-                                  },
-                                ),
-                                title: NetSelect(),
-                                centerTitle: true,
-                              ),
-                              preferredSize: Size.fromHeight(NavHeight)),
-                          drawer: Drawer(
-                            child: DrawerBody(),
-                          ),
+                            onPressed:(){
+                              _walletDisconnect(context,connectState);
+                            }
+                        ),
+                      ),
+                      visible: connectState.connectedSession != null,
+                    ),
+                    appBar: PreferredSize(
+                        child: AppBar(
+                          actions: [
+                            Padding(
+                              child: GestureDetector(
+                                  onTap: _handleScan,
+                                  child: Image(
+                                    width: 20,
+                                    image: AssetImage('icons/scan.png'),
+                                  )),
+                              padding: EdgeInsets.only(right: 10),
+                            )
+                          ],
                           backgroundColor: Colors.white,
-                          body: CustomRefreshWidget(
-                            onRefresh: () => onRefresh(context),
-                            enablePullUp: false,
+                          elevation: .5,
+                          leading: Builder(
+                            builder: (BuildContext context) {
+                              return IconButton(
+                                onPressed: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                icon: IconList,
+                                alignment: NavLeadingAlign,
+                              );
+                            },
+                          ),
+                          title: NetSelect(),
+                          centerTitle: true,
+                        ),
+                        preferredSize: Size.fromHeight(NavHeight)),
+                    drawer: Drawer(
+                      child: DrawerBody(),
+                    ),
+                    backgroundColor: Colors.white,
+                    body: CustomRefreshWidget(
+                      onRefresh: () => onRefresh(context),
+                      enablePullUp: false,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 25,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed(walletSelectPage);
+                            },
                             child: Column(
                               children: [
+                                CoinPriceWidget(),
                                 SizedBox(
-                                  height: 25,
+                                  height: 8,
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.toNamed(walletSelectPage);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      CoinPriceWidget(),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Obx(
-                                            () => CommonText(
-                                          $store.wal.label,
-                                          size: 14,
-                                          color: Color(0xffB4B5B7),
-                                        ),
-                                      ),
-                                    ],
+                                Obx(
+                                      () => CommonText(
+                                    $store.wal.label,
+                                    size: 14,
+                                    color: Color(0xffB4B5B7),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 18,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 25,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 5),
-                                      child: Obx(() => CommonText(
-                                        dotString(str: $store.wal.addr),
-                                        size: 14,
-                                        color: Color(0xffB4B5B7),
-                                      )),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5),
-                                          color: Color(0xfff8f8f8)),
-                                    ),
-                                    SizedBox(
-                                      width: 14,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        copyText($store.wal.addr);
-                                        showCustomToast('copyAddr'.tr);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                            color: CustomColor.primary,
-                                            borderRadius: BorderRadius.circular(5)),
-                                        child: Image(
-                                            fit: BoxFit.fitWidth,
-                                            width: 17,
-                                            height: 17,
-                                            image: AssetImage('icons/copy-w.png')),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        var net = $store.net;
-                                        var wal = $store.wal;
-                                        Get.toNamed(walletMangePage,
-                                            arguments: {'net': net, 'wallet': wal});
-                                      },
-                                      child: Container(
-                                        width: 24,
-                                        height: 24,
-                                        margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                        padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                                        // alignment:Alignment.center,
-                                        decoration: BoxDecoration(
-                                            color: CustomColor.primary,
-                                            borderRadius: BorderRadius.circular(5)),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            CommonText(
-                                              '...',
-                                              size: 14,
-                                              color: Colors.white,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 18,
-                                ),
-                                WalletService(mainPage),
-                                SizedBox(
-                                  height: 40,
-                                ),
-                                MainTokenWidget(),
-                                Expanded(
-                                    child: SingleChildScrollView(
-                                      padding: EdgeInsets.only(bottom: 40),
-                                      child: Column(
-                                        children: [TokenList()],
-                                      ),
-                                    ))
                               ],
                             ),
                           ),
-                        ),
-                        onWillPop: () async {
-                          AndroidBackTop.backDeskTop();
-                          return false;
-                        }
-                    );
+                          SizedBox(
+                            height: 18,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 25,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 5),
+                                child: Obx(() => CommonText(
+                                  dotString(str: $store.wal.addr),
+                                  size: 14,
+                                  color: Color(0xffB4B5B7),
+                                )),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Color(0xfff8f8f8)),
+                              ),
+                              SizedBox(
+                                width: 14,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  copyText($store.wal.addr);
+                                  showCustomToast('copyAddr'.tr);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: Image(
+                                      fit: BoxFit.fitWidth,
+                                      width: 17,
+                                      height: 17,
+                                      image: AssetImage('icons/copy-w.png')),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  var net = $store.net;
+                                  var wal = $store.wal;
+                                  Get.toNamed(walletMangePage,
+                                      arguments: {'net': net, 'wallet': wal});
+                                },
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                  // alignment:Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: CustomColor.primary,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      CommonText(
+                                        '...',
+                                        size: 14,
+                                        color: Colors.white,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 18,
+                          ),
+                          WalletService(mainPage),
+                          SizedBox(
+                            height: 40,
+                          ),
+                          MainTokenWidget(),
+                          Expanded(
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.only(bottom: 40),
+                                child: Column(
+                                  children: [TokenList()],
+                                ),
+                              ))
+                        ],
+                      ),
+                    ),
+                  ),
+                  onWillPop: () async {
+                    AndroidBackTop.backDeskTop();
+                    return false;
                   }
               );
             },

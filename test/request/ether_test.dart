@@ -12,9 +12,9 @@ Future<void> main() {
           "vs":"usd"
         }
       ];
-      Chain.setRpcNetwork(filNet.rpc, filNet.chain);
-      var res = await Chain.chainProvider.getTokenPrice(param);
-      expect(res.length, 1);
+      // Chain.setRpcNetwork(filNet.rpc, filNet.chain);
+      // var res = await Chain.chainProvider.getTokenPrice(param);
+      // expect(res.length, 1);
     });
 
   });

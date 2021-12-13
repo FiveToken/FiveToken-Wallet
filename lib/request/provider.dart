@@ -46,8 +46,6 @@ abstract class ChainProvider {
 
   Future<String> getMaxFeePerGas();
 
-  Future<List> getTokenPrice(List param);
-
   Future<bool> addressCheck(String address);
 
   Future<String> getNetworkId();
