@@ -21,7 +21,6 @@ import 'package:fil/pages/home/widgets/price.dart';
 import 'package:fil/pages/home/widgets/token.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:passcode_screen/passcode_screen.dart';
-import 'package:wallet_connect/models/ethereum/wc_ethereum_transaction.dart';
 import 'package:wallet_connect/models/session/wc_session.dart';
 import 'package:wallet_connect/models/wc_peer_meta.dart';
 import 'package:wallet_connect/wc_client.dart';

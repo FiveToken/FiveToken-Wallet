@@ -17,7 +17,6 @@ class SelectLangPage extends StatelessWidget {
     Global.langCode = lang;
     Global.store.setString(StoreKeyLanguage, lang);
     Get.toNamed(initWalletPage);
-    BlocProvider.of<MainBloc>(context).add(AppOpenEvent(count: 1));
   }
 
   @override

@@ -18,10 +18,6 @@ part 'transfer_state.dart';
 
 class TransferBloc extends Bloc<TransferEvent, TransferState> {
   TransferBloc() : super(TransferState.idle()) {
-    on<TransferEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<GetNonceEvent>((event,emit) async{
       Chain.setRpcNetwork(event.rpc, event.chainType);
       String address = event.address;

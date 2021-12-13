@@ -14,10 +14,6 @@ part 'main_event.dart';
 
 class MainBloc extends Bloc<MainEvent, MainState> {
   MainBloc() : super(MainState.idle()) {
-    on<AppOpenEvent>((event, emit) {
-      // debugPrint("================AppOpenEvent=========" + event.count.toString());
-    });
-
     on<TestNetIsShowEvent>((event, emit){
       if(event.hideTestnet==null){return;}
       bool hideTestnet = event.hideTestnet;
