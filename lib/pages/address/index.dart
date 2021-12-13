@@ -120,7 +120,7 @@ class NetEntranceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddressBloc, AddressState>(builder: (context,state){
-      var coinType = state.net!=null&&CoinIcon.icons.containsKey(state.net)?state.net.coin:'FIL';
+      var coinType = state.net!=null&&state.net.coin!=null?state.net.coin:'FIL';
       Widget childWidget = CoinIcon.icons[coinType].icon;
       return GestureDetector(
         onTap: () {
