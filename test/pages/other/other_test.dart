@@ -19,8 +19,7 @@ void main() {
     await tester.runAsync(() async {
       var store = MockSharedPreferences();
       Global.store = store;
-      when(store.setString(any, any))
-          .thenAnswer((realInvocation) async => true);
+      store.setString(StoreKeyLanguage, 'en');
       await tester.pumpWidget(GetMaterialApp(
         initialRoute: setPage,
         getPages: [
@@ -33,6 +32,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(Get.currentRoute, langPage);
       await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, setPage);
+
+      await tester.tap(find.text('lang'.tr));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, langPage);
+      await tester.tap(find.text('中文'));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, setPage);
+
+      await tester.tap(find.text('lang'.tr));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, langPage);
+      await tester.tap(find.text('한국어'));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, setPage);
+
+      await tester.tap(find.text('lang'.tr));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, langPage);
+      await tester.tap(find.text('日本語'));
       await tester.pumpAndSettle();
       expect(Get.currentRoute, setPage);
     });
