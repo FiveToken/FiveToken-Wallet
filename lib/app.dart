@@ -24,8 +24,6 @@ import 'package:fil/init/device.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:fil/actions/event.dart';
-import 'bloc/price/price_bloc.dart';
-import 'package:fil/common/navigation.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -120,9 +118,6 @@ class AppState extends State<App> with WidgetsBindingObserver {
           ),
           BlocProvider(
               create: (ctx) => ConnectBloc(),
-          ),
-          BlocProvider(
-              create: (ctx) => PriceBloc(),
           ),
           BlocProvider(
             create: (ctx) => LockBloc(),

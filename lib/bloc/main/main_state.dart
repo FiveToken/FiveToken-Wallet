@@ -5,12 +5,14 @@ class MainState extends Equatable {
   final bool hideTestnet;
   final List<List<Network>> filterNets;
   final String balance;
+  final num usd;
 
   MainState({
     this.chainWallet,
     this.hideTestnet,
     this.filterNets,
     this.balance,
+    this.usd
   });
 
   factory MainState.idle() {
@@ -21,6 +23,7 @@ class MainState extends Equatable {
       hideTestnet: bol,
       filterNets: nets,
       balance:'0',
+      usd:0
     );
   }
 
@@ -28,13 +31,15 @@ class MainState extends Equatable {
     ChainWallet chainWallet,
     bool hideTestnet,
     List<List<Network>> filterNets,
-    String balance
+    String balance,
+    num usd,
   }) {
     return MainState(
       chainWallet: chainWallet ?? this.chainWallet,
       hideTestnet:hideTestnet ?? this.hideTestnet,
       filterNets:filterNets ?? this.filterNets,
       balance:balance ?? this.balance,
+        usd:usd ?? this.usd
     );
   }
 
@@ -50,5 +55,5 @@ class MainState extends Equatable {
 
   @override
   // TODO: implement props
-  List<Object> get props => [this.chainWallet,this.filterNets,this.hideTestnet,this.balance];
+  List<Object> get props => [this.chainWallet,this.filterNets,this.hideTestnet,this.balance,this.usd];
 }

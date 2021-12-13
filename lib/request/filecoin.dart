@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:bls/bls.dart';
 import 'package:dio/dio.dart';
 import 'package:fil/chain/gas.dart';
+import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/models/filMessage.dart';
@@ -170,17 +171,6 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<List> getTokenPrice(List param) async{
-    try{
-      var res = [];
-      var result = await client.post(tokenPrice,data:param);
-      return res;
-    }catch(error){
-      return [];
-    }
-  }
-
-  @override
   Future<List> getMessagePendingState(List param) async{
     try {
       var result =  await client.post(messagePending, data: param );
@@ -268,4 +258,37 @@ class Filecoin extends ChainProvider {
 
   @override
   void dispose() {}
+}
+
+
+Future<num> getTokenPrice(chain) async{
+  try{
+    String baseApi = Network.filecoinMainNet.rpc + '/api' + Config.clientID;
+    String tokenPrice = '/token/prices';
+    var map = {
+      'eth': 'ethereum',
+      'binance': 'binancecoin',
+      'filecoin':'filecoin'
+    };
+    List param = [
+      {
+        "id":map[chain],
+        "vs":"usd"
+      }
+    ];
+    num usd = 0;
+    final response = await http.post(baseApi+tokenPrice,data: param);
+    if(response.statusCode == 200){
+      var res = response.data;
+      if(res.length > 0){
+        var obj = res[0];
+        if(obj["vs"] == 'usd'){
+          usd = double.parse((obj["price"]).toString());
+        }
+      }
+    }
+    return usd;
+  }catch(error){
+    return 0;
+  }
 }

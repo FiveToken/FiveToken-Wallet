@@ -1,6 +1,3 @@
-
-
-
 import 'package:fil/common/global.dart';
 import 'package:fil/config/config.dart';
 import 'package:fil/request/provider.dart';

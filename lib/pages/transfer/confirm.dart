@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:decimal/decimal.dart';
-import 'package:fil/bloc/price/price_bloc.dart';
+import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
@@ -85,7 +85,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
             create: (context) => TransferBloc()..add(GetNonceEvent(rpc, chainType, from)),
         ),
       ],
-      child:BlocBuilder<TransferBloc, TransferState>(builder: (context, data) {
+      child:BlocBuilder<TransferBloc, TransferState>(
+          builder: (context, data) {
           return BlocListener<TransferBloc, TransferState>(
             listener: (context, state) {
               if (state.messageState == 'success') {
@@ -114,26 +115,28 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                 }
               }
             },
-            child: BlocBuilder<PriceBloc, PriceState>(builder: (context, priceState) {
-              return CommonScaffold(
-                grey: true,
-                title: 'send'.tr + title,
-                footerText: 'next'.tr,
-                onPressed: () {
-                  showPassDialog(context, (String pass) async {
-                    try {
-                        var wal = $store.wal;
-                        var ck = await wal.getPrivateKey(pass);
-                        pushMessage(data.nonce, ck, context);
-                      } catch (error) {
-                        print('error');
+            child: BlocBuilder<MainBloc, MainState>(
+              builder: (context, mainState) {
+                return CommonScaffold(
+                  grey: true,
+                  title: 'send'.tr + title,
+                  footerText: 'next'.tr,
+                  onPressed: () {
+                    showPassDialog(context, (String pass) async {
+                      try {
+                          var wal = $store.wal;
+                          var ck = await wal.getPrivateKey(pass);
+                          pushMessage(data.nonce, ck, context);
+                        } catch (error) {
+                          print('error');
+                        }
                       }
-                    }
-                  );
-                },
-                body: _body(priceState)
-              );
-            })
+                    );
+                  },
+                  body: _body(mainState)
+                );
+              }
+            )
           );
         }
       )
@@ -165,10 +168,10 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                 CommonText.main('amount'.tr),
                 Visibility(
                   child: CommonText(
-                    getAmountUsdPrice(state.usdPrice),
+                    getAmountUsdPrice(state.usd),
                     color: CustomColor.grey,
                   ),
-                  visible: state.usdPrice > 0,
+                  visible: state.usd > 0,
                 ),
               ],
             ),
@@ -181,7 +184,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                   color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8),
             ),
             Obx(() => SetGas(
-                maxFee: handlingFee, gas: gas, usdPrice: state.usdPrice)),
+                maxFee: handlingFee, gas: gas, usdPrice: state.usd)),
             SizedBox(
               height: 20,
             ),
@@ -194,7 +197,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                           children: [
                             CommonText.main('totalPay'.tr),
                             CommonText(
-                              getTotalUsd(state.usdPrice),
+                              getTotalUsd(state.usd),
                               color: CustomColor.grey,
                             )
                           ],
