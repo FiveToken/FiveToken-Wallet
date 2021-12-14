@@ -1,6 +1,5 @@
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

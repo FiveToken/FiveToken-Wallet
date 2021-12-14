@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/home/index.dart';
 import 'package:fil/pages/wallet/id.dart';
 import 'package:fil/pages/wallet/main.dart';

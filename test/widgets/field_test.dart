@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:flutter/material.dart';

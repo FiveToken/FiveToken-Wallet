@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:passcode_screen/passcode_screen.dart';
 
-import '../../index.dart';
-
 class ScreenPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {

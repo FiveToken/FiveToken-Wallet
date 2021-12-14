@@ -28,68 +28,68 @@ dependencies:
   # git: https://gitlab.com/abu0306/bls.git
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.7
-  hive: any
-  hive_flutter: any
-  flutter_secure_storage: any
-  path_provider: any
-  bip39: any
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^5.0.2
+  path_provider: ^2.0.7
+  bip39: ^1.0.6
   bip32: ^1.0.5
   decimal: ^1.5.0
   validators: ^3.0.0
-  dio: any
-  crypto: any
-  encrypt: any
+  dio: ^4.0.4
+  crypto: ^3.0.1
+  encrypt: ^5.0.1
   flotus: ^2.0.1
   bls: ^2.0.1
-  argon2: any
+  argon2: ^1.0.1
   libsodium: ^0.2.0
   flutter_screenshot_events:  ^2.0.0
   flutter_sodium: ^0.2.0
   permission_handler: 8.2.5
   passcode_screen: ^1.0.2
-  image_gallery_saver: any
+  image_gallery_saver: ^1.7.1
   get:
   qr_flutter: ^3.1.0
   flutter_slidable: ^0.5.7
   flutter_root_jailbreak: ^2.0.2
   scan: ^0.0.7
-  connectivity: any
-  pull_to_refresh: any
-  image_picker: any
+  connectivity: ^3.0.6
+  pull_to_refresh: ^2.0.0
+  image_picker: ^0.8.4
   fbutton: ^2.0.1
   package_info: ^0.4.3+2
-  webview_flutter: any
-  device_info: any
-  url_launcher: any
+  webview_flutter: ^2.3.1
+  device_info: ^2.0.3
+  url_launcher: ^6.0.17
   gesture_password_widget: ^1.0.6
-  share: any
-  oktoast: any
-  big_decimal: any
+  share: ^2.0.4
+  oktoast: ^3.1.5
+  big_decimal: ^0.3.1
   flutter_swipe_action_cell: ^1.3.4
   day: ^0.6.4
   uni_links: ^0.4.0
-  cryptography: any
+  cryptography: ^2.0.5
   logger: 0.9.4
   tuple: 1.0.3
-  uuid: any
-  web_socket_channel: any
+  uuid: ^3.0.5
+  web_socket_channel: ^2.1.0
   web3dart: 2.3.2
   random_color: ^1.0.5
   event_bus: ^1.1.1
-  dio_log: any
-  bloc: any
-  flutter_bloc: any
-  equatable: any
-  intl: any
+  dio_log: ^2.0.2
+  bloc: ^8.0.1
+  flutter_bloc: ^8.0.0
+  equatable: ^2.0.3
+  intl: ^0.17.0
   wallet_connect: ^1.0.2
 
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: any
-  build_runner: any
-  mockito: any
+  hive_generator: ^1.1.1
+  build_runner: ^2.1.5
+  mockito: ^5.0.16
   test: ^1.16.0
   bloc_test: ^9.0.0
 

@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/wallet/qr_code.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/material.dart';

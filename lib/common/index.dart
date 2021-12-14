@@ -5,4 +5,3 @@ export './utils.dart';
 export './formatter.dart';
 export './time.dart';
 export './pk.dart';
-export './walletConnect.dart';

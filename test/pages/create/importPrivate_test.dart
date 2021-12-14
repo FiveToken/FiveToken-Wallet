@@ -1,5 +1,4 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/create/importPrivateKey.dart';
 import 'package:fil/pages/init/wallet.dart';
 import 'package:fil/pages/pass/init.dart';

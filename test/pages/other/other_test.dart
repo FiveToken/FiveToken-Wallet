@@ -1,5 +1,4 @@
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/other/lang.dart';
 import 'package:fil/pages/other/set.dart';
 import 'package:fil/routes/path.dart';
@@ -10,7 +9,6 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
-import 'package:mockito/mockito.dart';
 
 import '../../widgets/dialog_test.dart';
 

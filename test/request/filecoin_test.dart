@@ -3,7 +3,7 @@ import 'package:fil/request/global.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fil/chain/net.dart';
 
-Future<void> main() {
+void main() {
   group("global test", (){
     test('filecoin test',() async{
       var filNet = Network.filecoinMainNet;

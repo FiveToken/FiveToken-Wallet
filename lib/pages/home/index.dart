@@ -6,7 +6,6 @@ import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/back.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_root_jailbreak/flutter_root_jailbreak.dart';

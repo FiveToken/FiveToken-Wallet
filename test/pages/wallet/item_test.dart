@@ -1,5 +1,4 @@
 import 'package:fil/common/utils.dart';
-import 'package:fil/index.dart';
 import 'package:fil/models/cacheMessage.dart';
 import 'package:fil/pages/wallet/main.dart';
 import 'package:fil/pages/wallet/widgets/messageItem.dart';

@@ -1,6 +1,5 @@
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/home/drawer.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/material.dart';

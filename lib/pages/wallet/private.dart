@@ -1,6 +1,5 @@
 import 'package:fil/bloc/mne/mne_bloc.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';

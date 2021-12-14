@@ -1,5 +1,4 @@
 import 'package:fil/common/pk.dart';
-import 'package:fil/index.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../constant.dart';

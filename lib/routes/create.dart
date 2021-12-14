@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/create/import.dart';
 import 'package:fil/pages/create/importMne.dart';
 import 'package:fil/pages/create/importPrivateKey.dart';

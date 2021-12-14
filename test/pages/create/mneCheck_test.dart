@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/create/mneCheck.dart';
 import 'package:fil/pages/create/mneCreate.dart';
 import 'package:fil/pages/init/wallet.dart';

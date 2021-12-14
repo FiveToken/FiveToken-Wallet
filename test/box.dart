@@ -1,7 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/models/address.dart';
 import 'package:hive/hive.dart';
 import 'package:mockito/mockito.dart';

@@ -1,7 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/store/store.dart';
 import 'package:hive/hive.dart';

@@ -1,6 +1,5 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/home/widgets/net.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/style.dart';

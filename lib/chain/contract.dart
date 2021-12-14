@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:fil/index.dart';
-
 const ABIList = [
   {
     "constant": true,

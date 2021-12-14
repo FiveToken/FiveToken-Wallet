@@ -1,6 +1,5 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -17,7 +16,7 @@ void main() {
       expect(BigInt.parse(gas.handlingFee), BigInt.from(300000));
     });
     test("test max fee", () {
-      var fee = '0.00029 nanoFIL';
+      var fee = '0.00029';
       expect(gas.handlingFee, fee);
     });
   });

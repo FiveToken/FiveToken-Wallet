@@ -6,7 +6,6 @@ import 'package:fil/common/global.dart';
 import 'package:fil/common/time.dart';
 import 'package:fil/models/cacheMessage.dart';
 import 'package:fil/request/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/store/store.dart'; // $store
 import 'package:fil/init/hive.dart'; // OpenedBox
 import 'package:web3dart/web3dart.dart'; // TransactionReceipt

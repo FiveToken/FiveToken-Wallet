@@ -1,7 +1,5 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/other/lang.dart';
 import 'package:fil/pages/other/lock.dart';
-import 'package:fil/pages/other/lockscreen.dart';
 import 'package:fil/pages/other/scan.dart';
 import 'package:fil/pages/other/set.dart';
 import 'package:fil/routes/path.dart';

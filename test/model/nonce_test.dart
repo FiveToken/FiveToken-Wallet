@@ -1,6 +1,5 @@
-import 'package:fil/index.dart';
+import 'package:fil/models/nonce.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fil/models/wallet.dart';
 void main() {
   test("generate model wallet", () async {
      Nonce nonce =Nonce.fromJson({

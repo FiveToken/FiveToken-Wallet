@@ -1,5 +1,4 @@
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/init/wallet.dart';
 import 'package:fil/routes/path.dart';

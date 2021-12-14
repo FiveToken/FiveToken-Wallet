@@ -1,6 +1,5 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/common/index.dart';
-import 'package:fil/index.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../constant.dart';
@@ -103,18 +102,7 @@ void main() {
         '7b2254797065223a22736563703235366b31222c22507269766174654b6579223a22413066553636356f5a67514d46656b5144434c31686872456b76464e445955766a39336d4c5565703079493d227d';
     expect(res, hex);
   });
-  test('check password', () {
-    var pass = 'Aa123456';
-    var wrongPass = 'Aa12345';
-    var wrongPass2 = 'a1234567';
-    var wrongPass3 = '12345678';
-    var wrongPass4 = 'Aabcdefg';
-    expect(isValidPassword(pass), true);
-    expect(isValidPassword(wrongPass), false);
-    expect(isValidPassword(wrongPass2), false);
-    expect(isValidPassword(wrongPass3), false);
-    expect(isValidPassword(wrongPass4), false);
-  });
+
   test('check url', () {
     var url = 'http://www.filecoin.io';
     var wrongUrl = 'http://www.filecoin.';
