@@ -35,9 +35,7 @@ void main() {
         'GetTokenBalanceEvent',
         build: ()=> walletBloc,
         act: (bloc) => bloc.add(GetTokenBalanceEvent(binanceTestnet.rpc,binanceTestnet.chain,ethAddress,contractAddress)),
-        expect: ()=> [
-
-        ]
+        expect: ()=> []
     );
 
 
@@ -53,7 +51,7 @@ void main() {
         'SetEnablePullUpEvent',
         build: ()=> walletBloc,
         act: (bloc) => bloc.add(SetEnablePullUpEvent(true)),
-        expect: ()=> [true]
+        expect: ()=> []
     );
 
   });
