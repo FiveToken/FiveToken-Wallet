@@ -39,6 +39,8 @@ void main() {
         GetPage(name: addressNetPage, page: () => AddressBookNetPage())
       ],
     ));
+    print(Get.currentRoute);
+    expect(Get.currentRoute, addressIndexPage);
     expect(find.byType(SwiperWidget), findsOneWidget);
     await tester.tap(find.byType(NetEntranceWidget));
     await tester.pumpAndSettle();

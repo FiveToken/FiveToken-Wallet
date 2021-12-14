@@ -217,6 +217,25 @@ class Network {
     ];
   }
 
+  static List<List<Network>> get mockNetList {
+    var arr = [
+      [
+        Network.filecoinMainNet,
+        Network.ethMainNet,
+        Network.binanceMainNet,
+      ],
+      [
+        Network.filecoinTestNet,
+        Network.ethKovanNet,
+        Network.ethRinkebyNet,
+        Network.ethRopstenNet,
+        Network.ethGoerliNet,
+        Network.binanceTestnet
+      ],
+    ];
+    return arr;
+  }
+
   static List<List<Network>> get netList {
     var arr = [
       [

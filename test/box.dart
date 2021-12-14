@@ -30,3 +30,4 @@ MockBox<Token> mockTokenBox() {
   // OpenedBox.tokenInstance = box;
   return box;
 }
+

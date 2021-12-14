@@ -10,7 +10,6 @@ List<GetPage> getOtherRoutes() {
   var setting = GetPage(name: setPage, page: () => SetPage());
   var lang = GetPage(name: langPage, page: () => LangPage());
   var lock = GetPage(name: lockPage, page: ()=> LockPage());
-  // var lockscreen = GetPage(name: lockScreen, page: ()=> LockScreenPage());
   list..add(scan)..add(setting)..add(lang)..add(lock);
   return list;
 }
