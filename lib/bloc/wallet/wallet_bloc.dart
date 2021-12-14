@@ -244,18 +244,18 @@ updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
       var mesList = map.keys.toList();
 
       var blocks = await Future.wait(futures);
-      for (var i = 0; i < mesList.length; i++) {
-        var block = blocks[i];
-        var key = mesList[i];
-        var mes = box.get(key);
-        if (block.timestamp != null && block.timestamp is int) {
-          mes.pending = 0;
-          mes.blockTime = block.timestamp;
-          mes.height = block.number;
-          mes.exitCode = map[key].status ? 0 : 1;
-          box.put(key, mes);
-        }
-      }
+      // for (var i = 0; i < mesList.length; i++) {
+      //   var block = blocks[i];
+      //   var key = mesList[i];
+      //   var mes = box.get(key);
+      //   if (block.timestamp != null && block.timestamp is int) {
+      //     mes.pending = 0;
+      //     mes.blockTime = block.timestamp;
+      //     mes.height = block.number;
+      //     mes.exitCode = map[key].status ? 0 : 1;
+      //     box.put(key, mes);
+      //   }
+      // }
     }
   }catch(error){
     print("error");

@@ -23,11 +23,11 @@ import 'package:fil/config/config.dart';
 class Ether extends ChainProvider {
   Web3Client client;
   RpcJson rpcJson;
-  Ether(String rpc, {Web3Client web3client}) {
+  Ether(String rpc, {Web3Client web3client,RpcJson rpcJson}) {
     this.rpc = rpc;
     final web3Rpc = web3.Web3(rpc);
-    client = web3Rpc.client;
-    rpcJson = web3Rpc.rpcJson;
+    client = web3client ?? web3Rpc.client;
+    this.rpcJson =  rpcJson ?? web3Rpc.rpcJson;
   }
 
   @override
