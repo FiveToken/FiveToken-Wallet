@@ -4,9 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/init/hive.dart';
-import 'package:meta/meta.dart';
 import 'package:fil/utils/enum.dart';
 
 part 'select_event.dart';

@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/common/argon2.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/models/private.dart';
 import 'package:flutter/foundation.dart';
-import '../index.dart';
 import 'global.dart';
 
 

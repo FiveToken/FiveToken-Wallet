@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/net/token.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter/material.dart';

@@ -1,5 +1,4 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
 import 'package:fil/models/address.dart';
 import 'package:fil/pages/address/add.dart';
 import 'package:fil/pages/address/select.dart';

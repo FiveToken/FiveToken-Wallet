@@ -1,12 +1,12 @@
-import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/store/store.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:meta/meta.dart';
 
 part 'reset_event.dart';

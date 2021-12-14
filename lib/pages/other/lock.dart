@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:fbutton/fbutton.dart';
 import 'package:fil/bloc/lock/lock_bloc.dart';
-import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/chain/lock.dart';
-import 'package:fil/index.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/widgets/card.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -14,8 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:passcode_screen/passcode_screen.dart';
-import 'package:passcode_screen/circle.dart';//如需要自定义密码圆点UI时需引入
-import 'package:passcode_screen/keyboard.dart';//如需要自定义键盘UI时需引入
 
 class LockPage extends StatefulWidget {
   @override

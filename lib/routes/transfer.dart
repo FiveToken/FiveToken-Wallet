@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/transfer/confirm.dart';
 import 'package:fil/pages/transfer/detail.dart';
 import 'package:fil/pages/transfer/gas.dart';

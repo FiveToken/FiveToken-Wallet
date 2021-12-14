@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:fil/common/utils.dart';
-import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'token.g.dart';
 

@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/wallet/mne.dart';
 import 'package:fil/routes/path.dart';

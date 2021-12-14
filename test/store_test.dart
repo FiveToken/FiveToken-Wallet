@@ -2,7 +2,6 @@ import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';

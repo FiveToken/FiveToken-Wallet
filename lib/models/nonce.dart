@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'nonce.g.dart';
 

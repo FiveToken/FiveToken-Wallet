@@ -3,7 +3,6 @@ import 'package:decimal/decimal.dart';
 import 'package:dio_log/dio_log.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
-import 'package:fil/index.dart';
 import 'package:fil/utils/decimal_extension.dart';
 import 'package:fil/utils/string_extension.dart';
 import 'package:flutter/material.dart';

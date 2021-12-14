@@ -1,6 +1,5 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:fil/models/address.dart';
 import 'package:fil/pages/address/index.dart';
 import 'package:fil/pages/address/net.dart';

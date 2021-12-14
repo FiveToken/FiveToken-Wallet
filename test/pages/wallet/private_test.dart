@@ -1,5 +1,4 @@
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/wallet/mne.dart';
 import 'package:fil/pages/wallet/private.dart';

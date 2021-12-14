@@ -1,6 +1,5 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/wallet/manage.dart';
 import 'package:fil/routes/path.dart';

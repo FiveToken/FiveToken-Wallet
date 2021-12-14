@@ -1,4 +1,4 @@
-import 'package:fil/index.dart';
+import 'package:fil/common/time.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

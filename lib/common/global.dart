@@ -1,7 +1,6 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/models/wallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

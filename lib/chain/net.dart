@@ -1,7 +1,5 @@
 import 'dart:ui';
-
-import 'package:fil/conf/conf.dart';
-import 'package:fil/index.dart';
+import 'package:fil/config/config.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
@@ -43,7 +41,7 @@ class Network {
   }
 
   String get url {
-    return chain == 'eth' ? (rpc + EthClientID) : rpc;
+    return chain == 'eth' ? (rpc + Config.ethClientID) : rpc;
   }
 
   String getDetailLink(String cid) {

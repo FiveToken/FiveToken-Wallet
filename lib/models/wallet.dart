@@ -1,5 +1,4 @@
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'wallet.g.dart';
 

@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:fil/pages/net/add.dart';
 import 'package:fil/pages/net/list.dart';
 import 'package:fil/pages/net/token.dart';

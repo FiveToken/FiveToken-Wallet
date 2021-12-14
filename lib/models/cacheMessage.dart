@@ -1,7 +1,6 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'cacheMessage.g.dart';
 

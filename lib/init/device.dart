@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:device_info/device_info.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/index.dart';
 
 Future initDeviceInfo() async {
   DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
