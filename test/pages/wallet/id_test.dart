@@ -2,6 +2,7 @@ import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/common/global.dart';
+import 'package:fil/init/hive.dart';
 import 'package:fil/pages/init/lang.dart';
 import 'package:fil/pages/wallet/id.dart';
 import 'package:fil/routes/path.dart';
@@ -40,9 +41,7 @@ void main() {
             chain: 'eth',
             addressType: AddressType.eth.type)
       ]);
-  print(box.values);
-  print(OpenedBox.walletInstance);
-  print(netBox.values);
+  OpenedBox.walletInstance = box;
   testWidgets('test render id wallet page', (tester) async {
     await tester.pumpWidget(GetMaterialApp(
       initialRoute: initLangPage,
