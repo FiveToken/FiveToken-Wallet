@@ -136,7 +136,6 @@ Future<bool> isValidChainAddress(String address, Network network) async {
     if(network.addressType == 'filecoin'){
       Chain.setRpcNetwork(network.rpc, network.chain);
       res = await Chain.chainProvider.addressCheck(address);
-      print('res');
     }else{
       var start = address.startsWith('0x');
       var reg = RegExp(r"([A-Fa-f0-9]{40}$)");
@@ -145,7 +144,6 @@ Future<bool> isValidChainAddress(String address, Network network) async {
     }
     return res;
   }catch(error){
-    print('error');
     return false;
   }
 }
@@ -214,10 +212,9 @@ String getChainValue(String fil, {int precision = 18}) {
     var _decimal = _amount.toString().toDecimal;
     var res = _decimal.fmtDown(0);
     var val = num.parse(res).toStringAsFixed(0);
-    print('res');
     return val;
   }catch(error){
-    print('error');
+    throw(error);
   }
 }
 

@@ -33,8 +33,6 @@ class NetIndexStatePage extends State<NetIndexPage> {
   @override
   void initState() {
     super.initState();
-
-    debugPrint("text" + Network.netList.toString());
   }
 
   @override

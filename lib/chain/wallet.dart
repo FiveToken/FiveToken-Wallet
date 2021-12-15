@@ -114,7 +114,6 @@ class ChainWallet {
         return true;
       }
     }catch(e){
-      print(e);
       return false;
     }
   }
@@ -127,9 +126,7 @@ class ChainWallet {
       var str = base64Decode(private);
       var sk = utf8.decode(str);
       return sk;
-    }catch(e){
-      print(e);
-    }
+    }catch(e){}
   }
 }
 
@@ -224,10 +221,8 @@ class EthWallet extends ChainWallet {
     try {
       var addr = await EthPrivateKey.fromHex(pk).extractAddress();
       return addr.hex;
-    }catch(e){
-      print(e);
-    }
-    }
+    }catch(e){}
+  }
 
   static Future<EncryptKey> genEncryptKey(String mne, String pass) async {
     try {
@@ -258,7 +253,6 @@ class EthWallet extends ChainWallet {
           private: privateKey
       );
     }catch(e){
-      print(e);
       throw(e);
     }
   }

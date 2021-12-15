@@ -121,7 +121,6 @@ class PassDialogState extends State<PassDialog> {
       }
     } catch (e) {
       Get.back();
-      print(e);
     }
   }
 

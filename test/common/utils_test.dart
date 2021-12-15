@@ -38,37 +38,15 @@ void main() {
     expect(isDecimal(wrongStr), false);
     expect(isDecimal(wrongStr2), false);
   });
-  group("check address is valid", () {
-    var eth = '0xEa00C8d2d4e658Afc23737181aa1c12F9b99551e';
-    var fil1 = 'f14xxtyp7negvl3rvacc67povupv3tsu4b2ngjepq';
-    var fil3 =
-        'f3ru7s7lajvcdcagztyz6qfo5qnlu6h6xzazg4eqwfyyexff36tkeg2ce2raidffniq222qpr2rvtfjwvwikaa';
-    var fil0 = 'f01220';
-    var contract = "0xdd42bcecbe746e8f9415138ef01a4d16d1553df8";
-    var filNet = Network.filecoinMainNet;
-    var ethNet = Network.ethMainNet;
-    test('check contract addr', () {
-      expect(isValidContractAddress(contract), true);
-    });
-    test('check addr by net', () async {
-      var vaild = await isValidChainAddress(fil1, filNet);
-      expect(vaild, true);
-      expect(isValidChainAddress(eth, ethNet), true);
-      expect(isValidChainAddress(eth, filNet), false);
-    });
+
+  test('check contract addr', () {
+    var contract = "0x9343bc852c04690b239ec733c6f71d8816d436c3";
+    expect(isValidContractAddress(contract), true);
   });
+
   test('generate private key by mne', () {
     var pk = genCKBase64(Mne);
     expect(pk, raw);
-  });
-
-  test('copyText', () {
-    var str = "";
-    fun(){
-      str = 'abcdefg';
-    }
-    copyText(str, callback:fun );
-    expect(str, 'abcdefg');
   });
 
   test('format coin', () {

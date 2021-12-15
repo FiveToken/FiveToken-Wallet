@@ -61,7 +61,6 @@ Future<Uint8List> argon2decrypt(Uint8List privateKey) async {
   if(n!=null&&n.value!=null){
     nonce = n.value.toUint8List();
   };
-  print(nonce);
   try {
     Uint8List res = CryptoBox.decrypt(
         privateKey, // value
@@ -69,11 +68,8 @@ Future<Uint8List> argon2decrypt(Uint8List privateKey) async {
         utf8.encode(address), // publicKey
         utf8.encode(secretKey.substring(0, 32)) // secretKey
     );
-    print(res);
     return res;
-  }catch(e){
-    print(e);
-  }
+  }catch(e){}
 }
 
 
@@ -104,7 +100,6 @@ String encryptSodium(String privateKey, String address, String pass){
     );
     return base64Encode(res);
   }catch(e){
-    print(e);
     throw(e);
   }
 }
@@ -128,7 +123,6 @@ String decryptSodium(String privateKey,String address, String pass){
     );
     return base64Encode(res);
   }catch(e){
-    print(e);
     throw(e);
   }
 }

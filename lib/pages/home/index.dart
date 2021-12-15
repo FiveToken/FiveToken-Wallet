@@ -122,16 +122,13 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.resumed:
-        print('resumed');
         if (lock != null && lock.lockscreen == true) {
           openLockScreen(lock.password);
         }
         break;
       case AppLifecycleState.paused:
-        print('paused');
         break;
       case AppLifecycleState.detached:
-        print('detached');
         break;
     }
   }
@@ -185,7 +182,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       BlocProvider.of<HomeBloc>(context).add(
           GetTokenListEvent($store.net.rpc, $store.net.chain, $store.wal.addr));
     } catch (e) {
-      debugPrint('================');
+      throw(e);
     }
   }
 
@@ -396,7 +393,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   void _handleScanCallback(value) {
     showCustomLoading('connecting'.tr);
     final session = WCSession.from(value);
-    debugPrint('session $session');
     _wcClient.connectNewSession(session: session, peerMeta: fiveTokenMeta);
   }
 
@@ -468,7 +464,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                           Global.store.setString('wcSession', connectSession);
                                           Get.back();
                                         }catch(error){
-                                          print('error');
+                                          throw(error);
                                         }
                                       },
                                       height: 40,
@@ -530,7 +526,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                                 ResetConnectEvent(connectedSession: null, meta: null));
                             _wcClient.killSession();
                           } catch (error) {
-                            print('error');
+                            throw(error);
                           }
                         },
                         height: 40,

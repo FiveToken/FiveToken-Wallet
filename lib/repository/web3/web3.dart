@@ -15,7 +15,6 @@ class Web3 {
   Web3._();
 
   _init(String url) {
-    debugPrint("Web3: " + url);
     rpcJson = RpcJson(url,rpcHttp);
     client = Web3Client.custom(rpcJson);
     //

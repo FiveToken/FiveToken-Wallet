@@ -11,10 +11,6 @@ class HttpInterceptors extends InterceptorsWrapper {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint(response.statusCode.toString());
-    debugPrint(response.requestOptions.path);
-    debugPrint(response.requestOptions.headers.toString());
-    debugPrint(response.requestOptions.queryParameters.toString());
     if (response.data is Map) {
       final responseData = ResponseData.formJson(response.data);
       response.data = responseData.data;

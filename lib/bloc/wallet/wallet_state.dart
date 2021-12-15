@@ -60,7 +60,6 @@ class WalletState extends Equatable {
     final list = [];
     String formatStr = 'YYYY-MM-DD';
     list.addAll(storeMessageList);
-    print('list');
     list.sort((a, b) {
       if (a.blockTime != null && b.blockTime != null) {
         return b.blockTime.compareTo(a.blockTime);
@@ -77,7 +76,6 @@ class WalletState extends Equatable {
       }
       messageMap[time].add(mes);
     });
-    print('res');
     return messageMap;
   }
 }

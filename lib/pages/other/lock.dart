@@ -30,9 +30,7 @@ class LockPageState extends State<LockPage> {
     _context = context;
     return BlocBuilder<LockBloc, LockState>(builder: (context, state){
       return BlocListener<LockBloc, LockState>(
-        listener: (context, state){
-          print(state);
-        },
+        listener: (context, state){},
         child: CommonScaffold(
             title: 'lockScreenSetting'.tr,
             hasFooter: false,

@@ -49,9 +49,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }else{
           emit(state.copyWithHomeState(tokenList: list,chainType:event.chainType));
         }
-      } catch (error) {
-        print("================GetTokenListEvent2=========");
-      }
+      } catch (error) {}
     });
   }
 }

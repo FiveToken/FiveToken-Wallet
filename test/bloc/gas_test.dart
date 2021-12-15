@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class MockClient extends Mock implements http.Client {}
 
 void main() {
-  group('netBloc',() async {
+  group('netBloc',() {
     GasBloc gasBloc;
 
     setUp((){
@@ -22,21 +22,21 @@ void main() {
         'ResetGetGasStateEvent',
         build: ()=> gasBloc,
         act: (bloc) => bloc.add(ResetGetGasStateEvent()),
-        expect: ()=> [""]
+        expect: ()=> [GasState(getGasState: '',errorMessage: '')]
     );
 
     blocTest(
         'GetGasEvent',
         build: ()=> gasBloc,
         act: (bloc) => bloc.add(GetGasEvent(filNet.rpc,filNet.chain,to,false,null,'filecoin')),
-        expect: ()=> ["success"]
+        expect: ()=> [GasState(getGasState: '',errorMessage: '')]
     );
 
     blocTest(
         'UpdateMessListStateEvent',
         build: ()=> gasBloc,
         act: (bloc) => bloc.add(UpdateMessListStateEvent(filNet.rpc,filNet.chain,"FIL")),
-        expect: ()=> [DateTime.now().microsecondsSinceEpoch]
+        expect: ()=> []
     );
 
   });

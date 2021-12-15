@@ -161,7 +161,6 @@ class WalletManagePageState extends State<WalletManagePage> {
           label: 'pkExport'.tr,
           onTap: () {
             showPassDialog(context, (String pass) async {
-              print(pass);
               var private = await wallet.getPrivateKey(pass);
               Get.toNamed(walletPrivatekey,
                   arguments: {'private': private, 'wallet': wallet});
@@ -177,7 +176,6 @@ class WalletManagePageState extends State<WalletManagePage> {
                 Get.toNamed(walletMnePage, arguments: {'mne': mne});
               } catch (e) {
                 showCustomError(e.toString());
-                print(e);
               }
             }, wallet: wallet);
           }),

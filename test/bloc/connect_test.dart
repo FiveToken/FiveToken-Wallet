@@ -27,21 +27,21 @@ void main() {
         'SetConnectedSessionEvent',
         build: ()=> connectBloc,
         act: (bloc) => bloc.add(SetConnectedSessionEvent(connectedSession:peerMeta)),
-        expect: ()=> [peerMeta]
+        expect: ()=>  [ConnectState(connectedSession: peerMeta)]
     );
 
     blocTest(
         'SetMetaEvent',
         build: ()=> connectBloc,
         act: (bloc) => bloc.add(SetMetaEvent(meta:fiveTokenMeta)),
-        expect: ()=> [fiveTokenMeta]
+        expect: ()=>  [ConnectState(meta: fiveTokenMeta)]
     );
 
     blocTest(
         'ResetConnectEvent',
         build: ()=> connectBloc,
         act: (bloc) => bloc.add(ResetConnectEvent()),
-        expect: ()=> [null,null]
+        expect: ()=>  [ConnectState()]
     );
   });
 }

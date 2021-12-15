@@ -110,9 +110,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
         ..add(
           GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down',symbol)
         );
-    }catch(error){
-      print('error');
-    }
+    }catch(error){}
 
   }
 
@@ -310,7 +308,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       var _decimal = _value.toDecimal;
       return  _decimal.fmtDown(4) + " " + token.symbol;
     }catch(error){
-      print('error');
       return '0' + " " + token.symbol;
     }
   }

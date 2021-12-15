@@ -179,7 +179,7 @@ class TokenListState extends State<TokenList> {
                 $store.wal.addr
             ));
           }catch (e){
-            debugPrint('================');
+            throw(e);
           }
         }
       });

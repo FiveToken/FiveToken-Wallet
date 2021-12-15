@@ -1,9 +1,8 @@
 import 'dart:typed_data';
-
 import 'package:fil/chain/index.dart';
-import 'package:fil/models/chain_info.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
 import 'package:fil/request/ether.dart';
+import 'package:fil/store/store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -16,9 +15,12 @@ import 'ether_test.mocks.dart';
 @GenerateMocks([
   Ether,
   Web3Client,
-  RpcJson
+  RpcJson,
+  StoreController
 ])
 void main() {
+  final mockStoreController = MockStoreController();
+
   test('getBlockByNumber', () async {
     final web3Client = MockWeb3Client();
     final rpcJson = MockRpcJson();
@@ -115,7 +117,90 @@ void main() {
     expect(balance, 0);
   });
 
+  test('get getMaxFeePerGas', () async {
+    final web3Client = MockWeb3Client();
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    int blockNumber = 13802876;
+    when(
+        web3Client.getBlockNumber()
+    ).thenAnswer(
+            (realInvocation) => Future.value(blockNumber)
+    );
+    final res = await ether.getMaxFeePerGas();
+    expect(res, '0');
+  });
 
 
+  test('get getBalanceOfToken', () async {
+    final web3Client = MockWeb3Client();
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
+    final address = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    final tokenAddress = '0x9343bc852c04690b239ec733c6f71d8816d436c3';
+    var con = DeployedContract(abi, EthereumAddress.fromHex(tokenAddress));
+
+    String balance = '0';
+    when(
+      web3Client.call(
+        contract: con,
+        function: con.function('balanceOf'),
+        params: [EthereumAddress.fromHex(address)]
+      )
+    ).thenAnswer(
+            (realInvocation) => Future.value([0])
+    );
+    final res = await ether.getBalanceOfToken(address,tokenAddress);
+    expect(res, '0');
+  });
+
+
+  test('get getNonce', () async {
+    final web3Client = MockWeb3Client();
+    final address = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    when(
+        web3Client.getTransactionCount(
+            EthereumAddress.fromHex(address))
+    ).thenAnswer(
+            (realInvocation) => Future.value(1)
+    );
+    final res = await ether.getNonce(address);
+    expect(res, 1);
+  });
+
+  test('addressCheck', () async {
+    final web3Client = MockWeb3Client();
+    final address = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    final res = await ether.addressCheck(address);
+    expect(res, false);
+  });
+
+  test('getFileCoinMessageList', () async {
+    final web3Client = MockWeb3Client();
+    final address = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    final res = await ether.getFileCoinMessageList(
+        actor:'',
+      direction: '',
+      mid: '',
+      limit: 1
+    );
+    expect(res, []);
+  });
+
+  test('getMessagePendingState', () async {
+    final web3Client = MockWeb3Client();
+    final address = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    final res = await ether.getMessagePendingState([]);
+    expect(res, []);
+  });
+
+  test('dispose', () async {
+    final web3Client = MockWeb3Client();
+    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
+    final res = await ether.dispose();
+  });
 
 }

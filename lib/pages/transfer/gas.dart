@@ -101,9 +101,7 @@ class ChainGasPageState extends State<ChainGasPage> {
       ChainGas gas = ChainGas.fromJson(_gas);
       $store.setGas(gas);
       Get.back();
-    }catch(error){
-      print('error');
-    }
+    }catch(error){}
 
   }
 

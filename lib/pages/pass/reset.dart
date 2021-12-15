@@ -34,12 +34,10 @@ class PassResetPageState extends State<PassResetPage> {
       try {
         key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
       }
-      catch (e) {
-        print(e);
-      }
+      catch (e) { }
     }else{
       try{ key = await FilecoinWallet.genEncryptKeyByPrivateKey(privateKey, pass,  prefix: prefix); }
-      catch(e){print(e);}
+      catch(e){}
     }
     return key;
   }
@@ -94,9 +92,7 @@ class PassResetPageState extends State<PassResetPage> {
           if(!same){
             try {
               p = await wal.getPrivateKey(pass);
-            }catch(e){
-              print(e);
-            }
+            }catch(e){}
           }
           var prefix = wal.rpc == Network.filecoinMainNet.rpc? 'f': 't';
           // var addr = wal.addressType;

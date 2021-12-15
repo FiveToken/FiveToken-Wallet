@@ -6,9 +6,7 @@ class AndroidBackTop {
     final platform = MethodChannel(CHANNEL);
     try {
       await platform.invokeMethod('backDesktop');
-    } on PlatformException catch (e) {
-      print(e.toString());
-    }
+    } on PlatformException catch (e) {}
     return Future.value(false);
   }
 }

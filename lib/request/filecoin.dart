@@ -38,14 +38,12 @@ class Filecoin extends ChainProvider {
     String balance = '0';
     try {
       var result =  await client.get(balancePath, queryParameters: {'actor': address});
-      debugPrint("========" + jsonEncode(result.data));
         if(result.data != null){
           balance = result.data['balance'];
         }
       return balance;
     } catch (e) {
       return balance;
-      debugPrint(jsonEncode(e.message));
     }
   }
 
@@ -96,12 +94,10 @@ class Filecoin extends ChainProvider {
           pushPath,
           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}
       );
-      print(cid);
       return TransactionResponse(
         cid:result.toString(), message:''
       );
     } catch (e) {
-      print('error');
       return TransactionResponse(
         cid:'',
         message: e.message
@@ -185,10 +181,8 @@ class Filecoin extends ChainProvider {
     var nonce = -1;
     try {
       var res = await client.get(balancePath, queryParameters: {'actor': address});
-      print('getnonce');
       return res.data["nonce"] ?? -1;
     } catch (e) {
-      print(e);
       return -1;
     }
   }
@@ -203,7 +197,6 @@ class Filecoin extends ChainProvider {
         return false;
       }
     } catch (e) {
-      print(e);
       return false;
     }
   }

@@ -56,9 +56,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
           ));
         }
-      }catch(error){
-        print('error');
-      }
+      }catch(error){}
     });
 
     on<GetFileCoinMessageListEvent>((event,emit) async {
@@ -74,7 +72,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
         ));
       }catch(error){
-        print('error');
+        throw(error);
       }
     });
 
@@ -102,7 +100,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
         ));
       }catch(error){
-        print('error');
+        throw(error);
       }
 
     });
@@ -169,7 +167,6 @@ getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
       };
     }
   }catch(error){
-    print('error');
     return {
       "mid":'',
       "enablePullUp":false
@@ -244,21 +241,21 @@ updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
       var mesList = map.keys.toList();
 
       var blocks = await Future.wait(futures);
-      // for (var i = 0; i < mesList.length; i++) {
-      //   var block = blocks[i];
-      //   var key = mesList[i];
-      //   var mes = box.get(key);
-      //   if (block.timestamp != null && block.timestamp is int) {
-      //     mes.pending = 0;
-      //     mes.blockTime = block.timestamp;
-      //     mes.height = block.number;
-      //     mes.exitCode = map[key].status ? 0 : 1;
-      //     box.put(key, mes);
-      //   }
-      // }
+      for (var i = 0; i < mesList.length; i++) {
+        var block = blocks[i];
+        var key = mesList[i];
+        var mes = box.get(key);
+        if (block.timestamp != null && block.timestamp is int) {
+          mes.pending = 0;
+          mes.blockTime = block.timestamp;
+          mes.height = block.number;
+          mes.exitCode = map[key].status ? 0 : 1;
+          box.put(key, mes);
+        }
+      }
     }
   }catch(error){
-    print("error");
+    throw(error);
   }
 }
 
@@ -276,10 +273,8 @@ List getStoreMsgList(symbol){
         list.add(message);
       }
     });
-    print('list');
     return list ?? [];
   }catch(error){
-    print('error');
     return [];
   }
 }

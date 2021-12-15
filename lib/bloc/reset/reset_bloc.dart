@@ -39,7 +39,7 @@ class ResetBloc extends Bloc<ResetEvent, ResetState> {
             try {
               p = await wal.getPrivateKey(pass);
             }catch(e){
-              print(e);
+              throw(e);
             }
           }
           var prefix = wal.rpc == Network.filecoinMainNet.rpc? 'f': 't';

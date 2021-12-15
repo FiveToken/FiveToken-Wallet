@@ -95,9 +95,7 @@ class Ether extends ChainProvider {
       var res = await client.getBalance(EthereumAddress.fromHex(address));
       balance = res.getInWei.toString();
     } catch (e) {
-      if (e is FormatException) {
-        debugPrint(jsonEncode(e.message));
-      }
+      throw(e);
     }
     return balance;
   }
@@ -121,7 +119,6 @@ class Ether extends ChainProvider {
       return balance;
     } catch (e) {
       return balance;
-      print(e);
     }
   }
 
@@ -145,7 +142,6 @@ class Ether extends ChainProvider {
               data: data,
               value: EtherAmount.fromUnitAndValue(EtherUnit.wei, 0))
         ]);
-        print('res');
       } else {
         res = await Future.wait([
           client.getGasPrice(),
@@ -157,7 +153,6 @@ class Ether extends ChainProvider {
       if (res.length == 2) {
         EtherAmount gasPrice = res[0];
         BigInt gasLimit = res[1];
-        print(gasPrice);
         int realLimit = gasLimit.toInt();
         if (isToken) {
           realLimit = (gasLimit.toInt() * 2).truncate();
@@ -221,15 +216,14 @@ class Ether extends ChainProvider {
             value: EtherAmount.inWei(BigInt.parse(amount)),
           ),
           chainId: int.tryParse($store.net.chainId) ?? 1);
-      print('res');
       return TransactionResponse(
         cid: res,
         message: ''
       );
     } catch (e) {
-      print(e);
       return TransactionResponse(
-          cid:'', message:e.message
+          cid:'',
+          message: e.message ?? ''
       );
     }
   }
@@ -260,7 +254,6 @@ class Ether extends ChainProvider {
         cid: res, message: ''
       );
     } catch (e) {
-      print(e);
       return TransactionResponse(
         cid: '', message:e.message
       );
@@ -294,7 +287,6 @@ class Ether extends ChainProvider {
         }
       }
     }catch(error){
-      print('error');
       return empty;
     }
   }
@@ -305,7 +297,7 @@ class Ether extends ChainProvider {
       var id = await client.getNetworkId();
       return id.toString();
     }catch(error){
-      print('error');
+      throw(error);
     }
   }
 

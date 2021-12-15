@@ -51,33 +51,28 @@ class GasBloc extends Bloc<GasEvent, GasState> {
       }catch(error){
         add(ResetGetGasStateEvent());
         dismissAllToast();
-        print(error);
       }
     });
 
 
     on<UpdateMessListStateEvent>((event,emit) async {
-      try{
-        List storeMessageList = getStoreMsgList(event.symbol).map((e) => e).toList();
-        final pendingList = storeMessageList.where((mes) => mes.pending == 1).toList();
-        if(pendingList.length > 0){
-          if(event.chainType == 'filecoin'){
-            Chain.setRpcNetwork(event.rpc, event.chainType);
-            List param = [];
-            pendingList.forEach((n) async {
-              param.add({"from":n.from,"nonce":n.nonce});
-            });
-            await upDateFileCoinMessageState(event.rpc,event.chainType,pendingList,param);
-          }else{
-            await updateEthMessageListState(event.rpc,event.chainType,pendingList);
-          }
-          List _list = getStoreMsgList(event.symbol).map((e) => e).toList();
-          emit(state.copyWithGasState(
-              timestamp:DateTime.now().microsecondsSinceEpoch
-          ));
+      List storeMessageList = getStoreMsgList(event.symbol).map((e) => e).toList();
+      final pendingList = storeMessageList.where((mes) => mes.pending == 1).toList();
+      if(pendingList.length > 0){
+        if(event.chainType == 'filecoin'){
+          Chain.setRpcNetwork(event.rpc, event.chainType);
+          List param = [];
+          pendingList.forEach((n) async {
+            param.add({"from":n.from,"nonce":n.nonce});
+          });
+          await upDateFileCoinMessageState(event.rpc,event.chainType,pendingList,param);
+        }else{
+          await updateEthMessageListState(event.rpc,event.chainType,pendingList);
         }
-      }catch(error){
-        print('error');
+        List _list = getStoreMsgList(event.symbol).map((e) => e).toList();
+        emit(state.copyWithGasState(
+            timestamp:DateTime.now().microsecondsSinceEpoch
+        ));
       }
     });
 

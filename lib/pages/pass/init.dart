@@ -135,9 +135,7 @@ class PassInitPageState extends State<PassInitPage> {
               EncryptKey key = keyMap[addrType];
               wal = getWallet(type, key, net);
               AddWallet(wal);
-            }catch(e){
-              print(e);
-            }
+            }catch(e){}
 
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
@@ -148,7 +146,6 @@ class PassInitPageState extends State<PassInitPage> {
         }
         updateName(walletName);
       } catch (e) {
-        print(e);
         this.loading = false;
         dismissAllToast();
       }
@@ -167,7 +164,6 @@ class PassInitPageState extends State<PassInitPage> {
         Global.store.setString('currentWalletAddress', wal.key);
         Global.store.setString('activeNetwork', net.rpc);
       } catch (e) {
-        print(e);
         this.loading = false;
         dismissAllToast();
       }
@@ -191,7 +187,6 @@ class PassInitPageState extends State<PassInitPage> {
         Global.store.setString('currentWalletAddress', wal.key);
         Global.store.setString('activeNetwork', net.rpc);
       } catch (e) {
-        print(e);
         this.loading = false;
         showCustomError('importFail'.tr);
       }
@@ -199,9 +194,7 @@ class PassInitPageState extends State<PassInitPage> {
 
     this.loading = false;
     dismissAllToast();
-
     // Navigator.popUntil(context, (route){
-    //   print( route.settings.name);
     //   return route.settings.name == mainPage;
     // });
     Global.lockFromInit = false;

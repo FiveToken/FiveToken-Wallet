@@ -186,14 +186,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
 
   void getGas(BuildContext context) {
     var to = addressCtrl.text.trim();
-    try {
-      if (mounted) {
-        BlocProvider.of<GasBloc>(context).add(ResetGetGasStateEvent());
-        BlocProvider.of<GasBloc>(context).add(GetGasEvent(
-            $store.net.rpc, $store.net.chain, to, isToken, token, rpcType));
-      }
-    } catch (error) {
-      print('error');
+    if (mounted) {
+      BlocProvider.of<GasBloc>(context).add(ResetGetGasStateEvent());
+      BlocProvider.of<GasBloc>(context).add(GetGasEvent(
+          $store.net.rpc, $store.net.chain, to, isToken, token, rpcType));
     }
   }
 
@@ -237,7 +233,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         }
       }
     } catch (error) {
-      print('error');
+      throw(error);
     }
   }
 
@@ -265,7 +261,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         }
       }
     } catch (error) {
-      print('error');
+      throw(error);
     }
   }
 
@@ -330,7 +326,6 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
 
       return true;
     } catch (error) {
-      print('err');
       return false;
     }
   }
@@ -379,7 +374,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
     } catch (error) {
-      print('error');
+      throw(error);
     }
   }
 

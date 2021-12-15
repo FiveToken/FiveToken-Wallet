@@ -12,10 +12,6 @@ class RpcHttpInterceptors extends InterceptorsWrapper {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint(response.statusCode.toString());
-    debugPrint(response.requestOptions.path);
-    debugPrint(response.requestOptions.headers.toString());
-    debugPrint(response.requestOptions.queryParameters.toString());
     handler.next(response);
   }
 

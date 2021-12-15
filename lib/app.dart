@@ -71,12 +71,8 @@ class AppState extends State<App> with WidgetsBindingObserver {
       }
       _sub = getLinksStream().listen((String link) {
         checkAndGo(link);
-      }, onError: (err) {
-        print(err.toString());
-      });
-    } on PlatformException {
-      print('parse error');
-    }
+      }, onError: (err) { });
+    } on PlatformException {}
   }
 
   void initDevice() async {

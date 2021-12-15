@@ -123,15 +123,10 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                   footerText: 'next'.tr,
                   onPressed: () {
                     showPassDialog(context, (String pass) async {
-                      try {
-                          var wal = $store.wal;
-                          var ck = await wal.getPrivateKey(pass);
-                          pushMessage(data.nonce, ck, context);
-                        } catch (error) {
-                          print('error');
-                        }
-                      }
-                    );
+                      var wal = $store.wal;
+                      var ck = await wal.getPrivateKey(pass);
+                      pushMessage(data.nonce, ck, context);
+                    });
                   },
                   body: _body(mainState)
                 );
@@ -344,7 +339,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     } catch (e) {
       dismissAllToast();
       showCustomError('sendFail'.tr);
-      print(e);
     }
   }
 
@@ -409,7 +403,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         goBack(_symbol);
       }
     } catch (error) {
-      print('error');
+      throw(error);
     }
   }
 
