@@ -9,6 +9,6 @@ void main() {
     NonceUnit nonce1 = NonceUnit(time: 1639287942266, value:[1,2,3,4,5,6,7,8]);
     nonce.toJson();
     expect(nonce.value, [1,2,3,4,5]);
-    expect(nonce1.value, [1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(nonce1.value, [1,2,3,4,5,6,7,8]);
   });
 }

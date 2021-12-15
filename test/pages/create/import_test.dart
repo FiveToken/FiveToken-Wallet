@@ -1,4 +1,5 @@
 import 'package:fil/chain/net.dart';
+import 'package:fil/init/hive.dart';
 import 'package:fil/pages/create/import.dart';
 import 'package:fil/pages/init/wallet.dart';
 import 'package:fil/routes/path.dart';
@@ -16,8 +17,8 @@ import '../../box.dart';
 void main() {
   testWidgets('test render import index page', (tester) async {
     Get.arguments;
-    var box = mockNetbox();
-    when(box.values).thenReturn([]);
+    OpenedBox.netInstance = MockBox<Network>();
+    when(OpenedBox.netInstance.values).thenReturn([]);
     await tester.pumpWidget(GetMaterialApp(
       initialRoute: initWalletPage,
       getPages: [

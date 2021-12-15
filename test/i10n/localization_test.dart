@@ -1,14 +1,64 @@
 import 'package:fil/i10n/localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   int dateTime = 1639389988079;
   test("generate config ChineseCupertinoLocalizations", () async {
     ChineseCupertinoLocalizations local = ChineseCupertinoLocalizations();
     local.init();
-    var hour = local.datePickerHour(15);
-    var month= local.datePickerDayOfMonth(dateTime);
+    var alertDialogLabel = local.alertDialogLabel;
+    var timerPickerHourLabels = local.timerPickerHourLabels;
+    var timerPickerMinuteLabels = local.timerPickerMinuteLabels;
+    var timerPickerSecondLabels = local.timerPickerSecondLabels;
+    var anteMeridiemAbbreviation = local.anteMeridiemAbbreviation;
+    local.searchTextFieldPlaceholderLabel;
+    local.modalBarrierDismissLabel;
+    local.todayLabel;
+    local.datePickerDateOrder;
+    local.datePickerDateTimeOrder;
+    local.datePickerHourSemanticsLabel(dateTime);
+    local.datePickerMediumDate(new DateTime.now());
+    local.datePickerMinute(dateTime);
+    local.datePickerMinuteSemanticsLabel(dateTime);
+    var copyButtonLabel = local.copyButtonLabel;
+    var cutButtonLabel= local.cutButtonLabel;
+    var hours = local.datePickerHour(15);
+    var dayOfMonth= local.datePickerDayOfMonth(dateTime);
+    var tabSemanticsLabel =local.tabSemanticsLabel(tabIndex:1,tabCount: 10);
+    var month = local.datePickerMonth(dateTime);
+    var year = local.datePickerYear(dateTime);
+    var button = local.pasteButtonLabel;
+    var abbreviation = local.postMeridiemAbbreviation;
+    var buttonLabel = local.selectAllButtonLabel;
+    var hour = local.timerPickerHour(dateTime);
+    var hourLabel = local.timerPickerHourLabel(dateTime);
+    var minute = local.timerPickerMinute(dateTime);
+    var minuteLabel = local.timerPickerMinuteLabel(dateTime);
+    var second = local.timerPickerSecond(dateTime);
+    var secondLabel = local.timerPickerSecondLabel(dateTime);
+    print(timerPickerHourLabels);
+    print(timerPickerMinuteLabels);
+    print(timerPickerSecondLabels);
+    print(anteMeridiemAbbreviation);
+    print(copyButtonLabel);
+    print(cutButtonLabel);
+    print(hours);
+    print(dayOfMonth);
+    print(tabSemanticsLabel);
     print(hour);
     print(month);
+    print(year);
+    print(alertDialogLabel);
+    print(button);
+    print(abbreviation);
+    print(buttonLabel);
+    print(hourLabel);
+    print(minute);
+    print(minuteLabel);
+    print(second);
+    print(secondLabel);
+
   });
 }

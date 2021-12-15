@@ -18,10 +18,13 @@ void main() {
   });
 
   test("generate model wallet price", () async {
-   CoinPrice price =   CoinPrice.fromJson({
+   CoinPrice price1 = CoinPrice(usd: 64.11, cny: 300);
+   CoinPrice price = CoinPrice.fromJson({
      'usd': 54.11,
      'cny': 240,
    });
+   price.toJson();
    expect(price.rate, 54.11);
+   expect(price1.cny, 300);
   });
 }
