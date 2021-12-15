@@ -9,8 +9,10 @@ void main() {
     'status': 'update'
   };
   test("test chain lock", () {
+    LockBox lock1 = LockBox(lockscreen: false, password: '', status: 'create');
     LockBox lock = LockBox.fromJson(lockJson);
     var resJson  = lock.toJson();
     expect(lockJson,resJson);
+    expect(lock1.status, 'create');
   });
 }
