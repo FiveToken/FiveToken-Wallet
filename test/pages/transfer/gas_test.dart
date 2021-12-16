@@ -31,6 +31,6 @@ void main() {
             )
         )
     );
-    expect(find.text('sure'.tr), true);
+    expect(find.text('sure'.tr), findsOneWidget);
   });
 }
