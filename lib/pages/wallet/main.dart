@@ -48,8 +48,8 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
       if (Get.arguments['symbol'] != null) {
         symbol = Get.arguments['symbol'];
       }
-
     }
+    Global.lockFromInit = false;
   }
 
   @override
