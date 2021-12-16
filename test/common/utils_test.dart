@@ -51,10 +51,11 @@ void main() {
 
   test('format coin', () {
     var amount = '1236000000000000000';
+    String amount1 = '1000';
     var format =
         formatCoin(amount, size: 2);
     var formatFixed =
-        formatCoin(amount, size: 2,min: 0.00000000001);
+        formatCoin(amount1, size: 2,min: 0.00000000001);
     expect(format, '1.23');
     expect(formatFixed, '0.00000000...');
   });
