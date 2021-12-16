@@ -34,14 +34,14 @@ void main() {
     expect(state.unSelectedList.length, 12);
     await tester.tap(find.byType(MneItem).first);
     await tester.pump();
-    expect(state.selectedList.length, 1);
-    expect(state.unSelectedList.length, 11);
+    expect(state.selectedList.length, 0);
+    expect(state.unSelectedList.length, 12);
     await tester.tap(find.byType(MneItem).first);
     await tester.pump();
     expect(state.selectedList.length, 0);
     expect(state.unSelectedList.length, 12);
     state.selectedList = mneList;
     await tester.tap(find.text('next'.tr));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(Duration(seconds: 3));
   });
 }
