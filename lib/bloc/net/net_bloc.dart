@@ -12,13 +12,8 @@ part 'net_state.dart';
 
 class NetBloc extends Bloc<NetEvent, NetState> {
   NetBloc() : super(NetState.idle()) {
-    on<NetEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
-
-
     on<SetNetEvent>((event, emit){
+      print(event);
       emit(state.copy(event.network));
     });
   }

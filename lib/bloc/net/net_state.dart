@@ -8,7 +8,6 @@ class NetState extends Equatable {
   List<Object> get props => [network];
 
   factory NetState.idle(){
-   final network = Network.netList;
     return const NetState(network: []);
   }
 

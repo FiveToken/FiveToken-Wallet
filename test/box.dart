@@ -1,3 +1,4 @@
+import 'package:fil/chain/lock.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
@@ -27,6 +28,12 @@ MockBox<ChainWallet> mockChainWalletBox() {
 
 MockBox<Token> mockTokenBox() {
   var box = MockBox<Token>();
+  // OpenedBox.tokenInstance = box;
+  return box;
+}
+
+MockBox<LockBox> mockLockBox() {
+  var box = MockBox<LockBox>();
   // OpenedBox.tokenInstance = box;
   return box;
 }
