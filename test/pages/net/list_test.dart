@@ -45,10 +45,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.lock_outline), findsWidgets);
-    print(find.text('add'.tr));
     await tester.tap(find.text('add'.tr));
     await tester.pumpAndSettle();
-
     Get.toNamed(netIndexPage);
     await tester.pumpAndSettle();
 

@@ -1,5 +1,6 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/common/global.dart';
+import 'package:fil/init/hive.dart';
 import 'package:fil/models/address.dart';
 import 'package:fil/pages/address/index.dart';
 import 'package:fil/pages/address/net.dart';
@@ -22,15 +23,15 @@ import '../../widgets/dialog_test.dart';
 void main() {
   var store = MockSharedPreferences();
   Global.store = store;
-  var box = mockAddressBookBox();
-  var netBox = mockNetbox();
+  OpenedBox.addressBookInsance = mockAddressBookBox();
+  OpenedBox.netInstance = mockNetbox();
   Get.put(StoreController());
   var net = Network.filecoinMainNet;
   $store.setNet(net);
-  when(box.values).thenReturn(
+  when(OpenedBox.addressBookInsance.values).thenReturn(
       [ContactAddress(label: WalletLabel, address: FilAddr, rpc: net.rpc)]);
-  when(netBox.values).thenAnswer((realInvocation) => []);
-  when(store.getBool(any)).thenAnswer((realInvocation) => false);
+  when(OpenedBox.netInstance.values).thenReturn([]);
+  // when(store.getBool(any)).thenAnswer((realInvocation) => false);
   testWidgets('test render address index page', (tester) async {
     await tester.pumpWidget(GetMaterialApp(
       initialRoute: addressIndexPage,
@@ -39,8 +40,8 @@ void main() {
         GetPage(name: addressNetPage, page: () => AddressBookNetPage())
       ],
     ));
-    print(Get.currentRoute);
     expect(Get.currentRoute, addressIndexPage);
+    await tester.pumpAndSettle();
     expect(find.byType(SwiperWidget), findsOneWidget);
     await tester.tap(find.byType(NetEntranceWidget));
     await tester.pumpAndSettle();
