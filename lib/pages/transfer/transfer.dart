@@ -207,10 +207,12 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         var last = pendingList.last;
         increaseGas();
         var toAddress = last.to;
-        var unit = Decimal.fromInt(pow(10, isToken ? token.precision : 18));
+        var _precision = last.token != null ? last.token.precision : 18;
+        var unit = Decimal.fromInt(pow(10, _precision));
         var _value = Decimal.parse(last.value);
         var amount =(_value / unit).toString();
-        bool valid = checkGas(amount);
+        var _balance =  last.token != null ? last.token.balance: $store.wal.balance;
+        bool valid = checkGas(_balance,amount);
         if (valid){
           Get.toNamed(transferConfrimPage, arguments: {
             "to": toAddress,
@@ -222,13 +224,13 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       }else{
         var toAddress = addressCtrl.text.trim();
         var amount = amountCtrl.text.trim();
-        bool valid = checkGas(amount);
+        var _balance = isToken ? token.balance : $store.wal.balance;
+        bool valid = checkGas(_balance,amount);
         if (valid) {
           Get.toNamed(transferConfrimPage, arguments: {
             "to": toAddress,
             "amount": amount,
             "prePage": prePage,
-            "isSpeedUp": isSpeedUp
           });
         }
       }
@@ -265,10 +267,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  bool checkGas(amount) {
+  bool checkGas(balance,amount) {
     var handlingFee = BigInt.parse($store.gas.handlingFee);
     var bigIntBalance =
-        BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+        BigInt.tryParse(balance);
     var bigIntAmount = BigInt.from(
         (double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
 

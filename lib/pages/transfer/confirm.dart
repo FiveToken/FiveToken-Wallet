@@ -26,11 +26,10 @@ class TransferConfirmPage extends StatefulWidget {
 
 class TransferConfirmPageState extends State<TransferConfirmPage> {
   var nonceBoxInstance = OpenedBox.nonceInsance;
-  Token token = Global.cacheToken;
+  Token token;
+  bool isToken = false;
+  String symbol = "";
 
-  bool get isToken => token != null;
-
-  String get title => token != null ? token.symbol : $store.net.coin;
   final EdgeInsets padding = EdgeInsets.symmetric(horizontal: 12, vertical: 14);
   ChainGas gas;
   String from = $store.wal.addr;
@@ -72,7 +71,15 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         prePage = Get.arguments['prePage'];
       }
       if (Get.arguments['isSpeedUp'] != null) {
+        var lastMessage = pendingList.last;
         isSpeedUp = Get.arguments['isSpeedUp'];
+        symbol = lastMessage.token != null ? lastMessage.token.symbol:lastMessage.symbol;
+        isToken = lastMessage.token != null ? true : false;
+        token = lastMessage.token != null ? lastMessage.token : Global.cacheToken;
+      }else{
+        symbol = token != null ? token.symbol : $store.net.coin;
+        isToken = Global.cacheToken != null;
+        token = Global.cacheToken;
       }
     }
   }
@@ -103,9 +110,14 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                   }
 
                   if(isSpeedUp){
+                    var lastMessage = pendingList.last;
+                    if(lastMessage.token == null){
+                      Global.cacheToken = null;
+                    }else{
+                      Global.cacheToken = lastMessage.token;
+                    }
                     if(prePage == walletMainPage){
-                      String _symbol = token != null ? token.symbol : $store.net.coin;
-                      Get.offAndToNamed(walletMainPage, arguments: {"symbol": _symbol});
+                      Get.offAndToNamed(walletMainPage, arguments: {"symbol": symbol});
                     }else{
                       Get.offAndToNamed(mainPage);
                     }
@@ -119,7 +131,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               builder: (context, mainState) {
                 return CommonScaffold(
                   grey: true,
-                  title: 'send'.tr + title,
+                  title: 'send'.tr + symbol,
                   footerText: 'next'.tr,
                   onPressed: () {
                     showPassDialog(context, (String pass) async {
@@ -174,7 +186,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               width: double.infinity,
               padding: padding,
               margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-              child: CommonText.grey(amount + ' ' + (isToken ? token.symbol : $store.net.coin)),
+              child: CommonText.grey(amount + ' ' + symbol),
               decoration: BoxDecoration(
                   color: Color(0xffe6e6e6), borderRadius: CustomRadius.b8),
             ),
@@ -249,7 +261,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   String getTotal() {
     try {
       if(isToken){
-        return amount + ' ' + token.symbol + ' + ' + handlingFee + ' ' + $store.net.coin;
+        return amount + ' ' + symbol + ' + ' + handlingFee + ' ' + $store.net.coin;
       }else{
         var total = Decimal.parse(amount) + Decimal.parse(handlingFee);
         return total.toStringAsFixed(8) + $store.net.coin;
@@ -368,7 +380,6 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               gasFeeCap: $store.gas.gasFeeCap,
               maxPriorityFee: $store.gas.maxPriorityFee,
               maxFeePerGas: $store.gas.maxFeePerGas));
-      String _symbol = token != null ? token.symbol : $store.net.coin;
       OpenedBox.mesInstance.put(
           hash,
           CacheMessage(
@@ -384,7 +395,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               gas: $store.gas,
               exitCode: -1,
               fee: $store.gas.handlingFee ?? 0,
-              symbol: _symbol,
+              symbol: symbol,
               blockTime:
                   (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
       var realNonce = nonce;
@@ -400,14 +411,20 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
       }
 
       if (mounted) {
-        goBack(_symbol);
+        goBack();
       }
     } catch (error) {
       throw(error);
     }
   }
 
-  void goBack(symbol) {
+  void goBack() {
+    var lastMessage = pendingList.last;
+    if(isSpeedUp && lastMessage.token == null){
+      Global.cacheToken = null;
+    }else{
+      Global.cacheToken = lastMessage.token;
+    }
     Get.offAndToNamed(walletMainPage, arguments: {"symbol": symbol});
   }
 }
@@ -476,60 +493,5 @@ class SetGas extends StatelessWidget {
     } catch (error) {
       return '';
     }
-  }
-}
-
-class SpeedupSheet extends StatelessWidget {
-  final Noop onSpeedUp;
-  final Noop onNew;
-
-  SpeedupSheet({this.onSpeedUp, this.onNew});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CommonTitle(
-          'sendConfirm'.tr,
-          showDelete: true,
-        ),
-        Container(
-            padding: EdgeInsets.fromLTRB(15, 15, 15, 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonText('hasPending'.tr),
-                SizedBox(
-                  height: 15,
-                ),
-                TapItemCard(
-                  items: [
-                    CardItem(
-                      label: 'speedup'.tr,
-                      onTap: () {
-                        Get.back();
-                        onSpeedUp();
-                      },
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                TapItemCard(
-                  items: [
-                    CardItem(
-                      label: 'continueNew'.tr,
-                      onTap: () {
-                        Get.back();
-                        onNew();
-                      },
-                    )
-                  ],
-                ),
-              ],
-            ))
-      ],
-    );
   }
 }
