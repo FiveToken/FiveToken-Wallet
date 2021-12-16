@@ -1,3 +1,4 @@
+import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/transfer/transfer_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
@@ -9,13 +10,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/dialog_test.dart';
 
 class MockGasBloc extends Mock implements TransferBloc{}
+
+class MockMainBloc extends Mock implements MainBloc{}
 
 void main() {
   Get.put(StoreController());
@@ -31,6 +33,7 @@ void main() {
   });
   Global.cacheToken = token;
   TransferBloc bloc = TransferBloc();
+  MainBloc mainbloc = MainBloc();
   Network net = Network.ethMainNet;
   $store.setNet(net);
   String from = 'f134ljmsuc6ab45jiaf2qjahs3j2vl6jv7pm5oema';
@@ -41,7 +44,7 @@ void main() {
         Provider(
             create: (_) => bloc..add(GetNonceEvent(rpc, chainType, from)),
             child: MultiBlocProvider(
-                providers: [BlocProvider<TransferBloc>.value(value: bloc)],
+                providers: [BlocProvider<TransferBloc>.value(value: bloc), BlocProvider<MainBloc>.value(value:mainbloc)],
                 child: MaterialApp(
                   home:  TransferConfirmPage(),
                 )

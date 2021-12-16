@@ -1,7 +1,9 @@
+import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/pages/pass/reset.dart';
 import 'package:fil/routes/path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -9,8 +11,16 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:fil/pages/wallet/manage.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
-
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
+import 'package:get/get.dart';
+class MockSelectBloc extends Mock implements SelectBloc{}
+@GenerateMocks([
+  GetX
+])
 void main() {
+  SelectBloc bloc = MockSelectBloc();
   String pass= '123456789012';
   String newPass= '123456789011';
   ChainWallet wallet = ChainWallet(
@@ -30,7 +40,17 @@ void main() {
         GetMaterialApp(
           initialRoute: walletMangePage,
           getPages: [
-            GetPage(name: walletMangePage, page: () => WalletManagePage()),
+            GetPage(name: walletMangePage, arguments: {'wallet': wallet}, page: () =>
+              Provider(
+                  create: (_) => bloc..add(IdDeleteEvent())..add(ImportDeleteEvent()),
+                  child: MultiBlocProvider(
+                      providers: [BlocProvider<SelectBloc>.value(value: bloc)],
+                      child: MaterialApp(
+                        home:  WalletManagePage(),
+                      )
+                  )
+              )
+            ),
             GetPage(name: passwordResetPage, page: () => PassResetPage())
           ],
         )
