@@ -114,7 +114,7 @@ void main() {
             (realInvocation) => Future.value(EtherAmount.zero())
     );
     final balance = await ether.getBalance('0x3bB395b668Ff9Cb84e55aadFC8e646Dd9184Da9d');
-    expect(balance, 0);
+    expect(balance, '0');
   });
 
   test('get getMaxFeePerGas', () async {
@@ -195,12 +195,6 @@ void main() {
     final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
     final res = await ether.getMessagePendingState([]);
     expect(res, []);
-  });
-
-  test('dispose', () async {
-    final web3Client = MockWeb3Client();
-    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
-    final res = await ether.dispose();
   });
 
 }

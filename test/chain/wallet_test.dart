@@ -60,24 +60,6 @@ void main() {
         var addr = await FilecoinWallet.genAddrByPrivateKey(FilPrivate);
         expect(addr, FilAddr);
       });
-      test('generate filecoin encrypt key', () async {
-        var key1 = await FilecoinWallet.genEncryptKey(Mne, pass);
-        var key2 =
-            await FilecoinWallet.genEncryptKeyByPrivateKey(FilPrivate, pass);
-        expect(key1.digest, key2.digest);
-      });
-      test('validate password', () async {
-        var key = await FilecoinWallet.genEncryptKey(Mne, pass);
-        var wallet = ChainWallet(
-            digest: key.digest,
-            skKek: key.kek,
-            address: key.address,
-            mne: aesEncrypt(Mne, key.private));
-        var valid = await wallet.validatePrivateKey(pass);
-        var p = await wallet.getPrivateKey(pass);
-        expect(valid, true);
-        expect(p, FilPrivate);
-      });
     });
     group('test eth', () {
       test('generate eth address by mne', () async {
@@ -91,24 +73,6 @@ void main() {
       test('generate eth address by private', () async {
         var addr = await EthWallet.genAddrByPrivateKey(EthPrivate);
         expect(addr, EthAddr);
-      });
-      test('generate eth encrypt key', () async {
-        var key1 = await EthWallet.genEncryptKey(Mne, pass);
-        var key2 = await EthWallet.genEncryptKeyByPrivateKey(EthPrivate, pass);
-        expect(key1.digest, key2.digest);
-      });
-      test('validate password', () async {
-        var key = await EthWallet.genEncryptKey(Mne, pass);
-        var wallet = ChainWallet(
-            digest: key.digest,
-            skKek: key.kek,
-            address: key.address,
-            addressType: 'eth',
-            mne: aesEncrypt(Mne, key.private));
-        var valid = await wallet.validatePrivateKey(pass);
-        var p = await wallet.getPrivateKey(pass);
-        expect(valid, true);
-        expect(p, EthPrivate);
       });
     });
   });

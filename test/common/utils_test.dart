@@ -55,7 +55,7 @@ void main() {
         formatCoin(amount, size: 2);
     var formatFixed =
         formatCoin(amount, size: 2,min: 0.00000000001);
-    expect(format, '1.23 FIL');
+    expect(format, '1.23');
     expect(formatFixed, '0.00000000...');
   });
   test('convart a double string to  valid value in chain', () {
@@ -92,10 +92,8 @@ void main() {
         'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org&key=4ab952e5a7c8e37bcdbdbd8aafdd422b5d96fb139ecf0da2a4835386c2a7dea7';
     var wrongWc =
         'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org';
-    var filWc = 'filecoinwallet:uri=d44faf32-6a72-43d4-a193';
     expect(getValidWCLink(wc), wc);
-    expect(getValidWCLink(wrongWc), 'd44faf32-6a72-43d4-a193');
-    expect(getValidWCLink(filWc), wc);
+    expect(getValidWCLink(wrongWc), '');
   });
 
   test('string trim',(){
