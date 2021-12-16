@@ -147,7 +147,7 @@ class Ether extends ChainProvider {
           client.getGasPrice(),
           client.estimateGas(
               to: toAddr,
-              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1))
+              value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 0))
         ]);
       }
       if (res.length == 2) {
