@@ -28,8 +28,8 @@ class WalletManagePage extends StatefulWidget {
 }
 
 class WalletManagePageState extends State<WalletManagePage> {
-  ChainWallet wallet = Get.arguments['wallet'];
-  Network net = Get.arguments['net'];
+  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet']:ChainWallet();
+  Network net = Get.arguments!=null?Get.arguments['net']:Network();
   TextEditingController controller = TextEditingController();
 
   bool get isId {

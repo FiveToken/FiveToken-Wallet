@@ -26,6 +26,6 @@ void main() {
             )
         )
     );
-    expect(find.text('add'.tr), find.text('add'.tr));
+    expect(find.text('add'.tr), findsOneWidget);
   });
 }

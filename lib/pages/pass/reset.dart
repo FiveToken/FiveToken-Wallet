@@ -26,7 +26,7 @@ class PassResetPageState extends State<PassResetPage> {
   final TextEditingController confirmCtrl = TextEditingController();
   var box = OpenedBox.walletInstance;
   bool loading = false;
-  ChainWallet wallet = Get.arguments['wallet'];
+  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet']:ChainWallet();
 
   Future<EncryptKey> getKey(String addressType, String privateKey,  String pass, String prefix) async{
     EncryptKey key;
