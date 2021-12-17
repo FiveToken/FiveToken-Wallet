@@ -111,6 +111,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     _openState = false;
   }
 
+  var lastPopTime = null;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
@@ -121,7 +123,12 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (lock != null && lock.lockscreen == true) {
-          openLockScreen(lock.password);
+          if(lastPopTime == null || DateTime.now().difference(lastPopTime) > Duration(seconds: 5)){
+            lastPopTime = DateTime.now();
+            openLockScreen(lock.password);
+          }else{
+            lastPopTime = DateTime.now();
+          }
         }
         break;
       case AppLifecycleState.paused:
@@ -131,6 +138,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     }
   }
 
+  var lastPopTime2 = null;
   @override
   void initState() {
     _initWcClient();
@@ -142,8 +150,14 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       if (Global.lockscreen&&Global.lockFromInit) {
         var lockBox = OpenedBox.lockInstance;
         var lock = lockBox.get('lock');
-        Future.delayed(Duration.zero)
-            .then((value) => openLockScreen(lock.password));
+        // Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
+        if(lastPopTime2 == null || DateTime.now().difference(lastPopTime2) > Duration(seconds: 5)){
+          lastPopTime2 = DateTime.now();
+          Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
+        }else{
+          lastPopTime2 = DateTime.now();
+        }
+
       }
     }
   }
