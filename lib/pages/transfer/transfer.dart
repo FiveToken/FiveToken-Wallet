@@ -335,6 +335,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   void skipConfirmMessages(BuildContext context,bool bool) {
     isSpeedUp = bool;
     getGas(context);
+    Get.back();
   }
 
   void increaseGas() {

@@ -28,7 +28,7 @@ abstract class ChainProvider {
         int nonce}
   );
 
-  Future<GasResponse> getGas({String to, bool isToken = false, Token token});
+  Future<GasResponse> getGas({String from,String to, bool isToken = false, Token token});
 
   Future<int> getNonce(String address);
 

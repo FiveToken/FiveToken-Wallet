@@ -77,9 +77,9 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         isToken = lastMessage.token != null ? true : false;
         token = lastMessage.token != null ? lastMessage.token : Global.cacheToken;
       }else{
-        symbol = token != null ? token.symbol : $store.net.coin;
-        isToken = Global.cacheToken != null;
         token = Global.cacheToken;
+        symbol =  token != null ? token.symbol : $store.net.coin;
+        isToken = token != null;
       }
     }
   }
@@ -113,7 +113,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
                     var lastMessage = pendingList.last;
                     if(lastMessage.token == null){
                       Global.cacheToken = null;
-                    }else{
+                    }
+                    if(lastMessage.token != null){
                       Global.cacheToken = lastMessage.token;
                     }
                     if(prePage == walletMainPage){
@@ -422,7 +423,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
     var lastMessage = pendingList.last;
     if(isSpeedUp && lastMessage.token == null){
       Global.cacheToken = null;
-    }else{
+    }
+    if(isSpeedUp && lastMessage.token != null){
       Global.cacheToken = lastMessage.token;
     }
     Get.offAndToNamed(walletMainPage, arguments: {"symbol": symbol});

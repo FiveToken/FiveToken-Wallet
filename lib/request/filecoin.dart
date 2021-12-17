@@ -126,7 +126,7 @@ class Filecoin extends ChainProvider {
 
 
   @override
-  Future<GasResponse> getGas({String to, bool isToken = false, Token token}) async {
+  Future<GasResponse> getGas({String from,String to, bool isToken = false, Token token}) async {
     var empty = GasResponse();
     try{
       var result = await client

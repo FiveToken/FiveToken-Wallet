@@ -24,7 +24,7 @@ class GasBloc extends Bloc<GasEvent, GasState> {
       try{
         showCustomLoading('Loading');
         Chain.setRpcNetwork(event.rpc, event.chainType);
-        GasResponse res = await Chain.chainProvider.getGas(to:event.to,isToken:event.isToken,token:event.token);
+        GasResponse res = await Chain.chainProvider.getGas(from:$store.wal.address,to:event.to,isToken:event.isToken,token:event.token);
         dismissAllToast();
         if(res.gasState == "success"){
           String maxPriority = '0';
