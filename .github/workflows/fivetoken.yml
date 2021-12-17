@@ -1,6 +1,6 @@
 name: Flutter Workflow
 env:
-  FLUTTER_VERSION: "1.22.5"
+  FLUTTER_VERSION: "2.5.3"
 on: 
   pull_request:
   push:
