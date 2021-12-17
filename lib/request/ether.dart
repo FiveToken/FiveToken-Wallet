@@ -123,8 +123,9 @@ class Ether extends ChainProvider {
   }
 
   @override
-  Future<GasResponse> getGas({ String to, bool isToken = false, Token token }) async {
+  Future<GasResponse> getGas({String from, String to, bool isToken = false, Token token }) async {
     var empty = GasResponse();
+    var fromAddress = EthereumAddress.fromHex(from);
     var toAddr = EthereumAddress.fromHex(to);
     try {
       List<dynamic> res = [];
@@ -138,7 +139,7 @@ class Ether extends ChainProvider {
           client.getGasPrice(),
           client.estimateGas(
               to: EthereumAddress.fromHex(token.address),
-              sender: toAddr,
+              sender: fromAddress,
               data: data,
               value: EtherAmount.fromUnitAndValue(EtherUnit.wei, 0))
         ]);
