@@ -16,7 +16,7 @@ const String NetPrefix = 'f';
 const String DefaultWalletName = 'ID-Wallet ';
 
 class Global {
-  static String version = "v1.2.1";
+  static String version = "v1.3.0";
   static bool get isRelease => bool.fromEnvironment("dart.vm.product");
   static SharedPreferences store;
   static Wallet activeWallet;

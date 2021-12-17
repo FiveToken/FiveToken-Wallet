@@ -219,6 +219,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                            }
                                          }
                                          Global.eventBus.fire(WalletChangeEvent());
+                                         Global.lockFromInit = false;
                                          Get.offAndToNamed(mainPage);
                                          // Navigator.of(context).popUntil(
                                          //         (route) => route.settings.name == mainPage
@@ -272,6 +273,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                        Global.store
                                            .setString('currentWalletAddress', wal.key);
                                        Global.store.setString('activeNetwork', net.rpc);
+                                       Global.lockFromInit = false;
                                        Get.offAndToNamed(mainPage);
                                        // Navigator.of(context).popUntil(
                                        //         (route) => route.settings.name == mainPage);

@@ -76,6 +76,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     });
     super.dispose();
   }
+  bool _openState = false;
 
   void passwordEnteredCallback(String pass, String enterPassCode) {
     final bool isValid = enterPassCode == pass;
@@ -86,8 +87,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       });
     }
   }
-
-  bool _openState = false;
 
   void openLockScreen(pass) async {
     if (_openState == true && Global.lockscreen) return;
@@ -115,7 +114,6 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
-    super.didChangeAppLifecycleState(state);
     var lockBox = OpenedBox.lockInstance;
     var lock = lockBox.get('lock');
     switch (state) {
