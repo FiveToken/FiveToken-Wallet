@@ -328,7 +328,6 @@ class WalletService extends StatelessWidget {
           children: [
             IconBtn(
               onTap: () {
-                //Get.toNamed(walletMangePage);
                 Get.toNamed(walletCodePage);
               },
               path: 'send.png',
@@ -348,6 +347,9 @@ class WalletService extends StatelessWidget {
           children: [
             IconBtn(
               onTap: () {
+                if(page == mainPage){
+                  Global.cacheToken = null;
+                }
                 Get.toNamed(filTransferPage, arguments: {'page': page});
               },
               path: 'rec.png',
