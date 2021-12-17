@@ -1,0 +1,424 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - lcov.info - lib/common/utils.dart</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">lib/common</a> - utils.dart<span style="font-size: 80%;"> (source / <a href="utils.dart.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">lcov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">98</td>
+            <td class="headerCovTableEntry">117</td>
+            <td class="headerCovTableEntryMed">83.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : import 'dart:convert';</a>
+<a name="2"><span class="lineNum">       2 </span>            : </a>
+<a name="3"><span class="lineNum">       3 </span>            : import 'package:decimal/decimal.dart';</a>
+<a name="4"><span class="lineNum">       4 </span>            : import 'package:fil/chain/net.dart';</a>
+<a name="5"><span class="lineNum">       5 </span>            : import 'package:encrypt/encrypt.dart' as encrypt;</a>
+<a name="6"><span class="lineNum">       6 </span>            : import 'package:crypto/crypto.dart';</a>
+<a name="7"><span class="lineNum">       7 </span>            : import 'package:bip39/bip39.dart' as bip39;</a>
+<a name="8"><span class="lineNum">       8 </span>            : import 'package:bip32/bip32.dart' as bip32;</a>
+<a name="9"><span class="lineNum">       9 </span>            : import 'package:fil/models/index.dart';</a>
+<a name="10"><span class="lineNum">      10 </span>            : import 'package:fil/models/private.dart';</a>
+<a name="11"><span class="lineNum">      11 </span>            : import 'package:fil/request/global.dart';</a>
+<a name="12"><span class="lineNum">      12 </span>            : import 'package:fil/utils/decimal_extension.dart';</a>
+<a name="13"><span class="lineNum">      13 </span>            : import 'package:fil/utils/string_extension.dart';</a>
+<a name="14"><span class="lineNum">      14 </span>            : import 'package:flutter/services.dart';</a>
+<a name="15"><span class="lineNum">      15 </span>            : import 'package:hive/hive.dart';</a>
+<a name="16"><span class="lineNum">      16 </span>            : import 'dart:math';</a>
+<a name="17"><span class="lineNum">      17 </span>            : import 'package:url_launcher/url_launcher.dart';</a>
+<a name="18"><span class="lineNum">      18 </span>            : import 'package:fil/utils/num_extension.dart';</a>
+<a name="19"><span class="lineNum">      19 </span>            : import 'dart:async';</a>
+<a name="20"><span class="lineNum">      20 </span>            : import 'package:convert/convert.dart';</a>
+<a name="21"><span class="lineNum">      21 </span>            : import 'package:hive_flutter/hive_flutter.dart';</a>
+<a name="22"><span class="lineNum">      22 </span>            : const psalt = &quot;vFIzIawYOU&quot;;</a>
+<a name="23"><span class="lineNum">      23 </span>            : </a>
+<a name="24"><span class="lineNum">      24 </span>            : /*</a>
+<a name="25"><span class="lineNum">      25 </span>            :  encryption</a>
+<a name="26"><span class="lineNum">      26 </span>            :  * @param {string} raw</a>
+<a name="27"><span class="lineNum">      27 </span>            :  * @param {String} mix：key</a>
+<a name="28"><span class="lineNum">      28 </span>            : */</a>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">          1 : String aesDecrypt(String raw, String mix) {</span></a>
+<a name="30"><span class="lineNum">      30 </span><span class="lineCov">          1 :   if (raw == '') {</span></a>
+<a name="31"><span class="lineNum">      31 </span>            :     return '';</a>
+<a name="32"><span class="lineNum">      32 </span>            :   }</a>
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          2 :   var m = sha256.convert(base64.decode(mix));</span></a>
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">          3 :   var key = encrypt.Key.fromBase64(base64.encode(m.bytes));</span></a>
+<a name="35"><span class="lineNum">      35 </span>            :   final encrypter =</a>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">          2 :       encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cfb64));</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          2 :   final encrypted = encrypt.Encrypted(base64.decode(raw));</span></a>
+<a name="38"><span class="lineNum">      38 </span><span class="lineCov">          2 :   var decoded = encrypter.decrypt(encrypted, iv: encrypt.IV.fromLength(16));</span></a>
+<a name="39"><span class="lineNum">      39 </span>            :   return decoded;</a>
+<a name="40"><span class="lineNum">      40 </span>            : }</a>
+<a name="41"><span class="lineNum">      41 </span>            : </a>
+<a name="42"><span class="lineNum">      42 </span>            : /*</a>
+<a name="43"><span class="lineNum">      43 </span>            :  decrypt</a>
+<a name="44"><span class="lineNum">      44 </span>            :  * @param {string} raw</a>
+<a name="45"><span class="lineNum">      45 </span>            :  * @param {string} mix: key</a>
+<a name="46"><span class="lineNum">      46 </span>            : */</a>
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">          1 : String aesEncrypt(String raw, String mix) {</span></a>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">          1 :   if (raw == '') {</span></a>
+<a name="49"><span class="lineNum">      49 </span>            :     return '';</a>
+<a name="50"><span class="lineNum">      50 </span>            :   }</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          2 :   var m = sha256.convert(base64.decode(mix));</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          3 :   var key = encrypt.Key.fromBase64(base64.encode(m.bytes));</span></a>
+<a name="53"><span class="lineNum">      53 </span>            :   final encrypter =</a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          2 :       encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cfb64));</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">          2 :   var encoded = encrypter.encrypt(raw, iv: encrypt.IV.fromLength(16));</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          1 :   return encoded.base64;</span></a>
+<a name="57"><span class="lineNum">      57 </span>            : }</a>
+<a name="58"><span class="lineNum">      58 </span>            : </a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">          1 : String tokenify(String str, {String salt = psalt}) {</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          1 :   var key = utf8.encode(salt);</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          2 :   var bytes = utf8.encode(str.trim());</span></a>
+<a name="62"><span class="lineNum">      62 </span>            : </a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          1 :   var hmacSha = new Hmac(sha1, key); // HMAC-SHA1</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          1 :   var digest = hmacSha.convert(bytes);</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          1 :   return digest.toString();</span></a>
+<a name="66"><span class="lineNum">      66 </span>            : }</a>
+<a name="67"><span class="lineNum">      67 </span>            : </a>
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<a name="69"><span class="lineNum">      69 </span>            : /*</a>
+<a name="70"><span class="lineNum">      70 </span>            :  String copy</a>
+<a name="71"><span class="lineNum">      71 </span>            :  * @param {string} text</a>
+<a name="72"><span class="lineNum">      72 </span>            :  * @param {Function} callback</a>
+<a name="73"><span class="lineNum">      73 </span>            : */</a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 : void copyText(String text, {Function callback}) {</span></a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :   var data = ClipboardData(text: text);</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineNoCov">          0 :   Clipboard.setData(data).then((_) {</span></a>
+<a name="77"><span class="lineNum">      77 </span>            :     if (callback != null) {</a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :       callback();</span></a>
+<a name="79"><span class="lineNum">      79 </span>            :     }</a>
+<a name="80"><span class="lineNum">      80 </span>            :   });</a>
+<a name="81"><span class="lineNum">      81 </span>            : }</a>
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<a name="83"><span class="lineNum">      83 </span>            : /*</a>
+<a name="84"><span class="lineNum">      84 </span>            :  String truncation</a>
+<a name="85"><span class="lineNum">      85 </span>            :  * @param {string}</a>
+<a name="86"><span class="lineNum">      86 </span>            :  * @param {int} start</a>
+<a name="87"><span class="lineNum">      87 </span>            :  * @param {int} end</a>
+<a name="88"><span class="lineNum">      88 </span>            : */</a>
+<a name="89"><span class="lineNum">      89 </span><span class="lineCov">          9 : String dotString({String str = '', int headLen = 6, int tailLen = 6}) {</span></a>
+<a name="90"><span class="lineNum">      90 </span><span class="lineCov">          9 :   int strLen = str.length;</span></a>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">         18 :   if (strLen &lt; headLen + tailLen) {</span></a>
+<a name="92"><span class="lineNum">      92 </span>            :     return str;</a>
+<a name="93"><span class="lineNum">      93 </span>            :   }</a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          8 :   String headStr = str.substring(0, headLen);</span></a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          8 :   int tailStart = strLen - tailLen;</span></a>
+<a name="96"><span class="lineNum">      96 </span>            :   String tailStr = &quot;&quot;;</a>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          8 :   if (tailStart &gt; 0) {</span></a>
+<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          8 :     tailStr = str.substring(tailStart, strLen);</span></a>
+<a name="99"><span class="lineNum">      99 </span>            :   }</a>
+<a name="100"><span class="lineNum">     100 </span>            : </a>
+<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          8 :   return &quot;$headStr...$tailStr&quot;;</span></a>
+<a name="102"><span class="lineNum">     102 </span>            : }</a>
+<a name="103"><span class="lineNum">     103 </span>            : /*</a>
+<a name="104"><span class="lineNum">     104 </span>            :  Judge whether it is a number</a>
+<a name="105"><span class="lineNum">     105 </span>            :  * @param {string} input</a>
+<a name="106"><span class="lineNum">     106 </span>            : */</a>
+<a name="107"><span class="lineNum">     107 </span>            : </a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          1 : bool isDecimal(String input) {</span></a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">          1 :   var r = RegExp(r&quot;(^\d+(?:\.\d+)?([eE]-?\d+)?$|^\.\d+([eE]-?\d+)?$)&quot;);</span></a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineCov">          2 :   if (r.hasMatch(input.trim())) {</span></a>
+<a name="111"><span class="lineNum">     111 </span>            :     return true;</a>
+<a name="112"><span class="lineNum">     112 </span>            :   }</a>
+<a name="113"><span class="lineNum">     113 </span>            :   return false;</a>
+<a name="114"><span class="lineNum">     114 </span>            : }</a>
+<a name="115"><span class="lineNum">     115 </span>            : </a>
+<a name="116"><span class="lineNum">     116 </span>            : /*</a>
+<a name="117"><span class="lineNum">     117 </span>            :   contract address inspection</a>
+<a name="118"><span class="lineNum">     118 </span>            :   * @param {string} address:contract address</a>
+<a name="119"><span class="lineNum">     119 </span>            : */</a>
+<a name="120"><span class="lineNum">     120 </span>            : </a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">          1 : bool isValidContractAddress(String address){</span></a>
+<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          1 :   var start = address.startsWith('0x');</span></a>
+<a name="123"><span class="lineNum">     123 </span><span class="lineCov">          1 :   var reg = RegExp(r&quot;([A-Fa-f0-9]$)&quot;);</span></a>
+<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          1 :   var valid = reg.hasMatch(address);</span></a>
+<a name="125"><span class="lineNum">     125 </span>            :   return start &amp;&amp; valid;</a>
+<a name="126"><span class="lineNum">     126 </span>            : }</a>
+<a name="127"><span class="lineNum">     127 </span>            : </a>
+<a name="128"><span class="lineNum">     128 </span>            : /*</a>
+<a name="129"><span class="lineNum">     129 </span>            :   check address</a>
+<a name="130"><span class="lineNum">     130 </span>            :   * @param {string} address:address</a>
+<a name="131"><span class="lineNum">     131 </span>            :   * @param {Network} network:network to be verified</a>
+<a name="132"><span class="lineNum">     132 </span>            : */</a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 : Future&lt;bool&gt; isValidChainAddress(String address, Network network) async {</span></a>
+<a name="134"><span class="lineNum">     134 </span>            :   bool res = false;</a>
+<a name="135"><span class="lineNum">     135 </span>            :   try{</a>
+<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :     if(network.addressType == 'filecoin'){</span></a>
+<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :       Chain.setRpcNetwork(network.rpc, network.chain);</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :       res = await Chain.chainProvider.addressCheck(address);</span></a>
+<a name="139"><span class="lineNum">     139 </span>            :     }else{</a>
+<a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :       var start = address.startsWith('0x');</span></a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :       var reg = RegExp(r&quot;([A-Fa-f0-9]{40}$)&quot;);</span></a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineNoCov">          0 :       var valid = reg.hasMatch(address);</span></a>
+<a name="143"><span class="lineNum">     143 </span>            :       res = start &amp;&amp; valid;</a>
+<a name="144"><span class="lineNum">     144 </span>            :     }</a>
+<a name="145"><span class="lineNum">     145 </span>            :     return res;</a>
+<a name="146"><span class="lineNum">     146 </span>            :   }catch(error){</a>
+<a name="147"><span class="lineNum">     147 </span>            :     return false;</a>
+<a name="148"><span class="lineNum">     148 </span>            :   }</a>
+<a name="149"><span class="lineNum">     149 </span>            : }</a>
+<a name="150"><span class="lineNum">     150 </span>            : </a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          2 : String genCKBase64(String mne, {String path}) {</span></a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          2 :   var seed = bip39.mnemonicToSeed(mne);</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineCov">          2 :   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineCov">          2 :   var rs = nodeFromSeed.derivePath(path??&quot;m/44'/461'/0'/0&quot;);</span></a>
+<a name="155"><span class="lineNum">     155 </span><span class="lineCov">          2 :   var rs0 = rs.derive(0);</span></a>
+<a name="156"><span class="lineNum">     156 </span><span class="lineCov">          8 :   var ck = path!=&quot;m/44'/60'/0'/0&quot; ? base64Encode(rs0.privateKey):hex.encode(rs0.privateKey);</span></a>
+<a name="157"><span class="lineNum">     157 </span>            :   return ck;</a>
+<a name="158"><span class="lineNum">     158 </span>            : }</a>
+<a name="159"><span class="lineNum">     159 </span>            : </a>
+<a name="160"><span class="lineNum">     160 </span><span class="lineCov">          1 : String hex2str(String hexString) {</span></a>
+<a name="161"><span class="lineNum">     161 </span><span class="lineCov">          1 :   hexString = hexString.trim();</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineCov">          1 :   List&lt;String&gt; split = [];</span></a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          3 :   for (int i = 0; i &lt; hexString.length; i = i + 2) {</span></a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          3 :     split.add(hexString.substring(i, i + 2));</span></a>
+<a name="165"><span class="lineNum">     165 </span>            :   }</a>
+<a name="166"><span class="lineNum">     166 </span><span class="lineCov">          2 :   String ascii = List.generate(split.length,</span></a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineCov">          5 :       (i) =&gt; String.fromCharCode(int.parse(split[i], radix: 16))).join();</span></a>
+<a name="168"><span class="lineNum">     168 </span>            :   return ascii;</a>
+<a name="169"><span class="lineNum">     169 </span>            : }</a>
+<a name="170"><span class="lineNum">     170 </span>            : </a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          2 : String truncate(double value, {int size = 4}) {</span></a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineCov">         12 :   return ((value * pow(10, size)).floor() / pow(10, size)).toString();</span></a>
+<a name="173"><span class="lineNum">     173 </span>            : }</a>
+<a name="174"><span class="lineNum">     174 </span>            : </a>
+<a name="175"><span class="lineNum">     175 </span>            : </a>
+<a name="176"><span class="lineNum">     176 </span>            : /*</a>
+<a name="177"><span class="lineNum">     177 </span>            :   balance formatting</a>
+<a name="178"><span class="lineNum">     178 </span>            :   * @param {string} amount</a>
+<a name="179"><span class="lineNum">     179 </span>            :   * @param {num} size:significant number of decimal places</a>
+<a name="180"><span class="lineNum">     180 </span>            :   * @param {double} min:formatted minimum,If the balance is less than the minimum value, return the minimum value + ...</a>
+<a name="181"><span class="lineNum">     181 </span>            :   * @param {int} precision: current formatted balance precision</a>
+<a name="182"><span class="lineNum">     182 </span>            : */</a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">          5 : String formatCoin(String amount, { num size = 4, double min, int precision = 18 }) {</span></a>
+<a name="184"><span class="lineNum">     184 </span><span class="lineCov">          5 :   if (amount == '0') {</span></a>
+<a name="185"><span class="lineNum">     185 </span>            :     return '0';</a>
+<a name="186"><span class="lineNum">     186 </span>            :   }</a>
+<a name="187"><span class="lineNum">     187 </span>            :   try {</a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">         12 :     var _amount = double.parse(amount)/pow(10, precision);</span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineCov">          4 :     var _decimal = _amount.toDecimal;</span></a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineCov">          4 :     var res = _decimal.fmtDown(size);</span></a>
+<a name="191"><span class="lineNum">     191 </span>            :     String esc = '';</a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">         25 :     if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) &amp;&amp; (_amount &lt; min)){</span></a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          2 :       return  min.toStringAsFixed(7) + '0...';</span></a>
+<a name="194"><span class="lineNum">     194 </span>            :     }else{</a>
+<a name="195"><span class="lineNum">     195 </span>            :       return  res ;</a>
+<a name="196"><span class="lineNum">     196 </span>            :     }</a>
+<a name="197"><span class="lineNum">     197 </span>            : </a>
+<a name="198"><span class="lineNum">     198 </span>            :   } catch (e) {</a>
+<a name="199"><span class="lineNum">     199 </span>            :     return amount;</a>
+<a name="200"><span class="lineNum">     200 </span>            :   }</a>
+<a name="201"><span class="lineNum">     201 </span>            : }</a>
+<a name="202"><span class="lineNum">     202 </span>            : </a>
+<a name="203"><span class="lineNum">     203 </span>            : /*</a>
+<a name="204"><span class="lineNum">     204 </span>            :   get the minimum precision value</a>
+<a name="205"><span class="lineNum">     205 </span>            :   * @param {string} fil</a>
+<a name="206"><span class="lineNum">     206 </span>            :   * @param {int} precision: current value precision</a>
+<a name="207"><span class="lineNum">     207 </span>            : */</a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          1 : String getChainValue(String fil, {int precision = 18}) {</span></a>
+<a name="209"><span class="lineNum">     209 </span>            :   try{</a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">          4 :     var _value = Decimal.parse(fil) * Decimal.fromInt(pow(10, 18));</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          8 :     var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision))/Decimal.fromInt(pow(10,18));</span></a>
+<a name="212"><span class="lineNum">     212 </span><span class="lineCov">          2 :     var _decimal = _amount.toString().toDecimal;</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          1 :     var res = _decimal.fmtDown(0);</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">          2 :     var val = num.parse(res).toStringAsFixed(0);</span></a>
+<a name="215"><span class="lineNum">     215 </span>            :     return val;</a>
+<a name="216"><span class="lineNum">     216 </span>            :   }catch(error){</a>
+<a name="217"><span class="lineNum">     217 </span>            :     throw(error);</a>
+<a name="218"><span class="lineNum">     218 </span>            :   }</a>
+<a name="219"><span class="lineNum">     219 </span>            : }</a>
+<a name="220"><span class="lineNum">     220 </span>            : </a>
+<a name="221"><span class="lineNum">     221 </span>            : /*</a>
+<a name="222"><span class="lineNum">     222 </span>            :   ethereum private key verification</a>
+<a name="223"><span class="lineNum">     223 </span>            :   * @param {string} str</a>
+<a name="224"><span class="lineNum">     224 </span>            : */</a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          1 : bool ethPrivate(str){</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          1 :   RegExp eth = RegExp(r'^(0x)?[0-9A-Za-f]{64}');</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          3 :   return eth.hasMatch(str)&amp;&amp;str.length==64;</span></a>
+<a name="228"><span class="lineNum">     228 </span>            : }</a>
+<a name="229"><span class="lineNum">     229 </span>            : </a>
+<a name="230"><span class="lineNum">     230 </span><span class="lineCov">          1 : int getSecondSinceEpoch() {</span></a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineCov">          4 :   return (DateTime.now().millisecondsSinceEpoch / 1000).truncate();</span></a>
+<a name="232"><span class="lineNum">     232 </span>            : }</a>
+<a name="233"><span class="lineNum">     233 </span>            : </a>
+<a name="234"><span class="lineNum">     234 </span><span class="lineCov">          1 : String formatDouble(String str, {bool truncate = false, int size = 4}) {</span></a>
+<a name="235"><span class="lineNum">     235 </span>            :   try {</a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineCov">          1 :     var v = double.parse(str);</span></a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineCov">          1 :     if (v == 0.0) {</span></a>
+<a name="238"><span class="lineNum">     238 </span>            :       return '0';</a>
+<a name="239"><span class="lineNum">     239 </span>            :     } else {</a>
+<a name="240"><span class="lineNum">     240 </span>            :       if (truncate) {</a>
+<a name="241"><span class="lineNum">     241 </span><span class="lineCov">          6 :         return ((v * pow(10, size)).floor() / pow(10, size)).toString();</span></a>
+<a name="242"><span class="lineNum">     242 </span>            :       } else {</a>
+<a name="243"><span class="lineNum">     243 </span>            :         return str;</a>
+<a name="244"><span class="lineNum">     244 </span>            :       }</a>
+<a name="245"><span class="lineNum">     245 </span>            :     }</a>
+<a name="246"><span class="lineNum">     246 </span>            :   } catch (e) {</a>
+<a name="247"><span class="lineNum">     247 </span>            :     return '0';</a>
+<a name="248"><span class="lineNum">     248 </span>            :   }</a>
+<a name="249"><span class="lineNum">     249 </span>            : }</a>
+<a name="250"><span class="lineNum">     250 </span>            : </a>
+<a name="251"><span class="lineNum">     251 </span><span class="lineCov">          1 : String base64ToHex(String pk, String type) {</span></a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          1 :   String t = type == '1' ? 'secp256k1' : 'bls';</span></a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          1 :   PrivateKey privateKey = PrivateKey(t, pk);</span></a>
+<a name="254"><span class="lineNum">     254 </span>            :   String result = '';</a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          3 :   var list = BinaryWriter.utf8Encoder.convert(jsonEncode(privateKey.toJson()));</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          3 :   for (var i = 0; i &lt; list.length; i++) {</span></a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          3 :     result += list[i].toRadixString(16);</span></a>
+<a name="258"><span class="lineNum">     258 </span>            :   }</a>
+<a name="259"><span class="lineNum">     259 </span>            :   return result;</a>
+<a name="260"><span class="lineNum">     260 </span>            : }</a>
+<a name="261"><span class="lineNum">     261 </span>            : </a>
+<a name="262"><span class="lineNum">     262 </span>            : /*</a>
+<a name="263"><span class="lineNum">     263 </span>            :   open in browser</a>
+<a name="264"><span class="lineNum">     264 </span>            :   * @param {string} url</a>
+<a name="265"><span class="lineNum">     265 </span>            : */</a>
+<a name="266"><span class="lineNum">     266 </span><span class="lineCov">          1 : Future openInBrowser(String url) async {</span></a>
+<a name="267"><span class="lineNum">     267 </span><span class="lineCov">          2 :   if (await canLaunch(url)) {</span></a>
+<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :     await launch(</span></a>
+<a name="269"><span class="lineNum">     269 </span>            :       url,</a>
+<a name="270"><span class="lineNum">     270 </span>            :       forceSafariVC: false,</a>
+<a name="271"><span class="lineNum">     271 </span>            :       forceWebView: false,</a>
+<a name="272"><span class="lineNum">     272 </span>            :     );</a>
+<a name="273"><span class="lineNum">     273 </span>            :   } else {</a>
+<a name="274"><span class="lineNum">     274 </span><span class="lineNoCov">          0 :     throw 'Could not launch $url';</span></a>
+<a name="275"><span class="lineNum">     275 </span>            :   }</a>
+<a name="276"><span class="lineNum">     276 </span>            : }</a>
+<a name="277"><span class="lineNum">     277 </span>            : </a>
+<a name="278"><span class="lineNum">     278 </span>            : /*</a>
+<a name="279"><span class="lineNum">     279 </span>            :   password verification</a>
+<a name="280"><span class="lineNum">     280 </span>            :   * @param {string} pass</a>
+<a name="281"><span class="lineNum">     281 </span>            : */</a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineCov">          1 : bool isValidPass(String pass){</span></a>
+<a name="283"><span class="lineNum">     283 </span><span class="lineCov">          1 :   pass = pass.trim();</span></a>
+<a name="284"><span class="lineNum">     284 </span><span class="lineCov">          2 :   return pass.length &gt; 11;</span></a>
+<a name="285"><span class="lineNum">     285 </span>            : }</a>
+<a name="286"><span class="lineNum">     286 </span>            : </a>
+<a name="287"><span class="lineNum">     287 </span>            : /*</a>
+<a name="288"><span class="lineNum">     288 </span>            :   url check</a>
+<a name="289"><span class="lineNum">     289 </span>            :   * @param {string} url</a>
+<a name="290"><span class="lineNum">     290 </span>            : */</a>
+<a name="291"><span class="lineNum">     291 </span><span class="lineCov">          1 : bool isValidUrl(String url) {</span></a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineCov">          1 :   final urlRegExp = new RegExp(</span></a>
+<a name="293"><span class="lineNum">     293 </span>            :       r&quot;^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$&quot;);</a>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">          1 :   return urlRegExp.hasMatch(url);</span></a>
+<a name="295"><span class="lineNum">     295 </span>            : }</a>
+<a name="296"><span class="lineNum">     296 </span>            : </a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineNoCov">          0 : void nextTick(Noop callback) {</span></a>
+<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 :   Future.delayed(Duration.zero).then((value) {</span></a>
+<a name="299"><span class="lineNum">     299 </span>            :     callback();</a>
+<a name="300"><span class="lineNum">     300 </span>            :   });</a>
+<a name="301"><span class="lineNum">     301 </span>            : }</a>
+<a name="302"><span class="lineNum">     302 </span>            : </a>
+<a name="303"><span class="lineNum">     303 </span>            : /*</a>
+<a name="304"><span class="lineNum">     304 </span>            :   walletConnect link verification</a>
+<a name="305"><span class="lineNum">     305 </span>            :   * @param {string} link</a>
+<a name="306"><span class="lineNum">     306 </span>            : */</a>
+<a name="307"><span class="lineNum">     307 </span><span class="lineCov">          1 : String getValidWCLink(String link) {</span></a>
+<a name="308"><span class="lineNum">     308 </span>            :   bool Function(String) fullLink =</a>
+<a name="309"><span class="lineNum">     309 </span><span class="lineCov">          3 :       (String url) =&gt; url.contains('bridge') &amp;&amp; url.contains('key');</span></a>
+<a name="310"><span class="lineNum">     310 </span>            :   if (!fullLink(link)) {</a>
+<a name="311"><span class="lineNum">     311 </span>            :     return '';</a>
+<a name="312"><span class="lineNum">     312 </span>            :   } else {</a>
+<a name="313"><span class="lineNum">     313 </span><span class="lineCov">          1 :     if (link.startsWith('wc:')) {</span></a>
+<a name="314"><span class="lineNum">     314 </span>            :       return link;</a>
+<a name="315"><span class="lineNum">     315 </span><span class="lineNoCov">          0 :     } else if (link.startsWith('filecoinwallet')) {</span></a>
+<a name="316"><span class="lineNum">     316 </span><span class="lineNoCov">          0 :       var list = link.split('uri=');</span></a>
+<a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :       if (list.length == 2) {</span></a>
+<a name="318"><span class="lineNum">     318 </span><span class="lineNoCov">          0 :         return list[1];</span></a>
+<a name="319"><span class="lineNum">     319 </span>            :       } else {</a>
+<a name="320"><span class="lineNum">     320 </span>            :         return '';</a>
+<a name="321"><span class="lineNum">     321 </span>            :       }</a>
+<a name="322"><span class="lineNum">     322 </span>            :     } else {</a>
+<a name="323"><span class="lineNum">     323 </span>            :       return '';</a>
+<a name="324"><span class="lineNum">     324 </span>            :     }</a>
+<a name="325"><span class="lineNum">     325 </span>            :   }</a>
+<a name="326"><span class="lineNum">     326 </span>            : }</a>
+<a name="327"><span class="lineNum">     327 </span>            : </a>
+<a name="328"><span class="lineNum">     328 </span><span class="lineCov">          1 : String trParams(String tr, [Map&lt;String, String&gt; params = const {}]) {</span></a>
+<a name="329"><span class="lineNum">     329 </span>            :   var trans = tr;</a>
+<a name="330"><span class="lineNum">     330 </span><span class="lineCov">          1 :   if (params.isNotEmpty) {</span></a>
+<a name="331"><span class="lineNum">     331 </span><span class="lineCov">          2 :     params.forEach((key, value) {</span></a>
+<a name="332"><span class="lineNum">     332 </span><span class="lineCov">          2 :       trans = trans.replaceAll('@$key', value);</span></a>
+<a name="333"><span class="lineNum">     333 </span>            :     });</a>
+<a name="334"><span class="lineNum">     334 </span>            :   }</a>
+<a name="335"><span class="lineNum">     335 </span>            :   return trans;</a>
+<a name="336"><span class="lineNum">     336 </span>            : }</a>
+<a name="337"><span class="lineNum">     337 </span>            : </a>
+<a name="338"><span class="lineNum">     338 </span>            : /*</a>
+<a name="339"><span class="lineNum">     339 </span>            :   mnemonic string to list</a>
+<a name="340"><span class="lineNum">     340 </span>            :   * @param {string} str</a>
+<a name="341"><span class="lineNum">     341 </span>            : */</a>
+<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          2 : String StringTrim(String str){</span></a>
+<a name="343"><span class="lineNum">     343 </span><span class="lineCov">          4 :   if(str.trim()==''){ return str; }</span></a>
+<a name="344"><span class="lineNum">     344 </span><span class="lineCov">          2 :   var arr1 = str.split(' ');</span></a>
+<a name="345"><span class="lineNum">     345 </span><span class="lineCov">          6 :   var arr2 =arr1.where((ele)=&gt;ele!='');</span></a>
+<a name="346"><span class="lineNum">     346 </span><span class="lineCov">          2 :   String  res =arr2.join(' ');</span></a>
+<a name="347"><span class="lineNum">     347 </span>            :   return res;</a>
+<a name="348"><span class="lineNum">     348 </span>            : }</a>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.15-5-g462f71d</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
