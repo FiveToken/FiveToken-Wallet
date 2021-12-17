@@ -1,7 +1,10 @@
-import 'package:fil/index.dart';
+import 'package:fil/pages/address/add.dart';
+import 'package:fil/pages/address/index.dart';
 import 'package:fil/pages/address/net.dart';
 import 'package:fil/pages/address/select.dart';
 import 'package:fil/pages/address/wallet.dart';
+import 'package:fil/routes/path.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
 
 List<GetPage> getAddressBookRoutes() {
   var list = <GetPage>[];

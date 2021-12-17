@@ -1,4 +1,3 @@
-import 'package:fil/index.dart';
 import 'package:hive/hive.dart';
 part 'nonce.g.dart';
 
@@ -8,7 +7,10 @@ class Nonce {
   int time;
   @HiveField(1)
   int value;
-  Nonce({this.time, this.value});
+  Nonce({
+    this.time = 0,
+    this.value = 0
+  });
   Nonce.fromJson(Map<dynamic, dynamic> json) {
     time = json['time'];
     value = json['value'];

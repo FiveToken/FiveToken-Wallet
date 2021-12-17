@@ -1,6 +1,19 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+import 'package:fil/init/hive.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/pages/other/scan.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/models/index.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/common/utils.dart';
+
 
 class ImportPrivateKeyPage extends StatefulWidget {
   @override
@@ -14,6 +27,7 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
   void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;
+    var box  = OpenedBox.walletInstance;
     if (inputStr == "") {
       showCustomError('enterPk'.tr);
       return;
@@ -24,17 +38,42 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
     if (name == '') {
       showCustomError('enterName'.tr);
       return;
-    }
+    } else if( name.length>20){
+      showCustomError('upName'.tr);
+      return;
+    }else{}
+
     if (net.chain == 'filecoin') {
       try {
-        PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+        var pk = filPk.privateKey;
+        var filAddr = await FilecoinWallet.genAddrByPrivateKey(pk);
+        var rpc = net.rpc;
+        var type = 2;
+        String key = '$filAddr\_$rpc\_$type';
+        if (box.get(key)!=null) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
       } catch (e) {
         showCustomError('wrongPk'.tr);
         return;
       }
     } else {
       try {
-        await EthWallet.genAddrByPrivateKey(inputStr);
+        if(!ethPrivate(inputStr)){
+          showCustomError('wrongPk'.tr);
+          return;
+        }
+        var ethAddr = await EthWallet.genAddrByPrivateKey(inputStr);
+        var type = 2;
+        var rpc = net.rpc;
+        String key = '$ethAddr\_$rpc\_$type';
+        if (box.get(key)!=null) {
+          showCustomError('errorExist'.tr);
+          return;
+        }
+
       } catch (e) {
         showCustomError('wrongPk'.tr);
         return;
@@ -135,7 +174,9 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
               ),
               Field(
                 label: 'walletName'.tr,
+                maxLength: 20,
                 controller: nameControl,
+                placeholder: 'placeholderWalletName'.tr,
               )
             ],
           ),

@@ -1,4 +1,12 @@
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/style.dart';
 
 class SetPage extends StatefulWidget {
   @override
@@ -46,6 +54,12 @@ class SetPageState extends State<SetPage> {
                   label: 'net'.tr,
                   onTap: () {
                     Get.toNamed(netIndexPage);
+                  },
+                ),
+                CardItem(
+                  label: 'lockScreenSetting'.tr,
+                  onTap: () {
+                    Get.toNamed(lockPage);
                   },
                 ),
               ],

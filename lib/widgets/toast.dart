@@ -1,6 +1,9 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/style.dart';
 
 class ToastContent extends StatelessWidget {
   final Widget body;

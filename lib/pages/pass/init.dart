@@ -1,8 +1,24 @@
+import 'package:fil/bloc/pass/pass_bloc.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+import 'package:fil/common/encryptKey.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/index.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/init/hive.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/utils/enum.dart';
+
 
 class PassInitPage extends StatefulWidget {
   @override
@@ -12,6 +28,7 @@ class PassInitPage extends StatefulWidget {
 }
 
 class PassInitPageState extends State<PassInitPage> {
+  TextEditingController nameCtrl = TextEditingController();
   TextEditingController passCtrl = TextEditingController();
   TextEditingController passConfirmCtrl = TextEditingController();
   int type; //0 id 1 mne 2 privatekey
@@ -20,12 +37,21 @@ class PassInitPageState extends State<PassInitPage> {
   Network net;
   String label;
   bool loading = false;
-  var box = OpenedBox.walletInstance;
+  var box  = OpenedBox.walletInstance;
   bool checkPass() {
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
-    if (!isValidPassword(pass)) {
-      showCustomError('enterValidPass'.tr);
+    var walletName = nameCtrl.text.trim();
+    bool flag = type == WalletType.id;
+    if(walletName==''&&flag){
+      showCustomError('enterName'.tr);
+      return false;
+    }
+    if (!isValidPass(pass)) {
+      showCustomError('placeholderValidPass'.tr);
+      return false;
+    } else if(!isValidPass(confirm)){
+      showCustomError('placeholderValidPass'.tr);
       return false;
     } else if (pass != confirm) {
       showCustomError('diffPass'.tr);
@@ -38,37 +64,64 @@ class PassInitPageState extends State<PassInitPage> {
   @override
   void initState() {
     super.initState();
-    var arg = Get.arguments ?? {'type': 0};
+    var arg = Get.arguments ?? {'type': WalletType.id};
     type = arg['type'];
+    if(arg['type']==WalletType.id){
+      nameCtrl.text = arg['label'];
+    }
     mne = arg['mne'];
     label = arg['label'];
     privateKey = arg['privateKey'];
     net = arg['net'];
   }
 
+
+  ChainWallet getWallet(type, EncryptKey key,Network net){
+    return ChainWallet(
+      label: label,
+      mne: type!= WalletType.privateKey ?aesEncrypt(mne, key.private): '',
+      groupHash: type!= WalletType.privateKey ?tokenify(mne): '',
+      type: type,
+      rpc: net.rpc,
+      addressType: net.addressType,
+      digest: key.digest,
+      address: key.address,
+      skKek: key.kek,
+    );
+  }
+
+  void updateName(String newLabel) async{
+    var box = OpenedBox.walletInstance;
+    var wallet = $store.wal;
+    var list = box.values.where((wal)=> wal.groupHash == wallet.groupHash);
+    list.forEach((wal)=>{
+      wal.label = newLabel,
+      box.put(wal.key, wal)
+    });
+    $store.changeWalletName(newLabel);
+  }
+
+  void AddWallet(ChainWallet wallet) async{
+    var box = OpenedBox.walletInstance;
+    await box.put(wallet.key, wallet);
+  }
+
   void handleSubmit() async {
     String pass = passCtrl.text.trim();
+    String walletName = nameCtrl.text.trim();
     if (!checkPass()) {
       return;
     }
     if (loading) {
       return;
     }
-
     this.loading = true;
     showCustomLoading('Loading');
-    if (type == 0 || (type == 1 && net == null)) {
+    if (type == WalletType.id) {
       try {
-        Map<String, EncryptKey> keyMap = {};
-        var ethPk = await compute(EthWallet.genPrivateKeyByMne, mne);
-        var filPk = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-        keyMap['eth'] = await EthWallet.genEncryptKeyByPrivateKey(ethPk, pass);
-        keyMap['filecoin'] =
-            await FilecoinWallet.genEncryptKeyByPrivateKey(filPk, pass);
-        keyMap['calibration'] = await FilecoinWallet.genEncryptKeyByPrivateKey(
-            filPk, pass,
-            prefix: 't');
-        var key = keyMap['eth'].address + '_' + Network.ethMainNet.rpc + '_0';
+        Map<String, EncryptKey> keyMap = await getKeyMap(mne, pass);
+        EncryptKey ethKey = keyMap['eth'];
+        var key = ethKey.address + '_' + Network.ethMainNet.rpc + '_0';
         if (box.containsKey(key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
@@ -76,22 +129,14 @@ class PassInitPageState extends State<PassInitPage> {
         }
         for (var nets in Network.netList) {
           for (var net in nets) {
-            var type = net.addressType;
-            EncryptKey key = keyMap[type];
-            if (net.rpc == Network.filecoinTestNet.rpc) {
-              key = keyMap[net.net];
-            }
-            var wal = ChainWallet(
-                label: label,
-                mne: aesEncrypt(mne, key.private),
-                groupHash: tokenify(mne),
-                type: 0,
-                rpc: net.rpc,
-                addressType: type);
-            wal.digest = key.digest;
-            wal.address = key.address;
-            wal.skKek = key.kek;
-            box.put(wal.key, wal);
+            var addrType = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
+            var wal;
+            try {
+              EncryptKey key = keyMap[addrType];
+              wal = getWallet(type, key, net);
+              AddWallet(wal);
+            }catch(e){}
+
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
               $store.setWallet(wal);
@@ -99,88 +144,49 @@ class PassInitPageState extends State<PassInitPage> {
             }
           }
         }
+        updateName(walletName);
       } catch (e) {
-        print(e);
         this.loading = false;
         dismissAllToast();
       }
-    } else if (type == 1 && net != null) {
+    } else if (type == WalletType.mne) {
       try {
-        EncryptKey key;
-        if (net.addressType == 'eth') {
-          var private = await compute(EthWallet.genPrivateKeyByMne, mne);
-          key = await EthWallet.genEncryptKeyByPrivateKey(private, pass);
-        } else {
-          var private = await compute(FilecoinWallet.genPrivateKeyByMne, mne);
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass,
-              prefix: net.prefix);
-        }
-        var wal = ChainWallet(
-            label: label,
-            mne: aesEncrypt(mne, key.private),
-            groupHash: tokenify(mne),
-            type: 1,
-            rpc: net.rpc,
-            addressType: net.addressType);
-        wal.digest = key.digest;
-        wal.address = key.address;
-        wal.skKek = key.kek;
+        EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
+        var wal = getWallet(type, key, net);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
           return;
         }
-        box.put(wal.key, wal);
+        await AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
         Global.store.setString('activeNetwork', net.rpc);
       } catch (e) {
-        print(e);
-        dismissAllToast();
         this.loading = false;
+        dismissAllToast();
       }
     } else {
       try {
-        EncryptKey key;
-        if (net.addressType == 'eth') {
-          if (privateKey.length > 64) {
-            showCustomError('wrongPk'.tr);
-            this.loading = false;
-            return;
-          }
-          key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
-        } else {
-          PrivateKey filPk =
-              PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
-          var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
-          var pk = filPk.privateKey;
-          key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass,
-              type: type, prefix: net.prefix);
+        EncryptKey key = await getKey2(net.addressType, privateKey, pass, net);
+        if (net.addressType == 'eth' && privateKey.length > 64) {
+          showCustomError('wrongPk'.tr);
+          this.loading = false;
+          return;
         }
-
-        var wal = ChainWallet(
-            label: label,
-            mne: '',
-            groupHash: '',
-            type: 2,
-            rpc: net.rpc,
-            addressType: net.addressType);
-        wal.digest = key.digest;
-        wal.address = key.address;
-        wal.skKek = key.kek;
-        if (box.containsKey(wal.key)) {
+        var wal = getWallet(type, key, net);
+        if (box.get(wal.key)!=null) {
           showCustomError('errorExist'.tr);
           this.loading = false;
           return;
         }
-        box.put(wal.key, wal);
+        await AddWallet(wal);
         $store.setWallet(wal);
         $store.setNet(net);
         Global.store.setString('currentWalletAddress', wal.key);
         Global.store.setString('activeNetwork', net.rpc);
       } catch (e) {
-        print(e);
         this.loading = false;
         showCustomError('importFail'.tr);
       }
@@ -188,6 +194,10 @@ class PassInitPageState extends State<PassInitPage> {
 
     this.loading = false;
     dismissAllToast();
+    // Navigator.popUntil(context, (route){
+    //   return route.settings.name == mainPage;
+    // });
+    Global.lockFromInit = false;
     Get.offAllNamed(mainPage);
   }
 
@@ -196,20 +206,29 @@ class PassInitPageState extends State<PassInitPage> {
     return CommonScaffold(
       grey: true,
       title: 'pass'.tr,
-      footerText: 'next'.tr,
+      footerText: 'sure'.tr,
       onPressed: () {
         handleSubmit();
       },
       body: Padding(
         child: Column(
           children: [
+            Visibility(child: Field(
+              label:  'walletName'.tr,
+              controller: nameCtrl,
+              placeholder: 'placeholderWalletName'.tr,
+              maxLength: 20,
+            ),
+              visible: type == WalletType.id,
+            ),
+
             SizedBox(
               height: 15,
             ),
             PassField(
               controller: passCtrl,
               label: 'setPass'.tr,
-              hintText: 'enterValidPass'.tr,
+              hintText: 'placeholderValidPass'.tr,
             ),
             SizedBox(
               height: 20,
@@ -244,69 +263,72 @@ class PassField extends StatefulWidget {
 }
 
 class PassFieldState extends State<PassField> {
-  bool passShow = false;
+  void onTap(context, state){
+    BlocProvider.of<PassBloc>(context)..add(SetPassEvent(passShow: !state.passShow));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Visibility(
-          child: Column(
+    return BlocProvider(
+        create: (context) => PassBloc()..add(SetPassEvent()),
+        child: BlocBuilder<PassBloc, PassState>(builder: (ctx, state){
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CommonText(
-                widget.label,
-                size: 14,
-                weight: FontWeight.w500,
+              Visibility(
+                child: Column(
+                  children: [
+                    CommonText(
+                      widget.label,
+                      size: 14,
+                      weight: FontWeight.w500,
+                    ),
+                    SizedBox(
+                      height: 13,
+                    ),
+                  ],
+                ),
+                visible: widget.label != '',
               ),
-              SizedBox(
-                height: 13,
-              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                decoration: BoxDecoration(
+                    color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                          autofocus: widget.autofocus,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp("[^\u4e00-\u9fa5]"),
+                            ),
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                            LengthLimitingTextInputFormatter(20)
+                          ],
+                          style: TextStyle(fontSize: 12),
+                          obscureText: !state.passShow,
+                          controller: widget.controller,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration.collapsed(
+                              hintText: widget.hintText,
+                              hintStyle:
+                              TextStyle(color: Color(0xffcccccc), fontSize: 14)),
+                        )),
+                    GestureDetector(
+                      child: Image(
+                          width: 22,
+                          image: AssetImage(!state.passShow
+                              ? 'icons/close-eye-d.png'
+                              : 'icons/open-d.png')),
+                      onTap: ()=>{onTap(ctx, state)},
+                    ),
+                  ],
+                ),
+              )
             ],
-          ),
-          visible: widget.label != '',
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            children: [
-              Expanded(
-                  child: TextField(
-                autofocus: widget.autofocus,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp("[^\u4e00-\u9fa5]"),
-                  ),
-                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                  LengthLimitingTextInputFormatter(20)
-                ],
-                style: TextStyle(fontSize: 12),
-                obscureText: !passShow,
-                controller: widget.controller,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration.collapsed(
-                    hintText: widget.hintText,
-                    hintStyle:
-                        TextStyle(color: Color(0xffcccccc), fontSize: 14)),
-              )),
-              GestureDetector(
-                child: Image(
-                    width: 22,
-                    image: AssetImage(!passShow
-                        ? 'icons/close-eye-d.png'
-                        : 'icons/open-d.png')),
-                onTap: () {
-                  setState(() {
-                    passShow = !passShow;
-                  });
-                },
-              ),
-            ],
-          ),
-        )
-      ],
+          );
+        }),
     );
   }
 }

@@ -1,5 +1,5 @@
-import 'package:fil/index.dart';
 import 'package:fil/routes/wallet.dart';
+import 'package:get/get_navigation/src/routes/get_route.dart';
 import './create.dart';
 import './other.dart';
 import 'transfer.dart';

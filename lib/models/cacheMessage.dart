@@ -1,4 +1,6 @@
-import 'package:fil/index.dart';
+import 'package:fil/chain/gas.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/common/utils.dart';
 import 'package:hive/hive.dart';
 part 'cacheMessage.g.dart';
 
@@ -34,6 +36,8 @@ class CacheMessage {
   int height;
   @HiveField(14)
   String mid; //only for filecoin
+  @HiveField(15)
+  String symbol;
   CacheMessage(
       {this.from = '',
       this.to = '',
@@ -49,6 +53,7 @@ class CacheMessage {
       this.fee = '',
       this.height = 0,
       this.mid = '',
+        this.symbol='',
       this.exitCode});
   String get formatValue {
     if (token != null) {

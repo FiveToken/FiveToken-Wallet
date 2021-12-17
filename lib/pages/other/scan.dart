@@ -1,6 +1,11 @@
-import 'package:fil/index.dart';
 import 'package:scan/scan.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/common/index.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/widgets/style.dart';
 
 enum ScanScene { Address, PrivateKey, Mne, Connect }
 
@@ -22,11 +27,11 @@ class ScanPageState extends State<ScanPage> {
     scene = Get.arguments['scene'];
   }
 
-  bool checkScanResultBySene(String result) {
+  Future<bool> checkScanResultBySene(String result) async {
     var valid = false;
     switch (scene) {
       case ScanScene.Address:
-        valid = isValidChainAddress(result, $store.net);
+        valid = await isValidChainAddress(result, $store.net);
         if (!valid) {
           showCustomError('wrongAddr'.tr);
         }
@@ -44,6 +49,18 @@ class ScanPageState extends State<ScanPage> {
     return valid;
   }
 
+  void onCapture(data){
+    setState(() async {
+      controller.pause();
+      bool valid = await checkScanResultBySene(data);
+      if (valid) {
+        Get.back(result: data);
+      } else {
+        controller.resume();
+      }
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -54,16 +71,7 @@ class ScanPageState extends State<ScanPage> {
               controller: controller,
               scanAreaScale: 1,
               scanLineColor: Colors.green.shade400,
-              onCapture: (data) {
-                setState(() {
-                  controller.pause();
-                  if (checkScanResultBySene(data)) {
-                    Get.back(result: data);
-                  } else {
-                    controller.resume();
-                  }
-                });
-              },
+              onCapture: (data)=>{onCapture(data)},
             ),
             top: 0,
             left: 0,

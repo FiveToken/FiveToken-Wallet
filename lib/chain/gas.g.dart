@@ -21,13 +21,17 @@ class ChainGasAdapter extends TypeAdapter<ChainGas> {
       gasPremium: fields[1] as String,
       gasPrice: fields[0] as String,
       level: fields[3] as int,
+      rpcType: fields[4] as String,
+      maxPriorityFee: fields[5] as String,
+      maxFeePerGas: fields[6] as String,
+      gasFeeCap: fields[7] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ChainGas obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.gasPrice)
       ..writeByte(1)
@@ -35,7 +39,15 @@ class ChainGasAdapter extends TypeAdapter<ChainGas> {
       ..writeByte(2)
       ..write(obj.gasLimit)
       ..writeByte(3)
-      ..write(obj.level);
+      ..write(obj.level)
+      ..writeByte(4)
+      ..write(obj.rpcType)
+      ..writeByte(5)
+      ..write(obj.maxPriorityFee)
+      ..writeByte(6)
+      ..write(obj.maxFeePerGas)
+      ..writeByte(7)
+      ..write(obj.gasFeeCap);
   }
 
   @override

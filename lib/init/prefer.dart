@@ -1,5 +1,12 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/store/store.dart';
+import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'hive.dart';
 
 Future<String> initSharedPreferences() async {
   var initialRoute = mainPage;
@@ -12,6 +19,13 @@ Future<String> initSharedPreferences() async {
     Global.langCode = 'en';
   }
 
+  var lockBox = OpenedBox.lockInstance;
+  var lock = lockBox.get('lock');
+  Global.lockFromInit = true;
+  if (lock != null && lock.lockscreen == true) {
+    Global.lockscreen = true;
+  }
+
   var box = OpenedBox.walletInstance;
   var activeWalletAddr = instance.getString('currentWalletAddress');
   var activeNetwork = instance.getString('activeNetwork');
@@ -22,10 +36,11 @@ Future<String> initSharedPreferences() async {
     Global.wcSession = wcSession;
   }
   // migrate v1.0.0
-  var filList = OpenedBox.addressInsance.values;
-  var keys = OpenedBox.addressInsance.keys;
-  if (filList.isNotEmpty) {
+  Box AddressBox = OpenedBox.addressInsance;
+  if (AddressBox!=null) {
     var net = Network.filecoinMainNet;
+    var filList = AddressBox.values;
+    var keys = AddressBox.keys;
     for (var wal in filList) {
       var newWal = ChainWallet(
           label: wal.label,

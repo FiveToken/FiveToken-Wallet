@@ -1,28 +1,40 @@
-import 'package:fil/index.dart';
+import 'package:fil/chain/lock.dart';
+import 'package:fil/chain/net.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/chain/wallet.dart';
+import 'package:fil/models/address.dart';
+import 'package:hive/hive.dart';
 import 'package:mockito/mockito.dart';
 
 class MockBox<T> extends Mock implements Box<T> {}
 
 MockBox<Network> mockNetbox() {
   var box = MockBox<Network>();
-  OpenedBox.netInstance = box;
+  // OpenedBox.netInstance = box;
   return box;
 }
 
 MockBox<ContactAddress> mockAddressBookBox() {
   var box = MockBox<ContactAddress>();
-  OpenedBox.addressBookInsance = box;
+  // OpenedBox.addressBookInsance = box;
   return box;
 }
 
 MockBox<ChainWallet> mockChainWalletBox() {
   var box = MockBox<ChainWallet>();
-  OpenedBox.walletInstance = box;
+  // OpenedBox.walletInstance = box;
   return box;
 }
 
 MockBox<Token> mockTokenBox() {
   var box = MockBox<Token>();
-  OpenedBox.tokenInstance = box;
+  // OpenedBox.tokenInstance = box;
   return box;
 }
+
+MockBox<LockBox> mockLockBox() {
+  var box = MockBox<LockBox>();
+  // OpenedBox.tokenInstance = box;
+  return box;
+}
+

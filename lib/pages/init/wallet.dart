@@ -1,4 +1,13 @@
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/widgets/index.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/store/store.dart';
+
 
 class WalletInitPage extends StatelessWidget {
   @override
@@ -58,9 +67,8 @@ class WalletInitPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: 'createWallet'.tr,
-                          onTap: () {
-                            Get.toNamed(createWarnPage);
-                          })
+                          onTap: () => Get.toNamed(createWarnPage)
+                      )
                     ],
                   ),
                   SizedBox(
@@ -78,16 +86,12 @@ class WalletInitPage extends StatelessWidget {
                     items: [
                       CardItem(
                           label: 'pkImport'.tr,
-                          onTap: () {
-                            Get.toNamed(importIndexPage,
-                                arguments: {'net': $store.net, 'type': 2});
-                          }),
+                          onTap: () => Get.toNamed(importIndexPage, arguments: {'net': $store.net, 'type': 2})
+                      ),
                       CardItem(
                           label: 'mneImport'.tr,
-                          onTap: () {
-                            Get.toNamed(importIndexPage,
-                                arguments: {'net': $store.net, 'type': 1});
-                          })
+                          onTap: () => Get.toNamed(importIndexPage, arguments: {'net': $store.net, 'type': 1})
+                          )
                     ],
                   ),
                 ],

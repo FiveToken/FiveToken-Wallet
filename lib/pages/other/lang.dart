@@ -1,4 +1,8 @@
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/common/global.dart';
 
 class LangPage extends StatefulWidget {
   @override
@@ -29,27 +33,19 @@ class LangPageState extends State<LangPage> {
               items: [
                 CardItem(
                   label: 'English',
-                  onTap: () {
-                    selectLang('en');
-                  },
+                  onTap: () => selectLang('en'),
                 ),
                 CardItem(
                   label: '한국어',
-                  onTap: () {
-                    selectLang('kr');
-                  },
+                  onTap: () => selectLang('kr'),
                 ),
                 CardItem(
                   label: '日本語',
-                  onTap: () {
-                    selectLang('jp');
-                  },
+                  onTap: () => selectLang('jp'),
                 ),
                 CardItem(
                   label: '中文',
-                  onTap: () {
-                    selectLang('zh');
-                  },
+                  onTap: () => selectLang('zh'),
                 ),
               ],
             ),

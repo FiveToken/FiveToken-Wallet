@@ -1,4 +1,5 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
 
 const double NavHeight = 52;
 const NavLeadingAlign = Alignment(-0.5, 0);
@@ -49,5 +50,8 @@ class CustomColor {
 
   static Color get red {
     return Color(0xffE85C5C);
+  }
+  static Color get black{
+    return Color(0xff000000);
   }
 }

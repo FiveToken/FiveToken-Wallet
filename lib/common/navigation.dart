@@ -1,4 +1,7 @@
-import 'package:fil/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'global.dart';
 
 class PushObserver extends NavigatorObserver {
   @override
@@ -9,14 +12,20 @@ class PushObserver extends NavigatorObserver {
   @override
   void didRemove(Route<dynamic> route, Route<dynamic> previousRoute) {
     super.didRemove(route, previousRoute);
-    print('back');
+    if (route != null && route.settings.name == walletMainPage) {
+      _clearCashToken();
+    }
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic> previousRoute) {
     super.didPop(route, previousRoute);
     if (route != null && route.settings.name == walletMainPage) {
-      Global.cacheToken = null;
+      _clearCashToken();
     }
+  }
+
+  void _clearCashToken(){
+    Global.cacheToken = null;
   }
 }

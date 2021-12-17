@@ -1,5 +1,8 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'dart:math';
 import 'package:random_color/random_color.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/style.dart';
 
 class RandomIcon extends StatelessWidget {
   final String address;

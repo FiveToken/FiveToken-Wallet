@@ -1,4 +1,7 @@
-import 'package:fil/index.dart';
+import 'dart:math';
+
+import 'package:fil/common/utils.dart';
+import 'package:hive/hive.dart';
 part 'token.g.dart';
 
 @HiveType(typeId: 8)
@@ -25,6 +28,15 @@ class Token {
     } catch (e) {
       return '';
     }
+  }
+
+  Token.fromJson(dynamic json) {
+    symbol = json['symbol'];
+    precision = json['precision'];
+    address = json['address'];
+    chain = json['chain'];
+    rpc = json['rpc'];
+    balance = json['balance'];
   }
 
   Token(

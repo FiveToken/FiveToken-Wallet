@@ -1,6 +1,18 @@
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:fil/common/utils.dart';
+
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:get/get.dart';
+import 'package:fil/routes/path.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/pages/other/scan.dart';
+
 
 class ImportMnePage extends StatefulWidget {
   @override
@@ -22,9 +34,14 @@ class ImportMnePageState extends State<ImportMnePage> {
     if (label == "") {
       showCustomError('enterName'.tr);
       return false;
-    }
+    } else if(label.length>20) {
+      showCustomError('placeholderWalletName'.tr);
+      return false;
+    } else {}
+
+    String mneFilter =  StringTrim(inputStr);
     if (!bip39.validateMnemonic(
-      inputStr,
+      mneFilter,
     )) {
       showCustomError('wrongMne'.tr);
       return false;
@@ -109,7 +126,7 @@ class ImportMnePageState extends State<ImportMnePage> {
               Container(
                 child: TextField(
                   decoration: InputDecoration(
-                      hintText: 'enterMne'.tr,
+                      hintText: 'placeholderMne'.tr,
                       hintStyle:
                           TextStyle(color: Color(0xffcccccc), fontSize: 14),
                       enabledBorder: InputBorder.none,
@@ -128,6 +145,8 @@ class ImportMnePageState extends State<ImportMnePage> {
               ),
               Field(
                 label: 'walletName'.tr,
+                placeholder: 'placeholderWalletName'.tr,
+                maxLength: 20,
                 controller: nameControl,
               )
             ],

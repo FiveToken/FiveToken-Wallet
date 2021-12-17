@@ -1,4 +1,4 @@
-import 'package:fil/index.dart';
+import 'package:hive/hive.dart';
 part 'address.g.dart';
 
 @HiveType(typeId: 10)

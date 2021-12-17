@@ -1,10 +1,26 @@
+import 'package:decimal/decimal.dart';
+import 'package:fil/bloc/gas/gas_bloc.dart';
+import 'package:fil/chain/gas.dart';
+import 'package:fil/config/config.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/index.dart';
+import 'package:fil/widgets/field.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:oktoast/oktoast.dart';
 import 'dart:math';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/formatter.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/pages/other/scan.dart';
+import 'package:fil/chain/token.dart';
+import 'package:fil/chain/net.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/init/hive.dart';
 
 class FilTransferNewPage extends StatefulWidget {
   @override
@@ -17,18 +33,22 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
   TextEditingController addressCtrl = TextEditingController();
   int nonce;
   FocusNode focusNode = FocusNode();
-  ChainProvider provider;
+  String from = $store.wal.addr;
+  String rpc = $store.net.rpc;
   Network net = $store.net;
   ChainGas gas;
   ChainWallet wallet = $store.wal;
   Token token = Global.cacheToken;
   bool loading = false;
   String prePage;
+  String rpcType;
+  bool isSpeedUp;
   var nonceBoxInstance = OpenedBox.nonceInsance;
+
   @override
   void initState() {
     super.initState();
-
+    isSpeedUp = false;
     if (Get.arguments != null) {
       if (Get.arguments['to'] != null) {
         addressCtrl.text = Get.arguments['to'];
@@ -36,28 +56,18 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       if (Get.arguments['page'] != null) {
         prePage = Get.arguments['page'];
       }
-      // if (Get.arguments['token'] != null) {
-      //   this.token = Get.arguments['token'];
-      // }
-    }
-    focusNode.addListener(() {
-      if (!focusNode.hasFocus) {
-        var to = addressCtrl.text.trim();
-        if (isValidChainAddress(to, net)) {
-          getGas(to);
-        }
-      }
-    });
-    provider = initProvider();
-    getGas(wallet.addr);
-    getNonce();
-  }
 
-  ChainProvider initProvider() {
-    if (net.addressType == 'eth') {
-      return EthProvider(net);
-    } else {
-      return FilecoinProvider(net);
+      if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
+        rpcType = 'ethMain';
+      } else if ($store.net.chain == 'filecoin') {
+        rpcType = 'filecoin';
+      } else {
+        rpcType = 'ethOthers';
+      }
+
+      if (Get.arguments['token'] != null) {
+        this.token = Get.arguments['token'];
+      }
     }
   }
 
@@ -66,289 +76,103 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     $store.setGas(ChainGas());
     amountCtrl.dispose();
     addressCtrl.dispose();
-    provider.dispose();
     super.dispose();
-  }
-
-  bool get showSpeed {
-    return pendingList.isNotEmpty;
   }
 
   bool get isToken => token != null;
 
-  List<CacheMessage> get pendingList {
-    return OpenedBox.mesInstance.values
-        .where((mes) =>
-            mes.pending == 1 && mes.from == wallet.addr && mes.rpc == net.rpc)
-        .toList();
+  String get title => token != null ? token.symbol : $store.net.coin;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) => GasBloc()
+              ..add(
+                UpdateMessListStateEvent($store.net.rpc,$store.net.chain,title)
+            )
+        ),
+      ],
+      child: BlocBuilder<GasBloc, GasState>(builder: (ctx, data) {
+        return BlocListener<GasBloc, GasState>(
+            listener: (context, state) {
+              if (state.getGasState == 'success') {
+                getGasCallback();
+              }
+              if(state.getGasState == 'error'){
+                if(state.errorMessage.isNotEmpty){
+                  showCustomError(state.errorMessage);
+                }else{
+                  showCustomError('gasFail'.tr);
+                }
+              }
+            },
+            child: CommonScaffold(
+              grey: true,
+              title: 'send'.tr + title,
+              footerText: 'next'.tr,
+              actions: [
+                Padding(
+                  child: GestureDetector(
+                      onTap: handleScan,
+                      child: Image(
+                        width: 20,
+                        image: AssetImage('icons/scan.png'),
+                      )),
+                  padding: EdgeInsets.only(right: 10),
+                )
+              ],
+              onPressed: () => nextStep(ctx),
+              body: _body(),
+            ));
+      }),
+    );
   }
 
-  Future<bool> getNonce() async {
-    var nonce = await provider.getNonce();
-    var address = wallet.addr;
-    var now = getSecondSinceEpoch();
-    if (nonce != -1) {
-      this.nonce = nonce;
-      var key = '$address\_${net.rpc}';
-      if (!nonceBoxInstance.containsKey(key)) {
-        nonceBoxInstance.put(key, Nonce(time: now, value: nonce));
-      } else {
-        Nonce nonceInfo = nonceBoxInstance.get(key);
-        var interval = 5 * 60 * 1000;
-        if (now - nonceInfo.time > interval) {
-          nonceBoxInstance.put(key, Nonce(time: now, value: nonce));
-        }
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  Future<bool> getGas(String to) async {
-    var g = await provider.getGas(to: to, isToken: isToken, token: token);
-    if (g.gasPrice != '0') {
-      $store.setGas(g);
-      this.gas = g;
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void speedup(String private) async {
-    if (loading) {
-      return;
-    }
-    pendingList.sort((a, b) {
-      if (a.nonce != null && b.nonce != null) {
-        return b.nonce.compareTo(a.nonce);
-      } else {
-        return -1;
-      }
-    });
-    var last = pendingList.last;
-    var from = last.from;
-    var n = last.nonce;
-    var rpc = last.rpc;
-    var key = '$from\_$n\_$rpc';
-    var cacheGas = OpenedBox.gasInsance.get(key);
-    if (cacheGas != null) {
-      try {
-        var chainPremium = $store.gas.gasPremium;
-        var g = provider.replaceGas(cacheGas, chainPremium: chainPremium);
-        this.loading = true;
-        showCustomLoading('Loading');
-        var res = '';
-        if (last.token != null) {
-          EthProvider p = provider;
-          res = await p.sendToken(
-              to: last.to,
-              nonce: n,
-              gas: g,
-              amount: last.value,
-              private: private,
-              addr: token.address);
-        } else {
-          res = await provider.sendTransaction(
-              nonce: n,
-              to: last.to,
-              amount: last.value,
-              gas: g,
-              private: private);
-        }
-
-        this.loading = false;
-        dismissAllToast();
-        if (res != '') {
-          showCustomToast('sended'.tr);
-          $store.setGas(ChainGas());
-          OpenedBox.gasInsance.put(key, g);
-          OpenedBox.mesInstance.put(
-              res,
-              CacheMessage(
-                  pending: 1,
-                  from: from,
-                  to: last.to,
-                  value: last.value,
-                  owner: from,
-                  nonce: n,
-                  hash: res,
-                  rpc: net.rpc,
-                  token: token,
-                  gas: g,
-                  fee: (BigInt.from(g.gasLimit) * BigInt.tryParse(g.gasPrice) ??
-                          0)
-                      .toString(),
-                  blockTime: (DateTime.now().millisecondsSinceEpoch / 1000)
-                      .truncate()));
-        } else {
-          showCustomError('sendFail'.tr);
-        }
-        if (mounted) {
-          goBack();
-        }
-      } catch (e) {
-        this.loading = false;
-        dismissAllToast();
-        print(e);
-      }
-    } else {
-      showCustomError('sendFail'.tr);
-    }
-  }
-
-  void pushMsg(String private) async {
-    if (loading) {
-      return;
-    }
-    if (!Global.online) {
-      showCustomError('errorNet'.tr);
-      return;
-    }
-    var from = wallet.addr;
-    var to = addressCtrl.text.trim();
-    var amount = amountCtrl.text.trim();
-    try {
-      var nonceKey = '$from\_${net.rpc}';
-      var value = getChainValue(amount, precision: token?.precision ?? 18);
-      this.loading = true;
-      showCustomLoading('Loading');
-      if ($store.gas.gasPrice == '0') {
-        var valid = await getGas(to);
-        if (!valid) {
-          showCustomError('errorSetGas'.tr);
-          return;
-        }
-      }
-      if (nonce == null || nonce == -1) {
-        var valid = await getNonce();
-        if (!valid) {
-          showCustomError("errorGetNonce".tr);
-          return;
-        }
-      }
-      var realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
-      var res = '';
-      if (isToken) {
-        EthProvider p = provider;
-        res = await p.sendToken(
-            to: to,
-            nonce: realNonce,
-            gas: $store.gas,
-            amount: value,
-            private: private,
-            addr: token.address);
-      } else {
-        res = await provider.sendTransaction(
-          to: to,
-          amount: value,
-          private: private,
-          nonce: realNonce,
-          gas: $store.gas,
-        );
-      }
-      this.loading = false;
-      dismissAllToast();
-      if (res != '') {
-        showCustomToast('sended'.tr);
-        var cacheGas = ChainGas(
-            gasPrice: $store.gas.gasPrice,
-            gasLimit: $store.gas.gasLimit,
-            gasPremium: $store.gas.gasPremium);
-        OpenedBox.gasInsance.put('$from\_$realNonce\_${net.rpc}', cacheGas);
-        $store.setGas(ChainGas());
-        OpenedBox.mesInstance.put(
-            res,
-            CacheMessage(
-                pending: 1,
-                from: from,
-                to: to,
-                value: value,
-                owner: from,
-                nonce: realNonce,
-                hash: res,
-                rpc: net.rpc,
-                token: token,
-                gas: cacheGas,
-                fee: (BigInt.from(cacheGas.gasLimit) *
-                            BigInt.tryParse(cacheGas.gasPrice) ??
-                        0)
-                    .toString(),
-                blockTime:
-                    (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
-        var oldNonce = nonceBoxInstance.get(nonceKey);
-        nonceBoxInstance.put(
-            nonceKey, Nonce(value: realNonce + 1, time: oldNonce.time));
-      } else {
-        showCustomError('sendFail'.tr);
-      }
-      if (mounted) {
-        goBack();
-      }
-    } catch (e) {
-      this.loading = false;
-      dismissAllToast();
-      showCustomError('sendFail'.tr);
-      print(e);
-    }
-  }
-
-  void goBack() {
-    if (prePage != walletMainPage) {
-      Get.offAndToNamed(walletMainPage);
-    } else {
-      Get.back();
-    }
-  }
-
-  bool checkInputValid() {
-    var amount = amountCtrl.text;
-    var toAddress = addressCtrl.text;
-    var trimAmount = amount.trim();
-    var trimAddress = toAddress.trim();
-    if (trimAddress == "") {
-      showCustomError('enterAddr'.tr);
-      return false;
-    }
-    if (!isValidChainAddress(trimAddress, net)) {
-      showCustomError('errorAddr'.tr);
-      return false;
-    }
-    if (trimAddress == $store.wal.addr) {
-      showCustomError('errorFromAsTo'.tr);
-      return false;
-    }
-    if (trimAmount == "" || !isDecimal(trimAmount)) {
-      showCustomError('enterValidAmount'.tr);
-      return false;
-    }
-    var a = double.parse(trimAmount);
-    if (a == 0) {
-      showCustomError('enterValidAmount'.tr);
-      return false;
-    }
-    var balanceNum =
-        BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
-    var fee = $store.gas.feeNum;
-    var amountNum = BigInt.from((double.tryParse(trimAmount) *
-        pow(10, isToken ? token.precision : 18)));
-    if (fee > BigInt.tryParse($store.wal.balance) ?? BigInt.zero) {
-      showCustomError('errorLowBalance'.tr);
-      return false;
-    }
-    if (isToken) {
-      if (amountNum > balanceNum) {
-        showCustomError('errorLowBalance'.tr);
-        return false;
-      }
-    } else {
-      if (balanceNum < fee + amountNum) {
-        showCustomError('errorLowBalance'.tr);
-        return false;
-      }
-    }
-    return true;
+  Widget _body() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Field(
+            controller: addressCtrl,
+            label: 'to'.tr,
+            focusNode: focusNode,
+            extra: GestureDetector(
+              child: Padding(
+                child: Image(width: 20, image: AssetImage('icons/book.png')),
+                padding: EdgeInsets.symmetric(horizontal: 12),
+              ),
+              onTap: () {
+                Get.toNamed(addressSelectPage).then((value) {
+                  var addr = '';
+                  if (value is ContactAddress) {
+                    addr = value.address;
+                  } else if (value is ChainWallet) {
+                    addr = value.addr;
+                  }
+                  addressCtrl.text = addr;
+                });
+              },
+            ),
+          ),
+          Field(
+            controller: amountCtrl,
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
+            label: 'amount'.tr,
+            append: CommonText(
+              token == null
+                  ? formatCoin($store.wal.balance) + $store.net.coin
+                  : token.formatBalance,
+              color: CustomColor.grey,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void handleScan() {
@@ -360,137 +184,204 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     });
   }
 
-  String get title => token != null ? token.symbol : $store.net.coin;
-  @override
-  Widget build(BuildContext context) {
-    return CommonScaffold(
-      grey: true,
-      title: 'send'.tr + title,
-      footerText: 'next'.tr,
-      actions: [
-        Padding(
-          child: GestureDetector(
-              onTap: handleScan,
-              child: Image(
-                width: 20,
-                image: AssetImage('icons/scan.png'),
-              )),
-          padding: EdgeInsets.only(right: 10),
-        )
-      ],
-      onPressed: () async {
-        if (!checkInputValid()) {
-          return;
+  void getGas(BuildContext context) {
+    var to = addressCtrl.text.trim();
+    if (mounted) {
+      BlocProvider.of<GasBloc>(context).add(ResetGetGasStateEvent());
+      BlocProvider.of<GasBloc>(context).add(GetGasEvent(
+          $store.net.rpc, $store.net.chain, to, isToken, token, rpcType));
+    }
+  }
+
+  List<CacheMessage> getPendingList(){
+    return OpenedBox.mesInstance.values
+        .where((mes) =>
+    mes.pending == 1 && mes.from == wallet.addr && mes.rpc == net.rpc)
+        .toList();
+  }
+
+  void getGasCallback() {
+    try {
+      if (isSpeedUp) {
+        var pendingList = getPendingList();
+        var last = pendingList.last;
+        increaseGas();
+        var toAddress = last.to;
+        var _precision = last.token != null ? last.token.precision : 18;
+        var unit = Decimal.fromInt(pow(10, _precision));
+        var _value = Decimal.parse(last.value);
+        var amount =(_value / unit).toString();
+        var _balance =  last.token != null ? last.token.balance: $store.wal.balance;
+        bool valid = checkGas(_balance,amount);
+        if (valid){
+          Get.toNamed(transferConfrimPage, arguments: {
+            "to": toAddress,
+            "amount": amount,
+            "prePage": prePage,
+            "isSpeedUp": isSpeedUp
+          });
         }
-        var pushNew = () {
-          showCustomModalBottomSheet(
-              shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
-              context: context,
-              builder: (BuildContext context) {
-                return ConstrainedBox(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.only(bottom: 30),
-                    child: ConfirmSheet(
-                      from: $store.wal.address,
-                      to: addressCtrl.text,
-                      gas: $store.gas.maxFee,
-                      value: amountCtrl.text,
-                      token: token,
-                      onConfirm: (String ck) {
-                        pushMsg(ck);
-                      },
-                    ),
-                  ),
-                  constraints: BoxConstraints(maxHeight: 800),
-                );
-              });
-        };
+      }else{
+        var toAddress = addressCtrl.text.trim();
+        var amount = amountCtrl.text.trim();
+        var _balance = isToken ? token.balance : $store.wal.balance;
+        bool valid = checkGas(_balance,amount);
+        if (valid) {
+          Get.toNamed(transferConfrimPage, arguments: {
+            "to": toAddress,
+            "amount": amount,
+            "prePage": prePage,
+          });
+        }
+      }
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  nextStep(BuildContext context) async {
+    try {
+      bool valid = await checkInputValid();
+      if (valid) {
+        var amount = amountCtrl.text.trim();
+        var toAddress = addressCtrl.text.trim();
+        List<CacheMessage> pendingList = OpenedBox.mesInstance.values
+            .where(
+                (mes) => mes.pending == 1 && mes.from == from && mes.rpc == rpc)
+            .toList();
+        bool showSpeed = pendingList.isNotEmpty;
+
         if (showSpeed) {
           showCustomModalBottomSheet(
               shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
               context: context,
-              builder: (BuildContext context) {
-                return ConstrainedBox(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.only(bottom: 30),
-                    child: SpeedupSheet(
-                      onNew: pushNew,
-                      onSpeedUp: () async {
-                        showPassDialog(context, (String pass) async {
-                          var wal = $store.wal;
-                          var ck =
-                              await getPrivateKey(wal.address, pass, wal.skKek);
-                          speedup(ck);
-                        });
-                      },
-                    ),
-                  ),
-                  constraints: BoxConstraints(maxHeight: 800),
-                );
+              builder: (BuildContext ctx) {
+                return _speedUpSheet(toAddress, amount, context);
               });
         } else {
-          pushNew();
+          getGas(context);
         }
-      },
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Field(
-              controller: addressCtrl,
-              label: 'to'.tr,
-              focusNode: focusNode,
-              extra: GestureDetector(
-                child: Padding(
-                  child: Image(width: 20, image: AssetImage('icons/book.png')),
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                ),
-                onTap: () {
-                  Get.toNamed(addressSelectPage).then((value) {
-                    var addr = '';
-                    if (value is ContactAddress) {
-                      addr = value.address;
-                    } else if (value is ChainWallet) {
-                      addr = value.addr;
-                    }
-                    if (addr.length > 0 && isValidChainAddress(addr, net)) {
-                      getGas(addr);
-                    }
-                    addressCtrl.text = addr;
-                  });
-                },
-              ),
-            ),
-            Field(
-              controller: amountCtrl,
-              type: TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [PrecisionLimitFormatter(8)],
-              label: 'amount'.tr,
-              append: CommonText(
-                token == null
-                    ? formatCoin($store.wal.balance)
-                    : token.formatBalance,
-                color: CustomColor.grey,
-              ),
-            ),
-            Obx(() => SetGas(
-                  maxFee: $store.gas.maxFee,
-                  gas: gas,
-                )),
-          ],
-        ),
-      ),
-    );
+      }
+    } catch (error) {
+      throw(error);
+    }
   }
-}
 
-class SpeedupSheet extends StatelessWidget {
-  final Noop onSpeedUp;
-  final Noop onNew;
-  SpeedupSheet({this.onSpeedUp, this.onNew});
-  @override
-  Widget build(BuildContext context) {
+  bool checkGas(balance,amount) {
+    var handlingFee = BigInt.parse($store.gas.handlingFee);
+    var bigIntBalance =
+        BigInt.tryParse(balance);
+    var bigIntAmount = BigInt.from(
+        (double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
+
+    if (isToken) {
+      var mainBigIntBalance = BigInt.parse($store.wal.balance);
+      if ((bigIntAmount > bigIntBalance) || (handlingFee > mainBigIntBalance)) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
+    } else {
+      if (bigIntBalance < handlingFee + bigIntAmount) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<bool> checkInputValid() async {
+    try {
+      var amount = amountCtrl.text.trim();
+      var toAddress = addressCtrl.text.trim().toLowerCase();
+      if (toAddress == "") {
+        showCustomError('enterAddr'.tr);
+        return false;
+      }
+      bool valid = await isValidChainAddress(toAddress, net);
+      if (!valid) {
+        showCustomError('errorAddr'.tr);
+        return false;
+      }
+      if (toAddress == $store.wal.addr) {
+        showCustomError('errorFromAsTo'.tr);
+        return false;
+      }
+      if (amount == "" || !isDecimal(amount)) {
+        showCustomError('enterValidAmount'.tr);
+        return false;
+      }
+      var _amount = double.parse(amount);
+      if (_amount == 0) {
+        showCustomError('enterValidAmount'.tr);
+        return false;
+      }
+
+      var bigIntBalance =
+          BigInt.tryParse(isToken ? token.balance : $store.wal.balance);
+      var bigIntAmount = BigInt.from(
+          (double.tryParse(amount) * pow(10, isToken ? token.precision : 18)));
+
+      if (bigIntAmount > bigIntBalance) {
+        showCustomError('errorLowBalance'.tr);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  void skipConfirmMessages(BuildContext context,bool bool) {
+    isSpeedUp = bool;
+    getGas(context);
+    Get.back();
+  }
+
+  void increaseGas() {
+    try {
+      var cacheGas = $store.gas;
+      var realMaxFeePerGas = $store.gas.maxFeePerGas;
+      var realGasFeeCap = $store.gas.gasFeeCap;
+      var realGasPrice = $store.gas.gasPrice;
+
+      if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
+        var increaseMaxFeePerGas =
+            (int.parse(cacheGas.maxFeePerGas) * Config.increaseGasCoefficient)
+                .truncate();
+        realMaxFeePerGas =
+            (max(int.parse(realMaxFeePerGas), increaseMaxFeePerGas)).toString();
+      } else if ($store.net.chain == 'filecoin') {
+        var increaseGasFeeCap =
+            (int.parse(cacheGas.gasFeeCap) * Config.increaseGasCoefficient)
+                .truncate();
+        realGasFeeCap =
+            (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
+      } else {
+        var increaseGasPrice =
+            (int.parse(cacheGas.gasPrice) * Config.increaseGasCoefficient)
+                .truncate();
+        realGasPrice =
+            (max(int.parse(realGasPrice), increaseGasPrice)).toString();
+      }
+
+      var _gas = {
+        "gasLimit": $store.gas.gasLimit,
+        "gasPremium": $store.gas.gasPremium,
+        "gasPrice": realGasPrice,
+        "rpcType": $store.gas.rpcType,
+        "gasFeeCap": realGasFeeCap,
+        "maxPriorityFee": $store.gas.maxPriorityFee,
+        "maxFeePerGas": realMaxFeePerGas
+      };
+      ChainGas transferGas = ChainGas.fromJson(_gas);
+      $store.setGas(transferGas);
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  Widget _speedUpSheet(toAddress, amount, context) {
     return Column(
       children: [
         CommonTitle(
@@ -510,10 +401,7 @@ class SpeedupSheet extends StatelessWidget {
                   items: [
                     CardItem(
                       label: 'speedup'.tr,
-                      onTap: () {
-                        Get.back();
-                        onSpeedUp();
-                      },
+                      onTap: () => skipConfirmMessages(context,true),
                     )
                   ],
                 ),
@@ -524,198 +412,13 @@ class SpeedupSheet extends StatelessWidget {
                   items: [
                     CardItem(
                       label: 'continueNew'.tr,
-                      onTap: () {
-                        Get.back();
-                        onNew();
-                      },
+                      onTap: () => skipConfirmMessages(context,false),
                     )
                   ],
                 ),
               ],
             ))
       ],
-    );
-  }
-}
-
-class ConfirmSheet extends StatelessWidget {
-  final String from;
-  final String to;
-  final String gas;
-  final String value;
-  final SingleStringParamFn onConfirm;
-  final Widget footer;
-  final Token token;
-  final EdgeInsets padding = EdgeInsets.symmetric(horizontal: 12, vertical: 14);
-  ConfirmSheet(
-      {this.from,
-      this.to,
-      this.gas,
-      this.value,
-      this.onConfirm,
-      this.footer,
-      this.token});
-  String get symbol => token != null ? token.symbol : $store.net.coin;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CommonTitle(
-          'sendConfirm'.tr,
-          showDelete: true,
-        ),
-        Container(
-          color: CustomColor.bgGrey,
-          child: Column(
-            children: [
-              Container(
-                padding: padding,
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CommonText.grey('from'.tr),
-                        Container(
-                          width: 50,
-                        ),
-                        Expanded(
-                            child: Text(
-                          from,
-                          textAlign: TextAlign.right,
-                        )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CommonText.grey('to'.tr),
-                        Container(
-                          width: 50,
-                        ),
-                        Expanded(
-                            child: Text(
-                          to,
-                          textAlign: TextAlign.right,
-                        )),
-                      ],
-                    )
-                  ],
-                ),
-                decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: CustomRadius.b8),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                padding: padding,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CommonText.grey('amount'.tr),
-                    CommonText(
-                      '-$value $symbol',
-                      size: 18,
-                      color: CustomColor.primary,
-                      weight: FontWeight.w500,
-                    )
-                  ],
-                ),
-                decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: CustomRadius.b8),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                padding: padding,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [CommonText.grey('fee'.tr), CommonText.main(gas)],
-                ),
-                decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: CustomRadius.b8),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              footer ??
-                  Container(
-                    width: double.infinity,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(const Radius.circular(8)),
-                      color: CustomColor.primary,
-                    ),
-                    child: FlatButton(
-                      child: Text(
-                        'send'.tr,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        Get.back();
-                        showPassDialog(context, (String pass) async {
-                          var wal = $store.wal;
-                          var ck = await wal.getPrivateKey(pass);
-                          onConfirm(ck);
-                        });
-                      },
-                      //color: Colors.blue,
-                    ),
-                  )
-            ],
-          ),
-          padding: EdgeInsets.fromLTRB(12, 15, 12, 20),
-        )
-      ],
-    );
-  }
-}
-
-class SetGas extends StatelessWidget {
-  final String maxFee;
-  final ChainGas gas;
-  SetGas({@required this.maxFee, this.gas});
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            child: CommonText.main('fee'.tr),
-            padding: EdgeInsets.symmetric(vertical: 12),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-            decoration: BoxDecoration(
-                color: Color(0xff5C8BCB), borderRadius: CustomRadius.b8),
-            child: Row(
-              children: [
-                CommonText(
-                  maxFee,
-                  size: 14,
-                  color: Colors.white,
-                ),
-                Spacer(),
-                CommonText(
-                  'advanced'.tr,
-                  color: Colors.white,
-                  size: 14,
-                ),
-                Image(width: 18, image: AssetImage('icons/right-w.png'))
-              ],
-            ),
-          )
-        ],
-      ),
-      onTap: () {
-        Get.toNamed(filGasPage, arguments: {'gas': gas});
-      },
     );
   }
 }

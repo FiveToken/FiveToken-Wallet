@@ -11,10 +11,10 @@ description:  fivetoken
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.2.1+19
+version: 1.3.0+1
 
 environment:
-  sdk: ">2.5.0 <3.0.0"
+  sdk: ">2.7.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -24,56 +24,74 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  # git: https://gitlab.com/abu0306/flotus.git
+  # git: https://gitlab.com/abu0306/bls.git
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.7
-  hive: ^1.4.4+1
-  hive_flutter: ^0.3.1
-  path_provider: any
-  bip39: ^1.0.3
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^5.0.2
+  path_provider: ^2.0.7
+  bip39: ^1.0.6
   bip32: ^1.0.5
-  dio: ^3.0.0
-  crypto: any
-  encrypt: ^4.0.0
-  flotus:
-    git: https://github.com/FiveToken/flotus.git
-  bls:
-    git: https://github.com/FiveToken/bls.git
-  permission_handler: 3.0.1
-  image_gallery_saver: ^1.1.0
+  decimal: ^1.5.0
+  validators: ^3.0.0
+  dio: ^4.0.4
+  crypto: ^3.0.1
+  encrypt: ^5.0.1
+  flotus: ^2.0.1
+  bls: ^2.0.1
+  argon2: ^1.0.1
+  libsodium: ^0.2.0
+  flutter_screenshot_events:  ^2.0.0
+  flutter_sodium: ^0.2.0
+  permission_handler: 8.2.5
+  passcode_screen: ^1.0.2
+  image_gallery_saver: ^1.7.1
   get:
   qr_flutter: ^3.1.0
   flutter_slidable: ^0.5.7
+  flutter_root_jailbreak: ^2.0.2
   scan: ^0.0.7
-  connectivity: ^2.0.2
-  pull_to_refresh: 1.6.3
-  image_picker: ^0.6.7+21
+  connectivity: ^3.0.6
+  pull_to_refresh: ^2.0.0
+  image_picker: ^0.8.4
   fbutton: ^2.0.1
   package_info: ^0.4.3+2
-  webview_flutter: ^1.0.7
-  device_info: ^1.0.0
-  url_launcher: ^5.7.10
+  webview_flutter: ^2.3.1
+  device_info: ^2.0.3
+  url_launcher: ^6.0.17
   gesture_password_widget: ^1.0.6
-  share: ^0.6.5+4
-  oktoast: ^2.3.2
+  share: ^2.0.4
+  oktoast: ^3.1.5
+  big_decimal: ^0.3.1
   flutter_swipe_action_cell: ^1.3.4
   day: ^0.6.4
   uni_links: ^0.4.0
-  cryptography: ^1.4.1
+  cryptography: ^2.0.5
   logger: 0.9.4
   tuple: 1.0.3
-  uuid: any
-  web_socket_channel: 1.2.0
-  web3dart: 
-     git: https://gitlab.com/abu0306/web3dart.git
+  uuid: ^3.0.5
+  web_socket_channel: ^2.1.0
+  web3dart: 2.3.2
   random_color: ^1.0.5
   event_bus: ^1.1.1
+  dio_log: ^2.0.2
+  bloc: ^8.0.1
+  flutter_bloc: ^8.0.0
+  equatable: ^2.0.3
+  intl: ^0.17.0
+  wallet_connect: ^1.0.2
+
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^0.8.2
-  build_runner: ^1.10.11
-  mockito: any
+  hive_generator: ^1.1.1
+  build_runner: ^2.1.5
+  mockito: ^5.0.16
+  test: ^1.16.0
+  bloc_test: ^9.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

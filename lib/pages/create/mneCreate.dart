@@ -1,7 +1,19 @@
+import 'package:fil/bloc/create/create_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:fil/common/index.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:fil/pages/create/warn.dart';
+import 'package:fil/widgets/dialog.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/models/index.dart';
+import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';
 
 class MneCreatePage extends StatefulWidget {
   @override
@@ -12,10 +24,17 @@ class MneCreatePage extends StatefulWidget {
 
 class MneCreatePageState extends State<MneCreatePage> {
   String mne;
+  String _message = "";
+
+  void dispose() {
+    super.dispose();
+    FlutterScreenshotEvents.disableScreenshots(false);
+  }
+
   @override
   void initState() {
     super.initState();
-    genMne();
+    mne = bip39.generateMnemonic();
     Future.delayed(Duration.zero).then((value) {
       showCustomDialog(
           context,
@@ -47,89 +66,95 @@ class MneCreatePageState extends State<MneCreatePage> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 8),
                 ),
-                onTap: () {
-                  Get.back();
-                },
+                onTap: () => Get.back(),
               ),
             ],
           ));
     });
-  }
-
-  void genMne() {
-    setState(() {
-      mne = bip39.generateMnemonic();
-    });
+    if(mounted){
+      FlutterScreenshotEvents.disableScreenshots(true);
+      FlutterScreenshotEvents.statusStream?.listen((event) {
+        setState(() {
+          _message = event.toString();
+        });
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      footerText: 'next'.tr,
-      onPressed: () {
-        Get.toNamed(mneCheckPage, arguments: {"mne": mne});
-      },
-      grey: true,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+    return BlocProvider(
+      create: (context) => CreateBloc()..add(SetCreateEvent(mne: mne)),
+      child: BlocBuilder<CreateBloc,CreateState>(builder: (ctx, state){
+        return CommonScaffold(
+        footerText: 'next'.tr,
+        onPressed: () {
+        Get.toNamed(mneCheckPage, arguments: {"mne": state.mne});
+        },
+        grey: true,
+        body: SingleChildScrollView(
+            child: Column(
+            children: [
             SizedBox(
-              height: 30,
+            height: 30,
             ),
             Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   CommonText(
-                    'backupMne'.tr,
-                    size: 14,
-                    weight: FontWeight.w500,
+                  'backupMne'.tr,
+                  size: 14,
+                  weight: FontWeight.w500,
                   ),
                   GestureDetector(
                     child: CommonText(
-                      'writeMne'.tr,
-                      size: 14,
-                      color: Color(0xffB4B5B7),
+                        'writeMne'.tr,
+                        size: 14,
+                        color: Color(0xffB4B5B7),
                     ),
                     onTap: () {
-                      copyText(mne);
-                      showCustomToast('copyMne'.tr);
+                    copyText(state.mne);
+                    showCustomToast('copyMne'.tr);
                     },
                   )
                 ],
+               ),
               ),
-            ),
-            SizedBox(
+              SizedBox(
               height: 20,
-            ),
-            Container(
+              ),
+              Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(8)),
-              child: mneGrids(),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              child: Column(
+                color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                child: mneGrids(state),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                child: Column(
                 children: [
                   TipItem('placeMne'.tr),
                   TipItem('shareMne'.tr),
                 ],
-              ),
-              padding: EdgeInsets.only(right: 12),
-            )
-          ],
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12),
-      ),
+                ),
+                padding: EdgeInsets.only(right: 12),
+              )
+            ],
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          ),
+        );
+      },
+    )
     );
   }
 
-  Widget mneGrids() {
-    List mneList = mne.split(' ');
+  Widget mneGrids(state) {
+    List mneList = state.mne.split(' ');
     if (mneList.length != 12) {
       return SizedBox();
     }

@@ -5,6 +5,8 @@ const String scanPage = '/scan';
 const String setPage = '/set';
 const String langPage = '/lang';
 const String servicePage = '/service';
+const String lockPage = '/lock';
+const String lockScreen = '/lock/screen';
 
 const String passwordSetPage = "/pass/init";
 const String passwordResetPage = "/pass/reset";
@@ -12,6 +14,7 @@ const String passwordResetPage = "/pass/reset";
 const String filDetailPage = "/transfer/detail";
 const String filTransferPage = "/transfer/index";
 const String filGasPage = "/transfer/gas";
+const String transferConfrimPage = "/transfer/confirm";
 
 //init
 const String initLangPage = '/init/lang';

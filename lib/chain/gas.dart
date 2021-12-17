@@ -1,4 +1,7 @@
-import 'package:fil/index.dart';
+
+import 'dart:math';
+import 'package:fil/common/utils.dart';
+import 'package:hive/hive.dart';
 part 'gas.g.dart';
 
 @HiveType(typeId: 12)
@@ -11,75 +14,58 @@ class ChainGas {
   int gasLimit;
   @HiveField(3)
   int level;
-  String get maxFee {
-    try {
-      return formatCoin(feeNum.toString(), size: 5);
-    } catch (e) {
-      return '';
-    }
-  }
+  @HiveField(4)
+  String rpcType;
+  @HiveField(5)
+  String maxPriorityFee;
+  @HiveField(6)
+  String maxFeePerGas;
+  @HiveField(7)
+  String gasFeeCap;
 
-  BigInt get feeNum {
-    try {
-      return BigInt.from(gasLimit) * BigInt.parse(gasPrice);
-    } catch (e) {
-      return BigInt.zero;
-    }
-  }
-
-  ChainGas get fast {
-    var res = ChainGas();
-    try {
-      var net = $store.net;
-      var price = double.parse(gasPrice);
-      if (net.addressType == 'eth' && price > 10 * pow(10, 9)) {
-        price += 2 * pow(10, 9);
-      } else {
-        price = 1.1 * price;
+  String get handlingFee{
+    try{
+      String fee = '0';
+      switch(rpcType){
+        case 'ethMain':
+          var feeNum = BigInt.parse(maxFeePerGas) * BigInt.from(gasLimit);
+          fee = feeNum.toString();
+          break;
+        case 'filecoin':
+          var feeNum = (BigInt.parse(gasPremium) + BigInt.parse(gasFeeCap)) * BigInt.from(gasLimit);
+          fee = feeNum.toString();
+          break;
+        case 'ethOthers':
+          var feeNum = BigInt.parse(gasPrice) * BigInt.from(gasLimit);
+          fee = feeNum.toString();
+          break;
+        default:
+          fee = '0';
       }
-      res
-        ..gasLimit = gasLimit
-        ..gasPremium = gasPremium
-        ..gasPrice = price.truncate().toString()
-        ..level = 0;
-      return res;
-    } catch (e) {
-      return res;
-    }
-  }
-
-  ChainGas get slow {
-    var res = ChainGas();
-    try {
-      var net = $store.net;
-      var price = double.parse(gasPrice);
-      var premium = double.parse(gasPremium);
-      if (net.addressType == 'eth' && price > 10 * pow(10, 9)) {
-        price -= 2 * pow(10, 9);
-      } else {
-        price = 0.9 * price;
-        premium = price - 100;
-      }
-      res
-        ..gasLimit = gasLimit
-        ..gasPremium = premium.truncate().toString()
-        ..gasPrice = price.truncate().toString()
-        ..level = 1;
-      return res;
-    } catch (e) {
-      return res;
+      return fee;
+    }catch(error){
+      return '0';
     }
   }
 
   ChainGas(
       {this.gasLimit = 0,
-      this.gasPremium = '0',
-      this.gasPrice = '0',
-      this.level = 0});
+        this.gasPremium = '0',
+        this.gasPrice = '0',
+        this.level = 0,
+        this.rpcType = '',
+        this.maxPriorityFee = '0',
+        this.maxFeePerGas = '0',
+        this.gasFeeCap = '0'
+      });
   ChainGas.fromJson(Map<String, dynamic> json) {
-    gasPrice = json['feeCap'] ?? '0';
+    gasPrice = json['gasPrice'] ?? '0';
     gasLimit = json['gasLimit'] ?? 0;
-    gasPremium = json['premium'] ?? '0';
+    gasPremium = json['gasPremium'] ?? '0';
     level = json['level'] ?? 0;
+    rpcType = json['rpcType'] ?? 0;
+    maxPriorityFee = json['maxPriorityFee'] ?? '0';
+    maxFeePerGas = json['maxFeePerGas'] ?? '0';
+    gasFeeCap = json['gasFeeCap'] ?? '0';
   }
 }

@@ -1,5 +1,17 @@
-import 'package:fil/index.dart';
+import 'dart:math';
 import 'package:fil/store/store.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/num_extension.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/common/time.dart';
+import 'package:fil/widgets/style.dart';
 
 class FilDetailPage extends StatefulWidget {
   @override
@@ -8,7 +20,6 @@ class FilDetailPage extends StatefulWidget {
 
 class FilDetailPageState extends State<FilDetailPage> {
   CacheMessage mes = Get.arguments;
-  ChainProvider provider;
 
   @override
   void initState() {
@@ -17,14 +28,6 @@ class FilDetailPageState extends State<FilDetailPage> {
 
   void goBrowser(CacheMessage m) {
     openInBrowser($store.net.getDetailLink(m.hash));
-  }
-
-  ChainProvider initProvider() {
-    if ($store.net.addressType == 'eth') {
-      return EthProvider($store.net);
-    } else {
-      return FilecoinProvider($store.net);
-    }
   }
 
   @override
@@ -44,7 +47,12 @@ class FilDetailPageState extends State<FilDetailPage> {
             SizedBox(
               height: 25,
             ),
-            CommonCard(MessageRow(label: 'amount'.tr, value: mes.formatValue)),
+            CommonCard(
+                MessageRow(
+                    label: 'amount'.tr,
+                    value: formatValue()
+                )
+            ),
             SizedBox(
               height: 7,
             ),
@@ -52,7 +60,7 @@ class FilDetailPageState extends State<FilDetailPage> {
                 visible: mes.pending != 1,
                 child: CommonCard(MessageRow(
                   label: 'fee'.tr,
-                  value: formatCoin(mes.fee, size: 5),
+                  value: formatCoin(mes.fee, size: 18) + " " + $store.net.coin,
                 ))),
             SizedBox(
               height: 7,
@@ -113,6 +121,20 @@ class FilDetailPageState extends State<FilDetailPage> {
         ),
       ),
     );
+  }
+
+  String formatValue(){
+    bool _isToken = mes.token != null;
+    if(_isToken){
+      var unit = pow(10, mes.token.precision);
+      var _value = double.parse(mes.value);
+      var _amount = (_value/unit).toDecimal;
+      var res = _amount.fmtDown(18);
+      return res + " " + mes.token.symbol;
+    }else{
+      var res = formatCoin(mes.value, size: 18);
+      return res + " " + $store.net.coin;
+    }
   }
 }
 

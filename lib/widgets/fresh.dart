@@ -1,6 +1,12 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/actions/event.dart';
 
 typedef FreshCallback = Future Function();
 
@@ -11,13 +17,17 @@ class CustomRefreshWidget extends StatefulWidget {
   final bool listenAppState;
   final FreshCallback onRefresh;
   final FreshCallback onLoading;
+  final bool initialRefresh;
+
   CustomRefreshWidget(
       {@required this.child,
       this.enablePullUp = true,
       this.enablePullDown = true,
       this.listenAppState = true,
       this.onLoading,
+      this.initialRefresh = true,
       @required this.onRefresh});
+
   @override
   State<StatefulWidget> createState() {
     return CustomRefreshWidgetState();
@@ -25,7 +35,8 @@ class CustomRefreshWidget extends StatefulWidget {
 }
 
 class CustomRefreshWidgetState extends State<CustomRefreshWidget> {
-  final RefreshController controller = RefreshController();
+   RefreshController controller;
+
   void _onRefresh() async {
     Timer timer = Timer(Duration(seconds: 10), () {
       controller.refreshFailed();
@@ -42,9 +53,11 @@ class CustomRefreshWidgetState extends State<CustomRefreshWidget> {
   @override
   void initState() {
     super.initState();
-    nextTick(() {
-      controller.requestRefresh();
-    });
+    // nextTick(() {
+    //   controller.requestRefresh();
+    // });
+
+    controller = RefreshController(initialRefresh: widget.initialRefresh);
     if (widget.listenAppState) {
       Global.eventBus.on<AppStateChangeEvent>().listen((event) {
         controller.requestRefresh();

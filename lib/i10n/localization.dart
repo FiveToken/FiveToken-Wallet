@@ -12,11 +12,18 @@ class ChineseCupertinoLocalizations implements CupertinoLocalizations {
 
   Future init() async {
     ml = await materialDelegate.load(local);
-    print(ml.pasteButtonLabel);
   }
 
   @override
   String get alertDialogLabel => ml.alertDialogLabel;
+  @override
+  String get searchTextFieldPlaceholderLabel => '';
+  @override
+  List<String> get timerPickerHourLabels => [''];
+  @override
+  List<String> get timerPickerMinuteLabels => [''];
+  @override 
+  List<String> get timerPickerSecondLabels => [''];
 
   @override
   String get anteMeridiemAbbreviation => ml.anteMeridiemAbbreviation;

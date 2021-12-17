@@ -1,7 +1,17 @@
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+import 'package:fil/models/wallet.dart';
+// import 'package:fil/index.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/pages/pass/init.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/chain/net.dart';
 
 class PassResetPage extends StatefulWidget {
   @override
@@ -11,106 +21,125 @@ class PassResetPage extends StatefulWidget {
 }
 
 class PassResetPageState extends State<PassResetPage> {
-  final TextEditingController oldCtrl = TextEditingController();
+  final TextEditingController passCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
-  final TextEditingController newConfirmCtrl = TextEditingController();
+  final TextEditingController confirmCtrl = TextEditingController();
   var box = OpenedBox.walletInstance;
   bool loading = false;
-  ChainWallet wallet = Get.arguments['wallet'];
-  Future<bool> checkValid() async {
-    var old = oldCtrl.text.trim();
-    var newP = newCtrl.text.trim();
-    var newCp = newConfirmCtrl.text.trim();
-    if (old == '') {
-      showCustomError('enterOldPass'.tr);
-      return false;
+  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet']:ChainWallet();
+
+  Future<EncryptKey> getKey(String addressType, String privateKey,  String pass, String prefix) async{
+    EncryptKey key;
+    if(addressType=='eth') {
+      try {
+        key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
+      }
+      catch (e) { }
+    }else{
+      try{ key = await FilecoinWallet.genEncryptKeyByPrivateKey(privateKey, pass,  prefix: prefix); }
+      catch(e){}
     }
-    var valid = await wallet.validatePrivateKey(old);
-    if (!valid) {
-      showCustomError('wrongOldPass'.tr);
-      return false;
-    }
-    if (!isValidPassword(newP)) {
-      showCustomError('enterValidPass'.tr);
-      return false;
-    }
-    if (newP != newCp) {
-      showCustomError('diffPass'.tr);
-      return false;
-    }
-    return true;
+    return key;
   }
 
   void handleConfrim() async {
-    if (loading) {
-      return;
-    }
-    this.loading = true;
-    showCustomLoading('Loading');
     try {
-      var valid = await checkValid();
-      var old = oldCtrl.text.trim();
-      var newP = newCtrl.text.trim();
-      var private = await wallet.getPrivateKey(old);
-      if (!valid) {
-        this.loading = false;
+      var pass = passCtrl.text.trim();
+      var newPass = newCtrl.text.trim();
+      var confirmPass = confirmCtrl.text.trim();
+      if (pass == '') {
+        showCustomError('enterOldPass'.tr);
         return;
-      } else {
-        var net = Network.getNetByRpc(wallet.rpc);
-        var isId = wallet.type == 0;
-        if (isId) {
-          var list = OpenedBox.walletInstance.values
-              .where((wal) => wal.groupHash == wallet.groupHash)
-              .toList();
-          for (var i = 0; i < list.length; i++) {
-            var wal = list[i];
-            var p = private;
-            var same = wal.addressType == wallet.addressType;
-            if (!same) {
-              p = await wal.getPrivateKey(old);
-            }
-            EncryptKey key;
-            if (wal.addressType == 'eth') {
-              key = await EthWallet.genEncryptKeyByPrivateKey(p, newP);
-            } else {
-              if (wal.rpc == Network.filecoinMainNet.rpc) {
-                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
-                    prefix: 'f');
-              } else {
-                key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newP,
-                    prefix: 't');
-              }
-            }
-            wal.skKek = key.kek;
-            box.put(wal.key, wal);
-            if (net.rpc == $store.net.rpc) {
-              $store.setWallet(wal);
-            }
+      }
+      if(newPass==''){
+        showCustomError('enterNewPass'.tr);
+        return;
+      }
+      if(confirmPass==''){
+        showCustomError('enterConfirmPass'.tr);
+        return;
+      }
+      if (!isValidPass(pass)) {
+        showCustomError('wrongOldPass'.tr);
+        return;
+      }
+      if (!isValidPass(newPass)) {
+        showCustomError('placeholderValidPass'.tr);
+        return;
+      }
+      if (newPass != confirmPass) {
+        showCustomError('diffPass'.tr);
+        return;
+      }
+      this.loading = true;
+      showCustomLoading('Loading');
+      var private = await wallet.getPrivateKey(pass);
+      if(private==null){
+        showCustomError('wrongOldPass'.tr);
+        return;
+      }
+      var net = Network.getNetByRpc(wallet.rpc);
+      var isId = wallet.type == 0;
+      if (isId) {
+        var list = OpenedBox.walletInstance.values
+            .where((wal) => wal.groupHash == wallet.groupHash)
+            .toList();
+        Map<String, EncryptKey> keyMap = {};
+        for (var i = 0; i < list.length; i++) {
+          var wal = list[i];
+          var same = wal.addressType == wallet.addressType;
+          var p = private;
+          if(!same){
+            try {
+              p = await wal.getPrivateKey(pass);
+            }catch(e){}
           }
-        } else {
+          var prefix = wal.rpc == Network.filecoinMainNet.rpc? 'f': 't';
+          // var addr = wal.addressType;
           EncryptKey key;
-          if (wallet.addressType == 'eth') {
-            key = await EthWallet.genEncryptKeyByPrivateKey(private, newP);
-          } else {
-            key = await FilecoinWallet.genEncryptKeyByPrivateKey(private, newP,
-                prefix: net.prefix);
+          if(wal.addressType == 'eth'){
+            var str = '$p\_$newPass';
+            if(!keyMap.containsKey(str)){
+              key = await EthWallet.genEncryptKeyByPrivateKey(p, newPass);
+              keyMap[str] = key;
+            }else{
+              key = keyMap[str];
+            }
+          }else{
+            var str = '$p\_$newPass\_$prefix';
+            if(!keyMap.containsKey(str)){
+              key = await FilecoinWallet.genEncryptKeyByPrivateKey(p, newPass,
+                  prefix: prefix);
+              keyMap[str] = key;
+            }else{
+              key = keyMap[str];
+            }
           }
-          wallet.skKek = key.kek;
-          box.put(wallet.key, wallet);
+          wal.skKek = key.kek;
+          box.put(wal.key, wal);
           if (net.rpc == $store.net.rpc) {
-            $store.setWallet(wallet);
+            $store.setWallet(wal);
           }
         }
-        dismissAllToast();
-        this.loading = false;
-        Get.back();
-        showCustomToast('changePassSucc'.tr);
+      } else {
+        EncryptKey key = await getKey(wallet.addressType, private, newPass, net.prefix);
+        wallet.skKek = key.kek;
+        box.put(wallet.key, wallet);
+        if (net.rpc == $store.net.rpc) {
+          $store.setWallet(wallet);
+        }
       }
+      dismissAllToast();
+      this.loading = false;
+      Get.back();
+      showCustomToast('changePassSucc'.tr);
     } catch (e) {
       this.loading = false;
       dismissAllToast();
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -122,19 +151,26 @@ class PassResetPageState extends State<PassResetPage> {
       body: Padding(
         child: Column(
           children: [
-            PassField(label: 'oldPass'.tr, controller: oldCtrl),
+            PassField(
+              label: 'oldPass'.tr,
+              controller: passCtrl,
+              hintText: 'placeholderValidPass'.tr,
+            ),
             SizedBox(
               height: 15,
             ),
             PassField(
                 label: 'newPass'.tr,
-                hintText: 'enterValidPass'.tr,
-                controller: newCtrl),
+                hintText: 'placeholderValidPass'.tr,
+                controller: newCtrl
+            ),
             SizedBox(
               height: 15,
             ),
             PassField(
-                hintText: 'enterPassAgain'.tr, controller: newConfirmCtrl),
+                hintText: 'enterPassAgain'.tr,
+                controller: confirmCtrl
+            ),
           ],
         ),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),

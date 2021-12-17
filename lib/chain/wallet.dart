@@ -1,8 +1,13 @@
-import 'package:bip39/bip39.dart' as bip39;
-import 'package:bip32/bip32.dart' as bip32;
+import 'dart:convert';
+import 'package:bls/bls.dart';
 import 'package:fil/chain/key.dart';
-import 'package:fil/index.dart';
+import 'package:fil/common/global.dart';
+import 'package:fil/common/pk.dart';
+import 'package:fil/common/utils.dart';
+import 'package:flotus/flotus.dart';
+import 'package:hive/hive.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:fil/common/argon2.dart';
 part 'wallet.g.dart';
 
 @HiveType(typeId: 9)
@@ -98,23 +103,30 @@ class ChainWallet {
   Future<bool> validatePrivateKey(
     String pass,
   ) async {
-    var sk = await this.getPrivateKey(pass);
-    var digest = await genPrivateKeyDigest(sk);
-    if (this.digest != digest) {
+    try {
+      var private = await decryptSodium(skKek, address, pass);
+      var str = base64Decode(private);
+      var str1 = utf8.decode(str);
+      var digest = await genPrivateKeyDigest(str1);
+      if (this.digest != digest) {
+        return false;
+      } else {
+        return true;
+      }
+    }catch(e){
       return false;
-    } else {
-      return true;
     }
   }
 
   Future<String> getPrivateKey(
     String pass,
   ) async {
-    var skBytes = base64Decode(skKek);
-    var kek = await genKek(address, pass);
-    var sk = xor(skBytes, kek);
-    var res = addressType == 'eth' ? hex.encode(base64Decode(sk)) : sk;
-    return res;
+    try {
+      var private = decryptSodium(skKek, address, pass);
+      var str = base64Decode(private);
+      var sk = utf8.decode(str);
+      return sk;
+    }catch(e){}
   }
 }
 
@@ -132,8 +144,13 @@ class FilecoinWallet extends ChainWallet {
     return ck;
   }
 
-  static Future<String> genAddrByPrivateKey(String ck,
-      {String type = SignSecp, String prefix = 'f'}) async {
+  static Future<String> genAddrByPrivateKey(
+      String ck,
+      {
+        String type = SignSecp,
+        String prefix = 'f'
+      }
+      ) async {
     String pk = '';
     if (type == SignSecp) {
       pk = await Flotus.secpPrivateToPublic(ck: ck);
@@ -148,12 +165,10 @@ class FilecoinWallet extends ChainWallet {
     try {
       var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(filPrivateKey);
-      var filkek = await genKek(filAddr, pass);
-      var filPkList = base64Decode(filPrivateKey);
-      var filSkKek = xor(filkek, filPkList);
+      var filKek = encryptSodium(filPrivateKey, filAddr, pass);
       var filDigest = await genPrivateKeyDigest(filPrivateKey);
       return EncryptKey(
-          kek: filSkKek,
+          kek: filKek,
           digest: filDigest,
           address: filAddr,
           private: filPrivateKey);
@@ -169,31 +184,30 @@ class FilecoinWallet extends ChainWallet {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
-      var filkek = await genKek(filAddr, pass);
-      var filPkList = base64Decode(privateKey);
-      var filSkKek = xor(filkek, filPkList);
+      var filKek = encryptSodium(privateKey,filAddr, pass);
       var filDigest = await genPrivateKeyDigest(privateKey);
       return EncryptKey(
-          kek: filSkKek,
+          kek: filKek,
           digest: filDigest,
-          address: filAddr,
-          private: privateKey);
+          address: filAddr,   // publicKey
+          private: privateKey);  // value
     } catch (e) {
       throw (e);
     }
   }
 }
 
+// genPrivateKeyByMne
+// genAddrByMne
+// genAddrByPrivateKey
+// genEncryptKey
+// genEncryptKeyByPrivateKey
+
 class EthWallet extends ChainWallet {
   EthWallet.fromJson(Map<String, dynamic> map) : super.fromJson(map);
-  static String genPrivateKeyByMne(
-    String m,
-  ) {
-    var seed = bip39.mnemonicToSeed(m);
-    bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
-    var rs = nodeFromSeed.derivePath("m/44'/60'/0'/0");
-    var rs0 = rs.derive(0);
-    return hex.encode(rs0.privateKey);
+  static String genPrivateKeyByMne(String m) {
+    var ck = genCKBase64(m, path:"m/44'/60'/0'/0");
+    return ck;
   }
 
   static Future<String> genAddrByMne(
@@ -204,20 +218,20 @@ class EthWallet extends ChainWallet {
   }
 
   static Future<String> genAddrByPrivateKey(String pk) async {
-    var addr = await EthPrivateKey.fromHex(pk).extractAddress();
-    return addr.hex;
+    try {
+      var addr = await EthPrivateKey.fromHex(pk).extractAddress();
+      return addr.hex;
+    }catch(e){}
   }
 
   static Future<EncryptKey> genEncryptKey(String mne, String pass) async {
     try {
       var ethPrivateKey = EthWallet.genPrivateKeyByMne(mne);
       var ethAddr = await EthWallet.genAddrByPrivateKey(ethPrivateKey);
-      var ethKek = await genKek(ethAddr, pass);
-      var ethPkList = hex.decode(ethPrivateKey);
-      var ethSkKek = xor(ethKek, ethPkList);
+      var ethKek = encryptSodium(ethPrivateKey, ethAddr, pass);
       var ethDigest = await genPrivateKeyDigest(ethPrivateKey);
       return EncryptKey(
-          kek: ethSkKek,
+          kek: ethKek,
           digest: ethDigest,
           address: ethAddr,
           private: ethPrivateKey);
@@ -228,20 +242,18 @@ class EthWallet extends ChainWallet {
 
   static Future<EncryptKey> genEncryptKeyByPrivateKey(
       String privateKey, String pass) async {
-    try {
+    try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
-      var ethKek = await genKek(ethAddr, pass);
-      var ethPkList = hex.decode(privateKey);
-      var ethSkKek = xor(ethKek, ethPkList);
+      var kek = encryptSodium(privateKey, ethAddr, pass);
       var ethDigest = await genPrivateKeyDigest(privateKey);
       return EncryptKey(
-          kek: ethSkKek,
+          kek: kek,
           digest: ethDigest,
           address: ethAddr,
-          private: privateKey);
-    } catch (e) {
-      print(e);
-      throw (e);
+          private: privateKey
+      );
+    }catch(e){
+      throw(e);
     }
   }
 }

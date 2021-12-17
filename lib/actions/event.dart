@@ -1,4 +1,4 @@
-import 'package:fil/index.dart';
+import 'package:fil/chain/token.dart';
 
 class AppStateChangeEvent {}
 

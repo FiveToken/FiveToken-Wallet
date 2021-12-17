@@ -1,10 +1,17 @@
+import 'package:fil/utils/enum.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/layout.dart';
+import 'package:fil/routes/path.dart';
 
 class ImportIndexPage extends StatelessWidget {
   final int type = Get.arguments['type']; //1 mne 2 privatekey
-  bool get isMne => type == 1;
-  void go(Network net) {
+  bool get isMne => type == WalletType.mne;
+  void go(int type, Network net) {
     Get.toNamed(isMne ? importMnePage : importPrivateKeyPage,
         arguments: {'type': type, 'net': net});
   }
@@ -25,9 +32,7 @@ class ImportIndexPage extends StatelessWidget {
                   CommonText.white('idWallet'.tr),
                   Image(width: 18, image: AssetImage('icons/right-w.png'))
                 ]),
-                onTap: () {
-                  go(null);
-                },
+                onTap: ()=> go(WalletType.id, null),
               ),
               visible: isMne,
             ),
@@ -54,9 +59,7 @@ class ImportIndexPage extends StatelessWidget {
                                   width: 18,
                                   image: AssetImage('icons/right-w.png'))
                             ]),
-                            onTap: () {
-                              go(net);
-                            },
+                            onTap: ()=>go(type, net),
                           ),
                           margin: EdgeInsets.only(bottom: 12),
                         );

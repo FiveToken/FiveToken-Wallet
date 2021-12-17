@@ -1,4 +1,10 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/common/utils.dart';
 
 class Field extends StatelessWidget {
   final String label;
@@ -13,6 +19,8 @@ class Field extends StatelessWidget {
   final String placeholder;
   final FocusNode focusNode;
   final bool selectable;
+  final int maxLength;
+  final int maxLines;
   Field(
       {this.label = '',
       this.controller,
@@ -25,6 +33,8 @@ class Field extends StatelessWidget {
       this.append,
       this.placeholder = '',
       this.selectable = false,
+      this.maxLength = null,
+      this.maxLines = null,
       this.inputFormatters = const []});
   @override
   Widget build(BuildContext context) {
@@ -53,7 +63,7 @@ class Field extends StatelessWidget {
               Container(
                 // height: 45,
                 constraints: BoxConstraints(minHeight: 45),
-                padding: EdgeInsets.fromLTRB(15, 12, 0, 12),
+                padding: EdgeInsets.fromLTRB(15, 4, 0, 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -63,13 +73,17 @@ class Field extends StatelessWidget {
                       enabled: enabled,
                       controller: controller,
                       keyboardType: type ?? TextInputType.multiline,
-                      maxLines: null,
+                      maxLines: maxLines,
+                      maxLength: maxLength,
                       focusNode: focusNode,
                       inputFormatters: inputFormatters,
                       textInputAction: inputAction ?? TextInputAction.done,
-                      decoration: InputDecoration.collapsed(
+                      decoration: InputDecoration(
+                          counterText: '',
                           hintText: placeholder,
-                          hintStyle: TextStyle(fontSize: 13)),
+                          hintStyle: TextStyle(color: Color(0xffcccccc), fontSize: 13),
+                          border: InputBorder.none,
+                      ),
                     )),
                     extra ??
                         Container(

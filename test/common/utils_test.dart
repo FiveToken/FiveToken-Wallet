@@ -1,5 +1,5 @@
+import 'package:fil/chain/net.dart';
 import 'package:fil/common/index.dart';
-import 'package:fil/index.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../constant.dart';
@@ -38,40 +38,26 @@ void main() {
     expect(isDecimal(wrongStr), false);
     expect(isDecimal(wrongStr2), false);
   });
-  group("check address is valid", () {
-    var eth = '0xEa00C8d2d4e658Afc23737181aa1c12F9b99551e';
-    var fil1 = 'f14xxtyp7negvl3rvacc67povupv3tsu4b2ngjepq';
-    var fil3 =
-        'f3ru7s7lajvcdcagztyz6qfo5qnlu6h6xzazg4eqwfyyexff36tkeg2ce2raidffniq222qpr2rvtfjwvwikaa';
-    var fil0 = 'f01220';
-    var filNet = Network.filecoinMainNet;
-    var ethNet = Network.ethMainNet;
-    test('check eth addr', () {
-      expect(isValidEthAddress(eth), true);
-    });
-    test('check fil addr', () {
-      expect(isValidFilecoinAddress(fil1, filNet), true);
-      expect(isValidFilecoinAddress(fil3, filNet), true);
-      expect(isValidFilecoinAddress(fil0, filNet), true);
-    });
-    test('check addr by net', () {
-      expect(isValidChainAddress(eth, ethNet), true);
-      expect(isValidChainAddress(fil1, filNet), true);
-      expect(isValidChainAddress(eth, filNet), false);
-    });
+
+  test('check contract addr', () {
+    var contract = "0x9343bc852c04690b239ec733c6f71d8816d436c3";
+    expect(isValidContractAddress(contract), true);
   });
+
   test('generate private key by mne', () {
     var pk = genCKBase64(Mne);
     expect(pk, raw);
   });
+
   test('format coin', () {
     var amount = '1236000000000000000';
+    String amount1 = '1000';
     var format =
-        formatCoin(amount, size: 2, fixed: false, net: Network.filecoinMainNet);
+        formatCoin(amount, size: 2);
     var formatFixed =
-        formatCoin(amount, size: 2, fixed: true, net: Network.filecoinMainNet);
-    expect(format, '1.23 FIL');
-    expect(formatFixed, '1.24 FIL');
+        formatCoin(amount1, size: 2,min: 0.00000000001);
+    expect(format, '1.23');
+    expect(formatFixed, '0.00000000...');
   });
   test('convart a double string to  valid value in chain', () {
     var str = '1.23';
@@ -83,24 +69,19 @@ void main() {
     expect(formatDouble(str, size: 2, truncate: true), '1.23');
     expect(formatDouble(str, size: 2, truncate: false), '1.236');
   });
+
+  test('Valid Password',(){
+    var password = '1234567890';
+    expect(isValidPass(password),false);
+  });
+
   test('convert base64 to hex', () {
     var res = base64ToHex(raw, '1');
     var hex =
         '7b2254797065223a22736563703235366b31222c22507269766174654b6579223a22413066553636356f5a67514d46656b5144434c31686872456b76464e445955766a39336d4c5565703079493d227d';
     expect(res, hex);
   });
-  test('check password', () {
-    var pass = 'Aa123456';
-    var wrongPass = 'Aa12345';
-    var wrongPass2 = 'a1234567';
-    var wrongPass3 = '12345678';
-    var wrongPass4 = 'Aabcdefg';
-    expect(isValidPassword(pass), true);
-    expect(isValidPassword(wrongPass), false);
-    expect(isValidPassword(wrongPass2), false);
-    expect(isValidPassword(wrongPass3), false);
-    expect(isValidPassword(wrongPass4), false);
-  });
+
   test('check url', () {
     var url = 'http://www.filecoin.io';
     var wrongUrl = 'http://www.filecoin.';
@@ -115,6 +96,12 @@ void main() {
     expect(getValidWCLink(wc), wc);
     expect(getValidWCLink(wrongWc), '');
   });
+
+  test('string trim',(){
+    var str = '  abcsdefg    ';
+    expect(StringTrim(str),'abcsdefg');
+  });
+
   test('format string with params', () {
     var str = 'hello @to';
     expect(trParams(str, {'to': 'world'}), 'hello world');

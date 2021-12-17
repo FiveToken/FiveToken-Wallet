@@ -1,14 +1,31 @@
+import 'dart:convert';
+
+import 'package:decimal/decimal.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:crypto/crypto.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip32/bip32.dart' as bip32;
+import 'package:fil/models/index.dart';
+import 'package:fil/models/private.dart';
+import 'package:fil/request/global.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
+import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:fil/utils/num_extension.dart';
+import 'dart:async';
+import 'package:convert/convert.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 const psalt = "vFIzIawYOU";
 
+/*
+ encryption
+ * @param {string} raw
+ * @param {String} mix：key
+*/
 String aesDecrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -22,6 +39,11 @@ String aesDecrypt(String raw, String mix) {
   return decoded;
 }
 
+/*
+ decrypt
+ * @param {string} raw
+ * @param {string} mix: key
+*/
 String aesEncrypt(String raw, String mix) {
   if (raw == '') {
     return '';
@@ -43,10 +65,12 @@ String tokenify(String str, {String salt = psalt}) {
   return digest.toString();
 }
 
-void unFocusOf(BuildContext context) {
-  FocusScope.of(context).requestFocus(FocusNode());
-}
 
+/*
+ String copy
+ * @param {string} text
+ * @param {Function} callback
+*/
 void copyText(String text, {Function callback}) {
   var data = ClipboardData(text: text);
   Clipboard.setData(data).then((_) {
@@ -56,6 +80,12 @@ void copyText(String text, {Function callback}) {
   });
 }
 
+/*
+ String truncation
+ * @param {string}
+ * @param {int} start
+ * @param {int} end
+*/
 String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
   int strLen = str.length;
   if (strLen < headLen + tailLen) {
@@ -70,6 +100,10 @@ String dotString({String str = '', int headLen = 6, int tailLen = 6}) {
 
   return "$headStr...$tailStr";
 }
+/*
+ Judge whether it is a number
+ * @param {string} input
+*/
 
 bool isDecimal(String input) {
   var r = RegExp(r"(^\d+(?:\.\d+)?([eE]-?\d+)?$|^\.\d+([eE]-?\d+)?$)");
@@ -79,49 +113,47 @@ bool isDecimal(String input) {
   return false;
 }
 
-bool isValidChainAddress(String addr, Network net) {
-  return net.addressType == 'eth'
-      ? isValidEthAddress(addr)
-      : isValidFilecoinAddress(addr, net);
+/*
+  contract address inspection
+  * @param {string} address:contract address
+*/
+
+bool isValidContractAddress(String address){
+  var start = address.startsWith('0x');
+  var reg = RegExp(r"([A-Fa-f0-9]$)");
+  var valid = reg.hasMatch(address);
+  return start && valid;
 }
 
-bool isValidEthAddress(String addr) {
-  return addr.length == 42 && addr.substring(0, 2) == '0x';
-}
-
-bool isValidFilecoinAddress(String address, Network net) {
-  var prefix = net.prefix;
-  if (address[0] != prefix) {
-    return false;
-  }
-  var addr = address.trim().toLowerCase();
-  if (addr == '') {
-    return false;
-  }
-  var protocol = addr[1];
-  if (!RegExp(r"^0|1|3$").hasMatch(protocol)) {
-    return false;
-  }
-  var raw = addr.substring(2);
-  if (protocol == "0") {
-    if (raw.length > 20) {
-      return false;
+/*
+  check address
+  * @param {string} address:address
+  * @param {Network} network:network to be verified
+*/
+Future<bool> isValidChainAddress(String address, Network network) async {
+  bool res = false;
+  try{
+    if(network.addressType == 'filecoin'){
+      Chain.setRpcNetwork(network.rpc, network.chain);
+      res = await Chain.chainProvider.addressCheck(address);
+    }else{
+      var start = address.startsWith('0x');
+      var reg = RegExp(r"([A-Fa-f0-9]{40}$)");
+      var valid = reg.hasMatch(address);
+      res = start && valid;
     }
+    return res;
+  }catch(error){
+    return false;
   }
-  if (protocol == "3") {
-    if (raw.length < 30 || raw.length > 120) {
-      return false;
-    }
-  }
-  return true;
 }
 
-String genCKBase64(String mne) {
+String genCKBase64(String mne, {String path}) {
   var seed = bip39.mnemonicToSeed(mne);
   bip32.BIP32 nodeFromSeed = bip32.BIP32.fromSeed(seed);
-  var rs = nodeFromSeed.derivePath("m/44'/461'/0'/0");
+  var rs = nodeFromSeed.derivePath(path??"m/44'/461'/0'/0");
   var rs0 = rs.derive(0);
-  var ck = base64Encode(rs0.privateKey);
+  var ck = path!="m/44'/60'/0'/0" ? base64Encode(rs0.privateKey):hex.encode(rs0.privateKey);
   return ck;
 }
 
@@ -140,48 +172,59 @@ String truncate(double value, {int size = 4}) {
   return ((value * pow(10, size)).floor() / pow(10, size)).toString();
 }
 
-String formatCoin(String amount,
-    {num size = 4, bool fixed = false, Network net}) {
-  net = net ?? $store.net;
-  if (amount == '0') {
-    return '0 ${net.coin}';
-  }
 
-  var isFil = net.addressType == AddressType.filecoin.type;
+/*
+  balance formatting
+  * @param {string} amount
+  * @param {num} size:significant number of decimal places
+  * @param {double} min:formatted minimum,If the balance is less than the minimum value, return the minimum value + ...
+  * @param {int} precision: current formatted balance precision
+*/
+String formatCoin(String amount, { num size = 4, double min, int precision = 18 }) {
+  if (amount == '0') {
+    return '0';
+  }
   try {
-    var str = amount;
-    var v = BigInt.parse(amount);
-    num length = str.length;
-    if (length < 5) {
-      var u = isFil ? 'attoFIL' : 'wei';
-      return '$str $u';
-    } else if (length >= 5 && length <= 13) {
-      var u = isFil ? 'nanoFIL' : 'gwei';
-      var unit = BigInt.from(pow(10, 9));
-      var res = v / unit;
-      return fixed
-          ? '${res.toStringAsFixed(size)} $u'
-          : '${truncate(res, size: size)} $u';
-    } else {
-      var u = isFil ? 'FIL' : net.coin;
-      var unit = BigInt.from(pow(10, 18));
-      var res = v / unit;
-      return fixed
-          ? '${res.toStringAsFixed(size)} $u'
-          : '${truncate(res, size: size)} $u';
+    var _amount = double.parse(amount)/pow(10, precision);
+    var _decimal = _amount.toDecimal;
+    var res = _decimal.fmtDown(size);
+    String esc = '';
+    if((min.runtimeType.toString() == 'double' || min.runtimeType.toString() == 'int' ) && (_amount < min)){
+      return  min.toStringAsFixed(7) + '0...';
+    }else{
+      return  res ;
     }
+
   } catch (e) {
     return amount;
   }
 }
 
+/*
+  get the minimum precision value
+  * @param {string} fil
+  * @param {int} precision: current value precision
+*/
 String getChainValue(String fil, {int precision = 18}) {
-  if (precision < 10) {
-    return BigInt.from((double.parse(fil) * pow(10, precision))).toString();
+  try{
+    var _value = Decimal.parse(fil) * Decimal.fromInt(pow(10, 18));
+    var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision))/Decimal.fromInt(pow(10,18));
+    var _decimal = _amount.toString().toDecimal;
+    var res = _decimal.fmtDown(0);
+    var val = num.parse(res).toStringAsFixed(0);
+    return val;
+  }catch(error){
+    throw(error);
   }
-  return (BigInt.from((double.parse(fil) * pow(10, 9))) *
-          BigInt.from(pow(10, precision - 9)))
-      .toString();
+}
+
+/*
+  ethereum private key verification
+  * @param {string} str
+*/
+bool ethPrivate(str){
+  RegExp eth = RegExp(r'^(0x)?[0-9A-Za-f]{64}');
+  return eth.hasMatch(str)&&str.length==64;
 }
 
 int getSecondSinceEpoch() {
@@ -216,6 +259,10 @@ String base64ToHex(String pk, String type) {
   return result;
 }
 
+/*
+  open in browser
+  * @param {string} url
+*/
 Future openInBrowser(String url) async {
   if (await canLaunch(url)) {
     await launch(
@@ -228,12 +275,19 @@ Future openInBrowser(String url) async {
   }
 }
 
-bool isValidPassword(String pass) {
+/*
+  password verification
+  * @param {string} pass
+*/
+bool isValidPass(String pass){
   pass = pass.trim();
-  var reg = RegExp(r'^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*).{8,20}$');
-  return reg.hasMatch(pass);
+  return pass.length > 11;
 }
 
+/*
+  url check
+  * @param {string} url
+*/
 bool isValidUrl(String url) {
   final urlRegExp = new RegExp(
       r"^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$");
@@ -246,6 +300,10 @@ void nextTick(Noop callback) {
   });
 }
 
+/*
+  walletConnect link verification
+  * @param {string} link
+*/
 String getValidWCLink(String link) {
   bool Function(String) fullLink =
       (String url) => url.contains('bridge') && url.contains('key');
@@ -275,4 +333,16 @@ String trParams(String tr, [Map<String, String> params = const {}]) {
     });
   }
   return trans;
+}
+
+/*
+  mnemonic string to list
+  * @param {string} str
+*/
+String StringTrim(String str){
+  if(str.trim()==''){ return str; }
+  var arr1 = str.split(' ');
+  var arr2 =arr1.where((ele)=>ele!='');
+  String  res =arr2.join(' ');
+  return res;
 }

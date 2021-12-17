@@ -1,5 +1,20 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'dart:math';
+
+import 'package:decimal/decimal.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/layout.dart';
+import 'package:fil/widgets/style.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/store/store.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/pages/wallet/main.dart';
 
 class MessageItem extends StatelessWidget {
   final CacheMessage mes;
@@ -24,13 +39,14 @@ class MessageItem extends StatelessWidget {
 
   bool get isToken => mes.token != null;
   String get value {
-    var v =
-        isToken ? mes.token.getFormatBalance(mes.value) : formatCoin(mes.value);
-    var unit = isToken ? $store.net.coin : mes.token?.symbol;
-    if (v == '0') {
-      return '0 $unit';
-    } else {
-      return '${pending || fail ? '' : (isSend ? '-' : '+')} $v';
+    if(isToken){
+      var _value = formatCoin(mes.value,size:8,min:0.00000001,precision:mes.token.precision) + ' ' + mes.token.symbol;
+      var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
+      return _isSend + ' ' + _value;
+    }else{
+      var _value = formatCoin(mes.value,size:8,min:0.00000001) + ' ' + $store.net.coin;
+      var _isSend = pending || fail ? '' : (isSend ? '-' : '+');
+      return _isSend + ' ' + _value;
     }
   }
 

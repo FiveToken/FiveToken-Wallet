@@ -1,17 +1,19 @@
 import 'dart:io';
-
 import 'package:device_info/device_info.dart';
-import 'package:fil/index.dart';
+import 'package:fil/common/global.dart';
 
-Future initDeviceInfo() async {
-  DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  if (Platform.isAndroid) {
-    var info = await deviceInfoPlugin.androidInfo;
+Future initDeviceInfo({DeviceInfoPlugin deviceInfoPlugin,bool isAndroid}) async {
+  DeviceInfoPlugin _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
+  bool _isAndroid = isAndroid ?? Platform.isAndroid;
+  if (_isAndroid) {
+    print("object");
+    print(_deviceInfoPlugin);
+    var info = await _deviceInfoPlugin.androidInfo;
     Global.uuid = info.androidId;
     Global.platform = 'android';
     Global.os = info.version.baseOS;
   } else {
-    var info = await deviceInfoPlugin.iosInfo;
+    var info = await _deviceInfoPlugin.iosInfo;
     Global.uuid = info.identifierForVendor;
     Global.platform = 'ios';
     Global.os = info.systemVersion.toString();

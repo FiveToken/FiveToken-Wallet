@@ -1,4 +1,9 @@
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:get/get.dart';
+import 'package:fil/widgets/style.dart';
+import 'package:fil/routes/path.dart';
 
 class CreateWarnPage extends StatelessWidget {
   @override
@@ -7,9 +12,7 @@ class CreateWarnPage extends StatelessWidget {
       grey: true,
       title: 'createWallet'.tr,
       footerText: 'next'.tr,
-      onPressed: () {
-        Get.toNamed(mnePage);
-      },
+      onPressed: () => Get.toNamed(mnePage),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -41,11 +44,6 @@ class CreateWarnPage extends StatelessWidget {
                         color: Colors.white,
                         weight: FontWeight.w500,
                       ),
-                      // CommonText(
-                      //   'missMne'.tr,
-                      //   size: 8,
-                      //   color: Colors.white,
-                      // )
                     ],
                   ),
                 ),

@@ -1,11 +1,23 @@
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/card.dart';
+import 'package:fil/widgets/layout.dart';
+import 'package:fil/store/store.dart';
+import 'package:get/get.dart';
+import 'package:fil/init/hive.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/utils/enum.dart';
+
+
 
 class AddressBookWalletSelect extends StatelessWidget {
   List<ChainWallet> get idWallets {
     var list = OpenedBox.walletInstance.values
         .where((wal) =>
-            wal.type == 0 &&
+            wal.type == WalletType.id &&
             wal.rpc == $store.net.rpc &&
             wal.key != $store.wal.key)
         .toList();
@@ -15,7 +27,7 @@ class AddressBookWalletSelect extends StatelessWidget {
   List<ChainWallet> get importWallets {
     var list = OpenedBox.walletInstance.values
         .where((wal) =>
-            wal.type != 0 &&
+            wal.type != WalletType.id &&
             wal.rpc == $store.net.rpc &&
             wal.key != $store.wal.key)
         .toList();

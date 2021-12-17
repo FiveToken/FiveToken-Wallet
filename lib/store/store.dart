@@ -1,6 +1,8 @@
+
+import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
+import 'package:fil/chain/token.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/index.dart';
 import 'package:get/get.dart';
 
 class StoreController extends GetxController {
@@ -9,6 +11,7 @@ class StoreController extends GetxController {
   var scanResult = ''.obs;
   var network = Network().obs;
   var tok = Token().obs;
+  var encryptionType = ''.obs;
   ChainWallet get wal {
     return wallet.value;
   }
@@ -51,6 +54,10 @@ class StoreController extends GetxController {
 
   void setGas(ChainGas gas) {
     g.value = gas;
+  }
+
+  void setEncryptionType(String type){
+    encryptionType.value = type;
   }
 }
 

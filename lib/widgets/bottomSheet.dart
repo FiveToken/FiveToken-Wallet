@@ -7,7 +7,8 @@
 import 'dart:async';
 import 'dart:ui' show lerpDouble;
 
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+// import 'package:fil/index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -683,7 +684,7 @@ Future<T> showCustomModalBottomSheet<T>({
   return Navigator.of(context, rootNavigator: useRootNavigator)
       .push(_ModalBottomSheetRoute<T>(
     builder: builder,
-    theme: Theme.of(context, shadowThemeOnly: true),
+    theme: Theme.of(context),
     isScrollControlled: isScrollControlled,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     backgroundColor: backgroundColor,

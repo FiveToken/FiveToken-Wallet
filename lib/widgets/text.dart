@@ -1,4 +1,6 @@
-import 'package:fil/index.dart';
+// import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:fil/widgets/style.dart';
 
 class CommonText extends StatelessWidget {
   final String text;
@@ -6,8 +8,10 @@ class CommonText extends StatelessWidget {
   final FontWeight weight;
   final Color color;
   final TextAlign align;
+  final bool ellipsis;
   const CommonText(this.text,
-      {this.size = 14, this.weight, this.color = Colors.black, this.align});
+      {this.size = 14, this.weight, this.color = Colors.black, this.align, this.ellipsis});
+
   @override
   Widget build(BuildContext context) {
     return Text(

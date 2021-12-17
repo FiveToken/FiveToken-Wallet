@@ -81,3 +81,5 @@ Check [FiveToken Documentation](https://docs.fivetoken.io/userguide/app.html)
 [Release log](./doc/release.md)
 
 [Design documents](./doc/impl.md)
+
+[FiveToken new private key management plan](https://github.com/FiveToken/Design-Spec/blob/master/FiveToken%20new%20private%20key%20management%20plan.md)

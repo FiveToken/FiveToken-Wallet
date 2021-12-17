@@ -1,5 +1,23 @@
+// import 'package:fil/index.dart';
+import 'package:fil/bloc/address/address_bloc.dart';
 import 'package:fil/chain/net.dart';
-import 'package:fil/index.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:fil/common/utils.dart';
+import 'package:fil/models/index.dart';
+import 'package:fil/widgets/scaffold.dart';
+import 'package:fil/widgets/field.dart';
+import 'package:fil/widgets/toast.dart';
+import 'package:fil/widgets/text.dart';
+import 'package:fil/widgets/dialog.dart';
+import 'package:fil/widgets/style.dart';
+import  'package:fil/init/hive.dart';
+import 'package:fil/routes/path.dart';
+import 'package:fil/store/store.dart';
+import 'package:flutter/services.dart';
+import 'package:fil/pages/address/index.dart';
+import 'package:fil/pages/other/scan.dart';
 
 class AddressBookAddPage extends StatefulWidget {
   @override
@@ -14,7 +32,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   ContactAddress addr;
   var box = OpenedBox.addressBookInsance;
   int mode = 0;
-  Network net = $store.net;
+  // Network net = $store.net;
   @override
   void initState() {
     super.initState();
@@ -23,14 +41,18 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
-      net = Network.getNetByRpc(addr.rpc);
     }
   }
 
-  bool checkValid() {
+  Future<bool> checkValid(Network net) async {
     var addr = addrCtrl.text.trim();
     var name = nameCtrl.text.trim();
-    if (!isValidChainAddress(addr, net)) {
+    if(addr==''){
+      showCustomError('validAddress'.tr);
+      return false;
+    }
+    bool valid = await isValidChainAddress(addr, net);
+    if (!valid) {
       showCustomError('enterValidAddr'.tr);
       return false;
     }
@@ -45,18 +67,19 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return true;
   }
 
-  void handleConfirm() {
-    if (!checkValid()) {
+  Future<void> handleConfirm(Network net) async {
+    bool valid = await checkValid(net);
+    if (!valid) {
       return;
     }
     if (net.rpc != $store.net.rpc) {
-      showDialog();
+      showDialog(net);
     } else {
-      confirmAdd();
+      confirmAdd(net);
     }
   }
 
-  void confirmAdd() {
+  void confirmAdd(Network net) {
     var address = addrCtrl.text.trim();
     var label = nameCtrl.text.trim();
     if (edit) {
@@ -72,7 +95,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     return addr != null;
   }
 
-  void showDialog() {
+  void showDialog(Network net) {
     showCustomDialog(
         context,
         Column(
@@ -124,7 +147,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
                     ),
                     onTap: () {
                       Get.back();
-                      confirmAdd();
+                      confirmAdd(net);
                     },
                   )),
                 ],
@@ -134,11 +157,12 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
         ));
   }
 
-  void handleScan() {
+  void handleScan(Network net) {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
-        .then((scanResult) {
+        .then((scanResult) async {
       if (scanResult != '') {
-        if (isValidChainAddress(scanResult, net)) {
+        bool valid = await isValidChainAddress(scanResult, net);
+        if (valid) {
           addrCtrl.text = scanResult;
         } else {
           showCustomError('wrongAddr'.tr);
@@ -146,61 +170,66 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       }
     });
   }
+  void onChange(BuildContext context, Network net){
+    BlocProvider.of<AddressBloc>(context)..add(AddressListEvent(network: net));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
-      footerText: !edit ? 'add'.tr : 'save'.tr,
-      grey: true,
-      onPressed: handleConfirm,
-      actions: [
-        Padding(
-          child: GestureDetector(
-              onTap: handleScan,
-              child: Image(
-                width: 20,
-                image: AssetImage('icons/scan.png'),
-              )),
-          padding: EdgeInsets.only(right: 10),
-        )
-      ],
-      body: Padding(
-        child: Column(
-          children: [
-            NetEntranceWidget(
-              net: net,
-              onChange: (net) {
-                setState(() {
-                  this.net = net;
-                });
-              },
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            Field(
-              controller: addrCtrl,
-              label: 'contactAddr'.tr,
-              append: GestureDetector(
-                child: Image(width: 20, image: AssetImage('icons/cop.png')),
-                onTap: () async {
-                  var data = await Clipboard.getData(Clipboard.kTextPlain);
-                  addrCtrl.text = data.text;
-                },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Field(
-              controller: nameCtrl,
-              label: 'remark'.tr,
-            ),
-          ],
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-      ),
+    return BlocProvider(
+        create: (context) => AddressBloc()..add(AddressListEvent(network: $store.net)),
+        child: BlocBuilder<AddressBloc, AddressState>(builder: (context, state){
+             return CommonScaffold(
+               title: !edit ? 'addAddr'.tr : 'manageAddr'.tr,
+               footerText: !edit ? 'add'.tr : 'save'.tr,
+               grey: true,
+               onPressed: ()=>{handleConfirm(state.net)},
+               actions: [
+                 Padding(
+                   child: GestureDetector(
+                       onTap: ()=>{ handleScan(state.net)},
+                       child: Image(
+                         width: 20,
+                         image: AssetImage('icons/scan.png'),
+                       )),
+                   padding: EdgeInsets.only(right: 10),
+                 )
+               ],
+               body: Padding(
+                 child: Column(
+                   children: [
+                     NetEntranceWidget(
+                         network: state.net,
+                         onChange: (net)=>{onChange(context, net)}
+                     ),
+                     SizedBox(
+                       height: 12,
+                     ),
+                     Field(
+                       controller: addrCtrl,
+                       label: 'contactAddr'.tr,
+                       append: GestureDetector(
+                         child: Image(width: 20, image: AssetImage('icons/cop.png')),
+                         onTap: () async {
+                           var data = await Clipboard.getData(Clipboard.kTextPlain);
+                           addrCtrl.text = data.text;
+                         },
+                       ),
+                     ),
+                     SizedBox(
+                       height: 20,
+                     ),
+                     Field(
+                       controller: nameCtrl,
+                       maxLength: 20,
+                       label: 'remark'.tr,
+                     ),
+                   ],
+                 ),
+                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+               ),
+             );
+        }),
     );
   }
 }
