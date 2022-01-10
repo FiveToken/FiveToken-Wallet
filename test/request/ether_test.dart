@@ -51,30 +51,6 @@ void main() {
     expect(limit, limit);
   });
 
-  test('getMaxPriorityFeePerGas', () async {
-    final web3Client = MockWeb3Client();
-    final rpcJson = MockRpcJson();
-    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client,rpcJson:rpcJson);
-    var _data = {
-      "baseFeePerGas":"0x9d949800c",
-      "gasUsed":"0x1c9c16b",
-      "gasLimit":"0x1c9c380",
-      "number":"0xd29d68",
-      "timestamp":"0x61b876e5",
-    };
-    var response = RPCResponse(
-        0, _data
-    );
-    when(
-        rpcJson.call('eth_maxPriorityFeePerGas')
-    ).thenAnswer(
-            (realInvocation) => Future.value(response)
-    );
-    final res = await ether.getMaxPriorityFeePerGas();
-    expect(res, "0");
-  });
-
-
   test('getNetworkId', () async {
     final web3Client = MockWeb3Client();
     final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
@@ -116,20 +92,6 @@ void main() {
     final balance = await ether.getBalance('0x3bB395b668Ff9Cb84e55aadFC8e646Dd9184Da9d');
     expect(balance, '0');
   });
-
-  test('get getMaxFeePerGas', () async {
-    final web3Client = MockWeb3Client();
-    final ether = Ether(Network.binanceTestnet.rpc,web3client: web3Client);
-    int blockNumber = 13802876;
-    when(
-        web3Client.getBlockNumber()
-    ).thenAnswer(
-            (realInvocation) => Future.value(blockNumber)
-    );
-    final res = await ether.getMaxFeePerGas();
-    expect(res, '0');
-  });
-
 
   test('get getBalanceOfToken', () async {
     final web3Client = MockWeb3Client();

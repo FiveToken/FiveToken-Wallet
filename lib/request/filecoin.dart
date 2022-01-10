@@ -217,7 +217,7 @@ class Filecoin extends ChainProvider {
   }
 
   @override
-  Future<String> getMaxFeePerGas() async{
+  Future<String> getBaseFeePerGas() async{
     return "0";
   }
 

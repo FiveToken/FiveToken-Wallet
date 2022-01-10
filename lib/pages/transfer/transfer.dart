@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/config/config.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -56,13 +57,12 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       if (Get.arguments['page'] != null) {
         prePage = Get.arguments['page'];
       }
-
       if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
-        rpcType = 'ethMain';
+        rpcType = RpcType.ethereumMain;
       } else if ($store.net.chain == 'filecoin') {
-        rpcType = 'filecoin';
+        rpcType = RpcType.fileCoin;
       } else {
-        rpcType = 'ethOthers';
+        rpcType = RpcType.ethereumOthers;
       }
 
       if (Get.arguments['token'] != null) {
@@ -372,7 +372,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         "rpcType": $store.gas.rpcType,
         "gasFeeCap": realGasFeeCap,
         "maxPriorityFee": $store.gas.maxPriorityFee,
-        "maxFeePerGas": realMaxFeePerGas
+        "maxFeePerGas": realMaxFeePerGas,
+        "baseFeePerGas":$store.gas.baseFeePerGas,
+        "baseMaxPriorityFee":$store.gas.baseMaxPriorityFee,
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);

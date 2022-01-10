@@ -104,15 +104,8 @@ class ChainWallet {
     String pass,
   ) async {
     try {
-      var private = await decryptSodium(skKek, address, pass);
-      var str = base64Decode(private);
-      var str1 = utf8.decode(str);
-      var digest = await genPrivateKeyDigest(str1);
-      if (this.digest != digest) {
-        return false;
-      } else {
-        return true;
-      }
+      await decryptSodium(skKek, address, pass);
+      return true;
     }catch(e){
       return false;
     }
@@ -166,12 +159,12 @@ class FilecoinWallet extends ChainWallet {
       var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(filPrivateKey);
       var filKek = encryptSodium(filPrivateKey, filAddr, pass);
-      var filDigest = await genPrivateKeyDigest(filPrivateKey);
+      var filDigest = await genPrivateKeyDigest(filKek);
       return EncryptKey(
           kek: filKek,
           digest: filDigest,
-          address: filAddr,
-          private: filPrivateKey);
+          address: filAddr
+      );
     } catch (e) {
       throw (e);
     }
@@ -185,12 +178,12 @@ class FilecoinWallet extends ChainWallet {
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
       var filKek = encryptSodium(privateKey,filAddr, pass);
-      var filDigest = await genPrivateKeyDigest(privateKey);
+      var filDigest = await genPrivateKeyDigest(filKek);
       return EncryptKey(
           kek: filKek,
           digest: filDigest,
           address: filAddr,   // publicKey
-          private: privateKey);  // value
+         );  // value
     } catch (e) {
       throw (e);
     }
@@ -229,12 +222,11 @@ class EthWallet extends ChainWallet {
       var ethPrivateKey = EthWallet.genPrivateKeyByMne(mne);
       var ethAddr = await EthWallet.genAddrByPrivateKey(ethPrivateKey);
       var ethKek = encryptSodium(ethPrivateKey, ethAddr, pass);
-      var ethDigest = await genPrivateKeyDigest(ethPrivateKey);
+      var ethDigest = await genPrivateKeyDigest(ethKek);
       return EncryptKey(
           kek: ethKek,
           digest: ethDigest,
-          address: ethAddr,
-          private: ethPrivateKey);
+          address: ethAddr);
     } catch (e) {
       throw (e);
     }
@@ -245,12 +237,11 @@ class EthWallet extends ChainWallet {
     try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
       var kek = encryptSodium(privateKey, ethAddr, pass);
-      var ethDigest = await genPrivateKeyDigest(privateKey);
+      var ethDigest = await genPrivateKeyDigest(kek);
       return EncryptKey(
           kek: kek,
           digest: ethDigest,
           address: ethAddr,
-          private: privateKey
       );
     }catch(e){
       throw(e);

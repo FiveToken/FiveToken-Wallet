@@ -6,6 +6,7 @@ import 'package:fil/common/utils.dart';
 import 'package:fil/models/private.dart';
 import 'package:flutter/foundation.dart';
 import 'global.dart';
+import 'package:fil/common/argon2.dart';
 
 
 Future<EncryptKey> getKey(String addressType, String pass, String mne, String prefix) async{
@@ -70,6 +71,17 @@ Future<Map<String, EncryptKey>> getKeyMapToReset(String private, String pass) as
   keyMap['filecoin'] =  await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass);
   keyMap['calibration'] =  await FilecoinWallet.genEncryptKeyByPrivateKey(private, pass, prefix: 't');
   return keyMap;
+}
+
+Future<String> getPrivateByKek(
+    String pass, String kek, String address
+    ) async {
+  try {
+    var private = await decryptSodium(kek, address, pass);
+    var str = base64Decode(private);
+    var sk = utf8.decode(str);
+    return sk;
+  }catch(e){}
 }
 
 

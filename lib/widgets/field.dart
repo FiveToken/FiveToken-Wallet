@@ -1,4 +1,5 @@
 // import 'package:fil/index.dart';
+import 'package:fil/models/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/text.dart';
@@ -20,6 +21,7 @@ class Field extends StatelessWidget {
   final FocusNode focusNode;
   final bool selectable;
   final int maxLength;
+  final ValueChanged onChanged;
   final int maxLines;
   Field(
       {this.label = '',
@@ -35,6 +37,7 @@ class Field extends StatelessWidget {
       this.selectable = false,
       this.maxLength = null,
       this.maxLines = null,
+        this.onChanged,
       this.inputFormatters = const []});
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,7 @@ class Field extends StatelessWidget {
                       maxLength: maxLength,
                       focusNode: focusNode,
                       inputFormatters: inputFormatters,
+                          onChanged:onChanged,
                       textInputAction: inputAction ?? TextInputAction.done,
                       decoration: InputDecoration(
                           counterText: '',

@@ -123,8 +123,6 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    showDebugBtn(context);
-
     BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
         $store.net.rpc,
         $store.net.chain,

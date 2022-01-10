@@ -10,6 +10,7 @@ import 'package:fil/models/transaction_response.dart';
 import 'package:fil/repository/http/http.dart';
 import 'package:fil/request/provider.dart';
 import 'package:fil/store/store.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
@@ -68,21 +69,19 @@ class Ether extends ChainProvider {
     try {
       var res = await rpcJson.call('eth_maxPriorityFeePerGas');
       var maxPriority = hexToInt(res.result);
-      var unit = BigInt.from(pow(10, 9));
-      var result = maxPriority/unit;
-      return result.toString();
+      return maxPriority.toString();
     } catch (error) {
       return '0';
     }
   }
 
   @override
-  Future<String> getMaxFeePerGas() async{
+  Future<String> getBaseFeePerGas() async{
     try{
       int block = await client.getBlockNumber();
       var blockInfo = await getBlockByNumber(block);
-      var maxFeePerGas = BigInt.from(blockInfo.baseFeePerGas) * BigInt.from(Config.baseFeePerGasToMaxFeePerGas);
-      return maxFeePerGas.toString();
+      var baseFee = blockInfo.baseFeePerGas;
+      return baseFee.toString();
     }catch(error){
       return '0';
     }
@@ -206,16 +205,30 @@ class Ether extends ChainProvider {
   ) async {
     try {
       var credentials = await client.credentialsFromPrivateKey(private);
+      var _transaction;
+      if(gas.rpcType == RpcType.ethereumMain){
+        _transaction = Transaction(
+          from:EthereumAddress.fromHex(from),
+          to: EthereumAddress.fromHex(to),
+          maxFeePerGas: EtherAmount.inWei(BigInt.parse(gas.maxFeePerGas)),
+          maxPriorityFeePerGas: EtherAmount.inWei(BigInt.parse(gas.maxPriorityFee)),
+          maxGas: gas.gasLimit,
+          nonce: nonce,
+          value: EtherAmount.inWei(BigInt.parse(amount)),
+        );
+      }else{
+        _transaction = Transaction(
+          from:EthereumAddress.fromHex(from),
+          to: EthereumAddress.fromHex(to),
+          gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)),
+          maxGas: gas.gasLimit,
+          nonce: nonce,
+          value: EtherAmount.inWei(BigInt.parse(amount)),
+        );
+      }
       var res = await client.sendTransaction(
           credentials,
-          Transaction(
-            from:EthereumAddress.fromHex(from),
-            to: EthereumAddress.fromHex(to),
-            gasPrice: EtherAmount.inWei(BigInt.parse(gas.gasPrice)),
-            maxGas: gas.gasLimit,
-            nonce: nonce,
-            value: EtherAmount.inWei(BigInt.parse(amount)),
-          ),
+          _transaction,
           chainId: int.tryParse($store.net.chainId) ?? 1);
       return TransactionResponse(
         cid: res,

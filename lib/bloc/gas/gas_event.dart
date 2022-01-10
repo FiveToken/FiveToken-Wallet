@@ -23,3 +23,19 @@ class UpdateMessListStateEvent extends GasEvent{
   final String symbol;
   UpdateMessListStateEvent(this.rpc,this.chainType,this.symbol);
 }
+
+class UpdateTabsEvent extends GasEvent{
+  final String tab;
+  UpdateTabsEvent(this.tab);
+}
+
+class UpdateGasGearEvent extends GasEvent{
+  final String gear;
+  UpdateGasGearEvent(this.gear);
+}
+
+class UpdateHandlingFeeEvent extends GasEvent{
+  final String handlingFee;
+  UpdateHandlingFeeEvent(this.handlingFee);
+}
+

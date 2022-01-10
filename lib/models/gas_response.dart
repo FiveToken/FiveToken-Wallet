@@ -15,12 +15,12 @@ class GasResponse {
       this.gasPremium,});
 
   GasResponse.fromJson(dynamic json) {
-    gasLimit = json['gasLimit'];
-    gasPrice = json['gasPrice'];
-    gasState = json['gasState'];
-    message = json['message'];
-    gasFeeCap = json['gasFeeCap'];
-    gasPremium = json['gasPremium'];
+    gasLimit = json['gasLimit'] ?? 0;
+    gasPrice = json['gasPrice'] ?? '0';
+    gasState = json['gasState'] ?? '0';
+    message = json['message'] ?? '';
+    gasFeeCap = json['gasFeeCap'] ?? '0';
+    gasPremium = json['gasPremium'] ?? '0';
   }
   int gasLimit;
   String gasPrice;

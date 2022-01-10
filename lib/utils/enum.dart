@@ -14,6 +14,24 @@ class HiveKey {
   static final secret = 'secret';
 }
 
+class GasTabBars {
+  static final gearSelection = 'gearSelection';
+  static final customize = 'customize';
+}
+
+class GasGear {
+  static const high = 'high';
+  static const middle = 'middle';
+  static const low = 'low';
+}
+
+class RpcType {
+  static const ethereumMain = 'ethereumMain';
+  static const ethereumOthers = 'ethereumOthers';
+  static const fileCoin = 'fileCoin';
+}
+
+
 class HiveBoxType{
   static final messageBox = 'messageBox';
   static final addressBox = 'addressBox';

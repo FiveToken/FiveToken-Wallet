@@ -44,7 +44,7 @@ abstract class ChainProvider {
 
   Future<String> getMaxPriorityFeePerGas();
 
-  Future<String> getMaxFeePerGas();
+  Future<String> getBaseFeePerGas();
 
   Future<bool> addressCheck(String address);
 

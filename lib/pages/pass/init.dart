@@ -18,7 +18,7 @@ import 'package:fil/store/store.dart';
 import 'package:fil/init/hive.dart';
 import 'package:flutter/services.dart';
 import 'package:fil/utils/enum.dart';
-
+import 'package:fil/common/encryptKey.dart';
 
 class PassInitPage extends StatefulWidget {
   @override
@@ -76,10 +76,10 @@ class PassInitPageState extends State<PassInitPage> {
   }
 
 
-  ChainWallet getWallet(type, EncryptKey key,Network net){
+  ChainWallet getWallet(type, EncryptKey key,Network net, private){
     return ChainWallet(
       label: label,
-      mne: type!= WalletType.privateKey ?aesEncrypt(mne, key.private): '',
+      mne: type!= WalletType.privateKey ?aesEncrypt(mne, private): '',
       groupHash: type!= WalletType.privateKey ?tokenify(mne): '',
       type: type,
       rpc: net.rpc,
@@ -133,10 +133,10 @@ class PassInitPageState extends State<PassInitPage> {
             var wal;
             try {
               EncryptKey key = keyMap[addrType];
-              wal = getWallet(type, key, net);
+              String private = await getPrivateByKek(pass, key.kek, key.address);
+              wal = getWallet(type, key, net, private);
               AddWallet(wal);
             }catch(e){}
-
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
               $store.setWallet(wal);
@@ -152,7 +152,8 @@ class PassInitPageState extends State<PassInitPage> {
     } else if (type == WalletType.mne) {
       try {
         EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
-        var wal = getWallet(type, key, net);
+        String private = await getPrivateByKek(pass, key.kek, key.address);
+        var wal = getWallet(type, key, net, private);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
@@ -175,7 +176,8 @@ class PassInitPageState extends State<PassInitPage> {
           this.loading = false;
           return;
         }
-        var wal = getWallet(type, key, net);
+        String private = await getPrivateByKek(pass, key.kek, key.address);
+        var wal = getWallet(type, key, net, private);
         if (box.get(wal.key)!=null) {
           showCustomError('errorExist'.tr);
           this.loading = false;

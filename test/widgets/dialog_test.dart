@@ -72,8 +72,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('sure'), findsOneWidget);
     await tester.enterText(find.byType(TextField), WalletLabel);
-    await tester.tap(find.text('sure'));
-    await tester.pumpAndSettle();
+    // await tester.tap(find.text('sure'));
+    // await tester.pumpAndSettle();
 
   });
 }

@@ -22,14 +22,7 @@ void main() {
         'ResetGetGasStateEvent',
         build: ()=> gasBloc,
         act: (bloc) => bloc.add(ResetGetGasStateEvent()),
-        expect: ()=> [GasState(getGasState: '',errorMessage: '')]
-    );
-
-    blocTest(
-        'GetGasEvent',
-        build: ()=> gasBloc,
-        act: (bloc) => bloc.add(GetGasEvent(filNet.rpc,filNet.chain,to,false,null,'filecoin')),
-        expect: ()=> [GasState(getGasState: '',errorMessage: '')]
+        expect: ()=> [GasState(getGasState: '',errorMessage: '',handlingFee: '0',tab: '',gear: '')]
     );
 
     blocTest(

@@ -9,6 +9,7 @@ import 'package:fil/widgets/text.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/pages/pass/init.dart';
+import 'package:fil/common/utils.dart';
 
 typedef SingleStringParamFn = void Function(String pass);
 void showCustomDialog(BuildContext context, Widget child, {Color color}) {
@@ -99,23 +100,17 @@ class PassDialogState extends State<PassDialog> {
       showCustomError('enterPass'.tr);
       return;
     }
+    if (!isValidPass(pass)) {
+      showCustomError('placeholderValidPass'.tr);
+      return;
+    }
     var wal = widget.wallet ?? $store.wal;
     try {
       var valid = await wal.validatePrivateKey(pass);
-      var instance = Global.store;
-      var pre = instance.getInt('passWrongCount') ?? 0;
       if (!valid) {
-        var now = pre + 1;
-        instance.setInt('passWrongCount', pre + 1);
-        if (now >= 5) {
           showCustomError('wrongPass'.tr);
           return;
-        } else {
-          showCustomError('wrongPass'.tr);
-          return;
-        }
       } else {
-        instance.setInt('passWrongCount', 0);
         widget.callback(pass);
         Get.back();
       }

@@ -1,6 +1,7 @@
 
 import 'dart:math';
 import 'package:fil/common/utils.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:hive/hive.dart';
 part 'gas.g.dart';
 
@@ -22,20 +23,26 @@ class ChainGas {
   String maxFeePerGas;
   @HiveField(7)
   String gasFeeCap;
+  @HiveField(8)
+  String baseMaxPriorityFee;
+  @HiveField(9)
+  String baseFeePerGas;
+  @HiveField(10)
+  bool isCustomize;
 
   String get handlingFee{
     try{
       String fee = '0';
       switch(rpcType){
-        case 'ethMain':
+        case RpcType.ethereumMain:
           var feeNum = BigInt.parse(maxFeePerGas) * BigInt.from(gasLimit);
           fee = feeNum.toString();
           break;
-        case 'filecoin':
+        case RpcType.fileCoin:
           var feeNum = (BigInt.parse(gasPremium) + BigInt.parse(gasFeeCap)) * BigInt.from(gasLimit);
           fee = feeNum.toString();
           break;
-        case 'ethOthers':
+        case RpcType.ethereumOthers:
           var feeNum = BigInt.parse(gasPrice) * BigInt.from(gasLimit);
           fee = feeNum.toString();
           break;
@@ -56,7 +63,10 @@ class ChainGas {
         this.rpcType = '',
         this.maxPriorityFee = '0',
         this.maxFeePerGas = '0',
-        this.gasFeeCap = '0'
+        this.gasFeeCap = '0',
+        this.baseMaxPriorityFee = '0',
+        this.baseFeePerGas = '0',
+        this.isCustomize = false
       });
   ChainGas.fromJson(Map<String, dynamic> json) {
     gasPrice = json['gasPrice'] ?? '0';
@@ -67,5 +77,8 @@ class ChainGas {
     maxPriorityFee = json['maxPriorityFee'] ?? '0';
     maxFeePerGas = json['maxFeePerGas'] ?? '0';
     gasFeeCap = json['gasFeeCap'] ?? '0';
+    baseMaxPriorityFee = json['baseMaxPriorityFee'] ?? '0';
+    baseFeePerGas = json['baseFeePerGas'] ?? '0';
+    isCustomize = json['isCustomize'] ?? false;
   }
 }

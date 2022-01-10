@@ -1,6 +1,7 @@
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/store/store.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -14,7 +15,7 @@ void main() {
       $store = Get.find();
       $store.setNet(Network.ethMainNet);
       final gas = ChainGas.fromJson({
-        "rpcType":"ethMain",
+        "rpcType": RpcType.ethereumMain,
         'maxFeePerGas': '10',
         'gasLimit': 10,
         "gasPremium":'0',

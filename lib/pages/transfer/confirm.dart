@@ -367,7 +367,9 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         "rpcType": $store.gas.rpcType,
         "gasFeeCap": $store.gas.gasFeeCap,
         "maxPriorityFee": $store.gas.maxPriorityFee,
-        "maxFeePerGas": $store.gas.maxFeePerGas
+        "maxFeePerGas": $store.gas.maxFeePerGas,
+        "baseFeePerGas":$store.gas.baseFeePerGas,
+        "baseMaxPriorityFee":$store.gas.baseMaxPriorityFee,
       };
       ChainGas transferGas = ChainGas.fromJson(_gas);
       $store.setGas(transferGas);
@@ -380,7 +382,9 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               rpcType: $store.gas.rpcType,
               gasFeeCap: $store.gas.gasFeeCap,
               maxPriorityFee: $store.gas.maxPriorityFee,
-              maxFeePerGas: $store.gas.maxFeePerGas));
+              maxFeePerGas: $store.gas.maxFeePerGas
+          )
+      );
       OpenedBox.mesInstance.put(
           hash,
           CacheMessage(
