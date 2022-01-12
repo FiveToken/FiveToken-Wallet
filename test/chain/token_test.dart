@@ -9,6 +9,6 @@ void main() {
         chain: "eth",
         symbol: 'ETH',
         balance: "10000000");
-    expect(token.formatBalance, '10.0 ETH');
+    expect(token.formatBalance, '10ETH');
   });
 }

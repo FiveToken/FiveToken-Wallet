@@ -213,7 +213,7 @@ String getChainValue(String fil, {int precision = 18}) {
     var val = num.parse(res).toStringAsFixed(0);
     return val;
   }catch(error){
-    throw(error);
+    return '0';
   }
 }
 

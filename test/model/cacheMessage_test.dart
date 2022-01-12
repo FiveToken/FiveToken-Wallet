@@ -30,7 +30,7 @@ void main() {
         symbol: 'FIL'
     );
     var value = msg1.formatValue;
-    var resValue = '100000000000000.0 FIL';
+    var resValue = '100000000000000FIL';
     expect(value, resValue);
 
   });
