@@ -194,9 +194,8 @@ String formatCoin(String amount, { num size = 4, double min, int precision = 18 
     }else{
       return  res ;
     }
-
   } catch (e) {
-    return amount;
+    return '0';
   }
 }
 

@@ -6,8 +6,6 @@ Future initDeviceInfo({DeviceInfoPlugin deviceInfoPlugin,bool isAndroid}) async 
   DeviceInfoPlugin _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
   bool _isAndroid = isAndroid ?? Platform.isAndroid;
   if (_isAndroid) {
-    print("object");
-    print(_deviceInfoPlugin);
     var info = await _deviceInfoPlugin.androidInfo;
     Global.uuid = info.androidId;
     Global.platform = 'android';

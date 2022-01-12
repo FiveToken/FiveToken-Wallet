@@ -136,7 +136,9 @@ class PassInitPageState extends State<PassInitPage> {
               String private = await getPrivateByKek(pass, key.kek, key.address);
               wal = getWallet(type, key, net, private);
               AddWallet(wal);
-            }catch(e){}
+            }catch(e){
+              return null;
+            }
             var currentNet = $store.net;
             if (currentNet.rpc == net.rpc) {
               $store.setWallet(wal);

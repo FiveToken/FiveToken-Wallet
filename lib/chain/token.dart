@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:fil/common/utils.dart';
 import 'package:hive/hive.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/utils/string_extension.dart';
+import 'package:fil/utils/num_extension.dart';
 part 'token.g.dart';
 
 @HiveType(typeId: 8)
@@ -22,9 +25,12 @@ class Token {
 
   String getFormatBalance(String b) {
     try {
+
       var unit = BigInt.from(pow(10, precision));
-      var balanceNum = BigInt.parse(b);
-      return '${truncate(balanceNum / unit)} $symbol';
+      var _balance = BigInt.parse(b) / unit;
+      var _decimal = _balance.toDecimal;
+      var res = _decimal.fmtDown(4);
+      return res + symbol;
     } catch (e) {
       return '';
     }

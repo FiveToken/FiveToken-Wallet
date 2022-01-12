@@ -94,7 +94,7 @@ class Ether extends ChainProvider {
       var res = await client.getBalance(EthereumAddress.fromHex(address));
       balance = res.getInWei.toString();
     } catch (e) {
-      throw(e);
+      return '0';
     }
     return balance;
   }
@@ -311,18 +311,14 @@ class Ether extends ChainProvider {
       var id = await client.getNetworkId();
       return id.toString();
     }catch(error){
-      throw(error);
+      return '';
     }
   }
 
   @override
   Future getTransactionReceipt(String hash) async{
-    try{
-        var res = await client.getTransactionReceipt(hash);
-        return res;
-    }catch(error){
-
-    }
+    var res = await client.getTransactionReceipt(hash);
+    return res;
   }
 
   @override

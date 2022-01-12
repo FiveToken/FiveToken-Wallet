@@ -56,7 +56,12 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
           ));
         }
-      }catch(error){}
+      }catch(error){
+        emit(state.copyWithWalletState(
+            storeMessageList: [],
+            timestamp:DateTime.now().microsecondsSinceEpoch
+        ));
+      }
     });
 
     on<GetFileCoinMessageListEvent>((event,emit) async {
@@ -72,7 +77,12 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
         ));
       }catch(error){
-        throw(error);
+        emit(state.copyWithWalletState(
+            storeMessageList:[],
+            mid:'',
+            enablePullUp:true,
+            timestamp:DateTime.now().microsecondsSinceEpoch
+        ));
       }
     });
 
@@ -100,7 +110,10 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             timestamp:DateTime.now().microsecondsSinceEpoch
         ));
       }catch(error){
-        throw(error);
+        emit(state.copyWithWalletState(
+            tokenBalance:'0',
+            timestamp:DateTime.now().microsecondsSinceEpoch
+        ));
       }
 
     });
@@ -215,47 +228,41 @@ upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
 }
 
 updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
-  try{
-    Chain.setRpcNetwork(rpc, chainType);
-    var box = OpenedBox.mesInstance;
-
-    var list = await Future.wait(
-        pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)).toList());
-    list = list.where((r) => r != null).toList();
-    Map<String, TransactionReceipt> map = {};
-    for (var i = 0; i < list.length; i++) {
-      var t = list[i];
-      var mes = pendingList[i];
-      if (t != null && t.gasUsed != null) {
-        var limit = BigInt.tryParse(mes.gas.gasPrice) ?? BigInt.one;
-        mes.fee = (limit * t.gasUsed).toString();
-        map[mes.hash] = t;
+  Chain.setRpcNetwork(rpc, chainType);
+  var box = OpenedBox.mesInstance;
+  var list = await Future.wait(
+      pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)).toList());
+  list = list.where((r) => r != null).toList();
+  Map<String, TransactionReceipt> map = {};
+  for (var i = 0; i < list.length; i++) {
+    var t = list[i];
+    var mes = pendingList[i];
+    if (t != null && t.gasUsed != null) {
+      var limit = BigInt.tryParse(mes.gas.gasPrice) ?? BigInt.one;
+      mes.fee = (limit * t.gasUsed).toString();
+      map[mes.hash] = t;
+    }
+  }
+  if (map.isNotEmpty) {
+    Chain.setRpcNetwork($store.net.rpc, $store.net.chain);
+    var futures = map.values
+        .map((t) =>
+        Chain.chainProvider.getBlockByNumber(t.blockNumber.blockNum))
+        .toList();
+    var mesList = map.keys.toList();
+    var blocks = await Future.wait(futures);
+    for (var i = 0; i < mesList.length; i++) {
+      var block = blocks[i];
+      var key = mesList[i];
+      var mes = box.get(key);
+      if (block.timestamp != null && block.timestamp is int) {
+        mes.pending = 0;
+        mes.blockTime = block.timestamp;
+        mes.height = block.number;
+        mes.exitCode = map[key].status ? 0 : 1;
+        box.put(key, mes);
       }
     }
-    if (map.isNotEmpty) {
-      Chain.setRpcNetwork($store.net.rpc, $store.net.chain);
-      var futures = map.values
-          .map((t) =>
-          Chain.chainProvider.getBlockByNumber(t.blockNumber.blockNum))
-          .toList();
-      var mesList = map.keys.toList();
-
-      var blocks = await Future.wait(futures);
-      for (var i = 0; i < mesList.length; i++) {
-        var block = blocks[i];
-        var key = mesList[i];
-        var mes = box.get(key);
-        if (block.timestamp != null && block.timestamp is int) {
-          mes.pending = 0;
-          mes.blockTime = block.timestamp;
-          mes.height = block.number;
-          mes.exitCode = map[key].status ? 0 : 1;
-          box.put(key, mes);
-        }
-      }
-    }
-  }catch(error){
-    throw(error);
   }
 }
 

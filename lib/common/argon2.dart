@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:argon2/argon2.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/models/nonce_unit.dart';
+import 'package:flutter/material.dart';
 
 import 'package:libsodium/libsodium.dart';
 
@@ -69,7 +70,9 @@ Future<Uint8List> argon2decrypt(Uint8List privateKey) async {
         utf8.encode(secretKey.substring(0, 32)) // secretKey
     );
     return res;
-  }catch(e){}
+  }catch(e){
+    throw(e);
+  }
 }
 
 

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
+import 'package:fil/common/formatter.dart';
 import 'package:fil/config/config.dart';
 import 'package:fil/models/index.dart';
 import 'package:fil/routes/path.dart';
@@ -72,52 +73,50 @@ class ChainGasPageState extends State<ChainGasPage> {
   }
 
   void handleSubmit(BuildContext context,tab) {
-    try {
-      var maxPriorityFee = maxPriorityFeeCtrl.text.trim();
-      var maxFeePerGas = maxFeePerGasCtrl.text.trim();
-      var gasFeeCap = gasFeeCapCtrl.text.trim();
-      var gasPrice = gasPriceCtrl.text.trim();
-      var gasPremium = gasPremiumCtrl.text.trim();
-      var gasLimit = gasLimitCtrl.text.trim();
+    var maxPriorityFee = maxPriorityFeeCtrl.text.trim();
+    var maxFeePerGas = maxFeePerGasCtrl.text.trim();
+    var gasFeeCap = gasFeeCapCtrl.text.trim();
+    var gasPrice = gasPriceCtrl.text.trim();
+    var gasPremium = gasPremiumCtrl.text.trim();
+    var gasLimit = gasLimitCtrl.text.trim();
 
-      if (rpcType == RpcType.ethereumMain) {
-        if (maxPriorityFee == '' || maxFeePerGas == '' || gasLimit == '') {
-          showCustomError('errorSetGas'.tr);
-          return;
-        }
-      } else if (rpcType == RpcType.fileCoin) {
-        if (gasFeeCap == '' || gasPremium == '' || gasLimit == '') {
-          showCustomError('errorSetGas'.tr);
-          return;
-        }
-      } else {
-        if (gasPrice == '' || gasLimit == '') {
-          showCustomError('errorSetGas'.tr);
-          return;
-        }
+    if (rpcType == RpcType.ethereumMain) {
+      if (maxPriorityFee == '' || maxFeePerGas == '' || gasLimit == '') {
+        showCustomError('errorSetGas'.tr);
+        return;
       }
-      var unit = Decimal.fromInt(pow(10,9));
-      var _maxFeePerGas = Decimal.parse(maxFeePerGas) * unit;
-      var _maxPriorityFee = Decimal.parse(maxPriorityFee) * unit;
-      var _gasPrice = Decimal.parse(gasPrice) * unit;
-      var _gas = {
-        "maxPriorityFee": _maxPriorityFee.toString(),
-        "maxFeePerGas": _maxFeePerGas.toString(),
-        "gasLimit": int.parse(gasLimit),
-        "gasPremium": gasPremium,
-        "gasPrice": _gasPrice.toString(),
-        "rpcType": rpcType,
-        "gasFeeCap": gasFeeCap,
-        "baseFeePerGas":$store.gas.baseFeePerGas,
-        "baseMaxPriorityFee":$store.gas.baseMaxPriorityFee,
-        "isCustomize": tab == GasTabBars.customize
-      };
-      ChainGas gas = ChainGas.fromJson(_gas);
-      $store.setGas(gas);
-      Get.back();
-    } catch (error) {
-      print(1);
+    } else if (rpcType == RpcType.fileCoin) {
+      if (gasFeeCap == '' || gasPremium == '' || gasLimit == '') {
+        showCustomError('errorSetGas'.tr);
+        return;
+      }
+    } else {
+      if (gasPrice == '' || gasLimit == '') {
+        showCustomError('errorSetGas'.tr);
+        return;
+      }
     }
+
+    var unit = Decimal.fromInt(pow(10,9));
+    var _maxFeePerGas = Decimal.parse(maxFeePerGas) * unit;
+    var _maxPriorityFee = Decimal.parse(maxPriorityFee) * unit;
+    var _gasPrice = Decimal.parse(gasPrice) * unit;
+    var _gas = {
+      "maxPriorityFee": _maxPriorityFee.toString(),
+      "maxFeePerGas": _maxFeePerGas.toString(),
+      "gasLimit": int.parse(gasLimit),
+      "gasPremium": gasPremium,
+      "gasPrice": _gasPrice.toString(),
+      "rpcType": rpcType,
+      "gasFeeCap": gasFeeCap,
+      "baseFeePerGas":$store.gas.baseFeePerGas,
+      "baseMaxPriorityFee":$store.gas.baseMaxPriorityFee,
+      "isCustomize": tab == GasTabBars.customize
+    };
+    ChainGas gas = ChainGas.fromJson(_gas);
+    $store.setGas(gas);
+    Get.back();
+
   }
 
   String getGearHandlingFee(gear){
@@ -338,30 +337,30 @@ class ChainGasPageState extends State<ChainGasPage> {
           Field(
             label: '',
             controller: gasFeeCapCtrl,
-            type: TextInputType.number,
             extra: Padding(
               padding: EdgeInsets.only(right: 12),
               child: CommonText('attoFIL'),
             ),
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           ),
           CommonText.white('GasPremium', size: 10),
           Field(
             label: '',
             controller: gasPremiumCtrl,
-            type: TextInputType.number,
             extra: Padding(
               padding: EdgeInsets.only(right: 12),
               child: CommonText('attoFIL'),
             ),
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           ),
           CommonText.white('GasLimit', size: 10),
           Field(
             label: '',
             controller: gasLimitCtrl,
-            type: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           )
         ],
       ),
@@ -380,10 +379,8 @@ class ChainGasPageState extends State<ChainGasPage> {
           Field(
             label: '',
             controller: maxPriorityFeeCtrl,
-            type: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
-            ],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           ),
           SizedBox(
             height: 10,
@@ -392,10 +389,8 @@ class ChainGasPageState extends State<ChainGasPage> {
           Field(
             label: '',
             controller: maxFeePerGasCtrl,
-            type: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
-            ],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           ),
           SizedBox(
             height: 10,
@@ -404,8 +399,8 @@ class ChainGasPageState extends State<ChainGasPage> {
           Field(
             label: '',
             controller: gasLimitCtrl,
-            type: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           )
         ],
       ),
@@ -424,21 +419,19 @@ class ChainGasPageState extends State<ChainGasPage> {
           Field(
             label: '',
             controller: gasPriceCtrl,
-            type: TextInputType.number,
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
             extra: Padding(
               padding: EdgeInsets.only(right: 12),
               child: CommonText('gwei'),
             ),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r"[0-9.]"))
-            ],
           ),
           CommonText.white('GasLimit', size: 10),
           Field(
             label: '',
             controller: gasLimitCtrl,
-            type: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            type: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [PrecisionLimitFormatter(18)],
           )
         ],
       ),

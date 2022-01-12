@@ -82,36 +82,33 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   String get title => showToken ? token.symbol : $store.net.coin;
 
   Future onRefresh(BuildContext context) async {
-    try{
-      if(showToken){
-        BlocProvider.of<WalletBloc>(context).add(
-            GetTokenBalanceEvent(
-                $store.net.rpc,
-                $store.net.chain,
-                $store.wal.addr,
-                token.address
-            )
-        );
-      }else{
-        BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
-          $store.net.rpc,
-          $store.net.chain,
-          $store.wal.addr,
-        ));
-      }
+    if(showToken){
+      BlocProvider.of<WalletBloc>(context).add(
+          GetTokenBalanceEvent(
+              $store.net.rpc,
+              $store.net.chain,
+              $store.wal.addr,
+              token.address
+          )
+      );
+    }else{
+      BlocProvider.of<MainBloc>(context).add(GetBalanceEvent(
+        $store.net.rpc,
+        $store.net.chain,
+        $store.wal.addr,
+      ));
+    }
 
-      BlocProvider.of<WalletBloc>(context)
-        ..add(
-            ResetMessageListEvent()
-        )
-        ..add(
+    BlocProvider.of<WalletBloc>(context)
+      ..add(
+          ResetMessageListEvent()
+      )
+      ..add(
           SetEnablePullUpEvent(false)
-        )
-        ..add(
+      )
+      ..add(
           GetMessageListEvent($store.net.rpc, $store.net.chain, $store.wal.addr,'down',symbol)
-        );
-    }catch(error){}
-
+      );
   }
 
   Future onLoading(BuildContext context) async {

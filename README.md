@@ -41,7 +41,7 @@ FiveToken targets to solve the problems via developing cross-chain payment proto
 
 ### Required dependencies
 
-- Flutter (Channel stable, 1.22.5）
+- Flutter (Channel stable, 2.5.3, Tools • Dart 2.14.4）
 - Android toolchain - develop for Android devices (Android SDK )
 - Xcode - develop for iOS and macOS 
 - Android Studio 

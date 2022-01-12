@@ -81,7 +81,9 @@ Future<String> getPrivateByKek(
     var str = base64Decode(private);
     var sk = utf8.decode(str);
     return sk;
-  }catch(e){}
+  }catch(e){
+    return '';
+  }
 }
 
 

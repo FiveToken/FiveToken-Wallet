@@ -119,7 +119,9 @@ class ChainWallet {
       var str = base64Decode(private);
       var sk = utf8.decode(str);
       return sk;
-    }catch(e){}
+    }catch(e){
+      return '';
+    }
   }
 }
 
@@ -166,7 +168,11 @@ class FilecoinWallet extends ChainWallet {
           address: filAddr
       );
     } catch (e) {
-      throw (e);
+      return EncryptKey(
+          kek: '',
+          digest: '',
+          address: ''
+      );
     }
   }
 
@@ -185,7 +191,11 @@ class FilecoinWallet extends ChainWallet {
           address: filAddr,   // publicKey
          );  // value
     } catch (e) {
-      throw (e);
+      return EncryptKey(
+        kek: '',
+        digest: '',
+        address: '',   // publicKey
+      );
     }
   }
 }

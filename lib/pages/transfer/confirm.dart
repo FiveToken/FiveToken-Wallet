@@ -438,7 +438,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
 class SetGas extends StatelessWidget {
   final String maxFee;
   final ChainGas gas;
-  final double usdPrice;
+  final num usdPrice;
 
   SetGas({@required this.maxFee, this.gas, this.usdPrice});
 
