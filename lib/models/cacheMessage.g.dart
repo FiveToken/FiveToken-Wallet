@@ -24,7 +24,7 @@ class CacheMessageAdapter extends TypeAdapter<CacheMessage> {
       blockTime: fields[5] as num,
       owner: fields[2] as String,
       pending: fields[7] as num,
-      nonce: fields[8] as num,
+      nonce: fields[8] as int,
       rpc: fields[9] as String,
       gas: fields[10] as ChainGas,
       token: fields[11] as Token,

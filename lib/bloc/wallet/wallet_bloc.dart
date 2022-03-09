@@ -161,7 +161,7 @@ getInterfaceFileCoinMessageList(String rpc, String chainType,String mid,String a
           fee: map['gas_fee'] as String,
           mid: map['mid'] as String,
           symbol: "FIL",
-          nonce: map['nonce'] as num,
+          nonce: map['nonce'] as int,
         );
         messages.add(mes);
         box.put(map["cid"],mes);
@@ -215,7 +215,7 @@ upDateFileCoinMessageState(String rpc, String chainType,List<dynamic> param,pend
                 height: message['block_epoch'] as int,
                 fee: message['gas_fee'] as String,
                 mid: message['mid'] as String,
-                nonce: message['nonce'] as num
+                nonce: message['nonce'] as int
             );
             box.put(n["message"]["cid"],mes);
           }else{
@@ -309,12 +309,14 @@ deleteSpeedUpMessages(symbol){
         shouldDeleteNonce.add(mes.nonce);
       }
     });
+
     if (shouldDeleteNonce.isNotEmpty) {
       var deleteKeys = pendingList
           .where((mes) => shouldDeleteNonce.contains(mes.nonce))
           .map((mes) => mes.hash);
       box.deleteAll(deleteKeys);
     }
+
   }
 
 }

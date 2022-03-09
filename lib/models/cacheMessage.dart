@@ -23,7 +23,7 @@ class CacheMessage {
   @HiveField(7)
   num pending;
   @HiveField(8)
-  num nonce;
+  int nonce;
   @HiveField(9)
   String rpc;
   @HiveField(10)

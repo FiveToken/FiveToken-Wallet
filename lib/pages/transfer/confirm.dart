@@ -105,7 +105,13 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
             listener: (context, state) {
               if (state.messageState == 'success') {
                 showCustomToast('sended'.tr);
-                pushMsgCallBack(state.nonce, state.response.cid);
+                if(isSpeedUp){
+                  var lastMessage = pendingList.last;
+                  pushMsgCallBack(lastMessage.nonce.toInt(), state.response.cid);
+                }else{
+                  pushMsgCallBack(state.nonce, state.response.cid);
+                }
+
               }
               if (state.messageState == 'error') {
                 try{
@@ -312,7 +318,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   }
   /*
   * send transaction
-  *  @param {int} nonce: the nonce of the current account
+  *  @param {num} nonce: the nonce of the current account
   *  @param {string} ck: private key
   *  @param {context} context: context
   * */
@@ -351,11 +357,8 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
         bool valid = checkGas();
         if (valid) {
           var value = getChainValue(amount, precision: token?.precision ?? 18);
-          var realNonce = nonce;
-          var nonceKey = '$from\_${$store.net.rpc}';
-          if (nonceBoxInstance.get(nonceKey) != null) {
-            realNonce = max(nonce, nonceBoxInstance.get(nonceKey).value);
-          }
+
+
           BlocProvider.of<TransferBloc>(context).add(ResetSendMessageEvent());
           BlocProvider.of<TransferBloc>(context).add(SendTransactionEvent(
               rpc,
@@ -364,7 +367,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               to,
               value,
               ck,
-              realNonce,
+              nonce,
               $store.gas,
               isToken,
               token));
@@ -377,7 +380,7 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
   }
   /*
   * Send transaction callback function
-  * @param {int} nonce: the nonce of the current account
+  * @param {num} nonce: the nonce of the current account
   * @param {string} hash: The hash value of the transaction
   * */
   void pushMsgCallBack(int nonce, String hash) {
@@ -428,17 +431,12 @@ class TransferConfirmPageState extends State<TransferConfirmPage> {
               symbol: symbol,
               blockTime:
                   (DateTime.now().millisecondsSinceEpoch / 1000).truncate()));
-      var realNonce = nonce;
-      if (nonceBoxInstance.get(nonceKey) != null) {
-        realNonce = nonce > nonceBoxInstance.get(nonceKey).value
-            ? nonce
-            : nonceBoxInstance.get(nonceKey).value;
-      }
-      var oldNonce = nonceBoxInstance.get(nonceKey);
-      if (oldNonce != null) {
-        nonceBoxInstance.put(
-            nonceKey, Nonce(value: realNonce + 1, time: oldNonce.time));
-      }
+
+      // var storeNonce = nonceBoxInstance.get(nonceKey);
+      var now = getSecondSinceEpoch();
+      nonceBoxInstance.put(
+          nonceKey, Nonce(value: nonce + 1, time: now)
+      );
 
       if (mounted) {
         goBack();

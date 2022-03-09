@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -23,20 +24,24 @@ class TransferBloc extends Bloc<TransferEvent, TransferState> {
       String address = event.address;
       var result = await Chain.chainProvider.getNonce(address);
       var now = getSecondSinceEpoch();
-      if (result != -1) {
-        var nonceBoxInstance = OpenedBox.nonceInsance;
-        var key = '$address\_${event.rpc}';
-        if (!nonceBoxInstance.containsKey(key)) {
-          nonceBoxInstance.put(key, Nonce(time: now, value: result));
-        } else {
-          Nonce nonceInfo = nonceBoxInstance.get(key);
+      var key = '$address\_${event.rpc}';
+      var nonceBoxInstance = OpenedBox.nonceInsance;
+      Nonce storeNonce = nonceBoxInstance.get(key);
+
+      if(result != -1){
+        int realNonce;
+        if(storeNonce != null){
           var interval = 5 * 60 * 1000;
-          if (now - nonceInfo.time > interval) {
-            nonceBoxInstance.put(key, Nonce(time: now, value: result));
+          if (now - storeNonce.time > interval){
+            realNonce = result;
+          }else{
+            realNonce = max(result, storeNonce.value);
           }
+        }else{
+          realNonce = result;
         }
+        emit(state.copyWithTransferState(nonce: realNonce));
       }
-      emit(state.copyWithTransferState(nonce: result));
     });
 
     on<SendTransactionEvent>((event,emit) async{
