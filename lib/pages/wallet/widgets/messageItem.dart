@@ -1,9 +1,4 @@
-// import 'package:fil/index.dart';
-import 'dart:math';
-
-import 'package:decimal/decimal.dart';
-import 'package:fil/utils/decimal_extension.dart';
-import 'package:fil/utils/string_extension.dart';
+import 'package:fil/models/cacheMessage.dart' show CacheMessage;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/text.dart';
@@ -13,9 +8,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/routes/path.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/pages/wallet/main.dart';
 
+// Widget of message Item
 class MessageItem extends StatelessWidget {
   final CacheMessage mes;
   MessageItem(this.mes);

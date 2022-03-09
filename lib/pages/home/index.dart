@@ -6,6 +6,8 @@ import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/common/back.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
+import 'package:fil/models/nonce.dart' show Nonce;
+import 'package:fil/widgets/dialog.dart' show CommonTitle, showCustomDialog;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_root_jailbreak/flutter_root_jailbreak.dart';
@@ -29,7 +31,6 @@ import 'package:fil/widgets/bottomSheet.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/widgets/fresh.dart';
 import 'package:fil/actions/event.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/pages/wallet/main.dart';
@@ -43,6 +44,7 @@ class MainPage extends StatefulWidget {
   }
 }
 
+// main page
 class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final TextEditingController controller = TextEditingController();
   var box;
@@ -56,7 +58,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     icons: ['https://fivetoken.io/image/ft-logo.png'],
   );
 
-  Widget title(label) {
+  Widget title(String label) {
     return Text(label, style: TextStyle(color: Colors.white));
   }
 
@@ -76,7 +78,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     });
     super.dispose();
   }
-  bool _openState = false;
+
+  bool _openState = false; // lock status
 
   void passwordEnteredCallback(String pass, String enterPassCode) {
     final bool isValid = enterPassCode == pass;
@@ -88,7 +91,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     }
   }
 
-  void openLockScreen(pass) async {
+  // open the lock screen
+  void openLockScreen(String password) async {
     if (_openState == true && Global.lockscreen) return;
     _openState = true;
     await Navigator.push(context,
@@ -100,8 +104,8 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         child: PasscodeScreen(
           isValidCallback: () {},
           title: title('enterPass'.tr),
-          passwordEnteredCallback: (value) =>
-              {passwordEnteredCallback(pass, value)},
+          passwordEnteredCallback: (String value) =>
+              {passwordEnteredCallback(password, value)},
           cancelButton: title('cancel'.tr),
           deleteButton: title('delete'.tr),
           shouldTriggerVerification: _verificationNotifier0.stream,
@@ -123,10 +127,13 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         if (lock != null && lock.lockscreen == true) {
-          if(lastPopTime == null || DateTime.now().difference(lastPopTime) > Duration(seconds: 5)){
+          if (lastPopTime == null ||
+              DateTime.now().difference(lastPopTime as DateTime) >
+                  Duration(seconds: 5)) {
             lastPopTime = DateTime.now();
+            this.closeFlag = false;
             openLockScreen(lock.password);
-          }else{
+          } else {
             lastPopTime = DateTime.now();
           }
         }
@@ -139,6 +146,7 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   var lastPopTime2 = null;
+
   @override
   void initState() {
     _initWcClient();
@@ -147,21 +155,28 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     box = OpenedBox.walletInstance;
     nonceBoxInstance = OpenedBox.nonceInsance;
     if (mounted) {
-      if (Global.lockscreen&&Global.lockFromInit) {
+      if (Global.lockscreen && Global.lockFromInit) {
         var lockBox = OpenedBox.lockInstance;
         var lock = lockBox.get('lock');
         // Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
-        if(lastPopTime2 == null || DateTime.now().difference(lastPopTime2) > Duration(seconds: 5)){
+        if (lastPopTime2 == null ||
+            DateTime.now().difference(lastPopTime2 as DateTime) >
+                Duration(seconds: 5)) {
           lastPopTime2 = DateTime.now();
-          Future.delayed(Duration.zero).then((value) => openLockScreen(lock.password));
-        }else{
+          Future.delayed(Duration.zero).then((value) {
+            openLockScreen(lock.password);
+            this.closeFlag = false;
+          });
+        } else {
           lastPopTime2 = DateTime.now();
         }
-
       }
     }
   }
 
+  /*
+  * WCClient init
+  * */
   _initWcClient() async {
     _wcClient = WCClient(
       onSessionRequest: _onSessionRequest,
@@ -186,15 +201,16 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     ));
     try {
       var wcSession = Global.store.getString('wcSession');
-      if(wcSession != null && wcSession != ""){
-        WCPeerMeta _session = WCPeerMeta.fromJson(jsonDecode(wcSession));
+      if (wcSession != null && wcSession != "") {
+        WCPeerMeta _session =
+            WCPeerMeta.fromJson(jsonDecode(wcSession) as Map<String, dynamic>);
         BlocProvider.of<ConnectBloc>(context)
-          ..add(SetConnectedSessionEvent(connectedSession: _session ));
+          ..add(SetConnectedSessionEvent(connectedSession: _session));
       }
       BlocProvider.of<HomeBloc>(context).add(
           GetTokenListEvent($store.net.rpc, $store.net.chain, $store.wal.addr));
     } catch (e) {
-      throw(e);
+      throw (e);
     }
   }
 
@@ -203,305 +219,307 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return MultiBlocProvider(
       providers: [BlocProvider(create: (context) => HomeBloc())],
       child: BlocBuilder<ConnectBloc, ConnectState>(
-        builder: (context, connectState) {
-          return BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, homeState) {
-              return WillPopScope(
-                  child: Scaffold(
-                    floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-                    floatingActionButton:Visibility(
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: CustomColor.primary),
-                        child:IconButton(
-                            icon: Image(
-                              image: AssetImage('icons/wc.png'),
-                            ),
-                            onPressed:(){
-                              _walletDisconnect(context,connectState);
-                            }
+          builder: (context, connectState) {
+        return BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, homeState) {
+            return WillPopScope(
+                child: Scaffold(
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.endFloat,
+                  floatingActionButton: Visibility(
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: CustomColor.primary),
+                      child: IconButton(
+                          icon: Image(
+                            image: AssetImage('icons/wc.png'),
+                          ),
+                          onPressed: () {
+                            _walletDisconnect(context, connectState);
+                          }),
+                    ),
+                    visible: connectState.connectedSession != null,
+                  ),
+                  appBar: PreferredSize(
+                      child: AppBar(
+                        actions: [
+                          Padding(
+                            child: GestureDetector(
+                                onTap: _handleScan,
+                                child: Image(
+                                  width: 20,
+                                  image: AssetImage('icons/scan.png'),
+                                )),
+                            padding: EdgeInsets.only(right: 10),
+                          )
+                        ],
+                        backgroundColor: Colors.white,
+                        elevation: .5,
+                        leading: Builder(
+                          builder: (BuildContext context) {
+                            return IconButton(
+                              onPressed: () {
+                                Scaffold.of(context).openDrawer();
+                              },
+                              icon: IconList,
+                              alignment: NavLeadingAlign,
+                            );
+                          },
                         ),
+                        title: NetSelect(),
+                        centerTitle: true,
                       ),
-                      visible: connectState.connectedSession != null,
-                    ),
-                    appBar: PreferredSize(
-                        child: AppBar(
-                          actions: [
-                            Padding(
-                              child: GestureDetector(
-                                  onTap: _handleScan,
-                                  child: Image(
-                                    width: 20,
-                                    image: AssetImage('icons/scan.png'),
-                                  )),
-                              padding: EdgeInsets.only(right: 10),
-                            )
-                          ],
-                          backgroundColor: Colors.white,
-                          elevation: .5,
-                          leading: Builder(
-                            builder: (BuildContext context) {
-                              return IconButton(
-                                onPressed: () {
-                                  Scaffold.of(context).openDrawer();
-                                },
-                                icon: IconList,
-                                alignment: NavLeadingAlign,
-                              );
-                            },
-                          ),
-                          title: NetSelect(),
-                          centerTitle: true,
+                      preferredSize: Size.fromHeight(NavHeight)),
+                  drawer: Drawer(
+                    child: DrawerBody(),
+                  ),
+                  backgroundColor: Colors.white,
+                  body: CustomRefreshWidget(
+                    onRefresh: () => onRefresh(context),
+                    enablePullUp: false,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 25,
                         ),
-                        preferredSize: Size.fromHeight(NavHeight)),
-                    drawer: Drawer(
-                      child: DrawerBody(),
-                    ),
-                    backgroundColor: Colors.white,
-                    body: CustomRefreshWidget(
-                      onRefresh: () => onRefresh(context),
-                      enablePullUp: false,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 25,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Get.toNamed(walletSelectPage);
-                            },
-                            child: Column(
-                              children: [
-                                CoinPriceWidget(),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Obx(
-                                      () => CommonText(
-                                    $store.wal.label,
-                                    size: 14,
-                                    color: Color(0xffB4B5B7),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 18,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(walletSelectPage);
+                          },
+                          child: Column(
                             children: [
-                              Container(
-                                height: 25,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 5),
-                                child: Obx(() => CommonText(
-                                  dotString(str: $store.wal.addr),
+                              CoinPriceWidget(),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Obx(
+                                () => CommonText(
+                                  $store.wal.label,
                                   size: 14,
                                   color: Color(0xffB4B5B7),
-                                )),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Color(0xfff8f8f8)),
-                              ),
-                              SizedBox(
-                                width: 14,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  copyText($store.wal.addr);
-                                  showCustomToast('copyAddr'.tr);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                      color: CustomColor.primary,
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: Image(
-                                      fit: BoxFit.fitWidth,
-                                      width: 17,
-                                      height: 17,
-                                      image: AssetImage('icons/copy-w.png')),
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  var net = $store.net;
-                                  var wal = $store.wal;
-                                  Get.toNamed(walletMangePage,
-                                      arguments: {'net': net, 'wallet': wal});
-                                },
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                                  // alignment:Alignment.center,
-                                  decoration: BoxDecoration(
-                                      color: CustomColor.primary,
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      CommonText(
-                                        '...',
-                                        size: 14,
-                                        color: Colors.white,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
                             ],
                           ),
-                          SizedBox(
-                            height: 18,
-                          ),
-                          WalletService(mainPage),
-                          SizedBox(
-                            height: 40,
-                          ),
-                          MainTokenWidget(),
-                          Expanded(
-                              child: SingleChildScrollView(
-                                padding: EdgeInsets.only(bottom: 40),
-                                child: Column(
-                                  children: [TokenList()],
+                        ),
+                        SizedBox(
+                          height: 18,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 25,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 5),
+                              child: Obx(() => CommonText(
+                                    dotString(str: $store.wal.addr),
+                                    size: 14,
+                                    color: Color(0xffB4B5B7),
+                                  )),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Color(0xfff8f8f8)),
+                            ),
+                            SizedBox(
+                              width: 14,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                copyText($store.wal.addr);
+                                showCustomToast('copyAddr'.tr);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                    color: CustomColor.primary,
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Image(
+                                    fit: BoxFit.fitWidth,
+                                    width: 17,
+                                    height: 17,
+                                    image: AssetImage('icons/copy-w.png')),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                var net = $store.net;
+                                var wal = $store.wal;
+                                Get.toNamed(walletMangePage,
+                                    arguments: {'net': net, 'wallet': wal});
+                              },
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                // alignment:Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: CustomColor.primary,
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CommonText(
+                                      '...',
+                                      size: 14,
+                                      color: Colors.white,
+                                    )
+                                  ],
                                 ),
-                              ))
-                        ],
-                      ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 18,
+                        ),
+                        WalletService(mainPage),
+                        SizedBox(
+                          height: 40,
+                        ),
+                        MainTokenWidget(),
+                        Expanded(
+                            child: SingleChildScrollView(
+                          padding: EdgeInsets.only(bottom: 40),
+                          child: Column(
+                            children: [TokenList()],
+                          ),
+                        ))
+                      ],
                     ),
                   ),
-                  onWillPop: () async {
-                    AndroidBackTop.backDeskTop();
-                    return false;
-                  }
-              );
-            },
-          );
-        }
-      ),
+                ),
+                onWillPop: () async {
+                  AndroidBackTop.backDeskTop();
+                  return false;
+                });
+          },
+        );
+      }),
     );
   }
 
+  /*
+  * Scan the QR code
+  * */
   void _handleScan() async {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((value) async {
-      bool valid = await isValidChainAddress(value, $store.net);
+      bool valid = isValidChainAddress(value as String, $store.net);
       if (value != null && valid) {
         Get.toNamed(filTransferPage, arguments: {'to': value});
-      } else if (getValidWCLink(value) != '') {
-        _handleScanCallback(value);
+      } else if (getValidWCLink(value as String) != '') {
+        _handleScanCallback(value as String);
       }
     });
   }
 
-  void _handleScanCallback(value) {
+  /*
+  * Scan the QR code callback
+  * */
+  void _handleScanCallback(String value) {
     showCustomLoading('connecting'.tr);
     final session = WCSession.from(value);
     _wcClient.connectNewSession(session: session, peerMeta: fiveTokenMeta);
   }
 
-  void _onConnect(){}
+  // Respond to connect callback
+  void _onConnect() {}
 
-  void _onSessionClosed(int code, String reason){}
+  // Respond to disconnect callback
+  void _onSessionClosed(int code, String reason) {}
 
-  void _onSessionRequest(int id, WCPeerMeta peerMeta){
+  // Respond to connection request callback
+  void _onSessionRequest(int id, WCPeerMeta peerMeta) {
     dismissAllToast();
     showCustomModalBottomSheet(
         shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 800),
-            child: SingleChildScrollView(
-                child: Column(
-                    children:[
-                      Container(
-                        width: 100,
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: Image.network(
-                          peerMeta.url,
-                          errorBuilder: (BuildContext context, Object object, StackTrace stackTrace) {
-                            return Image(
-                              image: AssetImage('icons/wc-blue.png'),
+              constraints: BoxConstraints(maxHeight: 800),
+              child: SingleChildScrollView(
+                  child: Column(children: [
+                Container(
+                  width: 100,
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Image.network(
+                    peerMeta.url,
+                    errorBuilder: (BuildContext context, Object object,
+                        StackTrace stackTrace) {
+                      return Image(
+                        image: AssetImage('icons/wc-blue.png'),
+                      );
+                    },
+                  ),
+                ),
+                CommonText.center(peerMeta.name, size: 16, color: Colors.black),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: CommonText(peerMeta.description),
+                ),
+                Container(
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    child: Row(children: [
+                      Expanded(
+                          child: FButton(
+                        alignment: Alignment.center,
+                        height: 40,
+                        onPressed: () {
+                          Get.back();
+                        },
+                        strokeWidth: .5,
+                        strokeColor: Color(0xffcccccc),
+                        corner: FCorner.all(6),
+                        text: 'cancel'.tr,
+                      )),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                          child: FButton(
+                        text: 'connect'.tr,
+                        alignment: Alignment.center,
+                        onPressed: () {
+                          try {
+                            _wcClient.approveSession(
+                              accounts: [$store.wal.address],
+                              chainId: int.tryParse($store.net.chainId),
                             );
-                          },
-                        ),
-                      ),
-                      CommonText.center(peerMeta.name, size: 16, color: Colors.black),
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 20),
-                        child: CommonText(peerMeta.description),
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                        child: Row(
-                              children:[
-                                Expanded(
-                                    child: FButton(
-                                      alignment: Alignment.center,
-                                      height: 40,
-                                      onPressed: () {
-                                        Get.back();
-                                      },
-                                      strokeWidth: .5,
-                                      strokeColor: Color(0xffcccccc),
-                                      corner: FCorner.all(6),
-                                      text: 'cancel'.tr,
-                                    )),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Expanded(
-                                    child: FButton(
-                                      text: 'connect'.tr,
-                                      alignment: Alignment.center,
-                                      onPressed: () {
-                                        try{
-                                          _wcClient.approveSession(
-                                            accounts: [$store.wal.address],
-                                            chainId: int.tryParse($store.net.chainId),
-                                          );
-                                          var connectSession = jsonEncode(peerMeta);
-                                          BlocProvider.of<ConnectBloc>(context)
-                                            ..add(SetConnectedSessionEvent(connectedSession: peerMeta ))
-                                            ..add(SetMetaEvent(meta: fiveTokenMeta ));
-                                          Global.store.setString('wcSession', connectSession);
-                                          Get.back();
-                                        }catch(error){
-                                          throw(error);
-                                        }
-                                      },
-                                      height: 40,
-                                      style: TextStyle(color: Colors.white),
-                                      color: CustomColor.primary,
-                                      corner: FCorner.all(6),
-                                    )),
-                              ]
-                          )
-                      )
-                    ]
-                )
-            )
-          );
-        }
-    );
+                            var connectSession = jsonEncode(peerMeta);
+                            BlocProvider.of<ConnectBloc>(context)
+                              ..add(SetConnectedSessionEvent(
+                                  connectedSession: peerMeta))
+                              ..add(SetMetaEvent(meta: fiveTokenMeta));
+                            Global.store.setString('wcSession', connectSession);
+                            Get.back();
+                          } catch (error) {
+                            throw (error);
+                          }
+                        },
+                        height: 40,
+                        style: TextStyle(color: Colors.white),
+                        color: CustomColor.primary,
+                        corner: FCorner.all(6),
+                      )),
+                    ]))
+              ])));
+        });
   }
 
-  void _onSessionError(dynamic message){}
+  // Respond to connection failure callback
+  void _onSessionError(dynamic message) {}
 
-  void _walletDisconnect(context,state){
+  void _walletDisconnect(BuildContext context, state) {
     showCustomModalBottomSheet(
         shape: RoundedRectangleBorder(borderRadius: CustomRadius.top),
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return ConstrainedBox(
             constraints: BoxConstraints(maxHeight: 800),
             child: SingleChildScrollView(
@@ -511,18 +529,21 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                     width: 100,
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Image.network(
-                      state.connectedSession.url,
-                      errorBuilder: (BuildContext context, Object object, StackTrace stackTrace) {
+                      state.connectedSession.url as String,
+                      errorBuilder: (BuildContext context, Object object,
+                          StackTrace stackTrace) {
                         return Image(
                           image: AssetImage('icons/wc-blue.png'),
                         );
                       },
                     ),
                   ),
-                  CommonText.center(state.connectedSession.name, size: 16, color: Colors.black),
+                  CommonText.center(state.connectedSession.name as String,
+                      size: 16, color: Colors.black),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    child: CommonText(state.connectedSession.description),
+                    child: CommonText(
+                        state.connectedSession.description as String),
                   ),
                   Container(
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -535,25 +556,23 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
                             Get.back();
                             Global.store.remove('wcSession');
                             BlocProvider.of<ConnectBloc>(context).add(
-                                ResetConnectEvent(connectedSession: null, meta: null));
+                                ResetConnectEvent(
+                                    connectedSession: null, meta: null));
                             _wcClient.killSession();
                           } catch (error) {
-                            throw(error);
+                            throw (error);
                           }
                         },
                         height: 40,
                         style: TextStyle(color: Colors.white),
                         color: CustomColor.primary,
                         corner: FCorner.all(6),
-                      )
-                  )
+                      ))
                 ],
               ),
             ),
           );
-        }
-    );
-
+        });
   }
 
   void rootDialog() {
@@ -605,5 +624,4 @@ class MainPageState extends State<MainPage> with WidgetsBindingObserver {
       return false;
     }
   }
-
 }

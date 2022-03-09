@@ -1,7 +1,6 @@
 import 'package:fil/bloc/gas/gas_bloc.dart';
-import 'package:fil/chain/gas.dart';
-import 'package:fil/chain/index.dart';
 import 'package:fil/chain/net.dart';
+import 'package:fil/chain/wallet.dart' show ChainWallet;
 import 'package:fil/common/global.dart';
 import 'package:fil/pages/transfer/transfer.dart';
 import 'package:fil/store/store.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
@@ -34,7 +32,6 @@ void main() {
     addressType: 'eth',
     skKek: 'CGmTwXja66YS39Y3Lp5MmUWNRMx5mp8YBstteIJDpHjK9vTyoDfbahaRY6+/RF4NfhKqyzmWckA1ngd3CG+FDWzkKNeoqW9BiY4cA89D+x8=',
     digest: 'r57NXYt4/wElj612To5Rkg==',
-    groupHash: '',
     rpc: 'https://mainnet.infura.io/v3/'
   );
   $store.setNet(net);

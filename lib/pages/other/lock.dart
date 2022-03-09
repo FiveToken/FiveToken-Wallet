@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:fbutton/fbutton.dart';
 import 'package:fil/bloc/lock/lock_bloc.dart';
 import 'package:fil/chain/lock.dart';
@@ -19,7 +18,7 @@ class LockPage extends StatefulWidget {
     return LockPageState();
   }
 }
-
+// page of Lock screen
 class LockPageState extends State<LockPage> {
   bool flag = false;
 
@@ -63,7 +62,7 @@ class LockPageState extends State<LockPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             CommonText.main('lockScreen'.tr),
-            Switch(value: state.lock, onChanged: (value){
+            Switch(value: state.lock as bool, onChanged: (value){
               onSwitchChanged(context,state, value);
             }),
           ],
@@ -87,7 +86,7 @@ class LockPageState extends State<LockPage> {
               children:[ CardItem(
                 label: 'change'.tr,
                 onTap: ()=>{
-                  BlocProvider.of<LockBloc>(context).add(SetLockEvent(status: 'update',lock: state.lock, password: state.password)),
+                  BlocProvider.of<LockBloc>(context).add(SetLockEvent(status: 'update',lock: state.lock as bool, password: state.password as String)),
                   openLockScreen(context, state, 'update')
                 },
               ),
@@ -117,7 +116,7 @@ class LockPageState extends State<LockPage> {
     Future.delayed(Duration.zero).then((value) =>openLockSencondScreen(ctx, state, enterPassCode, status));
   }
 
-  Widget title(label){
+  Widget title(String label){
     return Text(label,style: TextStyle(color: Colors.white));
   }
 

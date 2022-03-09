@@ -1,5 +1,8 @@
 import 'package:fil/bloc/create/create_bloc.dart';
 import 'package:fil/common/index.dart';
+import 'package:fil/utils/enum.dart';
+import 'package:fil/common/global.dart' show DefaultWalletName;
+import 'package:fil/common/utils.dart' show genCKBase64;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -15,6 +18,7 @@ class MneCheckPage extends StatefulWidget {
   State createState() => MneCheckPageState();
 }
 
+// Pages of check Mnemonic words
 class MneCheckPageState extends State<MneCheckPage> {
   List<String> unSelectedList = [];
   List<String> selectedList = [];
@@ -26,18 +30,15 @@ class MneCheckPageState extends State<MneCheckPage> {
     list.shuffle();
     unSelectedList = list;
   }
-
-  void handleSelect(BuildContext context, state,  num index) {
+  // Check button of Mnemonic Item button
+  void handleSelect(BuildContext context, state,  int index) {
     BlocProvider.of<CreateBloc>(context).add(UpdateEvent(type: index));
   }
-
-  void handleRemove(BuildContext context,state,  num index) {
+  // Delete button of Mnemonic Item button
+  void handleRemove(BuildContext context,state,  int index) {
     BlocProvider.of<CreateBloc>(context).add(DeleteEvent(type: index));
   }
 
-  String get mneCk {
-    return genCKBase64(mne);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +54,7 @@ class MneCheckPageState extends State<MneCheckPage> {
                 return;
               }
               Get.toNamed(passwordSetPage,
-                  arguments: {'type': 0, 'mne': mne, 'label': DefaultWalletName});
+                  arguments: {'type': WalletType.id, 'mne': mne, 'label': DefaultWalletName});
             },
             footerText: 'next'.tr,
             body: SingleChildScrollView(

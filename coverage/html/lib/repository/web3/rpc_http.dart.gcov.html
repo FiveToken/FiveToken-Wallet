@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -68,23 +68,23 @@
 <a name="6"><span class="lineNum">       6 </span>            : import 'package:fil/config/config.dart';</a>
 <a name="7"><span class="lineNum">       7 </span>            : import 'package:fil/repository/web3/rpc_interceptors.dart';</a>
 <a name="8"><span class="lineNum">       8 </span>            : </a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          3 : final rpcHttp = RpcHttp();</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          6 : final rpcHttp = RpcHttp();</span></a>
 <a name="10"><span class="lineNum">      10 </span>            : </a>
 <a name="11"><span class="lineNum">      11 </span>            : class RpcHttp extends DioForNative {</a>
 <a name="12"><span class="lineNum">      12 </span>            :   static RpcHttp instance;</a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          1 :   factory RpcHttp() {</span></a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          2 :     return instance ??= RpcHttp._().._init();</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          2 :   factory RpcHttp() {</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          4 :     return instance ??= RpcHttp._().._init();</span></a>
 <a name="16"><span class="lineNum">      16 </span>            :   }</a>
 <a name="17"><span class="lineNum">      17 </span>            : </a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          1 :   RpcHttp._();</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          2 :   RpcHttp._();</span></a>
 <a name="19"><span class="lineNum">      19 </span>            : </a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          1 :   _init() async {</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          2 :     (transformer as DefaultTransformer).jsonDecodeCallback = parseJson;</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          3 :     options.connectTimeout = Config.connectTimeout;</span></a>
-<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          3 :     options.receiveTimeout = Config.receiveTimeout;</span></a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          3 :     interceptors.add(RpcHttpInterceptors());</span></a>
-<a name="25"><span class="lineNum">      25 </span><span class="lineCov">          3 :     interceptors.add(DioLogInterceptor());</span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          2 :   _init() async {</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          4 :     (transformer as DefaultTransformer).jsonDecodeCallback = parseJson;</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          6 :     options.connectTimeout = Config.connectTimeout;</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          6 :     options.receiveTimeout = Config.receiveTimeout;</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          6 :     interceptors.add(RpcHttpInterceptors());</span></a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">          6 :     interceptors.add(DioLogInterceptor());</span></a>
 <a name="26"><span class="lineNum">      26 </span>            :   }</a>
 <a name="27"><span class="lineNum">      27 </span>            : }</a>
 <a name="28"><span class="lineNum">      28 </span>            : </a>

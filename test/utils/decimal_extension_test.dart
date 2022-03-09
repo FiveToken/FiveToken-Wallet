@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:fil/utils/num_extension.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fil/utils/decimal_extension.dart';
@@ -19,5 +20,10 @@ void main() {
     var res = _decimal.fmtUp(4);
     print(res);
     expect(res, res1);
+  });
+  test("generate utils Uint8ListExtension", (){
+    Uint8List list = Uint8List(12);
+    String res1 = "AAAAAAAAAAAAAAAA";
+    expect(list.toEncode(), res1);
   });
 }

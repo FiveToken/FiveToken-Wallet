@@ -1,5 +1,4 @@
 import 'package:fil/chain/wallet.dart';
-// import 'package:fil/index.dart';
 import 'package:flutter/material.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/widgets/card.dart';
@@ -11,9 +10,8 @@ import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/utils/enum.dart';
 
-
-
 class AddressBookWalletSelect extends StatelessWidget {
+
   List<ChainWallet> get idWallets {
     var list = OpenedBox.walletInstance.values
         .where((wal) =>
@@ -23,7 +21,7 @@ class AddressBookWalletSelect extends StatelessWidget {
         .toList();
     return list;
   }
-
+ // get import wallet
   List<ChainWallet> get importWallets {
     var list = OpenedBox.walletInstance.values
         .where((wal) =>

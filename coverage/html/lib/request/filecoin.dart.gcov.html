@@ -31,13 +31,13 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">0</td>
-            <td class="headerCovTableEntry">85</td>
-            <td class="headerCovTableEntryLo">0.0 %</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">104</td>
+            <td class="headerCovTableEntryLo">35.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -77,276 +77,397 @@
 <a name="15"><span class="lineNum">      15 </span>            : import 'package:fil/repository/http/http.dart';</a>
 <a name="16"><span class="lineNum">      16 </span>            : import 'package:fil/config/config.dart';</a>
 <a name="17"><span class="lineNum">      17 </span>            : import 'package:fil/models/chain_info.dart';</a>
-<a name="18"><span class="lineNum">      18 </span>            : </a>
-<a name="19"><span class="lineNum">      19 </span>            : class Filecoin extends ChainProvider {</a>
-<a name="20"><span class="lineNum">      20 </span>            :   Dio client;</a>
-<a name="21"><span class="lineNum">      21 </span>            :   static String balancePath = '/actor/balance';</a>
-<a name="22"><span class="lineNum">      22 </span>            :   static String pushPath = '/message';</a>
-<a name="23"><span class="lineNum">      23 </span>            :   static String messageListPath = '/actor/messages';</a>
-<a name="24"><span class="lineNum">      24 </span>            :   static String feePath = '/recommend/fee';</a>
-<a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 :   static String clientId = Config.clientID;</span></a>
-<a name="26"><span class="lineNum">      26 </span>            :   static String messagePending = '/message/pending';</a>
-<a name="27"><span class="lineNum">      27 </span>            :   static String tokenPrice = '/token/prices';</a>
-<a name="28"><span class="lineNum">      28 </span>            :   static String addrCheck = '/address/check';</a>
-<a name="29"><span class="lineNum">      29 </span>            : </a>
-<a name="30"><span class="lineNum">      30 </span><span class="lineNoCov">          0 :   Filecoin(String rpc, {Dio httpClient}) {</span></a>
-<a name="31"><span class="lineNum">      31 </span><span class="lineNoCov">          0 :     this.rpc = rpc;</span></a>
-<a name="32"><span class="lineNum">      32 </span><span class="lineNoCov">          0 :     client = httpClient ?? http;</span></a>
-<a name="33"><span class="lineNum">      33 </span><span class="lineNoCov">          0 :     client.options.baseUrl = rpc + '/api$clientId';</span></a>
-<a name="34"><span class="lineNum">      34 </span>            :   }</a>
-<a name="35"><span class="lineNum">      35 </span>            : </a>
-<a name="36"><span class="lineNum">      36 </span>            :   @override</a>
-<a name="37"><span class="lineNum">      37 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getBalance(String address) async {</span></a>
-<a name="38"><span class="lineNum">      38 </span>            :     String balance = '0';</a>
-<a name="39"><span class="lineNum">      39 </span>            :     try {</a>
-<a name="40"><span class="lineNum">      40 </span><span class="lineNoCov">          0 :       var result =  await client.get(balancePath, queryParameters: {'actor': address});</span></a>
-<a name="41"><span class="lineNum">      41 </span><span class="lineNoCov">          0 :         if(result.data != null){</span></a>
-<a name="42"><span class="lineNum">      42 </span><span class="lineNoCov">          0 :           balance = result.data['balance'];</span></a>
-<a name="43"><span class="lineNum">      43 </span>            :         }</a>
-<a name="44"><span class="lineNum">      44 </span>            :       return balance;</a>
-<a name="45"><span class="lineNum">      45 </span>            :     } catch (e) {</a>
-<a name="46"><span class="lineNum">      46 </span>            :       return balance;</a>
-<a name="47"><span class="lineNum">      47 </span>            :     }</a>
-<a name="48"><span class="lineNum">      48 </span>            :   }</a>
-<a name="49"><span class="lineNum">      49 </span>            : </a>
-<a name="50"><span class="lineNum">      50 </span>            :   @override</a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :   Future&lt;ChainInfo&gt; getBlockByNumber(int number) async{</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :     return ChainInfo(</span></a>
-<a name="53"><span class="lineNum">      53 </span>            :       gasUsed: 0,</a>
-<a name="54"><span class="lineNum">      54 </span>            :       gasLimit:0,</a>
-<a name="55"><span class="lineNum">      55 </span>            :       number:0,</a>
-<a name="56"><span class="lineNum">      56 </span>            :       timestamp: 0,</a>
-<a name="57"><span class="lineNum">      57 </span>            :     );</a>
-<a name="58"><span class="lineNum">      58 </span>            :   }</a>
-<a name="59"><span class="lineNum">      59 </span>            : </a>
-<a name="60"><span class="lineNum">      60 </span>            :   @override</a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineNoCov">          0 :   Future&lt;TransactionResponse&gt; sendTransaction(</span></a>
-<a name="62"><span class="lineNum">      62 </span>            :       String from,</a>
-<a name="63"><span class="lineNum">      63 </span>            :       String to,</a>
-<a name="64"><span class="lineNum">      64 </span>            :       String amount,</a>
-<a name="65"><span class="lineNum">      65 </span>            :       String private,</a>
-<a name="66"><span class="lineNum">      66 </span>            :       ChainGas gas,</a>
-<a name="67"><span class="lineNum">      67 </span>            :       int nonce,</a>
-<a name="68"><span class="lineNum">      68 </span>            :   ) async {</a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :     var msg = TMessage(</span></a>
-<a name="70"><span class="lineNum">      70 </span>            :         version: 0,</a>
-<a name="71"><span class="lineNum">      71 </span>            :         method: 0,</a>
-<a name="72"><span class="lineNum">      72 </span>            :         nonce: nonce,</a>
-<a name="73"><span class="lineNum">      73 </span>            :         from: from,</a>
-<a name="74"><span class="lineNum">      74 </span>            :         to: to,</a>
-<a name="75"><span class="lineNum">      75 </span>            :         params: &quot;&quot;,</a>
-<a name="76"><span class="lineNum">      76 </span>            :         value: amount,</a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :         gasFeeCap: gas.gasFeeCap,</span></a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :         gasLimit: gas.gasLimit,</span></a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :         gasPremium: gas.gasPremium);</span></a>
+<a name="18"><span class="lineNum">      18 </span>            : import 'package:fil/common/shared_preferences.dart';</a>
+<a name="19"><span class="lineNum">      19 </span>            : import 'package:fil/common/cryptography.dart';</a>
+<a name="20"><span class="lineNum">      20 </span>            : </a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          1 : Future fetchPing() async {</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          1 :   List&lt;String&gt; hostList = [];</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          2 :   for (var i = 1; i &lt; 16; i++) {</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          3 :     String hash = await sha256hash('fivetoken${i}');</span></a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">          2 :     String hostMid = hash.substring(0, 4) +</span></a>
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">          5 :         hash.substring(hash.length - 9, hash.length - 1);</span></a>
+<a name="27"><span class="lineNum">      27 </span><span class="lineCov">          1 :     String host = 'https://api${hostMid}.xyz/api/7om8n3ri4v23pjjfs4ozctlb';</span></a>
+<a name="28"><span class="lineNum">      28 </span><span class="lineCov">          1 :     hostList.add(host);</span></a>
+<a name="29"><span class="lineNum">      29 </span>            :   }</a>
+<a name="30"><span class="lineNum">      30 </span>            :   try {</a>
+<a name="31"><span class="lineNum">      31 </span><span class="lineCov">          6 :     final one = await Future.any(hostList.map((e) =&gt; _callPing(e + '/ping')));</span></a>
+<a name="32"><span class="lineNum">      32 </span><span class="lineCov">          4 :     await PreferencesManagerX().setString('host', one.data as String);</span></a>
+<a name="33"><span class="lineNum">      33 </span>            :     return one;</a>
+<a name="34"><span class="lineNum">      34 </span>            :   } catch (e) {</a>
+<a name="35"><span class="lineNum">      35 </span><span class="lineNoCov">          0 :     print(e);</span></a>
+<a name="36"><span class="lineNum">      36 </span>            :   }</a>
+<a name="37"><span class="lineNum">      37 </span>            : </a>
+<a name="38"><span class="lineNum">      38 </span>            : }</a>
+<a name="39"><span class="lineNum">      39 </span>            : </a>
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          1 : Future _callPing(String url) async {</span></a>
+<a name="41"><span class="lineNum">      41 </span>            :   try {</a>
+<a name="42"><span class="lineNum">      42 </span><span class="lineCov">          3 :     return await http.get(url);</span></a>
+<a name="43"><span class="lineNum">      43 </span>            :   }</a>
+<a name="44"><span class="lineNum">      44 </span>            :   catch (e) {</a>
+<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          3 :     await Future.delayed(Duration(seconds: 30));</span></a>
+<a name="46"><span class="lineNum">      46 </span>            :   }</a>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<a name="48"><span class="lineNum">      48 </span>            : </a>
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">          1 : String GetBaseUrl() {</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">          2 :   String host = PreferencesManagerX().getString('host') as String;</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          1 :   return host != null ? host + &quot;/api/7om8n3ri4v23pjjfs4ozctlb&quot; : 'https://api.fivetoken.io/api/7om8n3ri4v23pjjfs4ozctlb';</span></a>
+<a name="52"><span class="lineNum">      52 </span>            : }</a>
+<a name="53"><span class="lineNum">      53 </span>            : </a>
+<a name="54"><span class="lineNum">      54 </span>            : class Filecoin extends ChainProvider {</a>
+<a name="55"><span class="lineNum">      55 </span>            :   Dio client;</a>
+<a name="56"><span class="lineNum">      56 </span>            :   static String balancePath = '/actor/balance';</a>
+<a name="57"><span class="lineNum">      57 </span>            :   static String pushPath = '/message';</a>
+<a name="58"><span class="lineNum">      58 </span>            :   static String messageListPath = '/actor/messages';</a>
+<a name="59"><span class="lineNum">      59 </span>            :   static String feePath = '/recommend/fee';</a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :   static String clientId = Config.clientID;</span></a>
+<a name="61"><span class="lineNum">      61 </span>            :   static String messagePending = '/message/pending';</a>
+<a name="62"><span class="lineNum">      62 </span>            :   static String tokenPrice = '/token/prices';</a>
+<a name="63"><span class="lineNum">      63 </span>            :   static String addrCheck = '/address/check';</a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          1 :   static String baseUrl (){</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          1 :     return GetBaseUrl();</span></a>
+<a name="66"><span class="lineNum">      66 </span>            :   }</a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineCov">          1 :   Filecoin(String rpc, {Dio httpClient}) {</span></a>
+<a name="68"><span class="lineNum">      68 </span><span class="lineCov">          1 :     this.rpc = rpc;</span></a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">          2 :     client = httpClient ?? http;</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          5 :     client.options.baseUrl = rpc =='https://api.fivetoken.io' ? baseUrl(): rpc + '/api$clientId';</span></a>
+<a name="71"><span class="lineNum">      71 </span>            :   }</a>
+<a name="72"><span class="lineNum">      72 </span>            : </a>
+<a name="73"><span class="lineNum">      73 </span>            :   /*</a>
+<a name="74"><span class="lineNum">      74 </span>            :   * Gets the balance of the account with the specified address.</a>
+<a name="75"><span class="lineNum">      75 </span>            :   * @param {string} address: The address where the balance needs to be obtained</a>
+<a name="76"><span class="lineNum">      76 </span>            :   * */</a>
+<a name="77"><span class="lineNum">      77 </span>            :   @override</a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getBalance(String address) async {</span></a>
+<a name="79"><span class="lineNum">      79 </span>            :     String balance = '0';</a>
 <a name="80"><span class="lineNum">      80 </span>            :     try {</a>
-<a name="81"><span class="lineNum">      81 </span>            :       String sign = '';</a>
-<a name="82"><span class="lineNum">      82 </span>            :       num signType;</a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :       var cid = await Flotus.messageCid(msg: jsonEncode(msg));</span></a>
-<a name="84"><span class="lineNum">      84 </span><span class="lineNoCov">          0 :       if (from[1] == '1') {</span></a>
-<a name="85"><span class="lineNum">      85 </span>            :         signType = SignTypeSecp;</a>
-<a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :         sign = await Flotus.secpSign(ck: private, msg: cid);</span></a>
-<a name="87"><span class="lineNum">      87 </span>            :       } else {</a>
-<a name="88"><span class="lineNum">      88 </span>            :         signType = SignTypeBls;</a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineNoCov">          0 :         sign = await Bls.cksign(num: &quot;$private $cid&quot;);</span></a>
-<a name="90"><span class="lineNum">      90 </span>            :       }</a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :       var sm = SignedMessage(msg, Signature(signType, sign));</span></a>
-<a name="92"><span class="lineNum">      92 </span>            :       String res = '';</a>
-<a name="93"><span class="lineNum">      93 </span><span class="lineNoCov">          0 :       var result = await client.post(</span></a>
-<a name="94"><span class="lineNum">      94 </span>            :           pushPath,</a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineNoCov">          0 :           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}</span></a>
-<a name="96"><span class="lineNum">      96 </span>            :       );</a>
-<a name="97"><span class="lineNum">      97 </span><span class="lineNoCov">          0 :       return TransactionResponse(</span></a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineNoCov">          0 :         cid:result.toString(), message:''</span></a>
-<a name="99"><span class="lineNum">      99 </span>            :       );</a>
-<a name="100"><span class="lineNum">     100 </span>            :     } catch (e) {</a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineNoCov">          0 :       return TransactionResponse(</span></a>
-<a name="102"><span class="lineNum">     102 </span>            :         cid:'',</a>
-<a name="103"><span class="lineNum">     103 </span><span class="lineNoCov">          0 :         message: e.message</span></a>
-<a name="104"><span class="lineNum">     104 </span>            :       );</a>
-<a name="105"><span class="lineNum">     105 </span>            :     }</a>
-<a name="106"><span class="lineNum">     106 </span>            :   }</a>
-<a name="107"><span class="lineNum">     107 </span>            : </a>
-<a name="108"><span class="lineNum">     108 </span>            :   @override</a>
-<a name="109"><span class="lineNum">     109 </span><span class="lineNoCov">          0 :   Future&lt;List&gt; getFileCoinMessageList(</span></a>
-<a name="110"><span class="lineNum">     110 </span>            :       {String actor = '',</a>
-<a name="111"><span class="lineNum">     111 </span>            :         String direction = 'down',</a>
-<a name="112"><span class="lineNum">     112 </span>            :         String mid = '',</a>
-<a name="113"><span class="lineNum">     113 </span>            :         int limit = 10}) async {</a>
-<a name="114"><span class="lineNum">     114 </span><span class="lineNoCov">          0 :     List list = [];</span></a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineNoCov">          0 :     var res = await client.get(messageListPath, queryParameters: {</span></a>
-<a name="116"><span class="lineNum">     116 </span>            :       'actor': actor,</a>
-<a name="117"><span class="lineNum">     117 </span>            :       'direction': direction,</a>
-<a name="118"><span class="lineNum">     118 </span>            :       'mid': mid,</a>
-<a name="119"><span class="lineNum">     119 </span>            :       'limit': limit</a>
-<a name="120"><span class="lineNum">     120 </span>            :     });</a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineNoCov">          0 :     if( res.data is Map &amp;&amp;  res.data['messages'] is List){</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :         list = res.data['messages'];</span></a>
-<a name="123"><span class="lineNum">     123 </span>            :     }</a>
-<a name="124"><span class="lineNum">     124 </span>            :     return list;</a>
-<a name="125"><span class="lineNum">     125 </span>            :   }</a>
-<a name="126"><span class="lineNum">     126 </span>            : </a>
-<a name="127"><span class="lineNum">     127 </span>            : </a>
-<a name="128"><span class="lineNum">     128 </span>            :   @override</a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 :   Future&lt;GasResponse&gt; getGas({String to, bool isToken = false, Token token}) async {</span></a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :     var empty = GasResponse();</span></a>
-<a name="131"><span class="lineNum">     131 </span>            :     try{</a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 :       var result = await client</span></a>
-<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 :           .get(feePath, queryParameters: {'method': 'Send', 'actor': to});</span></a>
-<a name="134"><span class="lineNum">     134 </span><span class="lineNoCov">          0 :       var res = result.data;</span></a>
-<a name="135"><span class="lineNum">     135 </span>            :       if (res != null){</a>
-<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :         var limit = res['gas_limit'] ?? 0;</span></a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :         var premium = res['gas_premium'] ?? '100000';</span></a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineNoCov">          0 :         var feeCap = res['gas_cap'] ?? '0';</span></a>
-<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :         var premiumNum = int.tryParse(premium) ?? 0;</span></a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineNoCov">          0 :         var feeCapNum = int.tryParse(feeCap) ?? 0;</span></a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
-<a name="142"><span class="lineNum">     142 </span>            :             gasState: &quot;success&quot;,</a>
-<a name="143"><span class="lineNum">     143 </span>            :             message: '',</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :             gasFeeCap: feeCapNum.toString(),</span></a>
-<a name="145"><span class="lineNum">     145 </span><span class="lineNoCov">          0 :             gasPremium: premiumNum.toString(),</span></a>
-<a name="146"><span class="lineNum">     146 </span>            :             gasLimit: limit</a>
-<a name="147"><span class="lineNum">     147 </span>            :         );</a>
-<a name="148"><span class="lineNum">     148 </span>            :       }else{</a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
-<a name="150"><span class="lineNum">     150 </span>            :             gasState: &quot;error&quot;,</a>
-<a name="151"><span class="lineNum">     151 </span>            :             message: ''</a>
-<a name="152"><span class="lineNum">     152 </span>            :         );</a>
-<a name="153"><span class="lineNum">     153 </span>            :       }</a>
-<a name="154"><span class="lineNum">     154 </span>            :     }catch(error){</a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineNoCov">          0 :       if(error.message.isNotEmpty){</span></a>
-<a name="156"><span class="lineNum">     156 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
-<a name="157"><span class="lineNum">     157 </span>            :             gasState: &quot;error&quot;,</a>
-<a name="158"><span class="lineNum">     158 </span><span class="lineNoCov">          0 :             message: error.message</span></a>
-<a name="159"><span class="lineNum">     159 </span>            :         );</a>
-<a name="160"><span class="lineNum">     160 </span>            :       }else{</a>
-<a name="161"><span class="lineNum">     161 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
-<a name="162"><span class="lineNum">     162 </span>            :             gasState: &quot;error&quot;,</a>
-<a name="163"><span class="lineNum">     163 </span>            :             message: ''</a>
-<a name="164"><span class="lineNum">     164 </span>            :         );</a>
-<a name="165"><span class="lineNum">     165 </span>            :       }</a>
-<a name="166"><span class="lineNum">     166 </span>            :     }</a>
-<a name="167"><span class="lineNum">     167 </span>            :   }</a>
-<a name="168"><span class="lineNum">     168 </span>            : </a>
-<a name="169"><span class="lineNum">     169 </span>            :   @override</a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :   Future&lt;List&gt; getMessagePendingState(List param) async{</span></a>
-<a name="171"><span class="lineNum">     171 </span>            :     try {</a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :       var result =  await client.post(messagePending, data: param );</span></a>
-<a name="173"><span class="lineNum">     173 </span><span class="lineNoCov">          0 :       return result.data ?? [];</span></a>
-<a name="174"><span class="lineNum">     174 </span>            :     } catch (e) {</a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 :       return [];</span></a>
-<a name="176"><span class="lineNum">     176 </span>            :     }</a>
-<a name="177"><span class="lineNum">     177 </span>            :   }</a>
-<a name="178"><span class="lineNum">     178 </span>            : </a>
-<a name="179"><span class="lineNum">     179 </span>            :   @override</a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineNoCov">          0 :   Future&lt;int&gt; getNonce(String address) async {</span></a>
-<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 :     var nonce = -1;</span></a>
-<a name="182"><span class="lineNum">     182 </span>            :     try {</a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 :       var res = await client.get(balancePath, queryParameters: {'actor': address});</span></a>
-<a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :       return res.data[&quot;nonce&quot;] ?? -1;</span></a>
-<a name="185"><span class="lineNum">     185 </span>            :     } catch (e) {</a>
-<a name="186"><span class="lineNum">     186 </span><span class="lineNoCov">          0 :       return -1;</span></a>
-<a name="187"><span class="lineNum">     187 </span>            :     }</a>
-<a name="188"><span class="lineNum">     188 </span>            :   }</a>
-<a name="189"><span class="lineNum">     189 </span>            : </a>
-<a name="190"><span class="lineNum">     190 </span>            :   @override</a>
-<a name="191"><span class="lineNum">     191 </span><span class="lineNoCov">          0 :   Future&lt;bool&gt; addressCheck(String address) async{</span></a>
-<a name="192"><span class="lineNum">     192 </span>            :     try {</a>
-<a name="193"><span class="lineNum">     193 </span><span class="lineNoCov">          0 :       var res = await client.get(addrCheck, queryParameters: {'address': address});</span></a>
-<a name="194"><span class="lineNum">     194 </span><span class="lineNoCov">          0 :       if(res.data == 'ok'){</span></a>
-<a name="195"><span class="lineNum">     195 </span>            :         return true;</a>
-<a name="196"><span class="lineNum">     196 </span>            :       }else{</a>
-<a name="197"><span class="lineNum">     197 </span>            :         return false;</a>
-<a name="198"><span class="lineNum">     198 </span>            :       }</a>
-<a name="199"><span class="lineNum">     199 </span>            :     } catch (e) {</a>
-<a name="200"><span class="lineNum">     200 </span>            :       return false;</a>
-<a name="201"><span class="lineNum">     201 </span>            :     }</a>
-<a name="202"><span class="lineNum">     202 </span>            :   }</a>
-<a name="203"><span class="lineNum">     203 </span>            : </a>
-<a name="204"><span class="lineNum">     204 </span>            :   @override</a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :   Future getTransactionReceipt(String hash) async{</span></a>
-<a name="206"><span class="lineNum">     206 </span>            :     return null;</a>
-<a name="207"><span class="lineNum">     207 </span>            :   }</a>
-<a name="208"><span class="lineNum">     208 </span>            : </a>
-<a name="209"><span class="lineNum">     209 </span>            :   @override</a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getBalanceOfToken(String mainAddress,String tokenAddress) async{</span></a>
-<a name="211"><span class="lineNum">     211 </span>            :     return '0';</a>
-<a name="212"><span class="lineNum">     212 </span>            :   }</a>
-<a name="213"><span class="lineNum">     213 </span>            : </a>
-<a name="214"><span class="lineNum">     214 </span>            :   @override</a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getMaxPriorityFeePerGas() async{</span></a>
-<a name="216"><span class="lineNum">     216 </span>            :     return &quot;0&quot;;</a>
-<a name="217"><span class="lineNum">     217 </span>            :   }</a>
-<a name="218"><span class="lineNum">     218 </span>            : </a>
-<a name="219"><span class="lineNum">     219 </span>            :   @override</a>
-<a name="220"><span class="lineNum">     220 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getMaxFeePerGas() async{</span></a>
-<a name="221"><span class="lineNum">     221 </span>            :     return &quot;0&quot;;</a>
-<a name="222"><span class="lineNum">     222 </span>            :   }</a>
-<a name="223"><span class="lineNum">     223 </span>            : </a>
-<a name="224"><span class="lineNum">     224 </span>            :   @override</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :   Future&lt;TransactionResponse&gt; sendToken(</span></a>
-<a name="226"><span class="lineNum">     226 </span>            :       {String to,</a>
-<a name="227"><span class="lineNum">     227 </span>            :         String amount,</a>
-<a name="228"><span class="lineNum">     228 </span>            :         String private,</a>
-<a name="229"><span class="lineNum">     229 </span>            :         ChainGas gas,</a>
-<a name="230"><span class="lineNum">     230 </span>            :         String addr,</a>
-<a name="231"><span class="lineNum">     231 </span>            :         int nonce}</a>
-<a name="232"><span class="lineNum">     232 </span>            :   ) async{</a>
-<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :     return TransactionResponse(</span></a>
-<a name="234"><span class="lineNum">     234 </span>            :       cid: '',</a>
-<a name="235"><span class="lineNum">     235 </span>            :       message: ''</a>
-<a name="236"><span class="lineNum">     236 </span>            :     );</a>
-<a name="237"><span class="lineNum">     237 </span>            :   }</a>
-<a name="238"><span class="lineNum">     238 </span>            : </a>
-<a name="239"><span class="lineNum">     239 </span>            :   @override</a>
-<a name="240"><span class="lineNum">     240 </span><span class="lineNoCov">          0 :   Future&lt;String&gt; getNetworkId() async{</span></a>
-<a name="241"><span class="lineNum">     241 </span>            :     return '';</a>
-<a name="242"><span class="lineNum">     242 </span>            :   }</a>
-<a name="243"><span class="lineNum">     243 </span>            : </a>
-<a name="244"><span class="lineNum">     244 </span>            :   @override</a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :   Future&lt;TokenInfo&gt; getTokenInfo(String address) async{</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :     return TokenInfo(</span></a>
-<a name="247"><span class="lineNum">     247 </span>            :         symbol: '',</a>
-<a name="248"><span class="lineNum">     248 </span>            :         precision:&quot;0&quot;</a>
-<a name="249"><span class="lineNum">     249 </span>            :     );</a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineNoCov">          0 :       var result =  await client.get(balancePath, queryParameters: {'actor': address});</span></a>
+<a name="82"><span class="lineNum">      82 </span><span class="lineNoCov">          0 :         if(result.data != null){</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :           balance = result.data['balance'] as String;</span></a>
+<a name="84"><span class="lineNum">      84 </span>            :         }</a>
+<a name="85"><span class="lineNum">      85 </span>            :       return balance;</a>
+<a name="86"><span class="lineNum">      86 </span>            :     } catch (e) {</a>
+<a name="87"><span class="lineNum">      87 </span>            :       return balance;</a>
+<a name="88"><span class="lineNum">      88 </span>            :     }</a>
+<a name="89"><span class="lineNum">      89 </span>            :   }</a>
+<a name="90"><span class="lineNum">      90 </span>            : </a>
+<a name="91"><span class="lineNum">      91 </span>            :   /*</a>
+<a name="92"><span class="lineNum">      92 </span>            :   * Returns the message of block number</a>
+<a name="93"><span class="lineNum">      93 </span>            :   * */</a>
+<a name="94"><span class="lineNum">      94 </span>            :   @override</a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          1 :   Future&lt;ChainInfo&gt; getBlockByNumber(int number) async{</span></a>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          1 :     return ChainInfo(</span></a>
+<a name="97"><span class="lineNum">      97 </span>            :       gasUsed: 0,</a>
+<a name="98"><span class="lineNum">      98 </span>            :       gasLimit:0,</a>
+<a name="99"><span class="lineNum">      99 </span>            :       number:0,</a>
+<a name="100"><span class="lineNum">     100 </span>            :       timestamp: 0,</a>
+<a name="101"><span class="lineNum">     101 </span>            :     );</a>
+<a name="102"><span class="lineNum">     102 </span>            :   }</a>
+<a name="103"><span class="lineNum">     103 </span>            : </a>
+<a name="104"><span class="lineNum">     104 </span>            :   /*</a>
+<a name="105"><span class="lineNum">     105 </span>            :   * Returns a hash of the transaction which, after the transaction has been included in a mined block,</a>
+<a name="106"><span class="lineNum">     106 </span>            :   * can be used to obtain detailed information about the transaction.</a>
+<a name="107"><span class="lineNum">     107 </span>            :   * @param {string} from: sending transaction from address</a>
+<a name="108"><span class="lineNum">     108 </span>            :   * @param {string} to:  sending transaction to address</a>
+<a name="109"><span class="lineNum">     109 </span>            :   * @param {String} amount：Amount sent</a>
+<a name="110"><span class="lineNum">     110 </span>            :   * @param {String} private：private of sending transactions</a>
+<a name="111"><span class="lineNum">     111 </span>            :   * @param {int} nonce：nonce of sending transactions</a>
+<a name="112"><span class="lineNum">     112 </span>            :   * */</a>
+<a name="113"><span class="lineNum">     113 </span>            :   @override</a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineNoCov">          0 :   Future&lt;TransactionResponse&gt; sendTransaction(</span></a>
+<a name="115"><span class="lineNum">     115 </span>            :       String from,</a>
+<a name="116"><span class="lineNum">     116 </span>            :       String to,</a>
+<a name="117"><span class="lineNum">     117 </span>            :       String amount,</a>
+<a name="118"><span class="lineNum">     118 </span>            :       String private,</a>
+<a name="119"><span class="lineNum">     119 </span>            :       ChainGas gas,</a>
+<a name="120"><span class="lineNum">     120 </span>            :       int nonce,</a>
+<a name="121"><span class="lineNum">     121 </span>            :   ) async {</a>
+<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 :     var msg = TMessage(</span></a>
+<a name="123"><span class="lineNum">     123 </span>            :         version: 0,</a>
+<a name="124"><span class="lineNum">     124 </span>            :         method: 0,</a>
+<a name="125"><span class="lineNum">     125 </span>            :         nonce: nonce,</a>
+<a name="126"><span class="lineNum">     126 </span>            :         from: from,</a>
+<a name="127"><span class="lineNum">     127 </span>            :         to: to,</a>
+<a name="128"><span class="lineNum">     128 </span>            :         params: &quot;&quot;,</a>
+<a name="129"><span class="lineNum">     129 </span>            :         value: amount,</a>
+<a name="130"><span class="lineNum">     130 </span><span class="lineNoCov">          0 :         gasFeeCap: gas.gasFeeCap,</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineNoCov">          0 :         gasLimit: gas.gasLimit,</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineNoCov">          0 :         gasPremium: gas.gasPremium);</span></a>
+<a name="133"><span class="lineNum">     133 </span>            :     try {</a>
+<a name="134"><span class="lineNum">     134 </span>            :       String sign = '';</a>
+<a name="135"><span class="lineNum">     135 </span>            :       num signType;</a>
+<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :       var cid = await Flotus.messageCid(msg: jsonEncode(msg));</span></a>
+<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :       if (from[1] == '1') {</span></a>
+<a name="138"><span class="lineNum">     138 </span>            :         signType = SignTypeSecp;</a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :         sign = await Flotus.secpSign(ck: private, msg: cid);</span></a>
+<a name="140"><span class="lineNum">     140 </span>            :       } else {</a>
+<a name="141"><span class="lineNum">     141 </span>            :         signType = SignTypeBls;</a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineNoCov">          0 :         sign = await Bls.cksign(num: &quot;$private $cid&quot;);</span></a>
+<a name="143"><span class="lineNum">     143 </span>            :       }</a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineNoCov">          0 :       var sm = SignedMessage(msg, Signature(signType, sign));</span></a>
+<a name="145"><span class="lineNum">     145 </span>            :       String res = '';</a>
+<a name="146"><span class="lineNum">     146 </span><span class="lineNoCov">          0 :       var result = await client.post(</span></a>
+<a name="147"><span class="lineNum">     147 </span>            :           pushPath,</a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineNoCov">          0 :           data: {'cid': cid, 'raw': jsonEncode(sm.toLotusSignedMessage())}</span></a>
+<a name="149"><span class="lineNum">     149 </span>            :       );</a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineNoCov">          0 :       return TransactionResponse(</span></a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineNoCov">          0 :         cid:result.toString(), message:''</span></a>
+<a name="152"><span class="lineNum">     152 </span>            :       );</a>
+<a name="153"><span class="lineNum">     153 </span>            :     } catch (e) {</a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :       return TransactionResponse(</span></a>
+<a name="155"><span class="lineNum">     155 </span>            :         cid:'',</a>
+<a name="156"><span class="lineNum">     156 </span><span class="lineNoCov">          0 :         message: e.message as String</span></a>
+<a name="157"><span class="lineNum">     157 </span>            :       );</a>
+<a name="158"><span class="lineNum">     158 </span>            :     }</a>
+<a name="159"><span class="lineNum">     159 </span>            :   }</a>
+<a name="160"><span class="lineNum">     160 </span>            : </a>
+<a name="161"><span class="lineNum">     161 </span>            :   /*</a>
+<a name="162"><span class="lineNum">     162 </span>            :   * get fileCoin messages list</a>
+<a name="163"><span class="lineNum">     163 </span>            :   * @param {string} actor:address to query</a>
+<a name="164"><span class="lineNum">     164 </span>            :   * @param {string} direction : up or down, indicating the operation action of the client, up means swiping up, pulling from the latest news to historical news; down means pulling down to refresh, pulling the latest news</a>
+<a name="165"><span class="lineNum">     165 </span>            :   * @param {string} mid : The message MID of the pagination reference, obtained from the first or last entry in the query list, is a numeric string, not a CID</a>
+<a name="166"><span class="lineNum">     166 </span>            :   * @param {int} limit: Number of bars</a>
+<a name="167"><span class="lineNum">     167 </span>            :   * */</a>
+<a name="168"><span class="lineNum">     168 </span>            :   @override</a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :   Future&lt;List&gt; getFileCoinMessageList(</span></a>
+<a name="170"><span class="lineNum">     170 </span>            :       {String actor = '',</a>
+<a name="171"><span class="lineNum">     171 </span>            :         String direction = 'down',</a>
+<a name="172"><span class="lineNum">     172 </span>            :         String mid = '',</a>
+<a name="173"><span class="lineNum">     173 </span>            :         int limit = 10}) async {</a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :     List list = [];</span></a>
+<a name="175"><span class="lineNum">     175 </span><span class="lineNoCov">          0 :     var res = await client.get(messageListPath, queryParameters: {</span></a>
+<a name="176"><span class="lineNum">     176 </span>            :       'actor': actor,</a>
+<a name="177"><span class="lineNum">     177 </span>            :       'direction': direction,</a>
+<a name="178"><span class="lineNum">     178 </span>            :       'mid': mid,</a>
+<a name="179"><span class="lineNum">     179 </span>            :       'limit': limit</a>
+<a name="180"><span class="lineNum">     180 </span>            :     });</a>
+<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 :     if( res.data is Map &amp;&amp;  res.data['messages'] is List){</span></a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineNoCov">          0 :         list = res.data['messages'] as List&lt;dynamic&gt;;</span></a>
+<a name="183"><span class="lineNum">     183 </span>            :     }</a>
+<a name="184"><span class="lineNum">     184 </span>            :     return list;</a>
+<a name="185"><span class="lineNum">     185 </span>            :   }</a>
+<a name="186"><span class="lineNum">     186 </span>            : </a>
+<a name="187"><span class="lineNum">     187 </span>            :   /*</a>
+<a name="188"><span class="lineNum">     188 </span>            :   * Get fee</a>
+<a name="189"><span class="lineNum">     189 </span>            :   * @param {string} from: sending transaction from address</a>
+<a name="190"><span class="lineNum">     190 </span>            :   * @param {string} to:  sending transaction to address</a>
+<a name="191"><span class="lineNum">     191 </span>            :   * @param {bool} isToken: is it a token</a>
+<a name="192"><span class="lineNum">     192 </span>            :   * @param {Token} token: Token Information</a>
+<a name="193"><span class="lineNum">     193 </span>            :   * */</a>
+<a name="194"><span class="lineNum">     194 </span>            :   @override</a>
+<a name="195"><span class="lineNum">     195 </span><span class="lineNoCov">          0 :   Future&lt;GasResponse&gt; getGas({String from,String to, bool isToken = false, Token token}) async {</span></a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :     var empty = GasResponse();</span></a>
+<a name="197"><span class="lineNum">     197 </span>            :     try{</a>
+<a name="198"><span class="lineNum">     198 </span><span class="lineNoCov">          0 :       var result = await client</span></a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :           .get(feePath, queryParameters: {'method': 'Send', 'actor': to});</span></a>
+<a name="200"><span class="lineNum">     200 </span><span class="lineNoCov">          0 :       var res = result.data;</span></a>
+<a name="201"><span class="lineNum">     201 </span>            :       if (res != null){</a>
+<a name="202"><span class="lineNum">     202 </span><span class="lineNoCov">          0 :         int limit = res['gas_limit'] as int ?? 0;</span></a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineNoCov">          0 :         String premium = res['gas_premium'] as String ?? '100000';</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineNoCov">          0 :         String feeCap = res['gas_cap'] as String ?? '0';</span></a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :         var premiumNum = int.tryParse(premium) ?? 0;</span></a>
+<a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :         var feeCapNum = int.tryParse(feeCap) ?? 0;</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
+<a name="208"><span class="lineNum">     208 </span>            :             gasState: &quot;success&quot;,</a>
+<a name="209"><span class="lineNum">     209 </span>            :             message: '',</a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :             gasFeeCap: feeCapNum.toString(),</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :             gasPremium: premiumNum.toString(),</span></a>
+<a name="212"><span class="lineNum">     212 </span>            :             gasLimit: limit</a>
+<a name="213"><span class="lineNum">     213 </span>            :         );</a>
+<a name="214"><span class="lineNum">     214 </span>            :       }else{</a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
+<a name="216"><span class="lineNum">     216 </span>            :             gasState: &quot;error&quot;,</a>
+<a name="217"><span class="lineNum">     217 </span>            :             message: ''</a>
+<a name="218"><span class="lineNum">     218 </span>            :         );</a>
+<a name="219"><span class="lineNum">     219 </span>            :       }</a>
+<a name="220"><span class="lineNum">     220 </span>            :     }catch(error){</a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineNoCov">          0 :       if(error.message.isNotEmpty as bool){</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
+<a name="223"><span class="lineNum">     223 </span>            :             gasState: &quot;error&quot;,</a>
+<a name="224"><span class="lineNum">     224 </span><span class="lineNoCov">          0 :             message: error.message as String</span></a>
+<a name="225"><span class="lineNum">     225 </span>            :         );</a>
+<a name="226"><span class="lineNum">     226 </span>            :       }else{</a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :         return GasResponse(</span></a>
+<a name="228"><span class="lineNum">     228 </span>            :             gasState: &quot;error&quot;,</a>
+<a name="229"><span class="lineNum">     229 </span>            :             message: ''</a>
+<a name="230"><span class="lineNum">     230 </span>            :         );</a>
+<a name="231"><span class="lineNum">     231 </span>            :       }</a>
+<a name="232"><span class="lineNum">     232 </span>            :     }</a>
+<a name="233"><span class="lineNum">     233 </span>            :   }</a>
+<a name="234"><span class="lineNum">     234 </span>            : </a>
+<a name="235"><span class="lineNum">     235 </span>            :   /*</a>
+<a name="236"><span class="lineNum">     236 </span>            :   * Query pending messages information</a>
+<a name="237"><span class="lineNum">     237 </span>            :   *  @param {List} param:[{</a>
+<a name="238"><span class="lineNum">     238 </span>            :   * from:Transaction sending address,</a>
+<a name="239"><span class="lineNum">     239 </span>            :   * nonce: Transaction nonce</a>
+<a name="240"><span class="lineNum">     240 </span>            :   * }]</a>
+<a name="241"><span class="lineNum">     241 </span>            :   * */</a>
+<a name="242"><span class="lineNum">     242 </span>            :   @override</a>
+<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :   Future&lt;List&gt; getMessagePendingState(List param) async{</span></a>
+<a name="244"><span class="lineNum">     244 </span>            :     try {</a>
+<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :       var result =  await client.post(messagePending, data: param );</span></a>
+<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :       return result.data as List&lt;dynamic&gt;?? [];</span></a>
+<a name="247"><span class="lineNum">     247 </span>            :     } catch (e) {</a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineNoCov">          0 :       return [];</span></a>
+<a name="249"><span class="lineNum">     249 </span>            :     }</a>
 <a name="250"><span class="lineNum">     250 </span>            :   }</a>
 <a name="251"><span class="lineNum">     251 </span>            : </a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineNoCov">          0 :   @override</span></a>
-<a name="253"><span class="lineNum">     253 </span>            :   void dispose() {}</a>
-<a name="254"><span class="lineNum">     254 </span>            : }</a>
-<a name="255"><span class="lineNum">     255 </span>            : </a>
-<a name="256"><span class="lineNum">     256 </span>            : </a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineNoCov">          0 : Future&lt;num&gt; getTokenPrice(chain) async{</span></a>
-<a name="258"><span class="lineNum">     258 </span>            :   try{</a>
-<a name="259"><span class="lineNum">     259 </span><span class="lineNoCov">          0 :     String baseApi = Network.filecoinMainNet.rpc + '/api' + Config.clientID;</span></a>
-<a name="260"><span class="lineNum">     260 </span>            :     String tokenPrice = '/token/prices';</a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :     var map = {</span></a>
-<a name="262"><span class="lineNum">     262 </span>            :       'eth': 'ethereum',</a>
-<a name="263"><span class="lineNum">     263 </span>            :       'binance': 'binancecoin',</a>
-<a name="264"><span class="lineNum">     264 </span>            :       'filecoin':'filecoin'</a>
-<a name="265"><span class="lineNum">     265 </span>            :     };</a>
-<a name="266"><span class="lineNum">     266 </span><span class="lineNoCov">          0 :     List param = [</span></a>
-<a name="267"><span class="lineNum">     267 </span><span class="lineNoCov">          0 :       {</span></a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :         &quot;id&quot;:map[chain],</span></a>
-<a name="269"><span class="lineNum">     269 </span>            :         &quot;vs&quot;:&quot;usd&quot;</a>
-<a name="270"><span class="lineNum">     270 </span>            :       }</a>
-<a name="271"><span class="lineNum">     271 </span>            :     ];</a>
-<a name="272"><span class="lineNum">     272 </span>            :     num usd = 0;</a>
-<a name="273"><span class="lineNum">     273 </span><span class="lineNoCov">          0 :     final response = await http.post(baseApi+tokenPrice,data: param);</span></a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineNoCov">          0 :     if(response.statusCode == 200){</span></a>
-<a name="275"><span class="lineNum">     275 </span><span class="lineNoCov">          0 :       var res = response.data;</span></a>
-<a name="276"><span class="lineNum">     276 </span><span class="lineNoCov">          0 :       if(res.length &gt; 0){</span></a>
-<a name="277"><span class="lineNum">     277 </span><span class="lineNoCov">          0 :         var obj = res[0];</span></a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineNoCov">          0 :         if(obj[&quot;vs&quot;] == 'usd'){</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineNoCov">          0 :           usd = double.parse((obj[&quot;price&quot;]).toString());</span></a>
-<a name="280"><span class="lineNum">     280 </span>            :         }</a>
-<a name="281"><span class="lineNum">     281 </span>            :       }</a>
-<a name="282"><span class="lineNum">     282 </span>            :     }</a>
-<a name="283"><span class="lineNum">     283 </span>            :     return usd;</a>
-<a name="284"><span class="lineNum">     284 </span>            :   }catch(error){</a>
-<a name="285"><span class="lineNum">     285 </span>            :     return 0;</a>
-<a name="286"><span class="lineNum">     286 </span>            :   }</a>
-<a name="287"><span class="lineNum">     287 </span>            : }</a>
+<a name="252"><span class="lineNum">     252 </span>            :   /*</a>
+<a name="253"><span class="lineNum">     253 </span>            :   * Get address nonce by the specified address.</a>
+<a name="254"><span class="lineNum">     254 </span>            :   * @param {string} address: the specified address</a>
+<a name="255"><span class="lineNum">     255 </span>            :   * */</a>
+<a name="256"><span class="lineNum">     256 </span>            :   @override</a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          1 :   Future&lt;int&gt; getNonce(String address) async {</span></a>
+<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          1 :     var nonce = -1;</span></a>
+<a name="259"><span class="lineNum">     259 </span>            :     try {</a>
+<a name="260"><span class="lineNum">     260 </span><span class="lineCov">          4 :       var res = await client.get(balancePath, queryParameters: {'actor': address});</span></a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineNoCov">          0 :       return res.data[&quot;nonce&quot;] as int ?? -1;</span></a>
+<a name="262"><span class="lineNum">     262 </span>            :     } catch (e) {</a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineCov">          1 :       return -1;</span></a>
+<a name="264"><span class="lineNum">     264 </span>            :     }</a>
+<a name="265"><span class="lineNum">     265 </span>            :   }</a>
+<a name="266"><span class="lineNum">     266 </span>            : </a>
+<a name="267"><span class="lineNum">     267 </span>            :   /*</a>
+<a name="268"><span class="lineNum">     268 </span>            :   * address check</a>
+<a name="269"><span class="lineNum">     269 </span>            :   * @param {string} address:address to check</a>
+<a name="270"><span class="lineNum">     270 </span>            :   * */</a>
+<a name="271"><span class="lineNum">     271 </span>            :   // @override</a>
+<a name="272"><span class="lineNum">     272 </span>            :   // Future&lt;bool&gt; addressCheck(String address) async{</a>
+<a name="273"><span class="lineNum">     273 </span>            :   //   try {</a>
+<a name="274"><span class="lineNum">     274 </span>            :   //     var res = await client.get(addrCheck, queryParameters: {'address': address});</a>
+<a name="275"><span class="lineNum">     275 </span>            :   //     if(res.data == 'ok'){</a>
+<a name="276"><span class="lineNum">     276 </span>            :   //       return true;</a>
+<a name="277"><span class="lineNum">     277 </span>            :   //     }else{</a>
+<a name="278"><span class="lineNum">     278 </span>            :   //       return false;</a>
+<a name="279"><span class="lineNum">     279 </span>            :   //     }</a>
+<a name="280"><span class="lineNum">     280 </span>            :   //   } catch (e) {</a>
+<a name="281"><span class="lineNum">     281 </span>            :   //     return false;</a>
+<a name="282"><span class="lineNum">     282 </span>            :   //   }</a>
+<a name="283"><span class="lineNum">     283 </span>            :   // }</a>
+<a name="284"><span class="lineNum">     284 </span>            : </a>
+<a name="285"><span class="lineNum">     285 </span>            :   /*</a>
+<a name="286"><span class="lineNum">     286 </span>            :   * Returns an receipt of a transaction based on its hash.</a>
+<a name="287"><span class="lineNum">     287 </span>            :   * @param {string} hash: transaction hash</a>
+<a name="288"><span class="lineNum">     288 </span>            :   * */</a>
+<a name="289"><span class="lineNum">     289 </span>            :   @override</a>
+<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          1 :   Future getTransactionReceipt(String hash) async{</span></a>
+<a name="291"><span class="lineNum">     291 </span>            :     return null;</a>
+<a name="292"><span class="lineNum">     292 </span>            :   }</a>
+<a name="293"><span class="lineNum">     293 </span>            : </a>
+<a name="294"><span class="lineNum">     294 </span>            :   /*</a>
+<a name="295"><span class="lineNum">     295 </span>            :   * Gets the balance of token</a>
+<a name="296"><span class="lineNum">     296 </span>            :   * @param {string} mainAddress:main token address</a>
+<a name="297"><span class="lineNum">     297 </span>            :   * @param {string} tokenAddress:contract address</a>
+<a name="298"><span class="lineNum">     298 </span>            :   * */</a>
+<a name="299"><span class="lineNum">     299 </span>            :   @override</a>
+<a name="300"><span class="lineNum">     300 </span><span class="lineCov">          1 :   Future&lt;String&gt; getBalanceOfToken(String mainAddress,String tokenAddress) async{</span></a>
+<a name="301"><span class="lineNum">     301 </span>            :     return '0';</a>
+<a name="302"><span class="lineNum">     302 </span>            :   }</a>
+<a name="303"><span class="lineNum">     303 </span>            : </a>
+<a name="304"><span class="lineNum">     304 </span>            :   /*</a>
+<a name="305"><span class="lineNum">     305 </span>            :   * Returns a fee per gas that is an estimate of how much you can pay as a priority fee, or &quot;tip&quot;, to get a transaction included in the current block.</a>
+<a name="306"><span class="lineNum">     306 </span>            :   * */</a>
+<a name="307"><span class="lineNum">     307 </span>            :   @override</a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineCov">          1 :   Future&lt;String&gt; getMaxPriorityFeePerGas() async{</span></a>
+<a name="309"><span class="lineNum">     309 </span>            :     return &quot;0&quot;;</a>
+<a name="310"><span class="lineNum">     310 </span>            :   }</a>
+<a name="311"><span class="lineNum">     311 </span>            : </a>
+<a name="312"><span class="lineNum">     312 </span>            :   /*</a>
+<a name="313"><span class="lineNum">     313 </span>            :   * get baseFeePerGas</a>
+<a name="314"><span class="lineNum">     314 </span>            :   * */</a>
+<a name="315"><span class="lineNum">     315 </span>            :   @override</a>
+<a name="316"><span class="lineNum">     316 </span><span class="lineCov">          1 :   Future&lt;String&gt; getBaseFeePerGas() async{</span></a>
+<a name="317"><span class="lineNum">     317 </span>            :     return &quot;0&quot;;</a>
+<a name="318"><span class="lineNum">     318 </span>            :   }</a>
+<a name="319"><span class="lineNum">     319 </span>            : </a>
+<a name="320"><span class="lineNum">     320 </span>            :   /*</a>
+<a name="321"><span class="lineNum">     321 </span>            :   * send token and Returns a hash</a>
+<a name="322"><span class="lineNum">     322 </span>            :   * @param {string} to:  sending transaction to address</a>
+<a name="323"><span class="lineNum">     323 </span>            :   * @param {String} amount：Amount sent</a>
+<a name="324"><span class="lineNum">     324 </span>            :   * @param {String} private：private of sending transactions</a>
+<a name="325"><span class="lineNum">     325 </span>            :   * @param {ChainGas} gas:transactions gas</a>
+<a name="326"><span class="lineNum">     326 </span>            :   * @param {string} addr:contract address</a>
+<a name="327"><span class="lineNum">     327 </span>            :   * @param {int} nonce：nonce of sending transactions</a>
+<a name="328"><span class="lineNum">     328 </span>            :   * */</a>
+<a name="329"><span class="lineNum">     329 </span>            :   @override</a>
+<a name="330"><span class="lineNum">     330 </span><span class="lineCov">          1 :   Future&lt;TransactionResponse&gt; sendToken(</span></a>
+<a name="331"><span class="lineNum">     331 </span>            :       {String to,</a>
+<a name="332"><span class="lineNum">     332 </span>            :         String amount,</a>
+<a name="333"><span class="lineNum">     333 </span>            :         String private,</a>
+<a name="334"><span class="lineNum">     334 </span>            :         ChainGas gas,</a>
+<a name="335"><span class="lineNum">     335 </span>            :         String addr,</a>
+<a name="336"><span class="lineNum">     336 </span>            :         int nonce}</a>
+<a name="337"><span class="lineNum">     337 </span>            :   ) async{</a>
+<a name="338"><span class="lineNum">     338 </span><span class="lineCov">          1 :     return TransactionResponse(</span></a>
+<a name="339"><span class="lineNum">     339 </span>            :       cid: '',</a>
+<a name="340"><span class="lineNum">     340 </span>            :       message: ''</a>
+<a name="341"><span class="lineNum">     341 </span>            :     );</a>
+<a name="342"><span class="lineNum">     342 </span>            :   }</a>
+<a name="343"><span class="lineNum">     343 </span>            : </a>
+<a name="344"><span class="lineNum">     344 </span>            :   /*</a>
+<a name="345"><span class="lineNum">     345 </span>            :   * Returns the id of the network the client is currently connected to.</a>
+<a name="346"><span class="lineNum">     346 </span>            :   * */</a>
+<a name="347"><span class="lineNum">     347 </span>            :   @override</a>
+<a name="348"><span class="lineNum">     348 </span><span class="lineCov">          1 :   Future&lt;String&gt; getNetworkId() async{</span></a>
+<a name="349"><span class="lineNum">     349 </span>            :     return '';</a>
+<a name="350"><span class="lineNum">     350 </span>            :   }</a>
+<a name="351"><span class="lineNum">     351 </span>            : </a>
+<a name="352"><span class="lineNum">     352 </span>            :   /*</a>
+<a name="353"><span class="lineNum">     353 </span>            :   * get Token Information</a>
+<a name="354"><span class="lineNum">     354 </span>            :   * @param { string } Token contract address</a>
+<a name="355"><span class="lineNum">     355 </span>            :   * */</a>
+<a name="356"><span class="lineNum">     356 </span>            :   @override</a>
+<a name="357"><span class="lineNum">     357 </span><span class="lineCov">          1 :   Future&lt;TokenInfo&gt; getTokenInfo(String address) async{</span></a>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">          1 :     return TokenInfo(</span></a>
+<a name="359"><span class="lineNum">     359 </span>            :         symbol: '',</a>
+<a name="360"><span class="lineNum">     360 </span>            :         precision:&quot;0&quot;</a>
+<a name="361"><span class="lineNum">     361 </span>            :     );</a>
+<a name="362"><span class="lineNum">     362 </span>            :   }</a>
+<a name="363"><span class="lineNum">     363 </span>            : </a>
+<a name="364"><span class="lineNum">     364 </span><span class="lineNoCov">          0 :   @override</span></a>
+<a name="365"><span class="lineNum">     365 </span>            :   void dispose() {}</a>
+<a name="366"><span class="lineNum">     366 </span>            : }</a>
+<a name="367"><span class="lineNum">     367 </span>            : </a>
+<a name="368"><span class="lineNum">     368 </span>            : /*</a>
+<a name="369"><span class="lineNum">     369 </span>            : * Get the USD price corresponding to the token</a>
+<a name="370"><span class="lineNum">     370 </span>            : * @param {string} chain: network to be queried</a>
+<a name="371"><span class="lineNum">     371 </span>            : * */</a>
+<a name="372"><span class="lineNum">     372 </span><span class="lineNoCov">          0 : Future&lt;double&gt; getTokenPrice(chain) async{</span></a>
+<a name="373"><span class="lineNum">     373 </span><span class="lineNoCov">          0 :   String baseUrl (){</span></a>
+<a name="374"><span class="lineNum">     374 </span><span class="lineNoCov">          0 :     return GetBaseUrl();</span></a>
+<a name="375"><span class="lineNum">     375 </span>            :   }</a>
+<a name="376"><span class="lineNum">     376 </span>            :    Dio client;</a>
+<a name="377"><span class="lineNum">     377 </span>            :    Dio httpClient ;</a>
+<a name="378"><span class="lineNum">     378 </span><span class="lineNoCov">          0 :    client = httpClient ?? http;</span></a>
+<a name="379"><span class="lineNum">     379 </span><span class="lineNoCov">          0 :    client.options.baseUrl = baseUrl();</span></a>
+<a name="380"><span class="lineNum">     380 </span>            :   try{</a>
+<a name="381"><span class="lineNum">     381 </span>            :     String tokenPrice = '/token/prices';</a>
+<a name="382"><span class="lineNum">     382 </span><span class="lineNoCov">          0 :     var map = {</span></a>
+<a name="383"><span class="lineNum">     383 </span>            :       'eth': 'ethereum',</a>
+<a name="384"><span class="lineNum">     384 </span>            :       'binance': 'binancecoin',</a>
+<a name="385"><span class="lineNum">     385 </span>            :       'filecoin':'filecoin'</a>
+<a name="386"><span class="lineNum">     386 </span>            :     };</a>
+<a name="387"><span class="lineNum">     387 </span><span class="lineNoCov">          0 :     List param = [</span></a>
+<a name="388"><span class="lineNum">     388 </span><span class="lineNoCov">          0 :       {</span></a>
+<a name="389"><span class="lineNum">     389 </span><span class="lineNoCov">          0 :         &quot;id&quot;:map[chain],</span></a>
+<a name="390"><span class="lineNum">     390 </span>            :         &quot;vs&quot;:&quot;usd&quot;</a>
+<a name="391"><span class="lineNum">     391 </span>            :       }</a>
+<a name="392"><span class="lineNum">     392 </span>            :     ];</a>
+<a name="393"><span class="lineNum">     393 </span>            :     double usd = 0.0;</a>
+<a name="394"><span class="lineNum">     394 </span><span class="lineNoCov">          0 :     var response = await client.post(tokenPrice, data: param);</span></a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineNoCov">          0 :     if(response.statusCode == 200){</span></a>
+<a name="396"><span class="lineNum">     396 </span><span class="lineNoCov">          0 :       var res = response.data;</span></a>
+<a name="397"><span class="lineNum">     397 </span><span class="lineNoCov">          0 :       if(res.length as int &gt; 0){</span></a>
+<a name="398"><span class="lineNum">     398 </span><span class="lineNoCov">          0 :         var obj = res[0];</span></a>
+<a name="399"><span class="lineNum">     399 </span><span class="lineNoCov">          0 :         if(obj[&quot;vs&quot;] == 'usd'){</span></a>
+<a name="400"><span class="lineNum">     400 </span><span class="lineNoCov">          0 :           usd = double.parse((obj[&quot;price&quot;]).toString());</span></a>
+<a name="401"><span class="lineNum">     401 </span>            :         }</a>
+<a name="402"><span class="lineNum">     402 </span>            :       }</a>
+<a name="403"><span class="lineNum">     403 </span>            :     }</a>
+<a name="404"><span class="lineNum">     404 </span>            :     return usd;</a>
+<a name="405"><span class="lineNum">     405 </span>            :   }catch(error){</a>
+<a name="406"><span class="lineNum">     406 </span>            :     return 0.0;</a>
+<a name="407"><span class="lineNum">     407 </span>            :   }</a>
+<a name="408"><span class="lineNum">     408 </span>            : }</a>
 </pre>
       </td>
     </tr>

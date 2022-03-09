@@ -31,7 +31,7 @@ class RpcJson implements RpcService {
 
     final data = response.data;
     final id = data['id'] as int;
-    if (data.containsKey('error')) {
+    if (data.containsKey('error') as bool) {
       final error = data['error'];
       final code = error['code'] as int;
       final message = error['message'] as String;

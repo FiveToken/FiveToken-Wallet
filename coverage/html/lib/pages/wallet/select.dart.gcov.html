@@ -31,13 +31,13 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">152</td>
+            <td class="headerCovTableEntry">124</td>
             <td class="headerCovTableEntry">204</td>
-            <td class="headerCovTableEntryLo">74.5 %</td>
+            <td class="headerCovTableEntryLo">60.8 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -87,7 +87,7 @@
 <a name="25"><span class="lineNum">      25 </span><span class="lineCov">          1 :     return WalletSelectPageState();</span></a>
 <a name="26"><span class="lineNum">      26 </span>            :   }</a>
 <a name="27"><span class="lineNum">      27 </span>            : }</a>
-<a name="28"><span class="lineNum">      28 </span>            : </a>
+<a name="28"><span class="lineNum">      28 </span>            : // page of wallet select</a>
 <a name="29"><span class="lineNum">      29 </span>            : class WalletSelectPageState extends State&lt;WalletSelectPage&gt; {</a>
 <a name="30"><span class="lineNum">      30 </span>            :   final ScrollController controller = ScrollController();</a>
 <a name="31"><span class="lineNum">      31 </span>            :   List&lt;ChainWallet&gt; list = [];</a>
@@ -98,55 +98,55 @@
 <a name="36"><span class="lineNum">      36 </span><span class="lineCov">          1 :     super.initState();</span></a>
 <a name="37"><span class="lineNum">      37 </span>            :   }</a>
 <a name="38"><span class="lineNum">      38 </span>            : </a>
-<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          1 :   void deleteIdWallet(context, state,  String hash) async {</span></a>
-<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          3 :     BlocProvider.of&lt;SelectBloc&gt;(context).add(IdDeleteEvent(hash: hash));</span></a>
-<a name="41"><span class="lineNum">      41 </span><span class="lineCov">          4 :     bool needSwitch = hash == $store.wal.groupHash;</span></a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineNoCov">          0 :   void deleteIdWallet(BuildContext context, state,  String hash) async {</span></a>
+<a name="40"><span class="lineNum">      40 </span><span class="lineNoCov">          0 :     BlocProvider.of&lt;SelectBloc&gt;(context).add(IdDeleteEvent(hash: hash));</span></a>
+<a name="41"><span class="lineNum">      41 </span><span class="lineNoCov">          0 :     bool needSwitch = hash == $store.wal.groupHash;</span></a>
 <a name="42"><span class="lineNum">      42 </span>            :     var box = OpenedBox.walletInstance;</a>
-<a name="43"><span class="lineNum">      43 </span><span class="lineCov">          1 :     var keys = box.values</span></a>
-<a name="44"><span class="lineNum">      44 </span><span class="lineCov">          1 :         .where((wal) =&gt; wal.groupHash == hash &amp;&amp; wal.type == WalletType.id)</span></a>
-<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          1 :         .map((wal) =&gt; wal.key);</span></a>
-<a name="46"><span class="lineNum">      46 </span><span class="lineCov">          1 :     box.deleteAll(keys);</span></a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineCov">          2 :     if (box.values.isEmpty) {</span></a>
+<a name="43"><span class="lineNum">      43 </span><span class="lineNoCov">          0 :     var keys = box.values</span></a>
+<a name="44"><span class="lineNum">      44 </span><span class="lineNoCov">          0 :         .where((wal) =&gt; wal.groupHash == hash &amp;&amp; wal.type == WalletType.id)</span></a>
+<a name="45"><span class="lineNum">      45 </span><span class="lineNoCov">          0 :         .map((wal) =&gt; wal.key);</span></a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineNoCov">          0 :     box.deleteAll(keys);</span></a>
+<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :     if (box.values.isEmpty) {</span></a>
 <a name="48"><span class="lineNum">      48 </span><span class="lineNoCov">          0 :       goInit();</span></a>
 <a name="49"><span class="lineNum">      49 </span>            :     } else {</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">          1 :       deleteAndSwitch(state, needSwitch);</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 :       deleteAndSwitch(state, needSwitch);</span></a>
 <a name="51"><span class="lineNum">      51 </span>            :     }</a>
 <a name="52"><span class="lineNum">      52 </span>            :   }</a>
 <a name="53"><span class="lineNum">      53 </span>            : </a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          1 :   void deleteImprotWallet(context, state, ChainWallet wal, Network net) async {</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">          4 :    await BlocProvider.of&lt;SelectBloc&gt;(context).add(ImportDeleteEvent(wal: wal, net: net));</span></a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          3 :     if (box.values.isEmpty) {</span></a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineCov">          1 :       goInit();</span></a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineNoCov">          0 :   void deleteImprotWallet(BuildContext context, state, ChainWallet wal, Network net) async {</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineNoCov">          0 :    await BlocProvider.of&lt;SelectBloc&gt;(context).add(ImportDeleteEvent(wal: wal, net: net));</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineNoCov">          0 :     if (box.values.isEmpty) {</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :       goInit();</span></a>
 <a name="58"><span class="lineNum">      58 </span>            :     } else {</a>
 <a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 :       bool needSwitch = wal.address == $store.wal.address;</span></a>
 <a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :       deleteAndSwitch(state, needSwitch);</span></a>
 <a name="61"><span class="lineNum">      61 </span>            :     }</a>
 <a name="62"><span class="lineNum">      62 </span>            :   }</a>
 <a name="63"><span class="lineNum">      63 </span>            : </a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          1 :   void deleteAndSwitch(state, bool needSwitch) {</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineNoCov">          0 :   void deleteAndSwitch(state, bool needSwitch) {</span></a>
 <a name="65"><span class="lineNum">      65 </span>            :     if (needSwitch) {</a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          2 :       if (state.idWalletMap.isNotEmpty) {</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineNoCov">          0 :       if (state.idWalletMap.isNotEmpty as bool) {</span></a>
 <a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :         var list = state.idWalletMap.entries.first.value</span></a>
 <a name="68"><span class="lineNum">      68 </span><span class="lineNoCov">          0 :             .where((wal) =&gt; wal.rpc == $store.net.rpc)</span></a>
 <a name="69"><span class="lineNum">      69 </span><span class="lineNoCov">          0 :             .toList();</span></a>
 <a name="70"><span class="lineNum">      70 </span>            : </a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :         if (list.isNotEmpty) {</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :         if (list.isNotEmpty as bool) {</span></a>
 <a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 :           var wallet = list[0];</span></a>
-<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :           $store.setWallet(wallet);</span></a>
-<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :           Global.store.setString('currentWalletAddress', wallet.key);</span></a>
+<a name="73"><span class="lineNum">      73 </span><span class="lineNoCov">          0 :           $store.setWallet(wallet as ChainWallet);</span></a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineNoCov">          0 :           Global.store.setString('currentWalletAddress', wallet.key as String);</span></a>
 <a name="75"><span class="lineNum">      75 </span>            :         }</a>
 <a name="76"><span class="lineNum">      76 </span>            :       } else {</a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineCov">          4 :         $store.setWallet(state.importList[0]);</span></a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineCov">          4 :         Global.store.setString('currentWalletAddress', state.importList[0].key);</span></a>
+<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :         $store.setWallet(state.importList[0] as ChainWallet);</span></a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :         Global.store.setString('currentWalletAddress', state.importList[0].key as String);</span></a>
 <a name="79"><span class="lineNum">      79 </span>            :       }</a>
 <a name="80"><span class="lineNum">      80 </span>            :     }</a>
 <a name="81"><span class="lineNum">      81 </span>            :   }</a>
 <a name="82"><span class="lineNum">      82 </span>            : </a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineCov">          1 :   void goInit() {</span></a>
-<a name="84"><span class="lineNum">      84 </span><span class="lineCov">          3 :     $store.setNet(Network.filecoinMainNet);</span></a>
-<a name="85"><span class="lineNum">      85 </span><span class="lineCov">          1 :     Global.store.remove('currentWalletAddress');</span></a>
-<a name="86"><span class="lineNum">      86 </span><span class="lineCov">          3 :     Global.store.setString('activeNetwork', Network.filecoinMainNet.rpc);</span></a>
-<a name="87"><span class="lineNum">      87 </span><span class="lineCov">          2 :     Get.offAllNamed(initLangPage);</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 :   void goInit() {</span></a>
+<a name="84"><span class="lineNum">      84 </span><span class="lineNoCov">          0 :     $store.setNet(Network.filecoinMainNet);</span></a>
+<a name="85"><span class="lineNum">      85 </span><span class="lineNoCov">          0 :     Global.store.remove('currentWalletAddress');</span></a>
+<a name="86"><span class="lineNum">      86 </span><span class="lineNoCov">          0 :     Global.store.setString('activeNetwork', Network.filecoinMainNet.rpc);</span></a>
+<a name="87"><span class="lineNum">      87 </span><span class="lineNoCov">          0 :     Get.offAllNamed(initLangPage);</span></a>
 <a name="88"><span class="lineNum">      88 </span>            :   }</a>
 <a name="89"><span class="lineNum">      89 </span>            : </a>
 <a name="90"><span class="lineNum">      90 </span><span class="lineCov">          1 :   @override</span></a>
@@ -257,202 +257,209 @@
 <a name="195"><span class="lineNum">     195 </span><span class="lineCov">          1 :                                      return SwiperWidget(</span></a>
 <a name="196"><span class="lineNum">     196 </span><span class="lineCov">          4 :                                        active: hash == $store.wal.groupHash,</span></a>
 <a name="197"><span class="lineNum">     197 </span><span class="lineCov">          1 :                                        onDelete: () {</span></a>
-<a name="198"><span class="lineNum">     198 </span><span class="lineCov">          1 :                                          showDeleteDialog(context,</span></a>
-<a name="199"><span class="lineNum">     199 </span><span class="lineCov">          1 :                                              title: 'deleteIdWallet'.tr,</span></a>
-<a name="200"><span class="lineNum">     200 </span><span class="lineCov">          2 :                                              content: 'confirmDeleteId'.tr, onDelete: () {</span></a>
-<a name="201"><span class="lineNum">     201 </span><span class="lineCov">          1 :                                                deleteIdWallet(context, state, hash);</span></a>
-<a name="202"><span class="lineNum">     202 </span>            :                                              });</a>
-<a name="203"><span class="lineNum">     203 </span>            :                                        },</a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineNoCov">          0 :                                        onSet: () async {</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 :                                          await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});</span></a>
-<a name="206"><span class="lineNum">     206 </span><span class="lineNoCov">          0 :                                          BlocProvider.of&lt;SelectBloc&gt;(context)..add(IdUpdateEvent());</span></a>
+<a name="198"><span class="lineNum">     198 </span><span class="lineCov">          1 :                                           showPassDialog(context, (String pass) async {</span></a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :                                             if(wals.length &gt; 0){</span></a>
+<a name="200"><span class="lineNum">     200 </span><span class="lineNoCov">          0 :                                               var wal = wals[0];</span></a>
+<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 :                                               var private = await wal.getPrivateKey(pass);</span></a>
+<a name="202"><span class="lineNum">     202 </span>            :                                               if(private!=null){</a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineNoCov">          0 :                                                 deleteIdWallet(context, state, hash);</span></a>
+<a name="204"><span class="lineNum">     204 </span>            :                                               }</a>
+<a name="205"><span class="lineNum">     205 </span>            :                                             }</a>
+<a name="206"><span class="lineNum">     206 </span>            :                                           });</a>
 <a name="207"><span class="lineNum">     207 </span>            :                                        },</a>
-<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :                                        onTap: () {</span></a>
-<a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :                                          if (hash != $store.wal.groupHash) {</span></a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                            var wallets = OpenedBox.walletInstance.values</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineNoCov">          0 :                                                .where((wal) =&gt;</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :                                            wal.groupHash == hash &amp;&amp;</span></a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineNoCov">          0 :                                                wal.rpc == $store.net.rpc)</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :                                                .toList();</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :                                            if (wallets.isNotEmpty) {</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :                                              $store.setWallet(wallets[0]);</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :                                              Global.store.setString(</span></a>
-<a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 :                                                  'currentWalletAddress', wallets[0].key);</span></a>
-<a name="219"><span class="lineNum">     219 </span>            :                                            }</a>
-<a name="220"><span class="lineNum">     220 </span>            :                                          }</a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineNoCov">          0 :                                          Global.eventBus.fire(WalletChangeEvent());</span></a>
-<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :                                          Get.offAndToNamed(mainPage);</span></a>
-<a name="223"><span class="lineNum">     223 </span>            :                                          // Navigator.of(context).popUntil(</a>
-<a name="224"><span class="lineNum">     224 </span>            :                                          //         (route) =&gt; route.settings.name == mainPage</a>
-<a name="225"><span class="lineNum">     225 </span>            :                                          // );</a>
-<a name="226"><span class="lineNum">     226 </span>            :                                        },</a>
-<a name="227"><span class="lineNum">     227 </span>            :                                        id: hash,</a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          1 :                                        child: Container(</span></a>
-<a name="229"><span class="lineNum">     229 </span>            :                                          height: 70,</a>
-<a name="230"><span class="lineNum">     230 </span>            :                                          alignment: Alignment.centerLeft,</a>
-<a name="231"><span class="lineNum">     231 </span>            :                                          child:</a>
-<a name="232"><span class="lineNum">     232 </span><span class="lineCov">          3 :                                          CommonText(wals[0].label, color: Colors.white),</span></a>
-<a name="233"><span class="lineNum">     233 </span>            :                                        ),</a>
-<a name="234"><span class="lineNum">     234 </span>            :                                      );</a>
-<a name="235"><span class="lineNum">     235 </span>            :                                    }),</a>
-<a name="236"><span class="lineNum">     236 </span>            :                                  ),</a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineCov">          1 :                                  SizedBox(</span></a>
-<a name="238"><span class="lineNum">     238 </span>            :                                    height: 12,</a>
-<a name="239"><span class="lineNum">     239 </span>            :                                  ),</a>
-<a name="240"><span class="lineNum">     240 </span>            :                                ],</a>
-<a name="241"><span class="lineNum">     241 </span>            :                              )),</a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineCov">          1 :                          Visibility(</span></a>
-<a name="243"><span class="lineNum">     243 </span><span class="lineCov">          1 :                            child: Column(</span></a>
-<a name="244"><span class="lineNum">     244 </span>            :                              crossAxisAlignment: CrossAxisAlignment.start,</a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineCov">          1 :                              children: [</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineCov">          1 :                                Container(</span></a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineCov">          2 :                                  child: CommonText('import'.tr),</span></a>
-<a name="248"><span class="lineNum">     248 </span><span class="lineCov">          1 :                                  padding: EdgeInsets.only(left: 12),</span></a>
-<a name="249"><span class="lineNum">     249 </span>            :                                ),</a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineCov">          1 :                                Column(</span></a>
-<a name="251"><span class="lineNum">     251 </span><span class="lineCov">          4 :                                  children: List.generate(state.importList.length, (index) {</span></a>
-<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          2 :                                    var wal = state.importList[index];</span></a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          2 :                                    var net = Network.getNetByRpc(wal.rpc);</span></a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          1 :                                    return SwiperWidget(</span></a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          5 :                                      active: $store.wal.key == wal.key,</span></a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          1 :                                      onDelete: () {</span></a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          1 :                                        showDeleteDialog(context,</span></a>
-<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          1 :                                            title: 'deleteAddr'.tr,</span></a>
-<a name="259"><span class="lineNum">     259 </span><span class="lineCov">          2 :                                            content: 'confirmDelete'.tr, onDelete: () {</span></a>
-<a name="260"><span class="lineNum">     260 </span><span class="lineCov">          1 :                                              deleteImprotWallet(context, state, wal, net);</span></a>
-<a name="261"><span class="lineNum">     261 </span>            :                                            });</a>
-<a name="262"><span class="lineNum">     262 </span>            :                                      },</a>
-<a name="263"><span class="lineNum">     263 </span><span class="lineNoCov">          0 :                                      onSet: () async{</span></a>
-<a name="264"><span class="lineNum">     264 </span><span class="lineNoCov">          0 :                                        await Get.toNamed(walletMangePage,</span></a>
-<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :                                            arguments: {'net': net, 'wallet': wal});</span></a>
-<a name="266"><span class="lineNum">     266 </span><span class="lineNoCov">          0 :                                        BlocProvider.of&lt;SelectBloc&gt;(context).add(ImportUpdateEvent());</span></a>
-<a name="267"><span class="lineNum">     267 </span>            :                                      },</a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineNoCov">          0 :                                      onTap: () {</span></a>
-<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :                                        $store.setWallet(wal);</span></a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :                                        $store.setNet(net);</span></a>
-<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :                                        Global.eventBus.fire(WalletChangeEvent());</span></a>
-<a name="272"><span class="lineNum">     272 </span>            :                                        Global.store</a>
-<a name="273"><span class="lineNum">     273 </span><span class="lineNoCov">          0 :                                            .setString('currentWalletAddress', wal.key);</span></a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineNoCov">          0 :                                        Global.store.setString('activeNetwork', net.rpc);</span></a>
-<a name="275"><span class="lineNum">     275 </span><span class="lineNoCov">          0 :                                        Get.offAndToNamed(mainPage);</span></a>
-<a name="276"><span class="lineNum">     276 </span>            :                                        // Navigator.of(context).popUntil(</a>
-<a name="277"><span class="lineNum">     277 </span>            :                                        //         (route) =&gt; route.settings.name == mainPage);</a>
-<a name="278"><span class="lineNum">     278 </span>            :                                      },</a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineCov">          1 :                                      id: wal.address,</span></a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineCov">          1 :                                      child: Container(</span></a>
-<a name="281"><span class="lineNum">     281 </span><span class="lineCov">          1 :                                        child: Row(</span></a>
-<a name="282"><span class="lineNum">     282 </span>            :                                          crossAxisAlignment: CrossAxisAlignment.center,</a>
-<a name="283"><span class="lineNum">     283 </span>            :                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,</a>
-<a name="284"><span class="lineNum">     284 </span><span class="lineCov">          1 :                                          children: [</span></a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineCov">          1 :                                            Column(</span></a>
-<a name="286"><span class="lineNum">     286 </span>            :                                              crossAxisAlignment: CrossAxisAlignment.start,</a>
-<a name="287"><span class="lineNum">     287 </span>            :                                              mainAxisAlignment: MainAxisAlignment.center,</a>
-<a name="288"><span class="lineNum">     288 </span><span class="lineCov">          1 :                                              children: [</span></a>
-<a name="289"><span class="lineNum">     289 </span><span class="lineCov">          2 :                                                CommonText.white(wal.label, size: 15),</span></a>
-<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          1 :                                                SizedBox(</span></a>
-<a name="291"><span class="lineNum">     291 </span>            :                                                  height: 5,</a>
-<a name="292"><span class="lineNum">     292 </span>            :                                                ),</a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineCov">          3 :                                                CommonText.white(dotString(str: wal.addr),</span></a>
-<a name="294"><span class="lineNum">     294 </span>            :                                                    size: 12)</a>
-<a name="295"><span class="lineNum">     295 </span>            :                                              ],</a>
-<a name="296"><span class="lineNum">     296 </span>            :                                            ),</a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          2 :                                            CommonText.white(net.label),</span></a>
-<a name="298"><span class="lineNum">     298 </span>            :                                          ],</a>
-<a name="299"><span class="lineNum">     299 </span>            :                                        ),</a>
-<a name="300"><span class="lineNum">     300 </span>            :                                      ),</a>
-<a name="301"><span class="lineNum">     301 </span>            :                                    );</a>
-<a name="302"><span class="lineNum">     302 </span>            :                                  }),</a>
-<a name="303"><span class="lineNum">     303 </span>            :                                )</a>
-<a name="304"><span class="lineNum">     304 </span>            :                              ],</a>
-<a name="305"><span class="lineNum">     305 </span>            :                            ),</a>
-<a name="306"><span class="lineNum">     306 </span><span class="lineCov">          2 :                            visible: state.importList.isNotEmpty,</span></a>
-<a name="307"><span class="lineNum">     307 </span>            :                          ),</a>
-<a name="308"><span class="lineNum">     308 </span>            :                        ],</a>
-<a name="309"><span class="lineNum">     309 </span>            :                      ),</a>
-<a name="310"><span class="lineNum">     310 </span>            :                    )</a>
-<a name="311"><span class="lineNum">     311 </span>            :                );</a>
-<a name="312"><span class="lineNum">     312 </span>            :             }</a>
-<a name="313"><span class="lineNum">     313 </span>            :         )</a>
-<a name="314"><span class="lineNum">     314 </span>            :     );</a>
-<a name="315"><span class="lineNum">     315 </span>            : </a>
-<a name="316"><span class="lineNum">     316 </span>            :   }</a>
-<a name="317"><span class="lineNum">     317 </span>            : }</a>
-<a name="318"><span class="lineNum">     318 </span>            : </a>
-<a name="319"><span class="lineNum">     319 </span>            : class SwiperWidget extends StatelessWidget {</a>
-<a name="320"><span class="lineNum">     320 </span>            :   final String id;</a>
-<a name="321"><span class="lineNum">     321 </span>            :   final Noop onDelete;</a>
-<a name="322"><span class="lineNum">     322 </span>            :   final Noop onSet;</a>
-<a name="323"><span class="lineNum">     323 </span>            :   final Noop onTap;</a>
-<a name="324"><span class="lineNum">     324 </span>            :   final bool showBalance;</a>
-<a name="325"><span class="lineNum">     325 </span>            :   final Widget child;</a>
-<a name="326"><span class="lineNum">     326 </span>            :   final bool active;</a>
-<a name="327"><span class="lineNum">     327 </span><span class="lineCov">          2 :   SwiperWidget(</span></a>
-<a name="328"><span class="lineNum">     328 </span>            :       {this.onDelete,</a>
-<a name="329"><span class="lineNum">     329 </span>            :       this.onSet,</a>
-<a name="330"><span class="lineNum">     330 </span>            :       this.onTap,</a>
-<a name="331"><span class="lineNum">     331 </span>            :       this.id,</a>
-<a name="332"><span class="lineNum">     332 </span>            :       this.child,</a>
-<a name="333"><span class="lineNum">     333 </span>            :       this.active = false,</a>
-<a name="334"><span class="lineNum">     334 </span>            :       this.showBalance = false});</a>
-<a name="335"><span class="lineNum">     335 </span><span class="lineCov">          2 :   @override</span></a>
-<a name="336"><span class="lineNum">     336 </span>            :   Widget build(BuildContext context) {</a>
-<a name="337"><span class="lineNum">     337 </span><span class="lineCov">          2 :     return SwipeActionCell(</span></a>
-<a name="338"><span class="lineNum">     338 </span><span class="lineCov">          4 :       key: ValueKey(id),</span></a>
-<a name="339"><span class="lineNum">     339 </span><span class="lineCov">          2 :       trailingActions: [</span></a>
-<a name="340"><span class="lineNum">     340 </span><span class="lineCov">          2 :         SwipeAction(</span></a>
-<a name="341"><span class="lineNum">     341 </span>            :             color: Colors.transparent,</a>
-<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          2 :             content: _getIconButton(</span></a>
-<a name="343"><span class="lineNum">     343 </span><span class="lineCov">          2 :                 CustomColor.red,</span></a>
-<a name="344"><span class="lineNum">     344 </span><span class="lineCov">          2 :                 Image(</span></a>
-<a name="345"><span class="lineNum">     345 </span><span class="lineCov">          2 :                   image: AssetImage('icons/delete.png'),</span></a>
-<a name="346"><span class="lineNum">     346 </span>            :                 )),</a>
-<a name="347"><span class="lineNum">     347 </span><span class="lineNoCov">          0 :             onTap: (handler) async {</span></a>
-<a name="348"><span class="lineNum">     348 </span>            :               handler(false);</a>
-<a name="349"><span class="lineNum">     349 </span><span class="lineNoCov">          0 :               onDelete();</span></a>
-<a name="350"><span class="lineNum">     350 </span>            :             }),</a>
-<a name="351"><span class="lineNum">     351 </span><span class="lineCov">          2 :         SwipeAction(</span></a>
-<a name="352"><span class="lineNum">     352 </span><span class="lineCov">          2 :             content: _getIconButton(</span></a>
-<a name="353"><span class="lineNum">     353 </span><span class="lineCov">          2 :                 Color(0xffE8CC5C),</span></a>
-<a name="354"><span class="lineNum">     354 </span><span class="lineCov">          2 :                 Image(</span></a>
-<a name="355"><span class="lineNum">     355 </span><span class="lineCov">          2 :                   image: AssetImage('icons/set.png'),</span></a>
-<a name="356"><span class="lineNum">     356 </span>            :                 )),</a>
-<a name="357"><span class="lineNum">     357 </span>            :             color: Colors.transparent,</a>
-<a name="358"><span class="lineNum">     358 </span><span class="lineNoCov">          0 :             onTap: (handler) {</span></a>
-<a name="359"><span class="lineNum">     359 </span>            :               handler(false);</a>
-<a name="360"><span class="lineNum">     360 </span><span class="lineNoCov">          0 :               onSet();</span></a>
-<a name="361"><span class="lineNum">     361 </span>            :             }),</a>
-<a name="362"><span class="lineNum">     362 </span>            :       ],</a>
-<a name="363"><span class="lineNum">     363 </span><span class="lineCov">          2 :       child: Padding(</span></a>
-<a name="364"><span class="lineNum">     364 </span><span class="lineCov">          2 :         padding: EdgeInsets.fromLTRB(12, 15, 12, 0),</span></a>
-<a name="365"><span class="lineNum">     365 </span><span class="lineCov">          2 :         child: GestureDetector(</span></a>
-<a name="366"><span class="lineNum">     366 </span><span class="lineCov">          2 :           child: Container(</span></a>
-<a name="367"><span class="lineNum">     367 </span>            :             height: 70,</a>
-<a name="368"><span class="lineNum">     368 </span><span class="lineCov">          2 :             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),</span></a>
-<a name="369"><span class="lineNum">     369 </span><span class="lineCov">          2 :             child: child,</span></a>
-<a name="370"><span class="lineNum">     370 </span><span class="lineCov">          2 :             decoration: BoxDecoration(</span></a>
-<a name="371"><span class="lineNum">     371 </span><span class="lineCov">          2 :                 borderRadius: CustomRadius.b8,</span></a>
-<a name="372"><span class="lineNum">     372 </span><span class="lineCov">          5 :                 color: active ? CustomColor.primary : Color(0xff8297B0)),</span></a>
-<a name="373"><span class="lineNum">     373 </span>            :           ),</a>
-<a name="374"><span class="lineNum">     374 </span><span class="lineCov">          2 :           onTap: onTap,</span></a>
-<a name="375"><span class="lineNum">     375 </span>            :         ),</a>
-<a name="376"><span class="lineNum">     376 </span>            :       ),</a>
-<a name="377"><span class="lineNum">     377 </span>            :     );</a>
-<a name="378"><span class="lineNum">     378 </span>            :   }</a>
-<a name="379"><span class="lineNum">     379 </span>            : }</a>
-<a name="380"><span class="lineNum">     380 </span>            : </a>
-<a name="381"><span class="lineNum">     381 </span><span class="lineCov">          2 : Widget _getIconButton(Color color, Widget icon) {</span></a>
-<a name="382"><span class="lineNum">     382 </span><span class="lineCov">          2 :   return Container(</span></a>
-<a name="383"><span class="lineNum">     383 </span>            :     width: 50,</a>
-<a name="384"><span class="lineNum">     384 </span>            :     height: 50,</a>
-<a name="385"><span class="lineNum">     385 </span><span class="lineCov">          2 :     padding: EdgeInsets.all(12),</span></a>
-<a name="386"><span class="lineNum">     386 </span><span class="lineCov">          2 :     margin: EdgeInsets.only(top: 20),</span></a>
-<a name="387"><span class="lineNum">     387 </span><span class="lineCov">          2 :     decoration: BoxDecoration(</span></a>
-<a name="388"><span class="lineNum">     388 </span><span class="lineCov">          2 :       borderRadius: BorderRadius.circular(25),</span></a>
-<a name="389"><span class="lineNum">     389 </span>            :       color: color,</a>
-<a name="390"><span class="lineNum">     390 </span>            :     ),</a>
-<a name="391"><span class="lineNum">     391 </span>            :     child: icon,</a>
-<a name="392"><span class="lineNum">     392 </span>            :   );</a>
-<a name="393"><span class="lineNum">     393 </span>            : }</a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineNoCov">          0 :                                        onSet: () async {</span></a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineNoCov">          0 :                                          await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                          BlocProvider.of&lt;SelectBloc&gt;(context)..add(IdUpdateEvent());</span></a>
+<a name="211"><span class="lineNum">     211 </span>            :                                        },</a>
+<a name="212"><span class="lineNum">     212 </span><span class="lineNoCov">          0 :                                        onTap: () {</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineNoCov">          0 :                                          if (hash != $store.wal.groupHash) {</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineNoCov">          0 :                                            var wallets = OpenedBox.walletInstance.values</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineNoCov">          0 :                                                .where((wal) =&gt;</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 :                                            wal.groupHash == hash &amp;&amp;</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineNoCov">          0 :                                                wal.rpc == $store.net.rpc)</span></a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineNoCov">          0 :                                                .toList();</span></a>
+<a name="219"><span class="lineNum">     219 </span><span class="lineNoCov">          0 :                                            if (wallets.isNotEmpty) {</span></a>
+<a name="220"><span class="lineNum">     220 </span><span class="lineNoCov">          0 :                                              $store.setWallet(wallets[0]);</span></a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineNoCov">          0 :                                              Global.store.setString(</span></a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 :                                                  'currentWalletAddress', wallets[0].key);</span></a>
+<a name="223"><span class="lineNum">     223 </span>            :                                            }</a>
+<a name="224"><span class="lineNum">     224 </span>            :                                          }</a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineNoCov">          0 :                                          Global.eventBus.fire(WalletChangeEvent());</span></a>
+<a name="226"><span class="lineNum">     226 </span>            :                                          Global.lockFromInit = false;</a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineNoCov">          0 :                                          Get.offAndToNamed(mainPage);</span></a>
+<a name="228"><span class="lineNum">     228 </span>            :                                          // Navigator.of(context).popUntil(</a>
+<a name="229"><span class="lineNum">     229 </span>            :                                          //         (route) =&gt; route.settings.name == mainPage</a>
+<a name="230"><span class="lineNum">     230 </span>            :                                          // );</a>
+<a name="231"><span class="lineNum">     231 </span>            :                                        },</a>
+<a name="232"><span class="lineNum">     232 </span>            :                                        id: hash,</a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineCov">          1 :                                        child: Container(</span></a>
+<a name="234"><span class="lineNum">     234 </span>            :                                          height: 70,</a>
+<a name="235"><span class="lineNum">     235 </span>            :                                          alignment: Alignment.centerLeft,</a>
+<a name="236"><span class="lineNum">     236 </span>            :                                          child:</a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineCov">          3 :                                          CommonText(wals[0].label, color: Colors.white),</span></a>
+<a name="238"><span class="lineNum">     238 </span>            :                                        ),</a>
+<a name="239"><span class="lineNum">     239 </span>            :                                      );</a>
+<a name="240"><span class="lineNum">     240 </span>            :                                    }),</a>
+<a name="241"><span class="lineNum">     241 </span>            :                                  ),</a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineCov">          1 :                                  SizedBox(</span></a>
+<a name="243"><span class="lineNum">     243 </span>            :                                    height: 12,</a>
+<a name="244"><span class="lineNum">     244 </span>            :                                  ),</a>
+<a name="245"><span class="lineNum">     245 </span>            :                                ],</a>
+<a name="246"><span class="lineNum">     246 </span>            :                              )),</a>
+<a name="247"><span class="lineNum">     247 </span><span class="lineCov">          1 :                          Visibility(</span></a>
+<a name="248"><span class="lineNum">     248 </span><span class="lineCov">          1 :                            child: Column(</span></a>
+<a name="249"><span class="lineNum">     249 </span>            :                              crossAxisAlignment: CrossAxisAlignment.start,</a>
+<a name="250"><span class="lineNum">     250 </span><span class="lineCov">          1 :                              children: [</span></a>
+<a name="251"><span class="lineNum">     251 </span><span class="lineCov">          1 :                                Container(</span></a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          2 :                                  child: CommonText('import'.tr),</span></a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          1 :                                  padding: EdgeInsets.only(left: 12),</span></a>
+<a name="254"><span class="lineNum">     254 </span>            :                                ),</a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          1 :                                Column(</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          4 :                                  children: List.generate(state.importList.length, (index) {</span></a>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          2 :                                    var wal = state.importList[index];</span></a>
+<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          2 :                                    var net = Network.getNetByRpc(wal.rpc);</span></a>
+<a name="259"><span class="lineNum">     259 </span><span class="lineCov">          1 :                                    return SwiperWidget(</span></a>
+<a name="260"><span class="lineNum">     260 </span><span class="lineCov">          5 :                                      active: $store.wal.key == wal.key,</span></a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineCov">          1 :                                      onDelete: () {</span></a>
+<a name="262"><span class="lineNum">     262 </span><span class="lineCov">          1 :                                         showPassDialog(context, (String pass) async {</span></a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineNoCov">          0 :                                           var private = await wal.getPrivateKey(pass);</span></a>
+<a name="264"><span class="lineNum">     264 </span>            :                                           if(private!=null){</a>
+<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :                                             deleteImprotWallet(context, state, wal, net);</span></a>
+<a name="266"><span class="lineNum">     266 </span>            :                                           }</a>
+<a name="267"><span class="lineNum">     267 </span>            :                                         });</a>
+<a name="268"><span class="lineNum">     268 </span>            :                                      },</a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineNoCov">          0 :                                      onSet: () async{</span></a>
+<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :                                        await Get.toNamed(walletMangePage,</span></a>
+<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :                                            arguments: {'net': net, 'wallet': wal});</span></a>
+<a name="272"><span class="lineNum">     272 </span><span class="lineNoCov">          0 :                                        BlocProvider.of&lt;SelectBloc&gt;(context).add(ImportUpdateEvent());</span></a>
+<a name="273"><span class="lineNum">     273 </span>            :                                      },</a>
+<a name="274"><span class="lineNum">     274 </span><span class="lineNoCov">          0 :                                      onTap: () {</span></a>
+<a name="275"><span class="lineNum">     275 </span><span class="lineNoCov">          0 :                                        $store.setWallet(wal);</span></a>
+<a name="276"><span class="lineNum">     276 </span><span class="lineNoCov">          0 :                                        $store.setNet(net);</span></a>
+<a name="277"><span class="lineNum">     277 </span><span class="lineNoCov">          0 :                                        Global.eventBus.fire(WalletChangeEvent());</span></a>
+<a name="278"><span class="lineNum">     278 </span>            :                                        Global.store</a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineNoCov">          0 :                                            .setString('currentWalletAddress', wal.key);</span></a>
+<a name="280"><span class="lineNum">     280 </span><span class="lineNoCov">          0 :                                        Global.store.setString('activeNetwork', net.rpc);</span></a>
+<a name="281"><span class="lineNum">     281 </span>            :                                        Global.lockFromInit = false;</a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineNoCov">          0 :                                        Get.offAndToNamed(mainPage);</span></a>
+<a name="283"><span class="lineNum">     283 </span>            :                                        // Navigator.of(context).popUntil(</a>
+<a name="284"><span class="lineNum">     284 </span>            :                                        //         (route) =&gt; route.settings.name == mainPage);</a>
+<a name="285"><span class="lineNum">     285 </span>            :                                      },</a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">          1 :                                      id: wal.address,</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">          1 :                                      child: Container(</span></a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineCov">          1 :                                        child: Row(</span></a>
+<a name="289"><span class="lineNum">     289 </span>            :                                          crossAxisAlignment: CrossAxisAlignment.center,</a>
+<a name="290"><span class="lineNum">     290 </span>            :                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,</a>
+<a name="291"><span class="lineNum">     291 </span><span class="lineCov">          1 :                                          children: [</span></a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineCov">          1 :                                            Column(</span></a>
+<a name="293"><span class="lineNum">     293 </span>            :                                              crossAxisAlignment: CrossAxisAlignment.start,</a>
+<a name="294"><span class="lineNum">     294 </span>            :                                              mainAxisAlignment: MainAxisAlignment.center,</a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          1 :                                              children: [</span></a>
+<a name="296"><span class="lineNum">     296 </span><span class="lineCov">          2 :                                                CommonText.white(wal.label, size: 15),</span></a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          1 :                                                SizedBox(</span></a>
+<a name="298"><span class="lineNum">     298 </span>            :                                                  height: 5,</a>
+<a name="299"><span class="lineNum">     299 </span>            :                                                ),</a>
+<a name="300"><span class="lineNum">     300 </span><span class="lineCov">          3 :                                                CommonText.white(dotString(str: wal.addr),</span></a>
+<a name="301"><span class="lineNum">     301 </span>            :                                                    size: 12)</a>
+<a name="302"><span class="lineNum">     302 </span>            :                                              ],</a>
+<a name="303"><span class="lineNum">     303 </span>            :                                            ),</a>
+<a name="304"><span class="lineNum">     304 </span><span class="lineCov">          2 :                                            CommonText.white(net.label),</span></a>
+<a name="305"><span class="lineNum">     305 </span>            :                                          ],</a>
+<a name="306"><span class="lineNum">     306 </span>            :                                        ),</a>
+<a name="307"><span class="lineNum">     307 </span>            :                                      ),</a>
+<a name="308"><span class="lineNum">     308 </span>            :                                    );</a>
+<a name="309"><span class="lineNum">     309 </span>            :                                  }),</a>
+<a name="310"><span class="lineNum">     310 </span>            :                                )</a>
+<a name="311"><span class="lineNum">     311 </span>            :                              ],</a>
+<a name="312"><span class="lineNum">     312 </span>            :                            ),</a>
+<a name="313"><span class="lineNum">     313 </span><span class="lineCov">          2 :                            visible: state.importList.isNotEmpty,</span></a>
+<a name="314"><span class="lineNum">     314 </span>            :                          ),</a>
+<a name="315"><span class="lineNum">     315 </span>            :                        ],</a>
+<a name="316"><span class="lineNum">     316 </span>            :                      ),</a>
+<a name="317"><span class="lineNum">     317 </span>            :                    )</a>
+<a name="318"><span class="lineNum">     318 </span>            :                );</a>
+<a name="319"><span class="lineNum">     319 </span>            :             }</a>
+<a name="320"><span class="lineNum">     320 </span>            :         )</a>
+<a name="321"><span class="lineNum">     321 </span>            :     );</a>
+<a name="322"><span class="lineNum">     322 </span>            : </a>
+<a name="323"><span class="lineNum">     323 </span>            :   }</a>
+<a name="324"><span class="lineNum">     324 </span>            : }</a>
+<a name="325"><span class="lineNum">     325 </span>            : </a>
+<a name="326"><span class="lineNum">     326 </span>            : class SwiperWidget extends StatelessWidget {</a>
+<a name="327"><span class="lineNum">     327 </span>            :   final String id;</a>
+<a name="328"><span class="lineNum">     328 </span>            :   final Noop onDelete;</a>
+<a name="329"><span class="lineNum">     329 </span>            :   final Noop onSet;</a>
+<a name="330"><span class="lineNum">     330 </span>            :   final Noop onTap;</a>
+<a name="331"><span class="lineNum">     331 </span>            :   final bool showBalance;</a>
+<a name="332"><span class="lineNum">     332 </span>            :   final Widget child;</a>
+<a name="333"><span class="lineNum">     333 </span>            :   final bool active;</a>
+<a name="334"><span class="lineNum">     334 </span><span class="lineCov">          2 :   SwiperWidget(</span></a>
+<a name="335"><span class="lineNum">     335 </span>            :       {this.onDelete,</a>
+<a name="336"><span class="lineNum">     336 </span>            :       this.onSet,</a>
+<a name="337"><span class="lineNum">     337 </span>            :       this.onTap,</a>
+<a name="338"><span class="lineNum">     338 </span>            :       this.id,</a>
+<a name="339"><span class="lineNum">     339 </span>            :       this.child,</a>
+<a name="340"><span class="lineNum">     340 </span>            :       this.active = false,</a>
+<a name="341"><span class="lineNum">     341 </span>            :       this.showBalance = false});</a>
+<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          2 :   @override</span></a>
+<a name="343"><span class="lineNum">     343 </span>            :   Widget build(BuildContext context) {</a>
+<a name="344"><span class="lineNum">     344 </span><span class="lineCov">          2 :     return SwipeActionCell(</span></a>
+<a name="345"><span class="lineNum">     345 </span><span class="lineCov">          4 :       key: ValueKey(id),</span></a>
+<a name="346"><span class="lineNum">     346 </span><span class="lineCov">          2 :       trailingActions: [</span></a>
+<a name="347"><span class="lineNum">     347 </span><span class="lineCov">          2 :         SwipeAction(</span></a>
+<a name="348"><span class="lineNum">     348 </span>            :             color: Colors.transparent,</a>
+<a name="349"><span class="lineNum">     349 </span><span class="lineCov">          2 :             content: _getIconButton(</span></a>
+<a name="350"><span class="lineNum">     350 </span><span class="lineCov">          2 :                 CustomColor.red,</span></a>
+<a name="351"><span class="lineNum">     351 </span><span class="lineCov">          2 :                 Image(</span></a>
+<a name="352"><span class="lineNum">     352 </span><span class="lineCov">          2 :                   image: AssetImage('icons/delete.png'),</span></a>
+<a name="353"><span class="lineNum">     353 </span>            :                 )),</a>
+<a name="354"><span class="lineNum">     354 </span><span class="lineNoCov">          0 :             onTap: (handler) async {</span></a>
+<a name="355"><span class="lineNum">     355 </span>            :               handler(false);</a>
+<a name="356"><span class="lineNum">     356 </span><span class="lineNoCov">          0 :               onDelete();</span></a>
+<a name="357"><span class="lineNum">     357 </span>            :             }),</a>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">          2 :         SwipeAction(</span></a>
+<a name="359"><span class="lineNum">     359 </span><span class="lineCov">          2 :             content: _getIconButton(</span></a>
+<a name="360"><span class="lineNum">     360 </span><span class="lineCov">          2 :                 Color(0xffE8CC5C),</span></a>
+<a name="361"><span class="lineNum">     361 </span><span class="lineCov">          2 :                 Image(</span></a>
+<a name="362"><span class="lineNum">     362 </span><span class="lineCov">          2 :                   image: AssetImage('icons/set.png'),</span></a>
+<a name="363"><span class="lineNum">     363 </span>            :                 )),</a>
+<a name="364"><span class="lineNum">     364 </span>            :             color: Colors.transparent,</a>
+<a name="365"><span class="lineNum">     365 </span><span class="lineNoCov">          0 :             onTap: (handler) {</span></a>
+<a name="366"><span class="lineNum">     366 </span>            :               handler(false);</a>
+<a name="367"><span class="lineNum">     367 </span><span class="lineNoCov">          0 :               onSet();</span></a>
+<a name="368"><span class="lineNum">     368 </span>            :             }),</a>
+<a name="369"><span class="lineNum">     369 </span>            :       ],</a>
+<a name="370"><span class="lineNum">     370 </span><span class="lineCov">          2 :       child: Padding(</span></a>
+<a name="371"><span class="lineNum">     371 </span><span class="lineCov">          2 :         padding: EdgeInsets.fromLTRB(12, 15, 12, 0),</span></a>
+<a name="372"><span class="lineNum">     372 </span><span class="lineCov">          2 :         child: GestureDetector(</span></a>
+<a name="373"><span class="lineNum">     373 </span><span class="lineCov">          2 :           child: Container(</span></a>
+<a name="374"><span class="lineNum">     374 </span>            :             height: 70,</a>
+<a name="375"><span class="lineNum">     375 </span><span class="lineCov">          2 :             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),</span></a>
+<a name="376"><span class="lineNum">     376 </span><span class="lineCov">          2 :             child: child,</span></a>
+<a name="377"><span class="lineNum">     377 </span><span class="lineCov">          2 :             decoration: BoxDecoration(</span></a>
+<a name="378"><span class="lineNum">     378 </span><span class="lineCov">          2 :                 borderRadius: CustomRadius.b8,</span></a>
+<a name="379"><span class="lineNum">     379 </span><span class="lineCov">          5 :                 color: active ? CustomColor.primary : Color(0xff8297B0)),</span></a>
+<a name="380"><span class="lineNum">     380 </span>            :           ),</a>
+<a name="381"><span class="lineNum">     381 </span><span class="lineCov">          2 :           onTap: onTap,</span></a>
+<a name="382"><span class="lineNum">     382 </span>            :         ),</a>
+<a name="383"><span class="lineNum">     383 </span>            :       ),</a>
+<a name="384"><span class="lineNum">     384 </span>            :     );</a>
+<a name="385"><span class="lineNum">     385 </span>            :   }</a>
+<a name="386"><span class="lineNum">     386 </span>            : }</a>
+<a name="387"><span class="lineNum">     387 </span>            : </a>
+<a name="388"><span class="lineNum">     388 </span><span class="lineCov">          2 : Widget _getIconButton(Color color, Widget icon) {</span></a>
+<a name="389"><span class="lineNum">     389 </span><span class="lineCov">          2 :   return Container(</span></a>
+<a name="390"><span class="lineNum">     390 </span>            :     width: 50,</a>
+<a name="391"><span class="lineNum">     391 </span>            :     height: 50,</a>
+<a name="392"><span class="lineNum">     392 </span><span class="lineCov">          2 :     padding: EdgeInsets.all(12),</span></a>
+<a name="393"><span class="lineNum">     393 </span><span class="lineCov">          2 :     margin: EdgeInsets.only(top: 20),</span></a>
+<a name="394"><span class="lineNum">     394 </span><span class="lineCov">          2 :     decoration: BoxDecoration(</span></a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineCov">          2 :       borderRadius: BorderRadius.circular(25),</span></a>
+<a name="396"><span class="lineNum">     396 </span>            :       color: color,</a>
+<a name="397"><span class="lineNum">     397 </span>            :     ),</a>
+<a name="398"><span class="lineNum">     398 </span>            :     child: icon,</a>
+<a name="399"><span class="lineNum">     399 </span>            :   );</a>
+<a name="400"><span class="lineNum">     400 </span>            : }</a>
 </pre>
       </td>
     </tr>

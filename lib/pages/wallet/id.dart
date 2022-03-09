@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
@@ -12,7 +11,6 @@ import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/init/hive.dart';
 import 'package:fil/routes/path.dart';
-// import 'package:fil/index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class IdWalletPage extends StatefulWidget {
@@ -21,10 +19,10 @@ class IdWalletPage extends StatefulWidget {
     return IdWalletPageState();
   }
 }
-
+// Page of id wallet
 class IdWalletPageState extends State<IdWalletPage> {
   List<List<ChainWallet>> list = [];
-  String groupHash = Get.arguments['groupHash'];
+  String groupHash = Get.arguments['groupHash'] as String;
   List<ChainWallet> currentMneWallets = [];
   @override
   void initState() {
@@ -33,6 +31,7 @@ class IdWalletPageState extends State<IdWalletPage> {
   }
 
   void setList() {
+
     currentMneWallets = OpenedBox.walletInstance.values.where((wal) {
       return wal.groupHash == groupHash;
     }).toList();

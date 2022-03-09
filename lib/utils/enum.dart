@@ -4,6 +4,12 @@ class WalletType{
   static final privateKey = 2; //  Private key
 }
 
+class NetworkType{
+  static final main = 0; // main
+  static final test = 1;  // test
+  static final custom = 2; // custom
+}
+
 class EncryptType{
   static final sha = 'sha256'; // encrypt sha256 Pbkdf2
   static final argon2 = 'argon2'; // encrypt argon2 libsodium

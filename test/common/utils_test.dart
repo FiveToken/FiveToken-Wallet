@@ -1,5 +1,6 @@
+
 import 'package:fil/chain/net.dart';
-import 'package:fil/common/index.dart';
+import 'package:fil/common/utils.dart' show StringTrim, aesDecrypt, aesEncrypt, base64ToHex, dotString, formatCoin, formatDouble, genCKBase64, getChainValue, getValidWCLink, isDecimal,isValidChainAddress,truncate, isValidContractAddress, isValidPass, isValidUrl, tokenify, trParams;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../constant.dart';
@@ -39,6 +40,18 @@ void main() {
     expect(isDecimal(wrongStr2), false);
   });
 
+  test('check  isValidChainAddress filecoin', () async {
+    var filecoinAddress = 'f16wkgzlglyejqlougingwbnztnp7lrh2xgzlbviq';
+    var _filecoinNetwork = Network.fromJson({"addressType":'filecoin'});
+    expect(await isValidChainAddress(filecoinAddress,_filecoinNetwork), true);
+  });
+
+  test('check  isValidChainAddress ethereum', () async {
+    var ethereumAddress = '0x3FB4F280cF531Ba7d88Fe4D0748A451E4D4276AD';
+    var _ethNetwork = Network.fromJson({"addressType":'eth'});
+    expect(await isValidChainAddress(ethereumAddress,_ethNetwork), true);
+  });
+
   test('check contract addr', () {
     var contract = "0x9343bc852c04690b239ec733c6f71d8816d436c3";
     expect(isValidContractAddress(contract), true);
@@ -70,6 +83,11 @@ void main() {
     expect(formatDouble(str, size: 2, truncate: false), '1.236');
   });
 
+  test('truncate', () {
+    var str = 1.23656;
+    expect(truncate(str, size: 2), '1.23');
+  });
+
   test('Valid Password',(){
     var password = '1234567890';
     expect(isValidPass(password),false);
@@ -91,10 +109,13 @@ void main() {
   test('get valid wallet conect url', () {
     var wc =
         'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org&key=4ab952e5a7c8e37bcdbdbd8aafdd422b5d96fb139ecf0da2a4835386c2a7dea7';
-    var wrongWc =
-        'wc:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org';
     expect(getValidWCLink(wc), wc);
-    expect(getValidWCLink(wrongWc), '');
+  });
+
+  test('get valid wallet conect url', () {
+  var wrongWc =
+      'filecoinwallet:d44faf32-6a72-43d4-a193-6525f50a9d10@1?bridge=https%3A%2F%2Fh.bridge.walletconnect.org&key=4ab952e5a7c8e37bcdbdbd8aafdd422b5d96fb139ecf0da2a4835386c2a7dea7&uri=123';
+    expect(getValidWCLink(wrongWc), '123');
   });
 
   test('string trim',(){

@@ -7,8 +7,8 @@ class TransactionResponse {
       this.message,});
 
   TransactionResponse.fromJson(dynamic json) {
-    cid = json['cid'];
-    message = json['message'];
+    cid = json['cid'] as String;
+    message = json['message'] as String;
   }
   String cid;
   String message;

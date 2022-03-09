@@ -6,10 +6,7 @@ import 'package:fil/routes/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:fil/pages/wallet/manage.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:mockito/annotations.dart';
@@ -34,38 +31,28 @@ void main() {
     mne: '',
     skKek: '26YiVLnEWv4KVBsRL6TPDFY4KrnRA0AbtwTeBBcLPl9jO19sa8npNTD4lupSBbf2GfTL82MpME3WejzBqZW/I2D73c0u2fUwliMLAtw59Gw=',
     digest: 'r57NXYt4/wElj612To5Rkg==',
-    groupHash: '',
     addressType: 'eth',
     rpc: 'https://mainnet.infura.io/v3/'
   );
   OpenedBox.walletInstance = mockChainWalletBox();
   when(OpenedBox.walletInstance.values).thenReturn([]);
-  testWidgets('test render init  page', (tester) async {
-    await tester.pumpWidget(
-        GetMaterialApp(
-          initialRoute: walletMangePage,
-          getPages: [
-            GetPage(name: walletMangePage, arguments: {'wallet': wallet}, page: () =>
-              Provider(
-                  create: (_) => bloc..add(IdDeleteEvent())..add(ImportDeleteEvent()),
-                  child: MultiBlocProvider(
-                      providers: [BlocProvider<SelectBloc>.value(value: bloc)],
-                      child: MaterialApp(
-                        home:  WalletManagePage(),
-                      )
-                  )
-              )
-            ),
-            GetPage(name: passwordResetPage, page: () => PassResetPage())
-          ],
-        )
-    );
+  testWidgets('test page reset', (tester) async {
+    await tester.pumpWidget(GetMaterialApp(
+      initialRoute: passwordResetPage,
+      getPages: [
+        GetPage(name: passwordResetPage, page: () => PassResetPage())
+      ],
+    ));
+    print(Get.currentRoute);
+    String currentPassword = '@Aa123456789012speak11';
+    String newPassword = '@Aa123456789012speak12';
+    String comfirmPassword = '@Aa123456789012speak12';
     // expect(Get.currentRoute, walletMangePage);
     // Get.toNamed(passwordResetPage, arguments: {'wallet': wallet});
-    // await tester.enterText(find.byType(TextField).at(0), pass);
-    // await tester.enterText(find.byType(TextField).at(1), newPass);
-    // await tester.enterText(find.byType(TextField).at(2), newPass);
-    // await tester.tap(find.text('sure'.tr));
+    await tester.enterText(find.byType(TextField).at(0), currentPassword);
+    await tester.enterText(find.byType(TextField).at(1), newPassword);
+    await tester.enterText(find.byType(TextField).at(2), comfirmPassword);
+    await tester.tap(find.text('change'.tr));
     // await tester.pumpAndSettle();
   });
 }

@@ -1,4 +1,4 @@
-// import 'package:fil/index.dart';
+import 'package:fil/widgets/style.dart' show CustomColor, CustomRadius;
 import 'package:flutter/material.dart';
 import 'package:fil/models/index.dart';
 import 'package:fil/widgets/text.dart';

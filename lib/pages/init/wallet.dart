@@ -8,7 +8,7 @@ import 'package:fil/widgets/index.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/store/store.dart';
 
-
+// Page of wallet init
 class WalletInitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

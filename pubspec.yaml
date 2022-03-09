@@ -28,6 +28,7 @@ dependencies:
   # git: https://gitlab.com/abu0306/bls.git
   cupertino_icons: ^0.1.2
   shared_preferences: ^0.5.7
+  lint: ^1.0.0
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   flutter_secure_storage: ^5.0.2
@@ -82,7 +83,7 @@ dependencies:
   equatable: ^2.0.3
   intl: ^0.17.0
   wallet_connect: ^1.0.2
-
+  zxcvbn: ^1.0.0
   #flutter_local_notifications: ^3.0.3
 dev_dependencies:
   flutter_test:

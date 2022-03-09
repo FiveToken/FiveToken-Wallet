@@ -69,16 +69,16 @@ class ChainGas {
         this.isCustomize = false
       });
   ChainGas.fromJson(Map<String, dynamic> json) {
-    gasPrice = json['gasPrice'] ?? '0';
-    gasLimit = json['gasLimit'] ?? 0;
-    gasPremium = json['gasPremium'] ?? '0';
-    level = json['level'] ?? 0;
-    rpcType = json['rpcType'] ?? 0;
-    maxPriorityFee = json['maxPriorityFee'] ?? '0';
-    maxFeePerGas = json['maxFeePerGas'] ?? '0';
-    gasFeeCap = json['gasFeeCap'] ?? '0';
-    baseMaxPriorityFee = json['baseMaxPriorityFee'] ?? '0';
-    baseFeePerGas = json['baseFeePerGas'] ?? '0';
-    isCustomize = json['isCustomize'] ?? false;
+    gasPrice = json['gasPrice'] as String ?? '0' ;
+    gasLimit = json['gasLimit'] as int ?? 0;
+    gasPremium = json['gasPremium'] as String ?? '0';
+    level = json['level'] as int ?? 0;
+    rpcType = json['rpcType'] as String ?? '0';
+    maxPriorityFee = json['maxPriorityFee'] as String ?? '0';
+    maxFeePerGas = json['maxFeePerGas'] as String?? '0';
+    gasFeeCap = json['gasFeeCap'] as String?? '0';
+    baseMaxPriorityFee = json['baseMaxPriorityFee'] as String?? '0';
+    baseFeePerGas = json['baseFeePerGas'] as String?? '0';
+    isCustomize = json['isCustomize'] as bool ?? false;
   }
 }

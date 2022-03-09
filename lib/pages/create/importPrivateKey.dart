@@ -1,6 +1,8 @@
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/init/hive.dart';
+import 'package:fil/utils/enum.dart';
+import 'package:fil/models/private.dart' show PrivateKey;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +12,6 @@ import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/pages/other/scan.dart';
 import 'package:fil/routes/path.dart';
-import 'package:fil/models/index.dart';
 import 'package:flutter/services.dart';
 import 'package:fil/common/utils.dart';
 
@@ -19,11 +20,13 @@ class ImportPrivateKeyPage extends StatefulWidget {
   @override
   State createState() => ImportPrivateKeyPageState();
 }
-
+// Page  of import  privateKey
 class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
-  TextEditingController inputControl = TextEditingController();
-  TextEditingController nameControl = TextEditingController();
-  Network net = Get.arguments['net'];
+  TextEditingController inputControl = TextEditingController(); // input of privateKey
+  TextEditingController nameControl = TextEditingController(); // input of wallet Name
+  Network net = Get.arguments['net'] as Network;
+
+  // Import privateKey
   void _handleImport(BuildContext context) async {
     var inputStr = inputControl.text.trim();
     var name = nameControl.text;
@@ -45,7 +48,7 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
 
     if (net.chain == 'filecoin') {
       try {
-        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)));
+        PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(inputStr)) as Map<String, dynamic>);
         var pk = filPk.privateKey;
         var filAddr = await FilecoinWallet.genAddrByPrivateKey(pk);
         var rpc = net.rpc;
@@ -80,18 +83,19 @@ class ImportPrivateKeyPageState extends State<ImportPrivateKeyPage> {
       }
     }
     Get.toNamed(passwordSetPage, arguments: {
-      'type': 2,
+      'type': WalletType.privateKey,
       'privateKey': inputStr,
       'net': net,
       'label': name
     });
   }
 
+  // Import privateKey by scanning
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.PrivateKey})
         .then((value) {
       try {
-        inputControl.text = value;
+        inputControl.text = value as String;
       } catch (e) {
         showCustomError('wrongPk'.tr);
       }

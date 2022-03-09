@@ -100,8 +100,8 @@ class Signature {
   Signature(this.type, this.data);
 
   Signature.fromJson(Map<String, dynamic> json)
-      : this.type = json['Type'],
-        this.data = json['Data'];
+      : this.type = json['Type'] as num,
+        this.data = json['Data'] as  String;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

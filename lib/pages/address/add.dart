@@ -1,11 +1,10 @@
-// import 'package:fil/index.dart';
 import 'package:fil/bloc/address/address_bloc.dart';
 import 'package:fil/chain/net.dart';
+import 'package:fil/models/address.dart' show ContactAddress;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/toast.dart';
@@ -25,7 +24,7 @@ class AddressBookAddPage extends StatefulWidget {
     return AddressBookAddPageState();
   }
 }
-
+// Page of add address book
 class AddressBookAddPageState extends State<AddressBookAddPage> {
   TextEditingController addrCtrl = TextEditingController();
   TextEditingController nameCtrl = TextEditingController();
@@ -37,7 +36,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
   void initState() {
     super.initState();
     if (Get.arguments != null && Get.arguments['mode'] != null) {
-      addr = Get.arguments['addr'] as ContactAddress;
+      addr = Get.arguments['address'] as ContactAddress;
       mode = 1;
       addrCtrl.text = addr.address;
       nameCtrl.text = addr.label;
@@ -51,7 +50,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       showCustomError('validAddress'.tr);
       return false;
     }
-    bool valid = await isValidChainAddress(addr, net);
+    bool valid = isValidChainAddress(addr, net);
     if (!valid) {
       showCustomError('enterValidAddr'.tr);
       return false;
@@ -78,7 +77,7 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
       confirmAdd(net);
     }
   }
-
+  // add
   void confirmAdd(Network net) {
     var address = addrCtrl.text.trim();
     var label = nameCtrl.text.trim();
@@ -161,11 +160,11 @@ class AddressBookAddPageState extends State<AddressBookAddPage> {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Connect})
         .then((scanResult) async {
       if (scanResult != '') {
-        bool valid = await isValidChainAddress(scanResult, net);
+        bool valid = isValidChainAddress(scanResult as String, net);
         if (valid) {
-          addrCtrl.text = scanResult;
+          addrCtrl.text = scanResult as String;
         } else {
-          showCustomError('wrongAddr'.tr);
+          showCustomError('wrongAddress'.tr);
         }
       }
     });

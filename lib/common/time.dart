@@ -1,6 +1,6 @@
 import 'package:day/day.dart';
 
-String formatTimeByStr(num timestamp, {String str = 'YYYY-MM-DD HH:mm:ss'}) {
+String formatTimeByStr(int timestamp, {String str = 'YYYY-MM-DD HH:mm:ss'}) {
   if (timestamp == null || timestamp == 0) {
     return '';
   }

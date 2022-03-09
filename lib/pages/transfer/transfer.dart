@@ -2,7 +2,15 @@ import 'package:decimal/decimal.dart';
 import 'package:fil/bloc/gas/gas_bloc.dart';
 import 'package:fil/chain/gas.dart';
 import 'package:fil/config/config.dart';
+import 'package:fil/models/address.dart' show ContactAddress;
+import 'package:fil/models/cacheMessage.dart' show CacheMessage;
 import 'package:fil/utils/enum.dart';
+import 'package:fil/widgets/bottomSheet.dart' show showCustomModalBottomSheet;
+import 'package:fil/widgets/card.dart' show CardItem, TapItemCard;
+import 'package:fil/widgets/dialog.dart' show CommonTitle;
+import 'package:fil/widgets/style.dart' show CustomColor, CustomRadius;
+import 'package:fil/widgets/text.dart' show CommonText;
+import 'package:fil/widgets/toast.dart' show showCustomError;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -15,7 +23,6 @@ import 'dart:math';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/formatter.dart';
 import 'package:fil/common/utils.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/pages/other/scan.dart';
 import 'package:fil/chain/token.dart';
@@ -52,10 +59,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     isSpeedUp = false;
     if (Get.arguments != null) {
       if (Get.arguments['to'] != null) {
-        addressCtrl.text = Get.arguments['to'];
+        addressCtrl.text = Get.arguments['to'] as String;
       }
       if (Get.arguments['page'] != null) {
-        prePage = Get.arguments['page'];
+        prePage = Get.arguments['page'] as String;
       }
       if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
         rpcType = RpcType.ethereumMain;
@@ -66,7 +73,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       }
 
       if (Get.arguments['token'] != null) {
-        this.token = Get.arguments['token'];
+        this.token = Get.arguments['token'] as Token;
       }
     }
   }
@@ -175,15 +182,21 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     );
   }
 
+  /*
+  * scan callback function
+  * */
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Address})
         .then((scanResult) {
       if (scanResult != '') {
-        addressCtrl.text = scanResult;
+        addressCtrl.text = scanResult as String;
       }
     });
   }
 
+  /*
+  * get gas
+  * */
   void getGas(BuildContext context) {
     var to = addressCtrl.text.trim();
     if (mounted) {
@@ -193,6 +206,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
+  /*
+  * Get the message whose message type is pending for the current account in the local cache
+  * */
   List<CacheMessage> getPendingList(){
     return OpenedBox.mesInstance.values
         .where((mes) =>
@@ -200,6 +216,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         .toList();
   }
 
+  /*
+  * Get the fee callback function
+  * */
   void getGasCallback() {
     try {
       if (isSpeedUp) {
@@ -208,7 +227,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         increaseGas();
         var toAddress = last.to;
         var _precision = last.token != null ? last.token.precision : 18;
-        var unit = Decimal.fromInt(pow(10, _precision));
+        var unit = Decimal.fromInt(pow(10, _precision).toInt());
         var _value = Decimal.parse(last.value);
         var amount =(_value / unit).toString();
         var _balance =  last.token != null ? last.token.balance: $store.wal.balance;
@@ -239,6 +258,10 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
+  /*
+  * next step callback
+  * @param {context} context: context
+  * */
   nextStep(BuildContext context) async {
     try {
       bool valid = await checkInputValid();
@@ -267,7 +290,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  bool checkGas(balance,amount) {
+  bool checkGas(String balance,String amount) {
     var handlingFee = BigInt.parse($store.gas.handlingFee);
     var bigIntBalance =
         BigInt.tryParse(balance);
@@ -289,6 +312,9 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     return true;
   }
 
+  /*
+  * input box check
+  * */
   Future<bool> checkInputValid() async {
     try {
       var amount = amountCtrl.text.trim();
@@ -297,7 +323,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
         showCustomError('enterAddr'.tr);
         return false;
       }
-      bool valid = await isValidChainAddress(toAddress, net);
+      bool valid = isValidChainAddress(toAddress, net);
       if (!valid) {
         showCustomError('errorAddr'.tr);
         return false;
@@ -338,12 +364,18 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     Get.back();
   }
 
+  /*
+  * message acceleration increases handling fees
+  * */
   void increaseGas() {
     try {
       var cacheGas = $store.gas;
       var realMaxFeePerGas = $store.gas.maxFeePerGas;
       var realGasFeeCap = $store.gas.gasFeeCap;
       var realGasPrice = $store.gas.gasPrice;
+
+      var realGasPremium = $store.gas.gasPremium;
+      var realGasLimit = $store.gas.gasLimit;
 
       if (($store.net.chain == 'eth') && ($store.net.net == 'main')) {
         var increaseMaxFeePerGas =
@@ -357,6 +389,12 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
                 .truncate();
         realGasFeeCap =
             (max(int.parse(realGasFeeCap), increaseGasFeeCap)).toString();
+
+        var increaseGasPremium = (int.parse(cacheGas.gasPremium)* Config.increaseGasCoefficient).truncate();
+        realGasPremium = (max(int.parse(realGasPremium),increaseGasPremium)).toString();
+
+        var increaseGasLimit = (cacheGas.gasLimit * Config.increaseGasCoefficient).truncate();
+        realGasLimit = max(realGasLimit,increaseGasLimit);
       } else {
         var increaseGasPrice =
             (int.parse(cacheGas.gasPrice) * Config.increaseGasCoefficient)
@@ -366,8 +404,8 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
       }
 
       var _gas = {
-        "gasLimit": $store.gas.gasLimit,
-        "gasPremium": $store.gas.gasPremium,
+        "gasLimit": realGasLimit,
+        "gasPremium": realGasPremium,
         "gasPrice": realGasPrice,
         "rpcType": $store.gas.rpcType,
         "gasFeeCap": realGasFeeCap,
@@ -383,7 +421,7 @@ class FilTransferNewPageState extends State<FilTransferNewPage> {
     }
   }
 
-  Widget _speedUpSheet(toAddress, amount, context) {
+  Widget _speedUpSheet(toAddress, amount, BuildContext context) {
     return Column(
       children: [
         CommonTitle(

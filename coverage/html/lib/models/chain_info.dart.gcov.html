@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -68,7 +68,7 @@
 <a name="6"><span class="lineNum">       6 </span>            : /// timestamp : 0</a>
 <a name="7"><span class="lineNum">       7 </span>            : </a>
 <a name="8"><span class="lineNum">       8 </span>            : class ChainInfo {</a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          1 :   ChainInfo({</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          2 :   ChainInfo({</span></a>
 <a name="10"><span class="lineNum">      10 </span>            :     this.gasUsed,</a>
 <a name="11"><span class="lineNum">      11 </span>            :     this.gasLimit,</a>
 <a name="12"><span class="lineNum">      12 </span>            :     this.number,</a>
@@ -77,11 +77,11 @@
 <a name="15"><span class="lineNum">      15 </span>            :   });</a>
 <a name="16"><span class="lineNum">      16 </span>            : </a>
 <a name="17"><span class="lineNum">      17 </span><span class="lineCov">          1 :   ChainInfo.fromJson(dynamic json) {</span></a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          3 :     gasUsed = hexToDartInt(json['gasUsed']);</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          3 :     gasLimit = hexToDartInt(json['gasLimit']);</span></a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          3 :     number = hexToDartInt(json['number']);</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          3 :     timestamp = hexToDartInt(json['timestamp']);</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          3 :     baseFeePerGas = hexToDartInt(json['baseFeePerGas']);</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          3 :     gasUsed = hexToDartInt(json['gasUsed'] as String);</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          3 :     gasLimit = hexToDartInt(json['gasLimit'] as String);</span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          3 :     number = hexToDartInt(json['number'] as String);</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          3 :     timestamp = hexToDartInt(json['timestamp'] as String);</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          3 :     baseFeePerGas = hexToDartInt(json['baseFeePerGas']as String);</span></a>
 <a name="23"><span class="lineNum">      23 </span>            :   }</a>
 <a name="24"><span class="lineNum">      24 </span>            : </a>
 <a name="25"><span class="lineNum">      25 </span>            :   int gasUsed;</a>

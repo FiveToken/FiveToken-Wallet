@@ -1,10 +1,10 @@
 import 'dart:math';
+import 'package:fil/models/cacheMessage.dart' show CacheMessage;
 import 'package:fil/store/store.dart';
 import 'package:fil/utils/decimal_extension.dart';
 import 'package:fil/utils/num_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/widgets/card.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -18,14 +18,19 @@ class FilDetailPage extends StatefulWidget {
   State createState() => FilDetailPageState();
 }
 
+// Page of fil detail
 class FilDetailPageState extends State<FilDetailPage> {
-  CacheMessage mes = Get.arguments;
+  CacheMessage mes = Get.arguments as CacheMessage;
 
   @override
   void initState() {
+    if(mes==null){
+      mes = CacheMessage();
+    }
     super.initState();
   }
 
+  // Go to the browser to see more information
   void goBrowser(CacheMessage m) {
     openInBrowser($store.net.getDetailLink(m.hash));
   }
@@ -47,12 +52,7 @@ class FilDetailPageState extends State<FilDetailPage> {
             SizedBox(
               height: 25,
             ),
-            CommonCard(
-                MessageRow(
-                    label: 'amount'.tr,
-                    value: formatValue()
-                )
-            ),
+            CommonCard(MessageRow(label: 'amount'.tr, value: formatValue())),
             SizedBox(
               height: 7,
             ),
@@ -123,15 +123,20 @@ class FilDetailPageState extends State<FilDetailPage> {
     );
   }
 
-  String formatValue(){
+  String formatValue() {
+    print('eeee');
+    if (mes == null) {
+      return '';
+    }
+    ;
     bool _isToken = mes.token != null;
-    if(_isToken){
+    if (_isToken) {
       var unit = pow(10, mes.token.precision);
       var _value = double.parse(mes.value);
-      var _amount = (_value/unit).toDecimal;
+      var _amount = (_value / unit).toDecimal;
       var res = _amount.fmtDown(18);
       return res + " " + mes.token.symbol;
-    }else{
+    } else {
       var res = formatCoin(mes.value, size: 18);
       return res + " " + $store.net.coin;
     }
@@ -140,7 +145,9 @@ class FilDetailPageState extends State<FilDetailPage> {
 
 class MessageStatusHeader extends StatelessWidget {
   final CacheMessage mes;
+
   MessageStatusHeader(this.mes);
+
   bool get pending {
     return mes.pending == 1;
   }
@@ -172,7 +179,7 @@ class MessageStatusHeader extends StatelessWidget {
           ),
           padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
         ),
-        CommonText.grey(formatTimeByStr(mes.blockTime))
+        CommonText.grey(formatTimeByStr(mes.blockTime.toInt()))
       ],
     );
   }
@@ -183,7 +190,9 @@ class MessageRow extends StatelessWidget {
   final String label;
   final String value;
   final Widget append;
+
   MessageRow({this.label, this.value, this.append, this.selectable = false});
+
   @override
   Widget build(BuildContext context) {
     return Padding(

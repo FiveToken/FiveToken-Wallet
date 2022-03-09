@@ -62,19 +62,19 @@ class WalletState extends Equatable {
     list.addAll(storeMessageList);
     list.sort((a, b) {
       if (a.blockTime != null && b.blockTime != null) {
-        return b.blockTime.compareTo(a.blockTime);
+        return b.blockTime.compareTo(a.blockTime) as int;
       } else {
         return 1;
       }
     });
 
     list.forEach((mes) {
-      var time = formatTimeByStr(mes.blockTime, str: formatStr);
+      var time = formatTimeByStr(mes.blockTime as int, str: formatStr);
       var item = messageMap[time];
       if (item == null) {
         messageMap[time] = [];
       }
-      messageMap[time].add(mes);
+      messageMap[time].add(mes as CacheMessage);
     });
     return messageMap;
   }

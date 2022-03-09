@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:decimal/decimal.dart';
 import 'package:intl/intl.dart';
 import 'package:fil/utils/num_extension.dart';
@@ -23,5 +26,11 @@ extension DecimalExtension on Decimal {
       return _numberFormat.format(toDouble().roundDown(decimals));
     }
     return toString();
+  }
+}
+
+extension Uint8ListExtension on Uint8List{
+  String toEncode(){
+    return base64Encode(this);
   }
 }

@@ -19,9 +19,9 @@ class LockBox {
   });
 
   LockBox.fromJson(dynamic json) {
-    lockscreen = json['lockscreen'];
-    password = json['password'];
-    status = json['status'];
+    lockscreen = json['lockscreen'] as bool;
+    password = json['password'] as String;
+    status = json['status'] as String;
   }
 
   Map<String, dynamic> toJson() {

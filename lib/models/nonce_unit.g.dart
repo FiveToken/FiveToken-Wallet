@@ -19,17 +19,20 @@ class NonceUnitAdapter extends TypeAdapter<NonceUnit> {
     return NonceUnit(
       time: fields[0] as int,
       value: (fields[1] as List)?.cast<int>(),
+      salt: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, NonceUnit obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.time)
       ..writeByte(1)
-      ..write(obj.value);
+      ..write(obj.value)
+      ..writeByte(2)
+      ..write(obj.salt);
   }
 
   @override

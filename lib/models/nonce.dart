@@ -12,8 +12,8 @@ class Nonce {
     this.value = 0
   });
   Nonce.fromJson(Map<dynamic, dynamic> json) {
-    time = json['time'];
-    value = json['value'];
+    time = json['time'] as int;
+    value = json['value'] as int;
   }
   Map<String, dynamic> toJson() {
     return <String, int>{'time': time, 'value': value};

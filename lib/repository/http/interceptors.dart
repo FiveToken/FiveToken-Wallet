@@ -11,8 +11,12 @@ class HttpInterceptors extends InterceptorsWrapper {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if(response.requestOptions.path.contains('/ping') ) {
+      response.data = (response.requestOptions.path).split('/api/')[0];
+      handler.next(response);
+    }
     if (response.data is Map) {
-      final responseData = ResponseData.formJson(response.data);
+      final responseData = ResponseData.formJson(response.data as Map<String, dynamic>);
       response.data = responseData.data;
       if (responseData.success) {
         handler.next(response);
@@ -52,8 +56,8 @@ class ResponseData {
   }
 
   ResponseData.formJson(Map<String, dynamic> json) {
-    data = json["data"];
-    code = json["code"];
-    msg = json["msg"];
+    data =  json["data"];
+    code = json["code"] as int;
+    msg = json["msg"] as String;
   }
 }

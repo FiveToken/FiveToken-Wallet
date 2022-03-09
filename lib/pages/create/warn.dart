@@ -69,6 +69,7 @@ class CreateWarnPage extends StatelessWidget {
   }
 }
 
+// widget of tip item
 class TipItem extends StatelessWidget {
   final String tip;
   TipItem(this.tip);

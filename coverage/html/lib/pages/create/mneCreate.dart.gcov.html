@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">99</td>
-            <td class="headerCovTableEntry">107</td>
-            <td class="headerCovTableEntryHi">92.5 %</td>
+            <td class="headerCovTableEntry">108</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -61,11 +61,11 @@
 <pre class="sourceHeading">          Line data    Source code</pre>
 <pre class="source">
 <a name="1"><span class="lineNum">       1 </span>            : import 'package:fil/bloc/create/create_bloc.dart';</a>
-<a name="2"><span class="lineNum">       2 </span>            : import 'package:flutter/material.dart';</a>
-<a name="3"><span class="lineNum">       3 </span>            : import 'package:flutter_bloc/flutter_bloc.dart';</a>
-<a name="4"><span class="lineNum">       4 </span>            : import 'package:get/get.dart';</a>
-<a name="5"><span class="lineNum">       5 </span>            : import 'package:fil/common/index.dart';</a>
-<a name="6"><span class="lineNum">       6 </span>            : // import 'package:fil/index.dart';</a>
+<a name="2"><span class="lineNum">       2 </span>            : import 'package:fil/common/utils.dart' show copyText;</a>
+<a name="3"><span class="lineNum">       3 </span>            : import 'package:flutter/material.dart';</a>
+<a name="4"><span class="lineNum">       4 </span>            : import 'package:flutter_bloc/flutter_bloc.dart';</a>
+<a name="5"><span class="lineNum">       5 </span>            : import 'package:get/get.dart';</a>
+<a name="6"><span class="lineNum">       6 </span>            : import 'package:fil/common/index.dart';</a>
 <a name="7"><span class="lineNum">       7 </span>            : import 'package:bip39/bip39.dart' as bip39;</a>
 <a name="8"><span class="lineNum">       8 </span>            : import 'package:fil/pages/create/warn.dart';</a>
 <a name="9"><span class="lineNum">       9 </span>            : import 'package:fil/widgets/dialog.dart';</a>
@@ -83,7 +83,7 @@
 <a name="21"><span class="lineNum">      21 </span><span class="lineCov">          1 :     return MneCreatePageState();</span></a>
 <a name="22"><span class="lineNum">      22 </span>            :   }</a>
 <a name="23"><span class="lineNum">      23 </span>            : }</a>
-<a name="24"><span class="lineNum">      24 </span>            : </a>
+<a name="24"><span class="lineNum">      24 </span>            : // Pages of create Mnemonic words</a>
 <a name="25"><span class="lineNum">      25 </span>            : class MneCreatePageState extends State&lt;MneCreatePage&gt; {</a>
 <a name="26"><span class="lineNum">      26 </span>            :   String mne;</a>
 <a name="27"><span class="lineNum">      27 </span>            :   String _message = &quot;&quot;;</a>
@@ -96,7 +96,7 @@
 <a name="34"><span class="lineNum">      34 </span><span class="lineCov">          1 :   @override</span></a>
 <a name="35"><span class="lineNum">      35 </span>            :   void initState() {</a>
 <a name="36"><span class="lineNum">      36 </span><span class="lineCov">          1 :     super.initState();</span></a>
-<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          2 :     mne = bip39.generateMnemonic();</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          2 :     mne = bip39.generateMnemonic(); // Generates 12 mnemonic words</span></a>
 <a name="38"><span class="lineNum">      38 </span><span class="lineCov">          3 :     Future.delayed(Duration.zero).then((value) {</span></a>
 <a name="39"><span class="lineNum">      39 </span><span class="lineCov">          1 :       showCustomDialog(</span></a>
 <a name="40"><span class="lineNum">      40 </span><span class="lineCov">          1 :           context,</span></a>
@@ -138,162 +138,165 @@
 <a name="76"><span class="lineNum">      76 </span><span class="lineCov">          1 :       FlutterScreenshotEvents.statusStream?.listen((event) {</span></a>
 <a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :         setState(() {</span></a>
 <a name="78"><span class="lineNum">      78 </span><span class="lineNoCov">          0 :           _message = event.toString();</span></a>
-<a name="79"><span class="lineNum">      79 </span>            :         });</a>
-<a name="80"><span class="lineNum">      80 </span>            :       });</a>
-<a name="81"><span class="lineNum">      81 </span>            :     }</a>
-<a name="82"><span class="lineNum">      82 </span>            :   }</a>
-<a name="83"><span class="lineNum">      83 </span>            : </a>
-<a name="84"><span class="lineNum">      84 </span><span class="lineCov">          1 :   @override</span></a>
-<a name="85"><span class="lineNum">      85 </span>            :   Widget build(BuildContext context) {</a>
-<a name="86"><span class="lineNum">      86 </span><span class="lineCov">          1 :     return BlocProvider(</span></a>
-<a name="87"><span class="lineNum">      87 </span><span class="lineCov">          5 :       create: (context) =&gt; CreateBloc()..add(SetCreateEvent(mne: mne)),</span></a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineCov">          2 :       child: BlocBuilder&lt;CreateBloc,CreateState&gt;(builder: (ctx, state){</span></a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineCov">          1 :         return CommonScaffold(</span></a>
-<a name="90"><span class="lineNum">      90 </span><span class="lineCov">          1 :         footerText: 'next'.tr,</span></a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineNoCov">          0 :         onPressed: () {</span></a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :         Get.toNamed(mneCheckPage, arguments: {&quot;mne&quot;: state.mne});</span></a>
-<a name="93"><span class="lineNum">      93 </span>            :         },</a>
-<a name="94"><span class="lineNum">      94 </span>            :         grey: true,</a>
-<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          1 :         body: SingleChildScrollView(</span></a>
-<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          1 :             child: Column(</span></a>
-<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          1 :             children: [</span></a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          1 :             SizedBox(</span></a>
-<a name="99"><span class="lineNum">      99 </span>            :             height: 30,</a>
-<a name="100"><span class="lineNum">     100 </span>            :             ),</a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          1 :             Container(</span></a>
-<a name="102"><span class="lineNum">     102 </span>            :                 width: double.infinity,</a>
-<a name="103"><span class="lineNum">     103 </span><span class="lineCov">          1 :                 child: Column(</span></a>
-<a name="104"><span class="lineNum">     104 </span>            :                   crossAxisAlignment: CrossAxisAlignment.start,</a>
-<a name="105"><span class="lineNum">     105 </span><span class="lineCov">          1 :                   children: [</span></a>
-<a name="106"><span class="lineNum">     106 </span><span class="lineCov">          1 :                   CommonText(</span></a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          1 :                   'backupMne'.tr,</span></a>
-<a name="108"><span class="lineNum">     108 </span>            :                   size: 14,</a>
-<a name="109"><span class="lineNum">     109 </span>            :                   weight: FontWeight.w500,</a>
-<a name="110"><span class="lineNum">     110 </span>            :                   ),</a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          1 :                   GestureDetector(</span></a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          1 :                     child: CommonText(</span></a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          1 :                         'writeMne'.tr,</span></a>
-<a name="114"><span class="lineNum">     114 </span>            :                         size: 14,</a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          1 :                         color: Color(0xffB4B5B7),</span></a>
-<a name="116"><span class="lineNum">     116 </span>            :                     ),</a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 :                     onTap: () {</span></a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :                     copyText(state.mne);</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :                     showCustomToast('copyMne'.tr);</span></a>
-<a name="120"><span class="lineNum">     120 </span>            :                     },</a>
-<a name="121"><span class="lineNum">     121 </span>            :                   )</a>
-<a name="122"><span class="lineNum">     122 </span>            :                 ],</a>
-<a name="123"><span class="lineNum">     123 </span>            :                ),</a>
-<a name="124"><span class="lineNum">     124 </span>            :               ),</a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          1 :               SizedBox(</span></a>
-<a name="126"><span class="lineNum">     126 </span>            :               height: 20,</a>
-<a name="127"><span class="lineNum">     127 </span>            :               ),</a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineCov">          1 :               Container(</span></a>
-<a name="129"><span class="lineNum">     129 </span>            :               width: double.infinity,</a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineCov">          1 :               decoration: BoxDecoration(</span></a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          1 :                 color: Colors.white, borderRadius: BorderRadius.circular(8)),</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineCov">          1 :                 child: mneGrids(state),</span></a>
-<a name="133"><span class="lineNum">     133 </span>            :               ),</a>
-<a name="134"><span class="lineNum">     134 </span><span class="lineCov">          1 :               SizedBox(</span></a>
-<a name="135"><span class="lineNum">     135 </span>            :                 height: 20,</a>
-<a name="136"><span class="lineNum">     136 </span>            :               ),</a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineCov">          1 :               Container(</span></a>
-<a name="138"><span class="lineNum">     138 </span><span class="lineCov">          1 :                 child: Column(</span></a>
-<a name="139"><span class="lineNum">     139 </span><span class="lineCov">          1 :                 children: [</span></a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          2 :                   TipItem('placeMne'.tr),</span></a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          2 :                   TipItem('shareMne'.tr),</span></a>
-<a name="142"><span class="lineNum">     142 </span>            :                 ],</a>
-<a name="143"><span class="lineNum">     143 </span>            :                 ),</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineCov">          1 :                 padding: EdgeInsets.only(right: 12),</span></a>
-<a name="145"><span class="lineNum">     145 </span>            :               )</a>
-<a name="146"><span class="lineNum">     146 </span>            :             ],</a>
-<a name="147"><span class="lineNum">     147 </span>            :           ),</a>
-<a name="148"><span class="lineNum">     148 </span><span class="lineCov">          1 :           padding: EdgeInsets.symmetric(horizontal: 12),</span></a>
-<a name="149"><span class="lineNum">     149 </span>            :           ),</a>
-<a name="150"><span class="lineNum">     150 </span>            :         );</a>
-<a name="151"><span class="lineNum">     151 </span>            :       },</a>
-<a name="152"><span class="lineNum">     152 </span>            :     )</a>
-<a name="153"><span class="lineNum">     153 </span>            :     );</a>
-<a name="154"><span class="lineNum">     154 </span>            :   }</a>
-<a name="155"><span class="lineNum">     155 </span>            : </a>
-<a name="156"><span class="lineNum">     156 </span><span class="lineCov">          1 :   Widget mneGrids(state) {</span></a>
-<a name="157"><span class="lineNum">     157 </span><span class="lineCov">          2 :     List mneList = state.mne.split(' ');</span></a>
-<a name="158"><span class="lineNum">     158 </span><span class="lineCov">          2 :     if (mneList.length != 12) {</span></a>
-<a name="159"><span class="lineNum">     159 </span><span class="lineCov">          1 :       return SizedBox();</span></a>
-<a name="160"><span class="lineNum">     160 </span>            :     }</a>
-<a name="161"><span class="lineNum">     161 </span><span class="lineCov">          4 :     var itemList = mneList.asMap().entries.map((entry) {</span></a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineCov">          1 :       var v = entry.value;</span></a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          1 :       return MneItem(</span></a>
-<a name="164"><span class="lineNum">     164 </span>            :         label: v,</a>
-<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          4 :         index: (entry.key + 1).toString() + '.',</span></a>
-<a name="166"><span class="lineNum">     166 </span>            :       );</a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineCov">          1 :     }).toList();</span></a>
-<a name="168"><span class="lineNum">     168 </span>            : </a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineCov">          1 :     return GridView.count(</span></a>
-<a name="170"><span class="lineNum">     170 </span>            :         padding: const EdgeInsets.all(12),</a>
-<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          1 :         physics: NeverScrollableScrollPhysics(),</span></a>
-<a name="172"><span class="lineNum">     172 </span>            :         childAspectRatio: 2.1,</a>
-<a name="173"><span class="lineNum">     173 </span>            :         crossAxisSpacing: 20,</a>
-<a name="174"><span class="lineNum">     174 </span>            :         mainAxisSpacing: 12,</a>
-<a name="175"><span class="lineNum">     175 </span>            :         crossAxisCount: 3,</a>
-<a name="176"><span class="lineNum">     176 </span>            :         shrinkWrap: true,</a>
-<a name="177"><span class="lineNum">     177 </span>            :         children: itemList);</a>
-<a name="178"><span class="lineNum">     178 </span>            :   }</a>
-<a name="179"><span class="lineNum">     179 </span>            : }</a>
-<a name="180"><span class="lineNum">     180 </span>            : </a>
-<a name="181"><span class="lineNum">     181 </span>            : class MneItem extends StatelessWidget {</a>
-<a name="182"><span class="lineNum">     182 </span>            :   final String label;</a>
-<a name="183"><span class="lineNum">     183 </span>            :   final Noop onTap;</a>
-<a name="184"><span class="lineNum">     184 </span>            :   final String index;</a>
-<a name="185"><span class="lineNum">     185 </span>            :   final Color bg;</a>
-<a name="186"><span class="lineNum">     186 </span>            :   final bool remove;</a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          3 :   MneItem(</span></a>
-<a name="188"><span class="lineNum">     188 </span>            :       {this.label, this.onTap, this.index = '', this.bg, this.remove = false});</a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineCov">          3 :   @override</span></a>
-<a name="190"><span class="lineNum">     190 </span>            :   Widget build(BuildContext context) {</a>
-<a name="191"><span class="lineNum">     191 </span><span class="lineCov">          3 :     return GestureDetector(</span></a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          1 :       onTap: () {</span></a>
-<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          1 :         if (onTap != null) {</span></a>
-<a name="194"><span class="lineNum">     194 </span><span class="lineCov">          1 :           onTap();</span></a>
-<a name="195"><span class="lineNum">     195 </span>            :         }</a>
-<a name="196"><span class="lineNum">     196 </span>            :       },</a>
-<a name="197"><span class="lineNum">     197 </span><span class="lineCov">          3 :       child: Stack(</span></a>
-<a name="198"><span class="lineNum">     198 </span><span class="lineCov">          3 :         children: [</span></a>
-<a name="199"><span class="lineNum">     199 </span><span class="lineCov">          3 :           Positioned(</span></a>
-<a name="200"><span class="lineNum">     200 </span><span class="lineCov">          3 :               child: Container(</span></a>
-<a name="201"><span class="lineNum">     201 </span><span class="lineCov">          3 :             decoration: BoxDecoration(</span></a>
-<a name="202"><span class="lineNum">     202 </span><span class="lineCov">          9 :                 color: bg ?? Color(0xFF5C8BCB), borderRadius: CustomRadius.b8),</span></a>
-<a name="203"><span class="lineNum">     203 </span>            :             alignment: Alignment.center,</a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineCov">          3 :             child: CommonText(</span></a>
-<a name="205"><span class="lineNum">     205 </span><span class="lineCov">          3 :               label,</span></a>
-<a name="206"><span class="lineNum">     206 </span>            :               size: 14,</a>
-<a name="207"><span class="lineNum">     207 </span>            :               color: Colors.white,</a>
-<a name="208"><span class="lineNum">     208 </span>            :             ),</a>
-<a name="209"><span class="lineNum">     209 </span>            :           )),</a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineCov">          3 :           Positioned(</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          3 :               child: Visibility(</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineCov">          6 :                   visible: index != '',</span></a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          3 :                   child: Container(</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">          3 :                     padding: EdgeInsets.all(5),</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineCov">          3 :                     child: CommonText(</span></a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          3 :                       index,</span></a>
-<a name="217"><span class="lineNum">     217 </span>            :                       size: 10,</a>
-<a name="218"><span class="lineNum">     218 </span>            :                       color: Colors.white,</a>
-<a name="219"><span class="lineNum">     219 </span>            :                     ),</a>
-<a name="220"><span class="lineNum">     220 </span>            :                   ))),</a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineCov">          3 :           Positioned(</span></a>
-<a name="222"><span class="lineNum">     222 </span>            :               right: 5,</a>
-<a name="223"><span class="lineNum">     223 </span>            :               top: 5,</a>
-<a name="224"><span class="lineNum">     224 </span><span class="lineCov">          3 :               child: Visibility(</span></a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          3 :                   visible: remove,</span></a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          3 :                   child: Image(</span></a>
-<a name="227"><span class="lineNum">     227 </span>            :                     width: 13,</a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          3 :                     image: AssetImage('icons/close.png'),</span></a>
-<a name="229"><span class="lineNum">     229 </span>            :                   )))</a>
-<a name="230"><span class="lineNum">     230 </span>            :         ],</a>
-<a name="231"><span class="lineNum">     231 </span>            :       ),</a>
-<a name="232"><span class="lineNum">     232 </span>            :     );</a>
-<a name="233"><span class="lineNum">     233 </span>            :   }</a>
-<a name="234"><span class="lineNum">     234 </span>            : }</a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineNoCov">          0 :           showCustomToast(_message);</span></a>
+<a name="80"><span class="lineNum">      80 </span>            :         });</a>
+<a name="81"><span class="lineNum">      81 </span>            :       });</a>
+<a name="82"><span class="lineNum">      82 </span>            :     }</a>
+<a name="83"><span class="lineNum">      83 </span>            :   }</a>
+<a name="84"><span class="lineNum">      84 </span>            : </a>
+<a name="85"><span class="lineNum">      85 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="86"><span class="lineNum">      86 </span>            :   Widget build(BuildContext context) {</a>
+<a name="87"><span class="lineNum">      87 </span><span class="lineCov">          1 :     return BlocProvider(</span></a>
+<a name="88"><span class="lineNum">      88 </span><span class="lineCov">          5 :       create: (context) =&gt; CreateBloc()..add(SetCreateEvent(mne: mne)),</span></a>
+<a name="89"><span class="lineNum">      89 </span><span class="lineCov">          2 :       child: BlocBuilder&lt;CreateBloc,CreateState&gt;(builder: (ctx, state){</span></a>
+<a name="90"><span class="lineNum">      90 </span><span class="lineCov">          1 :         return CommonScaffold(</span></a>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">          1 :         footerText: 'next'.tr,</span></a>
+<a name="92"><span class="lineNum">      92 </span><span class="lineNoCov">          0 :         onPressed: () {</span></a>
+<a name="93"><span class="lineNum">      93 </span><span class="lineNoCov">          0 :         Get.toNamed(mneCheckPage, arguments: {&quot;mne&quot;: state.mne});</span></a>
+<a name="94"><span class="lineNum">      94 </span>            :         },</a>
+<a name="95"><span class="lineNum">      95 </span>            :         grey: true,</a>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          1 :         body: SingleChildScrollView(</span></a>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          1 :             child: Column(</span></a>
+<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          1 :             children: [</span></a>
+<a name="99"><span class="lineNum">      99 </span><span class="lineCov">          1 :             SizedBox(</span></a>
+<a name="100"><span class="lineNum">     100 </span>            :             height: 30,</a>
+<a name="101"><span class="lineNum">     101 </span>            :             ),</a>
+<a name="102"><span class="lineNum">     102 </span><span class="lineCov">          1 :             Container(</span></a>
+<a name="103"><span class="lineNum">     103 </span>            :                 width: double.infinity,</a>
+<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          1 :                 child: Column(</span></a>
+<a name="105"><span class="lineNum">     105 </span>            :                   crossAxisAlignment: CrossAxisAlignment.start,</a>
+<a name="106"><span class="lineNum">     106 </span><span class="lineCov">          1 :                   children: [</span></a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          1 :                   CommonText(</span></a>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          1 :                   'backupMne'.tr,</span></a>
+<a name="109"><span class="lineNum">     109 </span>            :                   size: 14,</a>
+<a name="110"><span class="lineNum">     110 </span>            :                   weight: FontWeight.w500,</a>
+<a name="111"><span class="lineNum">     111 </span>            :                   ),</a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          1 :                   GestureDetector(</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          1 :                     child: CommonText(</span></a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          1 :                         'writeMne'.tr,</span></a>
+<a name="115"><span class="lineNum">     115 </span>            :                         size: 14,</a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          1 :                         color: Color(0xffB4B5B7),</span></a>
+<a name="117"><span class="lineNum">     117 </span>            :                     ),</a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :                     onTap: () {</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :                     copyText(state.mne);</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :                     showCustomToast('copyMne'.tr);</span></a>
+<a name="121"><span class="lineNum">     121 </span>            :                     },</a>
+<a name="122"><span class="lineNum">     122 </span>            :                   )</a>
+<a name="123"><span class="lineNum">     123 </span>            :                 ],</a>
+<a name="124"><span class="lineNum">     124 </span>            :                ),</a>
+<a name="125"><span class="lineNum">     125 </span>            :               ),</a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          1 :               SizedBox(</span></a>
+<a name="127"><span class="lineNum">     127 </span>            :               height: 20,</a>
+<a name="128"><span class="lineNum">     128 </span>            :               ),</a>
+<a name="129"><span class="lineNum">     129 </span><span class="lineCov">          1 :               Container(</span></a>
+<a name="130"><span class="lineNum">     130 </span>            :               width: double.infinity,</a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          1 :               decoration: BoxDecoration(</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineCov">          1 :                 color: Colors.white, borderRadius: BorderRadius.circular(8)),</span></a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">          1 :                 child: mneGrids(state),</span></a>
+<a name="134"><span class="lineNum">     134 </span>            :               ),</a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          1 :               SizedBox(</span></a>
+<a name="136"><span class="lineNum">     136 </span>            :                 height: 20,</a>
+<a name="137"><span class="lineNum">     137 </span>            :               ),</a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineCov">          1 :               Container(</span></a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineCov">          1 :                 child: Column(</span></a>
+<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          1 :                 children: [</span></a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          2 :                   TipItem('placeMne'.tr),</span></a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineCov">          2 :                   TipItem('shareMne'.tr),</span></a>
+<a name="143"><span class="lineNum">     143 </span>            :                 ],</a>
+<a name="144"><span class="lineNum">     144 </span>            :                 ),</a>
+<a name="145"><span class="lineNum">     145 </span><span class="lineCov">          1 :                 padding: EdgeInsets.only(right: 12),</span></a>
+<a name="146"><span class="lineNum">     146 </span>            :               )</a>
+<a name="147"><span class="lineNum">     147 </span>            :             ],</a>
+<a name="148"><span class="lineNum">     148 </span>            :           ),</a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">          1 :           padding: EdgeInsets.symmetric(horizontal: 12),</span></a>
+<a name="150"><span class="lineNum">     150 </span>            :           ),</a>
+<a name="151"><span class="lineNum">     151 </span>            :         );</a>
+<a name="152"><span class="lineNum">     152 </span>            :       },</a>
+<a name="153"><span class="lineNum">     153 </span>            :     )</a>
+<a name="154"><span class="lineNum">     154 </span>            :     );</a>
+<a name="155"><span class="lineNum">     155 </span>            :   }</a>
+<a name="156"><span class="lineNum">     156 </span>            : </a>
+<a name="157"><span class="lineNum">     157 </span>            :   // widget of mnemonic word grids</a>
+<a name="158"><span class="lineNum">     158 </span><span class="lineCov">          1 :   Widget mneGrids(state) {</span></a>
+<a name="159"><span class="lineNum">     159 </span><span class="lineCov">          2 :     var mneArr = state.mne.split(' ');</span></a>
+<a name="160"><span class="lineNum">     160 </span>            :     List mneList = mneArr as List&lt;dynamic&gt;;</a>
+<a name="161"><span class="lineNum">     161 </span><span class="lineCov">          2 :     if (mneList.length != 12) {</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineCov">          1 :       return SizedBox();</span></a>
+<a name="163"><span class="lineNum">     163 </span>            :     }</a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          4 :     var itemList = mneList.asMap().entries.map((entry) {</span></a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          1 :       var v = entry.value;</span></a>
+<a name="166"><span class="lineNum">     166 </span><span class="lineCov">          1 :       return MneItem(</span></a>
+<a name="167"><span class="lineNum">     167 </span>            :         label: v as String,</a>
+<a name="168"><span class="lineNum">     168 </span><span class="lineCov">          4 :         index: (entry.key + 1).toString() + '.',</span></a>
+<a name="169"><span class="lineNum">     169 </span>            :       );</a>
+<a name="170"><span class="lineNum">     170 </span><span class="lineCov">          1 :     }).toList();</span></a>
+<a name="171"><span class="lineNum">     171 </span>            : </a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineCov">          1 :     return GridView.count(</span></a>
+<a name="173"><span class="lineNum">     173 </span>            :         padding: const EdgeInsets.all(12),</a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineCov">          1 :         physics: NeverScrollableScrollPhysics(),</span></a>
+<a name="175"><span class="lineNum">     175 </span>            :         childAspectRatio: 2.1,</a>
+<a name="176"><span class="lineNum">     176 </span>            :         crossAxisSpacing: 20,</a>
+<a name="177"><span class="lineNum">     177 </span>            :         mainAxisSpacing: 12,</a>
+<a name="178"><span class="lineNum">     178 </span>            :         crossAxisCount: 3,</a>
+<a name="179"><span class="lineNum">     179 </span>            :         shrinkWrap: true,</a>
+<a name="180"><span class="lineNum">     180 </span>            :         children: itemList);</a>
+<a name="181"><span class="lineNum">     181 </span>            :   }</a>
+<a name="182"><span class="lineNum">     182 </span>            : }</a>
+<a name="183"><span class="lineNum">     183 </span>            : // widget of mnemonic word Item</a>
+<a name="184"><span class="lineNum">     184 </span>            : class MneItem extends StatelessWidget {</a>
+<a name="185"><span class="lineNum">     185 </span>            :   final String label;</a>
+<a name="186"><span class="lineNum">     186 </span>            :   final Noop onTap;</a>
+<a name="187"><span class="lineNum">     187 </span>            :   final String index;</a>
+<a name="188"><span class="lineNum">     188 </span>            :   final Color bg;</a>
+<a name="189"><span class="lineNum">     189 </span>            :   final bool remove;</a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineCov">          3 :   MneItem(</span></a>
+<a name="191"><span class="lineNum">     191 </span>            :       {this.label, this.onTap, this.index = '', this.bg, this.remove = false});</a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          3 :   @override</span></a>
+<a name="193"><span class="lineNum">     193 </span>            :   Widget build(BuildContext context) {</a>
+<a name="194"><span class="lineNum">     194 </span><span class="lineCov">          3 :     return GestureDetector(</span></a>
+<a name="195"><span class="lineNum">     195 </span><span class="lineCov">          1 :       onTap: () {</span></a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineCov">          1 :         if (onTap != null) {</span></a>
+<a name="197"><span class="lineNum">     197 </span><span class="lineCov">          1 :           onTap();</span></a>
+<a name="198"><span class="lineNum">     198 </span>            :         }</a>
+<a name="199"><span class="lineNum">     199 </span>            :       },</a>
+<a name="200"><span class="lineNum">     200 </span><span class="lineCov">          3 :       child: Stack(</span></a>
+<a name="201"><span class="lineNum">     201 </span><span class="lineCov">          3 :         children: [</span></a>
+<a name="202"><span class="lineNum">     202 </span><span class="lineCov">          3 :           Positioned(</span></a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineCov">          3 :               child: Container(</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineCov">          3 :             decoration: BoxDecoration(</span></a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineCov">          9 :                 color: bg ?? Color(0xFF5C8BCB), borderRadius: CustomRadius.b8),</span></a>
+<a name="206"><span class="lineNum">     206 </span>            :             alignment: Alignment.center,</a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">          3 :             child: CommonText(</span></a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          3 :               label,</span></a>
+<a name="209"><span class="lineNum">     209 </span>            :               size: 14,</a>
+<a name="210"><span class="lineNum">     210 </span>            :               color: Colors.white,</a>
+<a name="211"><span class="lineNum">     211 </span>            :             ),</a>
+<a name="212"><span class="lineNum">     212 </span>            :           )),</a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          3 :           Positioned(</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">          3 :               child: Visibility(</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">          6 :                   visible: index != '',</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          3 :                   child: Container(</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          3 :                     padding: EdgeInsets.all(5),</span></a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          3 :                     child: CommonText(</span></a>
+<a name="219"><span class="lineNum">     219 </span><span class="lineCov">          3 :                       index,</span></a>
+<a name="220"><span class="lineNum">     220 </span>            :                       size: 10,</a>
+<a name="221"><span class="lineNum">     221 </span>            :                       color: Colors.white,</a>
+<a name="222"><span class="lineNum">     222 </span>            :                     ),</a>
+<a name="223"><span class="lineNum">     223 </span>            :                   ))),</a>
+<a name="224"><span class="lineNum">     224 </span><span class="lineCov">          3 :           Positioned(</span></a>
+<a name="225"><span class="lineNum">     225 </span>            :               right: 5,</a>
+<a name="226"><span class="lineNum">     226 </span>            :               top: 5,</a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          3 :               child: Visibility(</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          3 :                   visible: remove,</span></a>
+<a name="229"><span class="lineNum">     229 </span><span class="lineCov">          3 :                   child: Image(</span></a>
+<a name="230"><span class="lineNum">     230 </span>            :                     width: 13,</a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineCov">          3 :                     image: AssetImage('icons/close.png'),</span></a>
+<a name="232"><span class="lineNum">     232 </span>            :                   )))</a>
+<a name="233"><span class="lineNum">     233 </span>            :         ],</a>
+<a name="234"><span class="lineNum">     234 </span>            :       ),</a>
+<a name="235"><span class="lineNum">     235 </span>            :     );</a>
+<a name="236"><span class="lineNum">     236 </span>            :   }</a>
+<a name="237"><span class="lineNum">     237 </span>            : }</a>
 </pre>
       </td>
     </tr>

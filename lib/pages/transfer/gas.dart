@@ -23,6 +23,7 @@ class ChainGasPage extends StatefulWidget {
   State createState() => ChainGasPageState();
 }
 
+// Page of chain Gas
 class ChainGasPageState extends State<ChainGasPage> {
   TextEditingController maxPriorityFeeCtrl = TextEditingController();
   TextEditingController maxFeePerGasCtrl = TextEditingController();
@@ -60,6 +61,9 @@ class ChainGasPageState extends State<ChainGasPage> {
     initGas(rpcType);
   }
 
+  /*
+  * fee initialization
+  * */
   void initGas(String rpcType) {
     var unit = BigInt.from(pow(10, 9));
     maxPriorityFeeCtrl.text =
@@ -97,7 +101,7 @@ class ChainGasPageState extends State<ChainGasPage> {
       }
     }
 
-    var unit = Decimal.fromInt(pow(10,9));
+    var unit = Decimal.fromInt(pow(10,9).toInt());
     var _maxFeePerGas = Decimal.parse(maxFeePerGas) * unit;
     var _maxPriorityFee = Decimal.parse(maxPriorityFee) * unit;
     var _gasPrice = Decimal.parse(gasPrice) * unit;
@@ -118,8 +122,11 @@ class ChainGasPageState extends State<ChainGasPage> {
     Get.back();
 
   }
-
-  String getGearHandlingFee(gear){
+  /*
+  * Get a fee based on the gear
+  * @param {string} gear: selected gear
+  * */
+  String getGearHandlingFee(String gear){
     try{
       ChainGas storeGas = $store.gas;
       String fee = '0';
@@ -145,8 +152,10 @@ class ChainGasPageState extends State<ChainGasPage> {
       return '0';
     }
   }
-
-  void changeGear(gear,ctx){
+  /*
+  * Transfer fee level adjustment
+  * */
+  void changeGear(String gear, BuildContext ctx){
     ChainGas storeGas = $store.gas;
     String fee = getGearHandlingFee(gear);
     BlocProvider.of<GasBloc>(ctx)..add(UpdateGasGearEvent(gear))..add(UpdateHandlingFeeEvent(fee));
@@ -319,6 +328,9 @@ class ChainGasPageState extends State<ChainGasPage> {
     );
   }
 
+  /*
+  * Get the fee component based on the network type
+  * */
   Widget _getGasWidget() {
     return rpcType == RpcType.ethereumMain
         ? _ethMainGas()

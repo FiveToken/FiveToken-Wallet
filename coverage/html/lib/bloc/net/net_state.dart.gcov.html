@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -64,7 +64,7 @@
 <a name="2"><span class="lineNum">       2 </span>            : </a>
 <a name="3"><span class="lineNum">       3 </span>            : class NetState extends Equatable {</a>
 <a name="4"><span class="lineNum">       4 </span>            :   final List&lt;List&lt;Network&gt;&gt; network;</a>
-<a name="5"><span class="lineNum">       5 </span><span class="lineCov">         42 :   const NetState({this.network});</span></a>
+<a name="5"><span class="lineNum">       5 </span><span class="lineCov">         57 :   const NetState({this.network});</span></a>
 <a name="6"><span class="lineNum">       6 </span>            : </a>
 <a name="7"><span class="lineNum">       7 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="8"><span class="lineNum">       8 </span><span class="lineCov">          4 :   List&lt;Object&gt; get props =&gt; [network];</span></a>
@@ -83,7 +83,7 @@
 <a name="21"><span class="lineNum">      21 </span><span class="lineNoCov">          0 :     final list = [];</span></a>
 <a name="22"><span class="lineNum">      22 </span><span class="lineNoCov">          0 :     list.addAll(network);</span></a>
 <a name="23"><span class="lineNum">      23 </span><span class="lineNoCov">          0 :     list.addAll(OpenedBox.netInstance.values);</span></a>
-<a name="24"><span class="lineNum">      24 </span>            :     return list;</a>
+<a name="24"><span class="lineNum">      24 </span>            :     return list as List&lt;List&lt;Network&gt;&gt; ;</a>
 <a name="25"><span class="lineNum">      25 </span>            :   }</a>
 <a name="26"><span class="lineNum">      26 </span>            : }</a>
 </pre>

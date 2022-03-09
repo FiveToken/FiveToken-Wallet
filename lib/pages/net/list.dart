@@ -14,7 +14,7 @@ class NetIndexPage extends StatefulWidget {
     return NetIndexStatePage();
   }
 }
-
+// Page of Network List
 class NetIndexStatePage extends State<NetIndexPage> {
 
   void onPressed(BuildContext context){

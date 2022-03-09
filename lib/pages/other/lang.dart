@@ -10,8 +10,9 @@ class LangPage extends StatefulWidget {
     return LangPageState();
   }
 }
-
+// Page of Language selection
 class LangPageState extends State<LangPage> {
+  // Set language
   void selectLang(String lang) async {
     Locale locale = Locale(lang);
     Global.store.setString(StoreKeyLanguage, lang);

@@ -12,6 +12,7 @@ import 'package:fil/init/hive.dart';
 import 'package:fil/actions/event.dart';
 import 'package:fil/utils/enum.dart';
 
+// widget of Network select
 class NetSelect extends StatelessWidget {
   @override
   build(BuildContext context) {

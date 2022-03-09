@@ -1,8 +1,13 @@
+import 'dart:typed_data';
 import 'package:fil/bloc/pass/pass_bloc.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
+import 'package:fil/common/argon2.dart';
 import 'package:fil/common/encryptKey.dart';
+import 'package:fil/pages/wallet/widgets/strengthPassword.dart';
+import 'package:fil/utils/decimal_extension.dart';
+import 'package:fil/common/utils.dart' show zxcvbnLevel;
 import 'package:fil/widgets/field.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oktoast/oktoast.dart';
@@ -13,12 +18,10 @@ import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/widgets/text.dart';
 import 'package:fil/common/global.dart';
-import 'package:fil/common/index.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/init/hive.dart';
 import 'package:flutter/services.dart';
 import 'package:fil/utils/enum.dart';
-import 'package:fil/common/encryptKey.dart';
 
 class PassInitPage extends StatefulWidget {
   @override
@@ -27,18 +30,22 @@ class PassInitPage extends StatefulWidget {
   }
 }
 
+// Page of Password initialization
 class PassInitPageState extends State<PassInitPage> {
   TextEditingController nameCtrl = TextEditingController();
   TextEditingController passCtrl = TextEditingController();
   TextEditingController passConfirmCtrl = TextEditingController();
-  int type; //0 id 1 mne 2 privatekey
+  int type;
   String mne;
   String privateKey;
   Network net;
   String label;
   bool loading = false;
   var box  = OpenedBox.walletInstance;
-  bool checkPass() {
+  num level = 0;
+
+  bool checkForm() {
+    FocusNode().requestFocus();
     var pass = passCtrl.text.trim();
     var confirm = passConfirmCtrl.text.trim();
     var walletName = nameCtrl.text.trim();
@@ -47,11 +54,8 @@ class PassInitPageState extends State<PassInitPage> {
       showCustomError('enterName'.tr);
       return false;
     }
-    if (!isValidPass(pass)) {
-      showCustomError('placeholderValidPass'.tr);
-      return false;
-    } else if(!isValidPass(confirm)){
-      showCustomError('placeholderValidPass'.tr);
+    if(level < 4 ){
+      showCustomError('levelTips'.tr);
       return false;
     } else if (pass != confirm) {
       showCustomError('diffPass'.tr);
@@ -65,22 +69,29 @@ class PassInitPageState extends State<PassInitPage> {
   void initState() {
     super.initState();
     var arg = Get.arguments ?? {'type': WalletType.id};
-    type = arg['type'];
+    type = arg['type'] as int;
     if(arg['type']==WalletType.id){
-      nameCtrl.text = arg['label'];
+      nameCtrl.text = arg['label'] as String;
     }
-    mne = arg['mne'];
-    label = arg['label'];
-    privateKey = arg['privateKey'];
-    net = arg['net'];
+    mne = arg['mne'] as String;
+    label = arg['label'] as String;
+    privateKey = arg['privateKey'] as String;
+    net = arg['net'] as Network;
+
+    passCtrl.addListener(() {
+      if(passCtrl.text != ''){
+        level = zxcvbnLevel(passCtrl.text);
+      }
+      setState(() {});
+    });
   }
 
-
-  ChainWallet getWallet(type, EncryptKey key,Network net, private){
+  // get wallet
+  ChainWallet getWallet(int type, EncryptKey key,Network net, String mne, String goupHash){
     return ChainWallet(
       label: label,
-      mne: type!= WalletType.privateKey ?aesEncrypt(mne, private): '',
-      groupHash: type!= WalletType.privateKey ?tokenify(mne): '',
+      mne: type!= WalletType.privateKey ?mne: '',
+      groupHash: type!= WalletType.privateKey ? goupHash: '',
       type: type,
       rpc: net.rpc,
       addressType: net.addressType,
@@ -89,7 +100,7 @@ class PassInitPageState extends State<PassInitPage> {
       skKek: key.kek,
     );
   }
-
+  // update wallet name
   void updateName(String newLabel) async{
     var box = OpenedBox.walletInstance;
     var wallet = $store.wal;
@@ -100,16 +111,16 @@ class PassInitPageState extends State<PassInitPage> {
     });
     $store.changeWalletName(newLabel);
   }
-
+  // add wallet
   void AddWallet(ChainWallet wallet) async{
     var box = OpenedBox.walletInstance;
     await box.put(wallet.key, wallet);
   }
-
+ // submit form information and initialize Wallet
   void handleSubmit() async {
     String pass = passCtrl.text.trim();
     String walletName = nameCtrl.text.trim();
-    if (!checkPass()) {
+    if (!checkForm()) {
       return;
     }
     if (loading) {
@@ -117,6 +128,8 @@ class PassInitPageState extends State<PassInitPage> {
     }
     this.loading = true;
     showCustomLoading('Loading');
+    String groupHash = randomNonce().toEncode();
+    // initialize Wallet
     if (type == WalletType.id) {
       try {
         Map<String, EncryptKey> keyMap = await getKeyMap(mne, pass);
@@ -130,11 +143,11 @@ class PassInitPageState extends State<PassInitPage> {
         for (var nets in Network.netList) {
           for (var net in nets) {
             var addrType = net.rpc == Network.filecoinTestNet.rpc? net.net: net.addressType;
-            var wal;
+            ChainWallet wal;
             try {
               EncryptKey key = keyMap[addrType];
-              String private = await getPrivateByKek(pass, key.kek, key.address);
-              wal = getWallet(type, key, net, private);
+              Uint8List mneStr = await encryptSodium(mne, 'mne', pass);
+              wal = getWallet(type, key, net, mneStr.toEncode(), groupHash);
               AddWallet(wal);
             }catch(e){
               return null;
@@ -154,8 +167,8 @@ class PassInitPageState extends State<PassInitPage> {
     } else if (type == WalletType.mne) {
       try {
         EncryptKey key = await getKey(net.addressType, pass, mne, net.prefix);
-        String private = await getPrivateByKek(pass, key.kek, key.address);
-        var wal = getWallet(type, key, net, private);
+        Uint8List mneStr = await encryptSodium(mne, 'mne', pass);
+        var wal = getWallet(type, key, net, mneStr.toEncode(), groupHash);
         if (box.containsKey(wal.key)) {
           showCustomError('errorExist'.tr);
           this.loading = false;
@@ -178,8 +191,7 @@ class PassInitPageState extends State<PassInitPage> {
           this.loading = false;
           return;
         }
-        String private = await getPrivateByKek(pass, key.kek, key.address);
-        var wal = getWallet(type, key, net, private);
+        var wal = getWallet(type, key, net, '', groupHash);
         if (box.get(wal.key)!=null) {
           showCustomError('errorExist'.tr);
           this.loading = false;
@@ -225,7 +237,6 @@ class PassInitPageState extends State<PassInitPage> {
             ),
               visible: type == WalletType.id,
             ),
-
             SizedBox(
               height: 15,
             ),
@@ -233,6 +244,25 @@ class PassInitPageState extends State<PassInitPage> {
               controller: passCtrl,
               label: 'setPass'.tr,
               hintText: 'placeholderValidPass'.tr,
+            ),
+            CustomPaint(
+              painter: StrengthPassword(level: level, context: context),
+              child: Center(),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                  Expanded(
+                      child: CommonText(
+                    'strengthTips'.tr,
+                    size: 14,
+                    color: Colors.black,
+                    weight: FontWeight.w500,)
+                  )
+              ],
             ),
             SizedBox(
               height: 20,
@@ -267,8 +297,8 @@ class PassField extends StatefulWidget {
 }
 
 class PassFieldState extends State<PassField> {
-  void onTap(context, state){
-    BlocProvider.of<PassBloc>(context)..add(SetPassEvent(passShow: !state.passShow));
+  void onTap(BuildContext context, bool show){
+    BlocProvider.of<PassBloc>(context)..add(SetPassEvent(passShow: show));
   }
 
   @override
@@ -325,7 +355,7 @@ class PassFieldState extends State<PassField> {
                           image: AssetImage(!state.passShow
                               ? 'icons/close-eye-d.png'
                               : 'icons/open-d.png')),
-                      onTap: ()=>{onTap(ctx, state)},
+                      onTap: ()=>{onTap(ctx, !state.passShow)},
                     ),
                   ],
                 ),

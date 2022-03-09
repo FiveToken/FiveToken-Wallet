@@ -25,7 +25,7 @@ class WalletSelectPage extends StatefulWidget {
     return WalletSelectPageState();
   }
 }
-
+// page of wallet select
 class WalletSelectPageState extends State<WalletSelectPage> {
   final ScrollController controller = ScrollController();
   List<ChainWallet> list = [];
@@ -36,7 +36,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
     super.initState();
   }
 
-  void deleteIdWallet(context, state,  String hash) async {
+  void deleteIdWallet(BuildContext context, state,  String hash) async {
     BlocProvider.of<SelectBloc>(context).add(IdDeleteEvent(hash: hash));
     bool needSwitch = hash == $store.wal.groupHash;
     var box = OpenedBox.walletInstance;
@@ -51,7 +51,7 @@ class WalletSelectPageState extends State<WalletSelectPage> {
     }
   }
 
-  void deleteImprotWallet(context, state, ChainWallet wal, Network net) async {
+  void deleteImprotWallet(BuildContext context, state, ChainWallet wal, Network net) async {
    await BlocProvider.of<SelectBloc>(context).add(ImportDeleteEvent(wal: wal, net: net));
     if (box.values.isEmpty) {
       goInit();
@@ -63,19 +63,19 @@ class WalletSelectPageState extends State<WalletSelectPage> {
 
   void deleteAndSwitch(state, bool needSwitch) {
     if (needSwitch) {
-      if (state.idWalletMap.isNotEmpty) {
+      if (state.idWalletMap.isNotEmpty as bool) {
         var list = state.idWalletMap.entries.first.value
             .where((wal) => wal.rpc == $store.net.rpc)
             .toList();
 
-        if (list.isNotEmpty) {
+        if (list.isNotEmpty as bool) {
           var wallet = list[0];
-          $store.setWallet(wallet);
-          Global.store.setString('currentWalletAddress', wallet.key);
+          $store.setWallet(wallet as ChainWallet);
+          Global.store.setString('currentWalletAddress', wallet.key as String);
         }
       } else {
-        $store.setWallet(state.importList[0]);
-        Global.store.setString('currentWalletAddress', state.importList[0].key);
+        $store.setWallet(state.importList[0] as ChainWallet);
+        Global.store.setString('currentWalletAddress', state.importList[0].key as String);
       }
     }
   }
@@ -195,11 +195,15 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                      return SwiperWidget(
                                        active: hash == $store.wal.groupHash,
                                        onDelete: () {
-                                         showDeleteDialog(context,
-                                             title: 'deleteIdWallet'.tr,
-                                             content: 'confirmDeleteId'.tr, onDelete: () {
-                                               deleteIdWallet(context, state, hash);
-                                             });
+                                          showPassDialog(context, (String pass) async {
+                                            if(wals.length > 0){
+                                              var wal = wals[0];
+                                              var private = await wal.getPrivateKey(pass);
+                                              if(private!=null){
+                                                deleteIdWallet(context, state, hash);
+                                              }
+                                            }
+                                          });
                                        },
                                        onSet: () async {
                                          await Get.toNamed(walletIdPage, arguments: {'groupHash': hash});
@@ -255,11 +259,12 @@ class WalletSelectPageState extends State<WalletSelectPage> {
                                    return SwiperWidget(
                                      active: $store.wal.key == wal.key,
                                      onDelete: () {
-                                       showDeleteDialog(context,
-                                           title: 'deleteAddr'.tr,
-                                           content: 'confirmDelete'.tr, onDelete: () {
-                                             deleteImprotWallet(context, state, wal, net);
-                                           });
+                                        showPassDialog(context, (String pass) async {
+                                          var private = await wal.getPrivateKey(pass);
+                                          if(private!=null){
+                                            deleteImprotWallet(context, state, wal, net);
+                                          }
+                                        });
                                      },
                                      onSet: () async{
                                        await Get.toNamed(walletMangePage,

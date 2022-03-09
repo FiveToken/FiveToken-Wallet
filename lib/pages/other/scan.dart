@@ -1,8 +1,8 @@
+import 'package:fil/common/utils.dart' show isValidChainAddress;
 import 'package:scan/scan.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fil/common/index.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/widgets/style.dart';
@@ -15,7 +15,7 @@ class ScanPage extends StatefulWidget {
     return ScanPageState();
   }
 }
-
+// Page of scanning
 class ScanPageState extends State<ScanPage> {
   ScanController controller = ScanController();
   StoreController controller2 = Get.find();
@@ -24,16 +24,18 @@ class ScanPageState extends State<ScanPage> {
   @override
   void initState() {
     super.initState();
-    scene = Get.arguments['scene'];
+    if(scene!=null) {
+      scene = Get.arguments['scene'] as ScanScene;
+    }
   }
 
-  Future<bool> checkScanResultBySene(String result) async {
+  Future<bool> checkScanResultByScene(String result) async {
     var valid = false;
     switch (scene) {
       case ScanScene.Address:
-        valid = await isValidChainAddress(result, $store.net);
+        valid =  isValidChainAddress(result, $store.net);
         if (!valid) {
-          showCustomError('wrongAddr'.tr);
+          showCustomError('wrongAddress'.tr);
         }
         break;
       case ScanScene.PrivateKey:
@@ -49,10 +51,10 @@ class ScanPageState extends State<ScanPage> {
     return valid;
   }
 
-  void onCapture(data){
+  void onCapture(String data){
     setState(() async {
       controller.pause();
-      bool valid = await checkScanResultBySene(data);
+      bool valid = await checkScanResultByScene(data);
       if (valid) {
         Get.back(result: data);
       } else {

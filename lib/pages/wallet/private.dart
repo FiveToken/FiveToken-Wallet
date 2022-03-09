@@ -15,16 +15,16 @@ class WalletPrivatekeyPage extends StatefulWidget {
     return WalletPrivatekeyPageState();
   }
 }
-
+// Page of privateKey wallet
 class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
   String private = Get.arguments['private'] as String;
   ChainWallet wallet = Get.arguments['wallet'] as ChainWallet;
   String _message = "";
-  void onTap(context, int idx){
+  void onTap(BuildContext context, int idx){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(index:idx));
   }
 
-  void onView(context){
+  void onView(BuildContext context){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(showCode: true));
   }
 
@@ -41,6 +41,7 @@ class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
       FlutterScreenshotEvents.statusStream?.listen((event) {
         setState(() {
           _message = event.toString();
+          showCustomToast(_message);
         });
       });
     }
@@ -58,10 +59,9 @@ class WalletPrivatekeyPageState extends State<WalletPrivatekeyPage> {
           return CommonScaffold(
             title: 'exportPk'.tr,
             grey: true,
-            footerText: 'copy'.tr,
+            footerText: 'cancel'.tr,
             onPressed: () {
-              copyText(ck);
-              showCustomToast('copySucc'.tr);
+              Get.back();
             },
             body: Column(
               children: [

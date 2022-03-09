@@ -1,4 +1,4 @@
-import 'package:fil/widgets/index.dart';
+import 'package:fil/widgets/style.dart' show CustomRadius;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 

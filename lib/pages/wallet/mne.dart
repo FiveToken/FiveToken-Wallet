@@ -1,4 +1,3 @@
-// import 'package:fil/index.dart';
 import 'package:fil/bloc/mne/mne_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenshot_events/flutter_screenshot_events.dart';
@@ -23,11 +22,11 @@ class WalletMnePage extends StatefulWidget {
 class WalletMnePageState extends State<WalletMnePage> {
   String _message = "";
 
-  void onTap(context, int idx){
+  void onTap(BuildContext context, int idx){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(index:idx));
   }
 
-  void onView(context){
+  void onView(BuildContext context){
     BlocProvider.of<MneBloc>(context).add(SetMneEvent(showCode: true));
   }
   void dispose() {
@@ -43,6 +42,7 @@ class WalletMnePageState extends State<WalletMnePage> {
       FlutterScreenshotEvents.statusStream?.listen((event) {
         setState(() {
           _message = event.toString();
+          showCustomToast(_message);
         });
       });
     }
@@ -57,11 +57,10 @@ class WalletMnePageState extends State<WalletMnePage> {
           return CommonScaffold(
               title: 'exportMne'.tr,
               grey: true,
+              footerText: 'cancel'.tr,
               onPressed: () {
-                copyText(mne);
-                showCustomToast('copySucc'.tr);
+                Get.back();
               },
-              footerText: 'copy'.tr,
               body: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -166,38 +165,32 @@ class KeyString extends StatelessWidget {
           SizedBox(
             height: 27,
           ),
-          GestureDetector(
-            child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8), color: Colors.white),
-              child: !isMne
-                  ? Container(
-                      child: CommonText(data),
-                      padding: EdgeInsets.all(15),
-                    )
-                  : ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: 200),
-                      child: GridView.count(
-                        padding: EdgeInsets.all(10),
-                        physics: NeverScrollableScrollPhysics(),
-                        crossAxisCount: 3,
-                        shrinkWrap: true,
-                        childAspectRatio: 2.1,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        children: List.generate(selectedList.length, (index) {
-                          return MneItem(
-                            label: selectedList[index],
-                            onTap: () {},
-                          );
-                        }),
-                      ),
-                    ),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8), color: Colors.white),
+            child: !isMne
+                ? Container(
+              child: CommonText(data),
+              padding: EdgeInsets.all(15),
+            )
+                : ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 200),
+              child: GridView.count(
+                padding: EdgeInsets.all(10),
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                childAspectRatio: 2.1,
+                mainAxisSpacing: 15,
+                crossAxisSpacing: 15,
+                children: List.generate(selectedList.length, (index) {
+                  return MneItem(
+                    label: selectedList[index],
+                    onTap: () {},
+                  );
+                }),
+              ),
             ),
-            onTap: () {
-              copyText(data);
-              showCustomToast('copySucc'.tr);
-            },
           )
         ],
       ),
@@ -206,101 +199,101 @@ class KeyString extends StatelessWidget {
   }
 }
 
-class KeyCode extends StatelessWidget {
-  final bool showCode;
-  final Noop onView;
-  final String data;
-  KeyCode({this.showCode, this.onView, this.data});
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CommonText(
-                'onlyScan'.tr,
-                color: CustomColor.primary,
-                size: 14,
-              ),
-              CommonText(
-                'tip6'.tr,
-                color: CustomColor.grey,
-                size: 14,
-              ),
-              CommonText(
-                'useSafe'.tr,
-                color: CustomColor.primary,
-                size: 14,
-              ),
-              CommonText(
-                'tip7'.tr,
-                color: CustomColor.grey,
-                size: 14,
-              ),
-            ],
-          ),
-        ),
-        Container(
-          height: 244,
-          width: double.infinity,
-          margin: EdgeInsets.fromLTRB(65, 28, 65, 0),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(8)),
-          child: !showCode
-              ? GestureDetector(
-                  onTap: onView,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 56,
-                      ),
-                      Container(
-                        alignment: Alignment.center,
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(36),
-                          color: CustomColor.bgGrey,
-                        ),
-                        padding: EdgeInsets.all(20),
-                        child: Image(image: AssetImage('icons/close-eye.png')),
-                      ),
-                      SizedBox(
-                        height: 22,
-                      ),
-                      CommonText(
-                        'noPerson'.tr,
-                        color: CustomColor.grey,
-                        weight: FontWeight.w500,
-                        size: 14,
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      CommonText(
-                        'view'.tr,
-                        weight: FontWeight.w500,
-                        size: 14,
-                        color: CustomColor.primary,
-                      )
-                    ],
-                  ),
-                )
-              : Container(
-                  height: 244,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  child: QrImage(
-                    data: data,
-                    size: 188,
-                    backgroundColor: Colors.white,
-                    version: QrVersions.auto,
-                  )),
-        )
-      ],
-    );
-  }
-}
+// class KeyCode extends StatelessWidget {
+//   final bool showCode;
+//   final Noop onView;
+//   final String data;
+//   KeyCode({this.showCode, this.onView, this.data});
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Padding(
+//           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               CommonText(
+//                 'onlyScan'.tr,
+//                 color: CustomColor.primary,
+//                 size: 14,
+//               ),
+//               CommonText(
+//                 'tip6'.tr,
+//                 color: CustomColor.grey,
+//                 size: 14,
+//               ),
+//               CommonText(
+//                 'useSafe'.tr,
+//                 color: CustomColor.primary,
+//                 size: 14,
+//               ),
+//               CommonText(
+//                 'tip7'.tr,
+//                 color: CustomColor.grey,
+//                 size: 14,
+//               ),
+//             ],
+//           ),
+//         ),
+//         Container(
+//           height: 244,
+//           width: double.infinity,
+//           margin: EdgeInsets.fromLTRB(65, 28, 65, 0),
+//           decoration: BoxDecoration(
+//               color: Colors.white, borderRadius: BorderRadius.circular(8)),
+//           child: !showCode
+//               ? GestureDetector(
+//                   onTap: onView,
+//                   child: Column(
+//                     children: [
+//                       SizedBox(
+//                         height: 56,
+//                       ),
+//                       Container(
+//                         alignment: Alignment.center,
+//                         width: 72,
+//                         height: 72,
+//                         decoration: BoxDecoration(
+//                           borderRadius: BorderRadius.circular(36),
+//                           color: CustomColor.bgGrey,
+//                         ),
+//                         padding: EdgeInsets.all(20),
+//                         child: Image(image: AssetImage('icons/close-eye.png')),
+//                       ),
+//                       SizedBox(
+//                         height: 22,
+//                       ),
+//                       CommonText(
+//                         'noPerson'.tr,
+//                         color: CustomColor.grey,
+//                         weight: FontWeight.w500,
+//                         size: 14,
+//                       ),
+//                       SizedBox(
+//                         height: 12,
+//                       ),
+//                       CommonText(
+//                         'view'.tr,
+//                         weight: FontWeight.w500,
+//                         size: 14,
+//                         color: CustomColor.primary,
+//                       )
+//                     ],
+//                   ),
+//                 )
+//               : Container(
+//                   height: 244,
+//                   width: double.infinity,
+//                   alignment: Alignment.center,
+//                   child: QrImage(
+//                     data: data,
+//                     size: 188,
+//                     backgroundColor: Colors.white,
+//                     version: QrVersions.auto,
+//                   )),
+//         )
+//       ],
+//     );
+//   }
+// }

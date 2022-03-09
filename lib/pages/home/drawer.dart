@@ -1,6 +1,4 @@
-// import 'package:fil/index.dart';
 import 'package:share/share.dart';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/text.dart';

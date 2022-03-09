@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:fil/config/config.dart';
 import 'package:fil/init/hive.dart';
+import 'package:fil/utils/enum.dart';
 import 'package:fil/widgets/style.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:hive/hive.dart';
@@ -37,7 +38,7 @@ class Network {
   
   Color c = CustomColor.bgGrey;
   String get label {
-    return netType == 2 ? name : '$chain$net'.tr;
+    return netType == NetworkType.custom ? name : '$chain$net'.tr;
   }
 
   String get url {
@@ -82,25 +83,25 @@ class Network {
         this.decimals = 0,
       });
   Network.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    chain = json['chain'];
-    net = json['net'];
-    netType = json['netType'];
-    chainId = json['chainId'];
-    rpc = json['rpc'];
-    browser = json['browser'];
-    addressType = json['addressType'];
-    prefix = json['prefix'];
-    path = json['path'];
-    color = json['color'];
-    coin = json['coin'];
-    decimals = json['decimals'];
+    name = json['name'] as String;
+    chain = json['chain']  as String ;
+    net = json['net']  as String;
+    netType = json['netType']  as int;
+    chainId = json['chainId']  as String;
+    rpc = json['rpc']  as String;
+    browser = json['browser']  as String;
+    addressType = json['addressType'] as String;
+    prefix = json['prefix'] as String;
+    path = json['path'] as String;
+    color = json['color'] as String;
+    coin = json['coin'] as String;
+    decimals = json['decimals'] as int;
   }
 
   static Network get filecoinMainNet => Network(
       chain: 'filecoin',
       net: 'main',
-      netType: 0,
+      netType: NetworkType.main,
       rpc: 'https://api.fivetoken.io',
       coin: 'FIL',
       browser: 'https://m.filscan.io',
@@ -112,7 +113,7 @@ class Network {
   static Network get ethMainNet => Network(
       chain: 'eth',
       net: 'main',
-      netType: 0,
+      netType: NetworkType.main,
       rpc: 'https://mainnet.infura.io/v3/',
       chainId: '1',
       path: "m/44'/60'/0'/0",
@@ -124,7 +125,7 @@ class Network {
   static Network get binanceMainNet => Network(
       chain: 'binance',
       net: 'main',
-      netType: 0,
+      netType: NetworkType.main,
       rpc: 'https://bsc-dataseed1.ninicoin.io',
       coin: 'BNB',
       browser: 'https://bscscan.com',
@@ -136,7 +137,7 @@ class Network {
   static Network get filecoinTestNet => Network(
       chain: 'filecoin',
       net: 'calibration',
-      netType: 1,
+      netType: NetworkType.test,
       path: "m/44'/461'/0'/0",
       rpc: 'https://api.calibration.fivetoken.io',
       coin: 'FIL',
@@ -147,7 +148,7 @@ class Network {
   static Network get ethKovanNet => Network(
       chain: 'eth',
       net: 'kovan',
-      netType: 1,
+      netType: NetworkType.test,
       path: "m/44'/60'/0'/0",
       rpc: 'https://kovan.infura.io/v3/',
       coin: 'ETH',
@@ -160,7 +161,7 @@ class Network {
       chain: 'eth',
       net: 'ropsten',
       path: "m/44'/60'/0'/0",
-      netType: 1,
+      netType: NetworkType.test,
       rpc: 'https://ropsten.infura.io/v3/',
       coin: 'ETH',
       chainId: '3',
@@ -171,7 +172,7 @@ class Network {
   static Network get ethRinkebyNet => Network(
       chain: 'eth',
       net: 'rinkeby',
-      netType: 1,
+      netType: NetworkType.test,
       chainId: '4',
       path: "m/44'/60'/0'/0",
       color: '0xffF6C343',
@@ -183,7 +184,7 @@ class Network {
   static Network get ethGoerliNet => Network(
       chain: 'eth',
       net: 'goerli',
-      netType: 1,
+      netType: NetworkType.test,
       path: "m/44'/60'/0'/0",
       color: '0xff3099f2',
       rpc: 'https://goerli.infura.io/v3/',
@@ -195,7 +196,7 @@ class Network {
   static Network get binanceTestnet => Network(
       chain: 'binance',
       net: 'test',
-      netType: 1,
+      netType: NetworkType.test,
       path: "m/44'/60'/0'/0",
       rpc: 'https://data-seed-prebsc-1-s2.binance.org:8545',
       coin: 'BNB',

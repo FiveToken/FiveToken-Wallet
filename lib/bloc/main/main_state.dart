@@ -48,8 +48,8 @@ class MainState extends Equatable {
     filterNets
   }) {
     return MainState(
-      filterNets:filterNets,
-      hideTestnet:hideTestnet,
+      filterNets:filterNets as List<List<Network>>,
+      hideTestnet:hideTestnet as bool,
     );
   }
 

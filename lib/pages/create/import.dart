@@ -9,11 +9,12 @@ import 'package:fil/widgets/layout.dart';
 import 'package:fil/routes/path.dart';
 
 class ImportIndexPage extends StatelessWidget {
-  final int type = Get.arguments['type']; //1 mne 2 privatekey
+  int type = Get.arguments['type'] as int; //1 mne 2 privatekey
   bool get isMne => type == WalletType.mne;
+
+  // Jump to import mnemonic Page or import privateKey Page
   void go(int type, Network net) {
-    Get.toNamed(isMne ? importMnePage : importPrivateKeyPage,
-        arguments: {'type': type, 'net': net});
+    Get.toNamed(isMne ? importMnePage : importPrivateKeyPage, arguments: {'type': type, 'net': net});
   }
 
   @override
@@ -39,7 +40,7 @@ class ImportIndexPage extends StatelessWidget {
             SizedBox(
               height: 12,
             ),
-            Layout.colStart(List.generate(Network.netList.length, (index) {
+            Layout.colStart(List.generate(Network.netList.length, (int index) {
               var nets = Network.netList[index];
               return Visibility(
                   visible: nets.isNotEmpty,
@@ -49,7 +50,7 @@ class ImportIndexPage extends StatelessWidget {
                       height: 12,
                     ),
                     Column(
-                      children: List.generate(nets.length, (index) {
+                      children: List.generate(nets.length, (int index) {
                         var net = nets[index];
                         return Container(
                           child: TapCardWidget(

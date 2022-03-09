@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -60,7 +60,7 @@
       <td>
 <pre class="sourceHeading">          Line data    Source code</pre>
 <pre class="source">
-<a name="1"><span class="lineNum">       1 </span>            : // import 'package:fil/index.dart';</a>
+<a name="1"><span class="lineNum">       1 </span>            : import 'package:fil/widgets/style.dart' show CustomColor, CustomRadius;</a>
 <a name="2"><span class="lineNum">       2 </span>            : import 'package:flutter/material.dart';</a>
 <a name="3"><span class="lineNum">       3 </span>            : import 'package:fil/models/index.dart';</a>
 <a name="4"><span class="lineNum">       4 </span>            : import 'package:fil/widgets/text.dart';</a>
@@ -68,13 +68,13 @@
 <a name="6"><span class="lineNum">       6 </span>            : </a>
 <a name="7"><span class="lineNum">       7 </span>            : class CommonCard extends StatelessWidget {</a>
 <a name="8"><span class="lineNum">       8 </span>            :   final Widget child;</a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          1 :   CommonCard(this.child);</span></a>
-<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          2 :   CommonCard(this.child);</span></a>
+<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="11"><span class="lineNum">      11 </span>            :   Widget build(BuildContext context) {</a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineCov">          1 :     return Container(</span></a>
-<a name="13"><span class="lineNum">      13 </span><span class="lineCov">          1 :       child: child,</span></a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          1 :       decoration: BoxDecoration(</span></a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          1 :           color: Colors.white, borderRadius: BorderRadius.circular(8)),</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineCov">          2 :     return Container(</span></a>
+<a name="13"><span class="lineNum">      13 </span><span class="lineCov">          2 :       child: child,</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          2 :       decoration: BoxDecoration(</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          2 :           color: Colors.white, borderRadius: BorderRadius.circular(8)),</span></a>
 <a name="16"><span class="lineNum">      16 </span>            :     );</a>
 <a name="17"><span class="lineNum">      17 </span>            :   }</a>
 <a name="18"><span class="lineNum">      18 </span>            : }</a>
@@ -106,26 +106,26 @@
 <a name="44"><span class="lineNum">      44 </span>            : </a>
 <a name="45"><span class="lineNum">      45 </span>            : class TapItemCard extends StatelessWidget {</a>
 <a name="46"><span class="lineNum">      46 </span>            :   final List&lt;CardItem&gt; items;</a>
-<a name="47"><span class="lineNum">      47 </span><span class="lineCov">         15 :   TapItemCard({this.items});</span></a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineCov">         15 :   @override</span></a>
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">         14 :   TapItemCard({this.items});</span></a>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">         14 :   @override</span></a>
 <a name="49"><span class="lineNum">      49 </span>            :   Widget build(BuildContext context) {</a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">         15 :     return Container(</span></a>
-<a name="51"><span class="lineNum">      51 </span><span class="lineCov">         15 :       decoration: BoxDecoration(</span></a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">         15 :           color: Colors.white, borderRadius: BorderRadius.circular(7)),</span></a>
-<a name="53"><span class="lineNum">      53 </span><span class="lineCov">         15 :       child: Column(</span></a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineCov">         60 :         children: List.generate(items.length, (index) {</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">         15 :           return Container(</span></a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineCov">         15 :             child: Column(</span></a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineCov">         15 :               children: [</span></a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineCov">         30 :                 items[index],</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineCov">         15 :                 Visibility(</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">         15 :                     child: Divider(</span></a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineCov">         14 :     return Container(</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">         14 :       decoration: BoxDecoration(</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">         14 :           color: Colors.white, borderRadius: BorderRadius.circular(7)),</span></a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">         14 :       child: Column(</span></a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">         56 :         children: List.generate(items.length, (index) {</span></a>
+<a name="55"><span class="lineNum">      55 </span><span class="lineCov">         14 :           return Container(</span></a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">         14 :             child: Column(</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">         14 :               children: [</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">         28 :                 items[index],</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">         14 :                 Visibility(</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">         14 :                     child: Divider(</span></a>
 <a name="61"><span class="lineNum">      61 </span>            :                       height: 1,</a>
 <a name="62"><span class="lineNum">      62 </span>            :                     ),</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">         60 :                     visible: index != items.length - 1)</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">         56 :                     visible: index != items.length - 1)</span></a>
 <a name="64"><span class="lineNum">      64 </span>            :               ],</a>
 <a name="65"><span class="lineNum">      65 </span>            :             ),</a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">         15 :             padding: EdgeInsets.symmetric(horizontal: 15),</span></a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">         14 :             padding: EdgeInsets.symmetric(horizontal: 15),</span></a>
 <a name="67"><span class="lineNum">      67 </span>            :           );</a>
 <a name="68"><span class="lineNum">      68 </span>            :         }),</a>
 <a name="69"><span class="lineNum">      69 </span>            :       ),</a>
@@ -137,25 +137,25 @@
 <a name="75"><span class="lineNum">      75 </span>            :   final String label;</a>
 <a name="76"><span class="lineNum">      76 </span>            :   final Noop onTap;</a>
 <a name="77"><span class="lineNum">      77 </span>            :   final Widget append;</a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineCov">         15 :   CardItem({@required this.label, this.onTap, this.append});</span></a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineCov">         15 :   @override</span></a>
+<a name="78"><span class="lineNum">      78 </span><span class="lineCov">         14 :   CardItem({@required this.label, this.onTap, this.append});</span></a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">         14 :   @override</span></a>
 <a name="80"><span class="lineNum">      80 </span>            :   Widget build(BuildContext context) {</a>
-<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         15 :     return GestureDetector(</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         14 :     return GestureDetector(</span></a>
 <a name="82"><span class="lineNum">      82 </span>            :       behavior: HitTestBehavior.opaque,</a>
-<a name="83"><span class="lineNum">      83 </span><span class="lineCov">         15 :       child: Container(</span></a>
-<a name="84"><span class="lineNum">      84 </span><span class="lineCov">         15 :         child: Row(</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineCov">         14 :       child: Container(</span></a>
+<a name="84"><span class="lineNum">      84 </span><span class="lineCov">         14 :         child: Row(</span></a>
 <a name="85"><span class="lineNum">      85 </span>            :           mainAxisAlignment: MainAxisAlignment.spaceBetween,</a>
-<a name="86"><span class="lineNum">      86 </span><span class="lineCov">         15 :           children: [</span></a>
-<a name="87"><span class="lineNum">      87 </span><span class="lineCov">         30 :             CommonText.main(label),</span></a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineCov">         15 :             SizedBox(</span></a>
+<a name="86"><span class="lineNum">      86 </span><span class="lineCov">         14 :           children: [</span></a>
+<a name="87"><span class="lineNum">      87 </span><span class="lineCov">         28 :             CommonText.main(label),</span></a>
+<a name="88"><span class="lineNum">      88 </span><span class="lineCov">         14 :             SizedBox(</span></a>
 <a name="89"><span class="lineNum">      89 </span>            :               width: 20,</a>
 <a name="90"><span class="lineNum">      90 </span>            :             ),</a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineCov">         15 :             append ?? ImageAr</span></a>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">         14 :             append ?? ImageAr</span></a>
 <a name="92"><span class="lineNum">      92 </span>            :           ],</a>
 <a name="93"><span class="lineNum">      93 </span>            :         ),</a>
 <a name="94"><span class="lineNum">      94 </span>            :         height: 40,</a>
 <a name="95"><span class="lineNum">      95 </span>            :       ),</a>
-<a name="96"><span class="lineNum">      96 </span><span class="lineCov">         15 :       onTap: onTap,</span></a>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">         14 :       onTap: onTap,</span></a>
 <a name="97"><span class="lineNum">      97 </span>            :     );</a>
 <a name="98"><span class="lineNum">      98 </span>            :   }</a>
 <a name="99"><span class="lineNum">      99 </span>            : }</a>

@@ -21,10 +21,10 @@ class ChainWalletAdapter extends TypeAdapter<ChainWallet> {
       address: fields[1] as String,
       type: fields[2] as int,
       balance: fields[3] as String,
+      groupHash: fields[7] as String,
       mne: fields[4] as String,
       skKek: fields[5] as String,
       digest: fields[6] as String,
-      groupHash: fields[7] as String,
       rpc: fields[9] as String,
       addressType: fields[8] as String,
     );

@@ -43,15 +43,15 @@ Future<String> initSharedPreferences() async {
     var keys = AddressBox.keys;
     for (var wal in filList) {
       var newWal = ChainWallet(
-          label: wal.label,
-          skKek: wal.skKek,
-          digest: wal.digest,
+          label: wal.label as String,
+          skKek: wal.skKek as String ,
+          digest: wal.digest as String,
           type: wal.mne == '' ? 2 : 1,
-          groupHash: '',
-          mne: wal.mne,
+          mne: wal.mne as String,
           addressType: net.addressType,
           rpc: net.rpc,
-          address: wal.addrWithNet);
+          address: wal.addrWithNet as String
+      );
       await box.put(newWal.key, newWal);
       if (activeWalletAddr == wal.addrWithNet) {
         activeWalletAddr = newWal.key;

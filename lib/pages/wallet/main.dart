@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:decimal/decimal.dart';
-import 'package:dio_log/dio_log.dart';
 import 'package:fil/bloc/main/main_bloc.dart';
 import 'package:fil/bloc/wallet/wallet_bloc.dart';
 import 'package:fil/utils/decimal_extension.dart';
@@ -31,7 +30,7 @@ class WalletMainPage extends StatefulWidget {
     return WalletMainPageState();
   }
 }
-
+// Page of main wallet
 class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   Token token = Global.cacheToken;
   bool get showToken => token != null;
@@ -41,12 +40,13 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     return this.net.addressType == AddressType.filecoin.type;
   }
 
+
   @override
   void initState() {
     super.initState();
     if (Get.arguments != null) {
       if (Get.arguments['symbol'] != null) {
-        symbol = Get.arguments['symbol'];
+        symbol = Get.arguments['symbol'] as String;
       }
     }
     Global.lockFromInit = false;
@@ -55,7 +55,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context));
+    routeObserver.subscribe(this, ModalRoute.of(context) as PageRoute<dynamic>);
   }
 
   @override
@@ -252,7 +252,7 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
                               } else if (item == todayStr) {
                                 date = 'today'.tr;
                               }else{
-                                date = item;
+                                date = item as String;
                               }
                               var massageList =
                               walletState.formatMessageList[item];
@@ -295,9 +295,12 @@ class WalletMainPageState extends State<WalletMainPage> with RouteAware {
     );
   }
 
-  String formatTokenBalance(balance){
+  /*
+  * Get formatted token balance
+  * */
+  String formatTokenBalance(String balance){
     try{
-      var unit = Decimal.fromInt(pow(10, token.precision));
+      var unit = Decimal.fromInt(pow(10, token.precision).toInt());
       var balanceNum = Decimal.parse(balance);
       var _value = (balanceNum / unit).toString();
       var _decimal = _value.toDecimal;

@@ -52,7 +52,7 @@ void main() {
             'sMKr+5Nte5wqM1WIWvcgg/rPBI5WzlWlK1Q8Ij4iuM4Buf9xHAClhqlWd6KwdWVWbtYa5E951cRhdLe3cvzBIMVDWBcfdlHQeHaa3vE0gnc=',
         skKek: 'Z5tz8fHqUqGNMHb47KCzPaAq0tKMgxEAcCOk5ri6ysE=',
         digest: 'yCjEF6kR8IgjHm/xz4GLpA==',
-        groupHash: '');
+    );
     await tester.pumpWidget(GetMaterialApp(
       home: Material(
         child: Builder(

@@ -7,8 +7,8 @@ class TokenInfo {
       this.precision,});
 
   TokenInfo.fromJson(dynamic json) {
-    symbol = json['symbol'];
-    precision = json['precision'];
+    symbol = json['symbol'] as String;
+    precision = json['precision'] as String;
   }
   String symbol;
   String precision;

@@ -64,7 +64,7 @@ void main() {
       ],
     )));
     expect(Get.currentRoute, addressSelectPage);
-    Get.toNamed(addressAddPage, arguments: {'mode': 1, 'addr': address});
+    Get.toNamed(addressAddPage, arguments: {'mode': 1, 'address': address});
     await tester.pumpAndSettle();
     expect(Get.currentRoute, addressAddPage);
     AddressBookAddPageState state =

@@ -26,7 +26,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(Get.currentRoute, walletMnePage);
     expect(find.byType(KeyString), findsOneWidget);
-    expect(find.byType(KeyCode), findsNothing);
+    // expect(find.byType(KeyCode), findsNothing);
     print(Get.currentRoute);
     // await tester.tap(find.text('code'.tr));
     // await tester.pump();

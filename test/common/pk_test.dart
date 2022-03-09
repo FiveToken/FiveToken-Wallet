@@ -77,25 +77,8 @@ void main() {
     25,
     227
   ];
-  test("generate salt", () async {
-    var str = '${addr}filwalllet$pass';
-    var list = await genSalt(str);
-    expect(list, equals(saltList));
-  });
   test('generate privatekey digest', () async {
     var res = await genPrivateKeyDigest(pk);
     expect(res, digest);
-  });
-  test('generate kek', () async {
-    var list = await genKek(addr, pass);
-    expect(list, equals(kekList));
-  });
-  test('test xor', () {
-    var res = xor(kekList, decodePrivate(pk));
-    expect(res, skKek);
-  });
-  test('test get privatekey by pass', () async {
-    var res = await getPrivateKey(addr, pass, skKek);
-    expect(res, res);
   });
 }

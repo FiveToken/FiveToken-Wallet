@@ -24,9 +24,10 @@ class AddressBookIndexPage extends StatefulWidget {
   }
 }
 
+// Pages of address book List
 class AddressBookIndexPageState extends State<AddressBookIndexPage> {
   var box = OpenedBox.addressBookInsance;
-
+ // Switching network
   void onChanges(BuildContext context, Network net){
     BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: net));
   }
@@ -98,7 +99,7 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
                         showCustomToast('copyAddr'.tr);
                       },
                       onSet: () {
-                        Get.toNamed(addressAddPage, arguments: {'mode': 1, 'addr': addr}).then((value) => {
+                        Get.toNamed(addressAddPage, arguments: {'mode': 1, 'address': addr}).then((value) => {
                         BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: $store.net))
                         });
                       },
@@ -112,7 +113,7 @@ class AddressBookIndexPageState extends State<AddressBookIndexPage> {
       }),);
   }
 }
-
+// widget of network Item
 class NetEntranceWidget extends StatelessWidget {
   final SingleParamCallback<Network> onChange;
   final Network network;
@@ -154,7 +155,7 @@ class NetEntranceWidget extends StatelessWidget {
               Expanded(child: Layout.colStart([
                 CommonText(state.net == null ? "" : state.net.label),
                 CommonText.grey(
-                  'showCurrentAddr'.tr,
+                  'showCurrentAddress'.tr,
                   size: 12,
                 )
               ])),

@@ -129,7 +129,7 @@ class TokenAddPageState extends State<TokenAddPage> {
                 onTap: () async {
                   var data = await Clipboard.getData(Clipboard.kTextPlain);
                   var addr = data.text.trim();
-                  bool valid = await isValidChainAddress(addr, $store.net);
+                  bool valid = isValidChainAddress(addr, $store.net);
                   if (addr != null && valid) {
                     addrCtrl.text = addr;
                     getMetaInfo(addr);

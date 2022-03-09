@@ -38,7 +38,7 @@ class Chain {
     }
   }
 
-  static setRpcNetwork(chainRpc,chainType) {
+  static setRpcNetwork(String chainRpc, String chainType) {
     Global.store.setString('chainRpc', chainRpc);
     Global.store.setString('chainType', chainType);
     String url = chainType == 'eth' ? (chainRpc + Config.ethClientID) : chainRpc;

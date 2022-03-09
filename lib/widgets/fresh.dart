@@ -1,10 +1,8 @@
-// import 'package:fil/index.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:get/get.dart';
 import 'package:fil/widgets/style.dart';
-import 'package:fil/common/utils.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/actions/event.dart';
 

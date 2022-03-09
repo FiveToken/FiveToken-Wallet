@@ -27,7 +27,7 @@ Future<EncryptKey> getKey2ByArgon2(String addressType, String privateKey,  Strin
       key = await EthWallet.genEncryptKeyByPrivateKey(privateKey, pass);
       break;
     default:
-      PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(privateKey)));
+      PrivateKey filPk = PrivateKey.fromMap(jsonDecode(hex2str(privateKey)) as Map<String, dynamic>);
       var type = filPk.type == 'secp256k1' ? SignSecp : SignBls;
       var pk = filPk.privateKey;
       key = await FilecoinWallet.genEncryptKeyByPrivateKey(pk, pass, type: type, prefix: net.prefix);

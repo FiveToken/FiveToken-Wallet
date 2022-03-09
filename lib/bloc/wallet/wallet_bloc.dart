@@ -35,8 +35,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
           }
 
           var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
-          var _mid = result["mid"];
-          var _enablePullUp = result["enablePullUp"];
+          String _mid = result["mid"] as String;
+          bool _enablePullUp = result["enablePullUp"] as bool;
           deleteSpeedUpMessages(event.symbol);
           List _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
           emit(state.copyWithWalletState(
@@ -67,8 +67,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     on<GetFileCoinMessageListEvent>((event,emit) async {
       try{
         var result = await getInterfaceFileCoinMessageList(event.rpc,event.chainType,state.mid,event.actor,event.direction);
-        var _mid = result['mid'];
-        var _enablePullUp = result["enablePullUp"];
+        String _mid = result['mid'] as String;
+        bool _enablePullUp = result["enablePullUp"] as bool;
         final _storeList = getStoreMsgList(event.symbol).map((e) => e).toList();
         emit(state.copyWithWalletState(
             storeMessageList:_storeList,
@@ -134,7 +134,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   }
 }
 
-getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
+getInterfaceFileCoinMessageList(String rpc, String chainType,String mid,String actor, String direction) async {
   try{
     String _mid = mid ?? '';
     Chain.setRpcNetwork(rpc, chainType);
@@ -148,27 +148,27 @@ getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
       List<CacheMessage> messages = [];
       result.forEach((map) {
         var mes = CacheMessage(
-          hash: map['cid'],
-          to: map['to'],
-          from: map['from'],
-          value: map['value'],
-          blockTime: map['block_time'],
-          exitCode: map['exit_code'],
+          hash: map['cid'] as String,
+          to: map['to'] as String,
+          from: map['from'] as String,
+          value: map['value'] as String,
+          blockTime: map['block_time'] as num,
+          exitCode: map['exit_code'] as num,
           owner: $store.wal.addr,
           pending: 0,
           rpc: $store.net.rpc,
-          height: map['block_epoch'],
-          fee: map['gas_fee'],
-          mid: map['mid'],
+          height: map['block_epoch'] as int,
+          fee: map['gas_fee'] as String,
+          mid: map['mid'] as String,
           symbol: "FIL",
-          nonce: map['nonce'],
+          nonce: map['nonce'] as num,
         );
         messages.add(mes);
         box.put(map["cid"],mes);
       });
       messages = messages.toList();
       List midList = messages.where((mes) => mes.mid != '').toList();
-      String lastMid = midList.last.mid;
+      String lastMid = midList.last.mid as String;
       return {
         "mid":lastMid,
         "enablePullUp":result.length >= 10
@@ -188,13 +188,13 @@ getInterfaceFileCoinMessageList(rpc,chainType,mid,actor,direction) async {
 
 }
 
-upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
+upDateFileCoinMessageState(String rpc, String chainType,List<dynamic> param,pendingList) async {
   var box = OpenedBox.mesInstance;
   Chain.setRpcNetwork(rpc, chainType);
   var result = await Chain.chainProvider.getMessagePendingState(param);
   result.forEach((n) {
     var message = n['message'];
-    if(message.isNotEmpty){
+    if(message.isNotEmpty as bool){
       pendingList.forEach((m) {
         // Filter the same message returned by local store and interface
         if((message["from"] == m.from) && (message["nonce"] == m.nonce)){
@@ -203,19 +203,19 @@ upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
           // exit_code == 0 ? "success":"fail"
           if(message["cid"] == m.hash ){
             var mes = CacheMessage(
-                hash: message["cid"],
-                to: message['to'],
-                from: message['from'],
-                value: message['value'],
-                blockTime: message['block_time'],
-                exitCode: message['exit_code'],
-                owner: message['from'],
+                hash: message["cid"] as String,
+                to: message['to'] as String,
+                from: message['from'] as String,
+                value: message['value'] as String,
+                blockTime: message['block_time'] as num,
+                exitCode: message['exit_code'] as num,
+                owner: message['from'] as String,
                 pending: 0,
-                rpc: m.rpc,
-                height: message['block_epoch'],
-                fee: message['gas_fee'],
-                mid: message['mid'],
-                nonce: message['nonce']
+                rpc: m.rpc as String,
+                height: message['block_epoch'] as int,
+                fee: message['gas_fee'] as String,
+                mid: message['mid'] as String,
+                nonce: message['nonce'] as num
             );
             box.put(n["message"]["cid"],mes);
           }else{
@@ -227,20 +227,21 @@ upDateFileCoinMessageState(rpc,chainType,param,pendingList) async {
   });
 }
 
-updateEthMessageListState(rpc,chainType,List<dynamic> pendingList) async {
+updateEthMessageListState(String rpc, String chainType,List<dynamic> pendingList) async {
   Chain.setRpcNetwork(rpc, chainType);
   var box = OpenedBox.mesInstance;
   var list = await Future.wait(
-      pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash)).toList());
+      pendingList.map((mes) => Chain.chainProvider.getTransactionReceipt(mes.hash as String)).toList());
   list = list.where((r) => r != null).toList();
   Map<String, TransactionReceipt> map = {};
   for (var i = 0; i < list.length; i++) {
     var t = list[i];
     var mes = pendingList[i];
     if (t != null && t.gasUsed != null) {
-      var limit = BigInt.tryParse(mes.gas.gasPrice) ?? BigInt.one;
-      mes.fee = (limit * t.gasUsed).toString();
-      map[mes.hash] = t;
+      BigInt limit = BigInt.tryParse(mes.gas.gasPrice as String) ?? BigInt.one;
+      BigInt gasUsed = t.gasUsed as BigInt;
+      mes.fee = (limit * gasUsed ).toString();
+      map[mes.hash as String] = t as TransactionReceipt;
     }
   }
   if (map.isNotEmpty) {
@@ -294,9 +295,9 @@ deleteSpeedUpMessages(symbol){
 
   _storeList.forEach((mes) {
     if (mes.pending == 1) {
-      pendingList.add(mes);
+      pendingList.add(mes as CacheMessage);
     } else {
-      resolvedList.add(mes);
+      resolvedList.add(mes as CacheMessage);
     }
   });
 

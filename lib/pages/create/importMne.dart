@@ -1,8 +1,6 @@
 import 'package:fil/chain/net.dart';
-// import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:fil/common/utils.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fil/widgets/field.dart';
 import 'package:fil/widgets/scaffold.dart';
@@ -18,12 +16,13 @@ class ImportMnePage extends StatefulWidget {
   @override
   State createState() => ImportMnePageState();
 }
-
+// Pages of import Mnemonic words
 class ImportMnePageState extends State<ImportMnePage> {
-  TextEditingController inputControl = TextEditingController();
-  TextEditingController nameControl = TextEditingController();
-  Network net = Get.arguments['net'];
-  int type = Get.arguments['type'];
+  TextEditingController inputControl = TextEditingController(); // input of Mnemonic
+  TextEditingController nameControl = TextEditingController(); // input of wallet Name
+  Network net = Get.arguments['net'] as Network;
+  int type = Get.arguments['type'] as int;
+  // Validate from Mnemonic, wallet name
   bool checkValidate() {
     String inputStr = inputControl.text.trim();
     String label = nameControl.text.trim();
@@ -49,6 +48,7 @@ class ImportMnePageState extends State<ImportMnePage> {
     return true;
   }
 
+  // Import mnemonics
   void handleImport() async {
     String inputStr = inputControl.text.trim();
     String label = nameControl.text.trim();
@@ -56,10 +56,11 @@ class ImportMnePageState extends State<ImportMnePage> {
         arguments: {'net': net, 'type': type, 'label': label, 'mne': inputStr});
   }
 
+  // Import mnemonics by scanning
   void handleScan() {
     Get.toNamed(scanPage, arguments: {'scene': ScanScene.Mne}).then((value) {
       try {
-        inputControl.text = value;
+        inputControl.text = value as  String;
       } catch (e) {
         showCustomError('wrongMne'.tr);
       }

@@ -1,9 +1,9 @@
 import 'package:fil/bloc/create/create_bloc.dart';
+import 'package:fil/common/utils.dart' show copyText;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:fil/common/index.dart';
-// import 'package:fil/index.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:fil/pages/create/warn.dart';
 import 'package:fil/widgets/dialog.dart';
@@ -21,7 +21,7 @@ class MneCreatePage extends StatefulWidget {
     return MneCreatePageState();
   }
 }
-
+// Pages of create Mnemonic words
 class MneCreatePageState extends State<MneCreatePage> {
   String mne;
   String _message = "";
@@ -34,7 +34,7 @@ class MneCreatePageState extends State<MneCreatePage> {
   @override
   void initState() {
     super.initState();
-    mne = bip39.generateMnemonic();
+    mne = bip39.generateMnemonic(); // Generates 12 mnemonic words
     Future.delayed(Duration.zero).then((value) {
       showCustomDialog(
           context,
@@ -76,6 +76,7 @@ class MneCreatePageState extends State<MneCreatePage> {
       FlutterScreenshotEvents.statusStream?.listen((event) {
         setState(() {
           _message = event.toString();
+          showCustomToast(_message);
         });
       });
     }
@@ -153,15 +154,17 @@ class MneCreatePageState extends State<MneCreatePage> {
     );
   }
 
+  // widget of mnemonic word grids
   Widget mneGrids(state) {
-    List mneList = state.mne.split(' ');
+    var mneArr = state.mne.split(' ');
+    List mneList = mneArr as List<dynamic>;
     if (mneList.length != 12) {
       return SizedBox();
     }
     var itemList = mneList.asMap().entries.map((entry) {
       var v = entry.value;
       return MneItem(
-        label: v,
+        label: v as String,
         index: (entry.key + 1).toString() + '.',
       );
     }).toList();
@@ -177,7 +180,7 @@ class MneCreatePageState extends State<MneCreatePage> {
         children: itemList);
   }
 }
-
+// widget of mnemonic word Item
 class MneItem extends StatelessWidget {
   final String label;
   final Noop onTap;

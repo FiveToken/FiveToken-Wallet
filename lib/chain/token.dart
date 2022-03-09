@@ -37,12 +37,12 @@ class Token {
   }
 
   Token.fromJson(dynamic json) {
-    symbol = json['symbol'];
-    precision = json['precision'];
-    address = json['address'];
-    chain = json['chain'];
-    rpc = json['rpc'];
-    balance = json['balance'];
+    symbol = json['symbol'] as String;
+    precision = json['precision'] as int;
+    address = json['address'] as String;
+    chain = json['chain'] as String;
+    rpc = json['rpc'] as String;
+    balance = json['balance'] as String;
   }
 
   Token(

@@ -10,19 +10,26 @@ class NonceUnit {
   @HiveField(1)
   List<int> value;
 
+  @HiveField(2)
+  String salt;
+
   NonceUnit({
       this.time, 
-      this.value,});
+      this.value,
+      this.salt
+  });
 
   NonceUnit.fromJson(dynamic json) {
-    time = json['time'];
-    value = json['value'];
+    time = json['time'] as int;
+    value = json['value'] as List<int>;
+    salt = json['salt'] as String;
   }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['time'] = time;
     map['value'] = value;
+    map['salt'] = salt;
     return map;
   }
 }

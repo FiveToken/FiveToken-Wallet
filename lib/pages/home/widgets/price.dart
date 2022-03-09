@@ -1,4 +1,6 @@
+
 import 'package:fil/bloc/main/main_bloc.dart';
+import 'package:fil/models/wallet.dart' show CoinPrice;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -6,7 +8,6 @@ import 'package:fil/common/global.dart';
 import 'package:fil/common/utils.dart';
 import 'dart:math';
 import 'package:fil/widgets/text.dart';
-import 'package:fil/models/index.dart';
 
 class CoinPriceWidget extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class CoinPriceWidget extends StatefulWidget {
     return CoinPriceState();
   }
 }
-
+// widget of coin price
 class CoinPriceState extends State<CoinPriceWidget> {
   CoinPrice price = CoinPrice();
   Worker worker;
@@ -30,6 +31,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
     worker.dispose();
   }
 
+  // get price rate
   double get rate {
     var lang = Global.langCode;
     lang = 'en';
@@ -41,7 +43,7 @@ class CoinPriceState extends State<CoinPriceWidget> {
     return BlocBuilder<MainBloc,MainState>(
         builder: (context, mainState){
           return CommonText(
-            getUsdPrce(mainState.balance,mainState.usd),
+            getUsdPrice(mainState.balance,mainState.usd),
             size: 30,
             weight: FontWeight.w800,
           );
@@ -50,7 +52,8 @@ class CoinPriceState extends State<CoinPriceWidget> {
 
   }
 
-  String getUsdPrce(String balance,num usd){
+  // get price of USD
+  String getUsdPrice(String balance,num usd){
     String unit = '\$';
     try{
       if(usd > 0){

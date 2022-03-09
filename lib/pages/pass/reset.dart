@@ -1,7 +1,7 @@
 import 'package:fil/chain/key.dart';
 import 'package:fil/chain/wallet.dart';
-import 'package:fil/models/wallet.dart';
-// import 'package:fil/index.dart';
+import 'package:fil/pages/wallet/widgets/strengthPassword.dart';
+import 'package:fil/widgets/text.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,14 +19,15 @@ class PassResetPage extends StatefulWidget {
     return PassResetPageState();
   }
 }
-
+// Page of reset password
 class PassResetPageState extends State<PassResetPage> {
   final TextEditingController passCtrl = TextEditingController();
   final TextEditingController newCtrl = TextEditingController();
   final TextEditingController confirmCtrl = TextEditingController();
   var box = OpenedBox.walletInstance;
   bool loading = false;
-  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet']:ChainWallet();
+  num level = 0;
+  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet'] as ChainWallet:ChainWallet();
 
   Future<EncryptKey> getKey(String addressType, String privateKey,  String pass, String prefix) async{
     EncryptKey key;
@@ -59,14 +60,11 @@ class PassResetPageState extends State<PassResetPage> {
         showCustomError('enterConfirmPass'.tr);
         return;
       }
-      if (!isValidPass(pass)) {
-        showCustomError('wrongOldPass'.tr);
-        return;
+      if(level < 4 ){
+        showCustomError('levelTips'.tr);
+        return ;
       }
-      if (!isValidPass(newPass)) {
-        showCustomError('placeholderValidPass'.tr);
-        return;
-      }
+
       if (newPass != confirmPass) {
         showCustomError('diffPass'.tr);
         return;
@@ -139,7 +137,15 @@ class PassResetPageState extends State<PassResetPage> {
     }
   }
 
-
+  @override
+  void initState() {
+    newCtrl.addListener(() {
+      if(newCtrl.text != ''){
+        level = zxcvbnLevel(newCtrl.text);
+      }
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +169,25 @@ class PassResetPageState extends State<PassResetPage> {
                 label: 'newPass'.tr,
                 hintText: 'placeholderValidPass'.tr,
                 controller: newCtrl
+            ),
+            CustomPaint(
+              painter: StrengthPassword(level: level, context: context),
+              child: Center(),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: CommonText(
+                      'strengthTips'.tr,
+                      size: 14,
+                      color: Colors.black,
+                      weight: FontWeight.w500,)
+                )
+              ],
             ),
             SizedBox(
               height: 15,

@@ -2,8 +2,6 @@ import 'package:fil/bloc/select/select_bloc.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/wallet.dart';
 import 'package:fil/utils/enum.dart';
-// import 'package:fil/index.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -15,7 +13,6 @@ import 'package:fil/widgets/dialog.dart';
 import 'package:fil/widgets/toast.dart';
 import 'package:fil/widgets/index.dart';
 import 'package:fil/store/store.dart';
-import 'package:fil/init/hive.dart';
 import 'package:fil/routes/path.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/widgets/style.dart';
@@ -28,8 +25,8 @@ class WalletManagePage extends StatefulWidget {
 }
 
 class WalletManagePageState extends State<WalletManagePage> {
-  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet']:ChainWallet();
-  Network net = Get.arguments!=null?Get.arguments['net']:Network();
+  ChainWallet wallet = Get.arguments!=null?Get.arguments['wallet'] as ChainWallet:ChainWallet();
+  Network net = Get.arguments!=null?Get.arguments['net'] as Network:Network();
   TextEditingController controller = TextEditingController();
 
   bool get isId {
@@ -171,8 +168,7 @@ class WalletManagePageState extends State<WalletManagePage> {
           onTap: () {
             showPassDialog(context, (String pass) async {
               try {
-                var ck = await wallet.getPrivateKey(pass);
-                var mne = aesDecrypt(wallet.mne, ck);
+                var mne = await wallet.getMne(pass);
                 Get.toNamed(walletMnePage, arguments: {'mne': mne});
               } catch (e) {
                 showCustomError(e.toString());

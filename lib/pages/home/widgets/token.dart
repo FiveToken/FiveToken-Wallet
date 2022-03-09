@@ -18,6 +18,7 @@ import 'package:fil/widgets/style.dart';
 
 
 class MainTokenWidget extends StatelessWidget {
+  // get coin Icon
   CoinIcon get coinIcon {
     var net = $store.net;
     var key = net.coin;
@@ -30,7 +31,7 @@ class MainTokenWidget extends StatelessWidget {
           bg: Colors.transparent, border: false, icon: RandomIcon(addr));
     }
   }
-
+ // get chain name
   String get label {
     var map = {'eth': 'Ethereum', 'binance': 'Binance'};
     return $store.net.chain == ''

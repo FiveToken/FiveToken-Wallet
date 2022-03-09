@@ -1,4 +1,3 @@
-
 import 'package:fil/chain/gas.dart';
 import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';

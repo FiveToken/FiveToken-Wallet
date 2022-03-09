@@ -19,6 +19,7 @@ import 'package:fil/utils/num_extension.dart';
 import 'dart:async';
 import 'package:convert/convert.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:zxcvbn/zxcvbn.dart';
 const psalt = "vFIzIawYOU";
 
 /*
@@ -130,22 +131,52 @@ bool isValidContractAddress(String address){
   * @param {string} address:address
   * @param {Network} network:network to be verified
 */
-Future<bool> isValidChainAddress(String address, Network network) async {
-  bool res = false;
+bool isValidChainAddress(String address, Network network) {
   try{
     if(network.addressType == 'filecoin'){
-      Chain.setRpcNetwork(network.rpc, network.chain);
-      res = await Chain.chainProvider.addressCheck(address);
+      var valid = checkFileCoinAddress(address);
+      return valid;
     }else{
       var start = address.startsWith('0x');
       var reg = RegExp(r"([A-Fa-f0-9]{40}$)");
       var valid = reg.hasMatch(address);
-      res = start && valid;
+      return start && valid;
     }
-    return res;
   }catch(error){
     return false;
   }
+}
+
+
+/*
+* Check address validity
+* @param {string} address:address
+* @returns {Boolean}
+*/
+
+bool checkFileCoinAddress (String address) {
+  if (!address.isNotEmpty) return false;
+  if (address.length < 3) return false;
+  String network = address[0];
+  if (network != 'f' && network != 't') return false;
+  var map = {
+    "ID": '0',
+    "secP256K1": '1',
+    "ACTOR": '2',
+    "BLS": '3'
+  };
+
+  String protocol = address[1] as String;
+
+  if (protocol == map['ID'] && address.length as int> 22) return false;
+
+  if (protocol == map['secP256K1'] && address.length != 41) return false;
+
+  if (protocol == map['ACTOR'] && address.length != 41) return false;
+
+  if (protocol == map['BLS'] && address.length != 86) return false;
+
+  return true;
 }
 
 String genCKBase64(String mne, {String path}) {
@@ -180,7 +211,7 @@ String truncate(double value, {int size = 4}) {
   * @param {double} min:formatted minimum,If the balance is less than the minimum value, return the minimum value + ...
   * @param {int} precision: current formatted balance precision
 */
-String formatCoin(String amount, { num size = 4, double min, int precision = 18 }) {
+String formatCoin(String amount, { int size = 4, double min, int precision = 18 }) {
   if (amount == '0') {
     return '0';
   }
@@ -206,8 +237,8 @@ String formatCoin(String amount, { num size = 4, double min, int precision = 18 
 */
 String getChainValue(String fil, {int precision = 18}) {
   try{
-    var _value = Decimal.parse(fil) * Decimal.fromInt(pow(10, 18));
-    var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision))/Decimal.fromInt(pow(10,18));
+    var _value = Decimal.parse(fil) * Decimal.fromInt(pow(10, 18).toInt());
+    var _amount = Decimal.parse(_value.toString()) * Decimal.fromInt(pow(10, precision).toInt())/Decimal.fromInt(pow(10,18).toInt());
     var _decimal = _amount.toString().toDecimal;
     var res = _decimal.fmtDown(0);
     var val = num.parse(res).toStringAsFixed(0);
@@ -221,7 +252,7 @@ String getChainValue(String fil, {int precision = 18}) {
   ethereum private key verification
   * @param {string} str
 */
-bool ethPrivate(str){
+bool ethPrivate(String str){
   RegExp eth = RegExp(r'^(0x)?[0-9A-Za-f]{64}');
   return eth.hasMatch(str)&&str.length==64;
 }
@@ -344,4 +375,9 @@ String StringTrim(String str){
   var arr2 =arr1.where((ele)=>ele!='');
   String  res =arr2.join(' ');
   return res;
+}
+num zxcvbnLevel(String password){
+  final zxcvbnFn = Zxcvbn();
+  final result = zxcvbnFn.evaluate(password);
+  return result.score as num;
 }

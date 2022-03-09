@@ -28,7 +28,6 @@ void main() {
           type: 0,
           balance: '0',
           mne: '',
-          groupHash: '',
           digest: '',
           skKek: '',
           rpc: '');

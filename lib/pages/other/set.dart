@@ -15,7 +15,10 @@ class SetPage extends StatefulWidget {
   }
 }
 
+// Page of set
 class SetPageState extends State<SetPage> {
+
+  // get language code
   String get lang {
     return Global.langCode == 'zh' ? 'cn' : 'en';
   }
@@ -72,14 +75,14 @@ class SetPageState extends State<SetPage> {
                 CardItem(
                   label: 'service'.tr,
                   onTap: () {
-                    var url = 'https://fivetoken.io/private?lang=$lang';
+                    var url = 'https://fivetoken.co/private?lang=$lang';
                     openInBrowser(url);
                   },
                 ),
                 CardItem(
                   label: 'clause'.tr,
                   onTap: () {
-                    var url = 'https://fivetoken.io/service?lang=$lang';
+                    var url = 'https://fivetoken.co/service?lang=$lang';
                     openInBrowser(url);
                   },
                 ),

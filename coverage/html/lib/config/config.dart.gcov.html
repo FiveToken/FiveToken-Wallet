@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-12-16 14:54:35</td>
+            <td class="headerValue">2022-03-08 13:49:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -61,13 +61,15 @@
 <pre class="sourceHeading">          Line data    Source code</pre>
 <pre class="source">
 <a name="1"><span class="lineNum">       1 </span>            : class Config {</a>
-<a name="2"><span class="lineNum">       2 </span><span class="lineCov">          6 :   static int connectTimeout = 1000 * 300;</span></a>
-<a name="3"><span class="lineNum">       3 </span><span class="lineCov">          6 :   static int receiveTimeout = 1000 * 300;</span></a>
+<a name="2"><span class="lineNum">       2 </span><span class="lineCov">         12 :   static int connectTimeout = 1000 * 300;</span></a>
+<a name="3"><span class="lineNum">       3 </span><span class="lineCov">         12 :   static int receiveTimeout = 1000 * 300;</span></a>
 <a name="4"><span class="lineNum">       4 </span>            :   static String ethClientID = '96837d28a772466ca6ed88eddb221e09';</a>
 <a name="5"><span class="lineNum">       5 </span>            :   static String clientID = '/uip7oegcgxr6ovab296tpqoh';</a>
-<a name="6"><span class="lineNum">       6 </span>            :   static double baseFeePerGasToMaxFeePerGas = 1.15;</a>
-<a name="7"><span class="lineNum">       7 </span>            :   static double increaseGasCoefficient = 1.3;</a>
-<a name="8"><span class="lineNum">       8 </span>            : }</a>
+<a name="6"><span class="lineNum">       6 </span>            :   static double increaseGasCoefficient = 1.3;</a>
+<a name="7"><span class="lineNum">       7 </span>            :   static double lowMaxPriorityFeePerGas = 0.95;</a>
+<a name="8"><span class="lineNum">       8 </span>            :   static double middleMaxPriorityFeePerGas = 1.0;</a>
+<a name="9"><span class="lineNum">       9 </span>            :   static double highMaxPriorityFeePerGas = 1.35;</a>
+<a name="10"><span class="lineNum">      10 </span>            : }</a>
 </pre>
       </td>
     </tr>

@@ -45,8 +45,8 @@ class RpcResponseData {
   }
 
   RpcResponseData.formJson(Map<String, dynamic> json) {
-    data = json["data"];
-    code = json["code"];
-    msg = json["msg"];
+    data = json["data"] as dynamic;
+    code = json["code"] as int;
+    msg = json["msg"] as String;
   }
 }

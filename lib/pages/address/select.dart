@@ -1,6 +1,6 @@
 import 'package:fil/bloc/address/address_bloc.dart';
 import 'package:fil/chain/wallet.dart';
-// import 'package:fil/index.dart';
+import 'package:fil/models/address.dart' show ContactAddress;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -10,7 +10,6 @@ import 'package:fil/widgets/scaffold.dart';
 import 'package:fil/widgets/layout.dart';
 import 'package:fil/widgets/card.dart';
 import 'package:fil/routes/path.dart';
-import 'package:fil/models/index.dart';
 import 'package:fil/common/utils.dart';
 import 'package:fil/store/store.dart';
 import  'package:fil/init/hive.dart';
@@ -22,10 +21,11 @@ class AddressBookSelectPage extends StatefulWidget {
   }
 }
 
+// Pages of address book select
 class AddressBookSelectPageState extends State<AddressBookSelectPage> {
   var box = OpenedBox.addressBookInsance;
   List<ContactAddress> list = [];
-
+  // set address List
   void setList(BuildContext context) {
     BlocProvider.of<AddressBloc>(context).add(AddressListEvent(network: $store.net));
   }

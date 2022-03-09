@@ -1,25 +1,17 @@
-import 'dart:convert';
-import 'dart:math';
 import 'package:fil/chain/contract.dart';
 import 'package:fil/chain/gas.dart';
-import 'package:fil/chain/net.dart';
 import 'package:fil/chain/token.dart';
 import 'package:fil/models/gas_response.dart';
 import 'package:fil/models/token_info.dart';
 import 'package:fil/models/transaction_response.dart';
-import 'package:fil/repository/http/http.dart';
 import 'package:fil/request/provider.dart';
 import 'package:fil/store/store.dart';
 import 'package:fil/utils/enum.dart';
-import 'package:fil/widgets/toast.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:fil/repository/web3/web3.dart' as web3;
 import 'package:fil/models/chain_info.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:fil/repository/web3/json_rpc.dart';
-import 'package:fil/config/config.dart';
 
 class Ether extends ChainProvider {
   Web3Client client;
@@ -31,6 +23,9 @@ class Ether extends ChainProvider {
     this.rpcJson =  rpcJson ?? web3Rpc.rpcJson;
   }
 
+  /*
+  * Returns the message of block number
+  * */
   @override
   Future<ChainInfo> getBlockByNumber(int number) async {
     try {
@@ -39,18 +34,18 @@ class Ether extends ChainProvider {
       var result = res.result;
       if(result['baseFeePerGas'] != null){
         return ChainInfo(
-            gasUsed: hexToDartInt(result['gasUsed']),
-            gasLimit:hexToDartInt(result['gasLimit']),
-            number:hexToDartInt(result['number']),
-            timestamp: hexToDartInt(result['timestamp']),
-            baseFeePerGas:hexToDartInt(result['baseFeePerGas'])
+            gasUsed: hexToDartInt(result['gasUsed'] as String),
+            gasLimit:hexToDartInt(result['gasLimit'] as String),
+            number:hexToDartInt(result['number'] as String),
+            timestamp: hexToDartInt(result['timestamp'] as String),
+            baseFeePerGas:hexToDartInt(result['baseFeePerGas'] as String)
         );
       }else{
         return ChainInfo(
-            gasUsed: hexToDartInt(result['gasUsed']),
-            gasLimit:hexToDartInt(result['gasLimit']),
-            number:hexToDartInt(result['number']),
-            timestamp: hexToDartInt(result['timestamp'])
+            gasUsed: hexToDartInt(result['gasUsed'] as String),
+            gasLimit:hexToDartInt(result['gasLimit'] as String),
+            number:hexToDartInt(result['number'] as String),
+            timestamp: hexToDartInt(result['timestamp'] as String)
         );
       }
     } catch (error) {
@@ -64,17 +59,23 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Returns a fee per gas that is an estimate of how much you can pay as a priority fee, or "tip", to get a transaction included in the current block.
+  * */
   @override
   Future<String> getMaxPriorityFeePerGas() async{
     try {
       var res = await rpcJson.call('eth_maxPriorityFeePerGas');
-      var maxPriority = hexToInt(res.result);
+      var maxPriority = hexToInt(res.result as String);
       return maxPriority.toString();
     } catch (error) {
       return '0';
     }
   }
 
+  /*
+  * get baseFeePerGas
+  * */
   @override
   Future<String> getBaseFeePerGas() async{
     try{
@@ -87,6 +88,10 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Gets the balance of the account with the specified address.
+  * @param {string} address: The address where the balance needs to be obtained
+  * */
   @override
   Future<String> getBalance(String address) async {
     String balance = '0';
@@ -99,6 +104,11 @@ class Ether extends ChainProvider {
     return balance;
   }
 
+  /*
+  * Gets the balance of token
+  * @param {string} mainAddress:main token address
+  * @param {string} tokenAddress:contract address
+  * */
   @override
   Future<String> getBalanceOfToken(String mainAddress,String tokenAddress) async{
     var abi = ContractAbi.fromJson(Contract.abi, 'bnb');
@@ -121,6 +131,13 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Get fee
+  * @param {string} from: sending transaction from address
+  * @param {string} to:  sending transaction to address
+  * @param {bool} isToken: is it a token
+  * @param {Token} token: Token Information
+  * */
   @override
   Future<GasResponse> getGas({String from, String to, bool isToken = false, Token token }) async {
     var empty = GasResponse();
@@ -151,8 +168,8 @@ class Ether extends ChainProvider {
         ]);
       }
       if (res.length == 2) {
-        EtherAmount gasPrice = res[0];
-        BigInt gasLimit = res[1];
+        EtherAmount gasPrice = res[0] as EtherAmount;
+        BigInt gasLimit = res[1] as BigInt;
         int realLimit = gasLimit.toInt();
         if (isToken) {
           realLimit = (gasLimit.toInt() * 2).truncate();
@@ -170,10 +187,10 @@ class Ether extends ChainProvider {
         );
       }
     } catch (error) {
-      if(error.message.isNotEmpty){
+      if(error.message.isNotEmpty as bool){
         return GasResponse(
             gasState: "error",
-            message: error.message
+            message: error.message as String
         );
       }else{
         return GasResponse(
@@ -184,6 +201,10 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Get address nonce by the specified address
+  * @param {string} address: the specified address
+  * */
   @override
   Future<int> getNonce(String address) async {
     try {
@@ -194,6 +215,15 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Returns a hash of the transaction which, after the transaction has been included in a mined block,
+  * can be used to obtain detailed information about the transaction.
+  * @param {string} from: sending transaction from address
+  * @param {string} to:  sending transaction to address
+  * @param {String} amount：Amount sent
+  * @param {String} private：private of sending transactions
+  * @param {int} nonce：nonce of sending transactions
+  * */
   @override
   Future<TransactionResponse> sendTransaction(
       String from,
@@ -205,7 +235,7 @@ class Ether extends ChainProvider {
   ) async {
     try {
       var credentials = await client.credentialsFromPrivateKey(private);
-      var _transaction;
+      Transaction _transaction;
       if(gas.rpcType == RpcType.ethereumMain){
         _transaction = Transaction(
           from:EthereumAddress.fromHex(from),
@@ -235,13 +265,23 @@ class Ether extends ChainProvider {
         message: ''
       );
     } catch (e) {
+      String msg = e.message as String ?? '';
       return TransactionResponse(
-          cid:'',
-          message: e.message ?? ''
+          cid: '',
+          message:  msg ?? ''
       );
     }
   }
 
+  /*
+  * send token and Returns a hash
+  * @param {string} to:  sending transaction to address
+  * @param {String} amount：Amount sent
+  * @param {String} private：private of sending transactions
+  * @param {ChainGas} gas:transactions gas
+  * @param {string} addr:contract address
+  * @param {int} nonce：nonce of sending transactions
+  * */
   @override
   Future<TransactionResponse> sendToken(
       {String to,
@@ -269,11 +309,15 @@ class Ether extends ChainProvider {
       );
     } catch (e) {
       return TransactionResponse(
-        cid: '', message:e.message
+        cid: '', message:e.message as String
       );
     }
   }
 
+  /*
+  * get Token Information
+  * @param { string } Token contract address
+  * */
   @override
   Future<TokenInfo> getTokenInfo(String address) async{
     var empty = TokenInfo(
@@ -305,6 +349,9 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Returns the id of the network the client is currently connected to.
+  * */
   @override
   Future<String> getNetworkId() async{
     try{
@@ -315,22 +362,44 @@ class Ether extends ChainProvider {
     }
   }
 
+  /*
+  * Returns an receipt of a transaction based on its hash.
+  * @param {string} hash: transaction hash
+  * */
   @override
   Future getTransactionReceipt(String hash) async{
     var res = await client.getTransactionReceipt(hash);
     return res;
   }
 
-  @override
-  Future<bool> addressCheck(String address) async{
-    return false;
-  }
+  /*
+  * address check
+  * @param {string} address:address to check
+  * */
+  // @override
+  // Future<bool> addressCheck(String address) async{
+  //   return false;
+  // }
 
+  /*
+  * get fileCoin messages list
+  * @param {string} actor:address to query
+  * @param {string} direction : up or down, indicating the operation action of the client, up means swiping up, pulling from the latest news to historical news; down means pulling down to refresh, pulling the latest news
+  * @param {string} mid : The message MID of the pagination reference, obtained from the first or last entry in the query list, is a numeric string, not a CID
+  * @param {int} limit: Number of bars
+  * */
   @override
   Future<List> getFileCoinMessageList({String actor ,String direction, String mid,int limit}) async{
     return [];
   }
 
+  /*
+  * Query pending messages information
+  *  @param {List} param:[{
+  * from:Transaction sending address,
+  * nonce: Transaction nonce
+  * }]
+  * */
   @override
   Future<List> getMessagePendingState(List param) async{
     return [];

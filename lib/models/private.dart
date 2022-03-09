@@ -7,6 +7,6 @@ class PrivateKey {
   }
 
   PrivateKey.fromMap(Map<String, dynamic> map)
-      : type = map["Type"],
-        privateKey = map["PrivateKey"];
+      : type = map["Type"] as String,
+        privateKey = map["PrivateKey"] as String;
 }

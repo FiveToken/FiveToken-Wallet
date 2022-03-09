@@ -1,6 +1,8 @@
 import 'package:fil/bloc/add/add_bloc.dart';
 import 'package:fil/request/global.dart';
 import 'package:fil/store/store.dart';
+import 'package:fil/widgets/dialog.dart' show showDeleteDialog;
+import 'package:fil/widgets/style.dart' show CustomColor;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -23,7 +25,7 @@ class NetAddPage extends StatefulWidget {
     return NetAddPageState();
   }
 }
-
+// Page of Network Add
 class NetAddPageState extends State<NetAddPage> {
   TextEditingController nameCtrl = TextEditingController();
   TextEditingController rpcCtrl = TextEditingController();

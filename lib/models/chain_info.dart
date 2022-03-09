@@ -15,11 +15,11 @@ class ChainInfo {
   });
 
   ChainInfo.fromJson(dynamic json) {
-    gasUsed = hexToDartInt(json['gasUsed']);
-    gasLimit = hexToDartInt(json['gasLimit']);
-    number = hexToDartInt(json['number']);
-    timestamp = hexToDartInt(json['timestamp']);
-    baseFeePerGas = hexToDartInt(json['baseFeePerGas']);
+    gasUsed = hexToDartInt(json['gasUsed'] as String);
+    gasLimit = hexToDartInt(json['gasLimit'] as String);
+    number = hexToDartInt(json['number'] as String);
+    timestamp = hexToDartInt(json['timestamp'] as String);
+    baseFeePerGas = hexToDartInt(json['baseFeePerGas']as String);
   }
 
   int gasUsed;

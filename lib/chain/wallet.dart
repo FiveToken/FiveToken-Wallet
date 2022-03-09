@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:bls/bls.dart';
 import 'package:fil/chain/key.dart';
 import 'package:fil/common/global.dart';
 import 'package:fil/common/pk.dart';
 import 'package:fil/common/utils.dart';
+import 'package:fil/utils/decimal_extension.dart';
 import 'package:flotus/flotus.dart';
 import 'package:hive/hive.dart';
 import 'package:web3dart/web3dart.dart';
@@ -42,10 +44,10 @@ class ChainWallet {
       this.address = '',
       this.type = 0,
       this.balance = '0',
+      this.groupHash = '',
       this.mne = '',
       this.skKek = '',
       this.digest = '',
-      this.groupHash = '',
       this.rpc = '',
       this.addressType = ''});
   ChainWallet.fromJson(Map<dynamic, dynamic> json) {
@@ -80,9 +82,9 @@ class ChainWallet {
         label: label,
         address: address,
         addressType: addressType,
+        groupHash: groupHash,
         balance: balance,
         mne: mne,
-        groupHash: groupHash,
         digest: digest,
         rpc: rpc,
         type: type,
@@ -115,13 +117,20 @@ class ChainWallet {
     String pass,
   ) async {
     try {
-      var private = decryptSodium(skKek, address, pass);
-      var str = base64Decode(private);
-      var sk = utf8.decode(str);
-      return sk;
+      String private = await decryptSodium(skKek, address, pass);
+      return private;
     }catch(e){
-      return '';
+      return null;
     }
+  }
+
+  Future<String> getMne(String pass) async {
+     try{
+       var mneString = await decryptSodium(mne, 'mne', pass);
+       return mneString;
+     }catch(e){
+       return  '';
+     }
   }
 }
 
@@ -160,19 +169,15 @@ class FilecoinWallet extends ChainWallet {
     try {
       var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(filPrivateKey);
-      var filKek = encryptSodium(filPrivateKey, filAddr, pass);
-      var filDigest = await genPrivateKeyDigest(filKek);
+      Uint8List filKek = await encryptSodium(filPrivateKey, filAddr, pass);
+      var filDigest = await genPrivateKeyDigest(filKek.toEncode());
       return EncryptKey(
-          kek: filKek,
+          kek: filKek.toEncode(),
           digest: filDigest,
           address: filAddr
       );
     } catch (e) {
-      return EncryptKey(
-          kek: '',
-          digest: '',
-          address: ''
-      );
+      throw(e);
     }
   }
 
@@ -183,19 +188,15 @@ class FilecoinWallet extends ChainWallet {
       // var filPrivateKey = FilecoinWallet.genPrivateKeyByMne(mne);
       var filAddr = await FilecoinWallet.genAddrByPrivateKey(privateKey,
           type: type, prefix: prefix);
-      var filKek = encryptSodium(privateKey,filAddr, pass);
-      var filDigest = await genPrivateKeyDigest(filKek);
+      Uint8List filKek = await encryptSodium(privateKey,filAddr, pass);
+      var filDigest = await genPrivateKeyDigest(filKek.toEncode());
       return EncryptKey(
-          kek: filKek,
+          kek: filKek.toEncode(),
           digest: filDigest,
           address: filAddr,   // publicKey
          );  // value
     } catch (e) {
-      return EncryptKey(
-        kek: '',
-        digest: '',
-        address: '',   // publicKey
-      );
+      throw(e);
     }
   }
 }
@@ -231,10 +232,10 @@ class EthWallet extends ChainWallet {
     try {
       var ethPrivateKey = EthWallet.genPrivateKeyByMne(mne);
       var ethAddr = await EthWallet.genAddrByPrivateKey(ethPrivateKey);
-      var ethKek = encryptSodium(ethPrivateKey, ethAddr, pass);
-      var ethDigest = await genPrivateKeyDigest(ethKek);
+      Uint8List ethKek = await encryptSodium(ethPrivateKey, ethAddr, pass);
+      var ethDigest = await genPrivateKeyDigest(ethKek.toEncode());
       return EncryptKey(
-          kek: ethKek,
+          kek: ethKek.toEncode(),
           digest: ethDigest,
           address: ethAddr);
     } catch (e) {
@@ -246,10 +247,10 @@ class EthWallet extends ChainWallet {
       String privateKey, String pass) async {
     try{
       var ethAddr = await EthWallet.genAddrByPrivateKey(privateKey);
-      var kek = encryptSodium(privateKey, ethAddr, pass);
-      var ethDigest = await genPrivateKeyDigest(kek);
+      Uint8List kek = await encryptSodium(privateKey, ethAddr, pass);
+      var ethDigest = await genPrivateKeyDigest(kek.toEncode());
       return EncryptKey(
-          kek: kek,
+          kek: kek.toEncode(),
           digest: ethDigest,
           address: ethAddr,
       );

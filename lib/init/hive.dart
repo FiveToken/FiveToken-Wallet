@@ -15,7 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fil/utils/enum.dart';
 
-var encryptionKey;
+List<int> encryptionKey;
 
 Future initHive() async {
   await Hive.initFlutter();
